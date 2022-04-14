@@ -13,7 +13,7 @@ if ( is_readable( $theme_customizer ) ) {
 
 /**
  * Include Support for wordpress.com-specific functions.
- * 
+ *
  * @since v1.0
  */
 $theme_wordpresscom = get_template_directory() . '/inc/wordpresscom.php';
@@ -501,3 +501,47 @@ function greeting2_scripts_loader() {
 	}
 }
 add_action( 'wp_enqueue_scripts', 'greeting2_scripts_loader' );
+
+
+
+//begin
+
+/***************************************************
+ * =================================================
+ * Adding new code
+ * =================================================
+ ***************************************************/
+/**
+ * Custom post
+ */
+add_action('init', 'greeting_custom_post_type');
+function greeting_custom_post_type() {
+
+	// landing page
+	register_post_type('landingpage',
+        array(
+            'labels' => array(
+                'name'          => __('Landing Pages', 'rigid'),
+                'singular_name' => __('Landing Page', 'rigid'),
+            ),
+            'menu_icon' => 'dashicons-flag',
+            'public'      => true,
+            'has_archive' => true,
+            'supports' => array('title')
+        )
+	);
+
+	// city
+	register_post_type('city',
+        array(
+            'labels' => array(
+                'name'          => __('City', 'rigid'),
+                'singular_name' => __('Cities', 'rigid'),
+            ),
+            'menu_icon' => 'dashicons-location-alt',
+            'public'      => true,
+            'has_archive' => true,
+            'supports' => array('title')
+        )
+	);
+}
