@@ -1,15 +1,118 @@
 <?php get_header(); ?>
 
-<section id="top">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style type="text/css">
+  .filter h5 {
+    font-family: 'Inter', serif;
+    font-weight: 500;
+    font-size: 12px;
+  }
+  .filter h6 {
+    font-family: 'Inter', serif;
+    font-weight: 800;
+    font-size: 13px;
+  }
+  .filter ul {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+  }
+  .filter span.price-filter-text {
+    font-size: 11px;
+  }
+
+  div.applied-filters {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 200;
+  }
+
+  div.store h6.card-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  div.store small {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 400;
+  }
+
+  h1 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+  }
+
+  .store {
+    transition: all .15s ease-in-out;
+  }
+  .store:hover {
+    transform: scale(1.015);
+  }
+  .store-btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+  }
+</style>
+
+<section id="top" class="bg-teal">
+    <div class="container py-4">
+      <div class="row">
+        <div class="col-3">
+          <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/Greeting-1.png" style="width: 150px;">
+        </div>
+        <div class="col-6">
+          <input type="text" class="form-control rounded-pill border-0" value="<?= the_title();?>" placeholder="Indtast by eller postnr.">
+        </div>
+        <div class="col-3">
+          Log ind
+          Tilmeld dig
+        </div>
+      </div>
+    </div>
 </section>
+
+<main id="main" class="container"<?php if ( isset( $navbar_position ) && 'fixed_top' === $navbar_position ) : echo ' style="padding-top: 100px;"'; elseif ( isset( $navbar_position ) && 'fixed_bottom' === $navbar_position ) : echo ' style="padding-bottom: 100px;"'; endif; ?>>
+
+<?php
+/**
+ *
+ * Perform start setup
+ *
+**/
+$cityPostalcode = get_post_meta($postId, 'postalcode', true);
+
+// get user meta query
+$userMetaQuery = $wpdb->get_results( "
+    SELECT * FROM {$wpdb->prefix}usermeta
+    WHERE meta_key = 'delivery_zips'
+" );
+
+$UserIdArrayForCityPostalcode = array();
+
+foreach($userMetaQuery as $userMeta){
+    if (str_contains($userMeta->meta_value, $cityPostalcode)) {
+        array_push($UserIdArrayForCityPostalcode, $userMeta->user_id);
+    }
+}
+
+// pass to backend
+$cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
+
+<input type="hidden" id="cityDefaultUserIdAsString" value="<?php echo $cityDefaultUserIdAsString;?>">
+
 
 <section id="content" class="row">
   <div class="container">
-    <h1>Send gavehilsner i <?php the_title();?></h1>
+    <h1 class="my-5">Send gavehilsner i <?php the_title();?></h1>
     <div class="row">
-      <div class="col-3">
-        <h5>Anledninger</h5>
-        <ul class="dropdown rounded-3 list-unstyled overflow-hidden">
+      <div class="col-3 filter">
+        <div class="row border-bottom py-1 mb-3">
+          <h6 class="float-start">Filtrér butikker</h6>
+        </div>
+        <h5 class="text-uppercase">Anledninger</h5>
+        <ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
           <li>
             <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="#">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-square" viewBox="0 0 16 16">
@@ -19,7 +122,7 @@
             </a>
           </li>
           <li>
-            <a class="dropdown-item d-flex align-items-center gap-2 py-2 active" href="#">
+            <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="#">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-square" viewBox="0 0 16 16">
                 <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
                 <path d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.235.235 0 0 1 .02-.022z"/>
@@ -37,8 +140,8 @@
           </li>
         </ul>
 
-        <h5>Kategorier</h5>
-        <ul class="dropdown rounded-3 list-unstyled overflow-hidden">
+        <h5 class="text-uppercase">Kategorier</h5>
+        <ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
           <li>
             <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="#">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-square" viewBox="0 0 16 16">
@@ -48,7 +151,7 @@
             </a>
           </li>
           <li>
-            <a class="dropdown-item d-flex align-items-center gap-2 py-2 active" href="#">
+            <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="#">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-square" viewBox="0 0 16 16">
                 <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
                 <path d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.235.235 0 0 1 .02-.022z"/>
@@ -64,250 +167,537 @@
               Action
             </a>
           </li>
+        </ul>
+
+        <?php
+        /**
+         * ---------------------
+         * Category filter
+         * ---------------------
+        **/
+        ?>
+        <h5 class="text-uppercase">Kategori</h5>
+        <ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
+
+        <?php
+        // search users for get filtered category
+        $cityPostalcode = get_post_meta($postId, 'postalcode', true);
+           $userMetaQuery = $wpdb->get_results( "
+           SELECT * FROM {$wpdb->prefix}usermeta
+           WHERE meta_key = 'delivery_zips'
+        " );
+
+        $UserIdArrayForCityPostalcode = array();
+        foreach($userMetaQuery as $userMeta){
+           if (str_contains($userMeta->meta_value, $cityPostalcode)) {
+               array_push($UserIdArrayForCityPostalcode, $userMeta->user_id);
+           }
+        }
+
+        // for category
+        $categoryTermListArray = array();
+
+        foreach ($UserIdArrayForCityPostalcode as $vendorId) {
+           $vendor = get_wcmp_vendor($vendorId);
+           $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
+           foreach ($vendorProducts as $productId) {
+               $categoryTermList = wp_get_post_terms($productId, 'product_cat', array('fields' => 'ids'));
+               foreach($categoryTermList as $catTerm){
+                   array_push($categoryTermListArray, $catTerm);
+               }
+           }
+        }
+        $categoryTermListArrayUnique = array_unique($categoryTermListArray);
+
+        // product category
+        $categoryArgs = array(
+           'taxonomy'   => "product_cat",
+           'exclude' => 15,
+           // 'pad_counts' => true,
+           // 'hide_empty' => 1,
+        );
+        $productCategories = get_terms($categoryArgs);
+        foreach($productCategories as $category){
+           foreach($categoryTermListArrayUnique as $catTerm){
+               if($catTerm == $category->term_id){ ?>
+                  <li>
+                   <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="#">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-square" viewBox="0 0 16 16">
+                       <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+                     </svg>
+                     <?php echo $category->name; ?>
+                   </a>
+                  </li>
+                  <!--<div class="checkbox">
+                      <label><input type="checkbox" name="type" class="vendor_sort_category" value="<?php echo $category->term_id; ?>"><?php echo $category->name; ?></label>
+                  </div>-->
+               <?php }
+           }
+        }
+        ?>
+        </ul>
+
+        <?php
+        /**
+         * ---------------------
+         * Occasion filter
+         * ---------------------
+        **/
+        ?>
+        <h5 class="text-uppercase">Anledning</h5>
+        <ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
+        <?php
+        // for used on occasion prepare here
+        $occasionTermListArray = array();
+
+        foreach ($UserIdArrayForCityPostalcode as $vendorId) {
+            $vendor = get_wcmp_vendor($vendorId);
+            $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
+            foreach ($vendorProducts as $productId) {
+                $occasionTermList = wp_get_post_terms($productId, 'occasion', array('fields' => 'ids'));
+                foreach($occasionTermList as $occasionTerm){
+                    array_push($occasionTermListArray, $occasionTerm);
+                }
+            }
+        }
+        $occasionTermListArrayUnique = array_unique($occasionTermListArray);
+        // for occasion end
+
+        $args = array(
+            'taxonomy'   => "occasion",
+            // 'hide_empty' => 1,
+            // 'include'    => $ids
+        );
+        $productOccasions = get_terms($args);
+        foreach($productOccasions as $occasion){
+            foreach($occasionTermListArrayUnique as $occasionTerm){
+                if($occasionTerm == $occasion->term_id){ ?>
+                  <li>
+                    <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="#">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-square" viewBox="0 0 16 16">
+                        <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+                      </svg>
+                      <?php echo $occasion->name; ?>
+                    </a>
+                  </li>
+                  <!--<div class="checkbox">
+                      <label><input type="checkbox" name="type" class="vendor_sort_category" value="<?php echo $occasion->term_id; ?>"><?php echo $occasion->name; ?></label>
+                  </div>-->
+        <?php   }
+            }
+        }
+        ?>
+        </ul>
+
+        <?php
+        /**
+         * ---------------------
+         * Delivery type filter
+         * ---------------------
+        **/
+        ?>
+        <h5>Levering</h5>
+        <ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
+        <?php
+        $args = array (
+            'role' => 'dc_vendor'
+        );
+
+        // Create the WP_User_Query object
+        $userQuery = new WP_User_Query($args);
+
+        // Get the results
+        $vendors = $userQuery->get_results();
+
+        $deliveryTypeArray = array();
+
+        foreach($vendors as $vendor){
+            $userMetas = get_user_meta($vendor->ID, 'delivery_type', true);
+            foreach($userMetas as $deliveryType){
+                array_push($deliveryTypeArray, $deliveryType);
+            }
+        }
+
+        // we need unique item
+        $deliveryTypeArrayUnique = array_unique($deliveryTypeArray);
+
+        foreach($deliveryTypeArrayUnique as $delivery){?>
+            <li>
+              <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-square" viewBox="0 0 16 16">
+                  <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+                </svg>
+                <?php echo $delivery; ?>
+              </a>
+            </li>
+            <!--<div class="checkbox">
+                <label><input type="checkbox" name="type" class="vendor_sort_category" value="<?php echo $delivery; ?>"><?php echo $delivery; ?></label>
+            </div>-->
+        <?php }
+        ?>
         </ul>
 
         <h5>Pris</h5>
-        <label for="price" class="form-label">Pris</label>
+        <!--<label for="price" class="form-label">Pris</label>-->
+        <p style="width: 100%;">
+          <span class="float-start price-filter-text">149,-</span>
+          <span class="float-end price-filter-text">749,-</span>
+        </p>
         <input type="range" class="form-range" min="0" max="2500" id="price">
 
       </div>
       <div class="col-9">
-        <div class="row mb-2">
+        <div class="applied-filters row mb-2">
           <div class="col-12">
-            <span class="badge rounded-pill border border-primary text-dark">Påske <button type="button" class="btn-close" aria-label="Close"></button></span>
-            <span class="badge rounded-pill border border-primary text-dark">Påske <button type="button" class="btn-close" aria-label="Close"></button></span>
-            <span class="badge rounded-pill border border-primary text-dark">Pris: 250,- til 750,- <button type="button" class="btn-close" aria-label="Close"></button></span>
-            <span class="badge rounded-pill border border-primary text-dark">5683 Haarby <button type="button" class="btn-close" aria-label="Close"></button></span>
-            <span class="badge rounded-pill border border-primary bg-primary text-dark">Nulstil alle <button type="button" class="btn-close" aria-label="Close"></button></span>
+            <a class="badge rounded-pill border border-primary text-dark">Påske <button type="button" class="btn-close" aria-label="Close"></button></a>
+            <a class="badge rounded-pill border border-primary text-dark">Påske <button type="button" class="btn-close" aria-label="Close"></button></a>
+            <a class="badge rounded-pill border border-primary text-dark">Pris: 250,- til 750,- <button type="button" class="btn-close" aria-label="Close"></button></a>
+            <a class="badge rounded-pill border border-primary text-dark">5683 Haarby <button type="button" class="btn-close" aria-label="Close"></button></a>
+            <a class="badge rounded-pill border border-primary bg-primary text-white">Nulstil alle <button type="button" class="btn-close  btn-close-white" aria-label="Close"></button></a>
           </div>
         </div>
-        <div class="row">
+
+        <div class="store row">
           <div class="col-12">
-            <div class="card mb-3">
-              <div class="row g-0 align-items-center">
-                <div class="col-md-2 text-center">
-                  <img class="img-fluid rounded-start" src="https://dev.greeting.dk/wp-content/uploads/2022/04/119550939_363089735070099_2663604500059929352_n-150x150.jpg" style="max-width: 100px;">
-                  <h6>Den blå dør</h6>
-                  <a href="#">Se butikkens udvalg ></a>
-                </div>
-                <div class="col-md-10">
-                  <div class="card-body row">
-                    <div class="col-4">
-                      <div class="card">
-                          <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/04/Jordbaer-1-aspect-ratio-1000-800-600x600.png" class="card-img-top" alt="REPLACEME"></a>
-                          <div class="card-body">
-                              <h6 class="card-title" style="font-size: 12px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                              <small>Fra 235 kr.</small>
-                          </div>
+            <div class="card shadow border-0 mb-3">
+              <div class="card-body">
+                <div class="row align-items-center">
+                  <div class="col-3 text-center">
+                    <img class="img-fluid rounded-start" src="https://dev.greeting.dk/wp-content/uploads/2022/04/119550939_363089735070099_2663604500059929352_n-150x150.jpg" style="max-width: 100px;">
+                    <h6>Den blå dør</h6>
+                    <a href="#" class="store-btn btn btn-secondary bg-teal border-0">Gå til butik ></a>
+                  </div>
+                  <div class="col-9">
+                    <div class="row">
+                      <div class="col-4">
+                        <div class="card border-0">
+                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/04/Jordbaer-1-aspect-ratio-1000-800-600x600.png" class="card-img-top" alt="REPLACEME"></a>
+                            <div class="card-body">
+                                <h6 class="card-title" style="font-size: 12px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
+                                <small>Fra 235 kr.</small>
+                            </div>
+                        </div>
                       </div>
-                    </div>
-                    <div class="col-4">
-                      <div class="card">
-                          <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/04/Jordbaer-1-aspect-ratio-1000-800-600x600.png" class="card-img-top" alt="REPLACEME"></a>
-                          <div class="card-body">
-                              <h6 class="card-title" style="font-size: 12px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                              <small>Fra 235 kr.</small>
-                          </div>
+                      <div class="col-4">
+                        <div class="card border-0">
+                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/04/Jordbaer-1-aspect-ratio-1000-800-600x600.png" class="card-img-top" alt="REPLACEME"></a>
+                            <div class="card-body">
+                                <h6 class="card-title" style="font-size: 12px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
+                                <small>Fra 235 kr.</small>
+                            </div>
+                        </div>
                       </div>
-                    </div>
-                    <div class="col-4">
-                      <div class="card">
-                          <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/04/Jordbaer-1-aspect-ratio-1000-800-600x600.png" class="card-img-top" alt="REPLACEME"></a>
-                          <div class="card-body">
-                              <h6 class="card-title" style="font-size: 12px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                              <small>Fra 235 kr.</small>
-                          </div>
+                      <div class="col-4">
+                        <div class="card border-0">
+                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/04/Jordbaer-1-aspect-ratio-1000-800-600x600.png" class="card-img-top" alt="REPLACEME"></a>
+                            <div class="card-body">
+                                <h6 class="card-title" style="font-size: 12px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
+                                <small>Fra 235 kr.</small>
+                            </div>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div class="card-footer ">
-                  <small class="text-muted">
-                    <div>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bicycle" viewBox="0 0 16 16">
-                        <path d="M4 4.5a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1v.5h4.14l.386-1.158A.5.5 0 0 1 11 4h1a.5.5 0 0 1 0 1h-.64l-.311.935.807 1.29a3 3 0 1 1-.848.53l-.508-.812-2.076 3.322A.5.5 0 0 1 8 10.5H5.959a3 3 0 1 1-1.815-3.274L5 5.856V5h-.5a.5.5 0 0 1-.5-.5zm1.5 2.443-.508.814c.5.444.85 1.054.967 1.743h1.139L5.5 6.943zM8 9.057 9.598 6.5H6.402L8 9.057zM4.937 9.5a1.997 1.997 0 0 0-.487-.877l-.548.877h1.035zM3.603 8.092A2 2 0 1 0 4.937 10.5H3a.5.5 0 0 1-.424-.765l1.027-1.643zm7.947.53a2 2 0 1 0 .848-.53l1.026 1.643a.5.5 0 1 1-.848.53L11.55 8.623z"/>
-                      </svg>
-                      Leverer til: 8000 Aarhus C, 8200 Aarhus N, 8270 Højbjerg
-                    </div>
-                  </small>
-                </div>
+              </div>
+              <div class="card-footer">
+                <small class="text-muted">
+                  <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bicycle" viewBox="0 0 16 16">
+                      <path d="M4 4.5a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1v.5h4.14l.386-1.158A.5.5 0 0 1 11 4h1a.5.5 0 0 1 0 1h-.64l-.311.935.807 1.29a3 3 0 1 1-.848.53l-.508-.812-2.076 3.322A.5.5 0 0 1 8 10.5H5.959a3 3 0 1 1-1.815-3.274L5 5.856V5h-.5a.5.5 0 0 1-.5-.5zm1.5 2.443-.508.814c.5.444.85 1.054.967 1.743h1.139L5.5 6.943zM8 9.057 9.598 6.5H6.402L8 9.057zM4.937 9.5a1.997 1.997 0 0 0-.487-.877l-.548.877h1.035zM3.603 8.092A2 2 0 1 0 4.937 10.5H3a.5.5 0 0 1-.424-.765l1.027-1.643zm7.947.53a2 2 0 1 0 .848-.53l1.026 1.643a.5.5 0 1 1-.848.53L11.55 8.623z"/>
+                    </svg>
+                    Leverer til: 8000 Aarhus C, 8200 Aarhus N, 8270 Højbjerg
+                  </div>
+                </small>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="row">
+        <div class="store row">
           <div class="col-12">
-            <div class="card mb-3">
-              <div class="row g-0 align-items-center">
-                <div class="col-md-2 text-center">
-                  <img class="img-fluid rounded-start" src="https://dev.greeting.dk/wp-content/uploads/2022/04/119550939_363089735070099_2663604500059929352_n-150x150.jpg" style="max-width: 100px;">
-                  <h6>Den blå dør</h6>
-                </div>
-                <div class="col-md-10">
-                  <div class="card-body row">
-                    <div class="col-4">
-                      <div class="card">
-                          <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/04/Jordbaer-1-aspect-ratio-1000-800-600x600.png" class="card-img-top" alt="REPLACEME"></a>
-                          <div class="card-body">
-                              <h6 class="card-title" style="font-size: 12px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                              <small>Fra 235 kr.</small>
-                          </div>
+            <div class="card shadow border-0 mb-3">
+              <div class="card-body">
+                <div class="row align-items-center">
+                  <div class="col-3 text-center">
+                    <img class="img-fluid rounded-start" src="https://dev.greeting.dk/wp-content/uploads/2022/04/119550939_363089735070099_2663604500059929352_n-150x150.jpg" style="max-width: 100px;">
+                    <h6>Den blå dør</h6>
+                    <a href="#" class="store-btn btn btn-secondary bg-teal border-0">Gå til butik ></a>
+                  </div>
+                  <div class="col-9">
+                    <div class="row">
+                      <div class="col-4">
+                        <div class="card border-0">
+                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/04/Jordbaer-1-aspect-ratio-1000-800-600x600.png" class="card-img-top" alt="REPLACEME"></a>
+                            <div class="card-body">
+                                <h6 class="card-title" style="font-size: 12px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
+                                <small>Fra 235 kr.</small>
+                            </div>
+                        </div>
                       </div>
-                    </div>
-                    <div class="col-4">
-                      <div class="card">
-                          <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/04/Jordbaer-1-aspect-ratio-1000-800-600x600.png" class="card-img-top" alt="REPLACEME"></a>
-                          <div class="card-body">
-                              <h6 class="card-title" style="font-size: 12px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                              <small>Fra 235 kr.</small>
-                          </div>
+                      <div class="col-4">
+                        <div class="card border-0">
+                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/04/Jordbaer-1-aspect-ratio-1000-800-600x600.png" class="card-img-top" alt="REPLACEME"></a>
+                            <div class="card-body">
+                                <h6 class="card-title" style="font-size: 12px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
+                                <small>Fra 235 kr.</small>
+                            </div>
+                        </div>
                       </div>
-                    </div>
-                    <div class="col-4">
-                      <div class="card">
-                          <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/04/Jordbaer-1-aspect-ratio-1000-800-600x600.png" class="card-img-top" alt="REPLACEME"></a>
-                          <div class="card-body">
-                              <h6 class="card-title" style="font-size: 12px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                              <small>Fra 235 kr.</small>
-                          </div>
+                      <div class="col-4">
+                        <div class="card border-0">
+                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/04/Jordbaer-1-aspect-ratio-1000-800-600x600.png" class="card-img-top" alt="REPLACEME"></a>
+                            <div class="card-body">
+                                <h6 class="card-title" style="font-size: 12px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
+                                <small>Fra 235 kr.</small>
+                            </div>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div class="card-footer ">
-                  <small class="text-muted">
-                    <div>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bicycle" viewBox="0 0 16 16">
-                        <path d="M4 4.5a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1v.5h4.14l.386-1.158A.5.5 0 0 1 11 4h1a.5.5 0 0 1 0 1h-.64l-.311.935.807 1.29a3 3 0 1 1-.848.53l-.508-.812-2.076 3.322A.5.5 0 0 1 8 10.5H5.959a3 3 0 1 1-1.815-3.274L5 5.856V5h-.5a.5.5 0 0 1-.5-.5zm1.5 2.443-.508.814c.5.444.85 1.054.967 1.743h1.139L5.5 6.943zM8 9.057 9.598 6.5H6.402L8 9.057zM4.937 9.5a1.997 1.997 0 0 0-.487-.877l-.548.877h1.035zM3.603 8.092A2 2 0 1 0 4.937 10.5H3a.5.5 0 0 1-.424-.765l1.027-1.643zm7.947.53a2 2 0 1 0 .848-.53l1.026 1.643a.5.5 0 1 1-.848.53L11.55 8.623z"/>
-                      </svg>
-                      Leverer til: 8000 Aarhus C, 8200 Aarhus N, 8270 Højbjerg
-                    </div>
-                  </small>
-                </div>
+              </div>
+              <div class="card-footer">
+                <small class="text-muted">
+                  <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bicycle" viewBox="0 0 16 16">
+                      <path d="M4 4.5a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1v.5h4.14l.386-1.158A.5.5 0 0 1 11 4h1a.5.5 0 0 1 0 1h-.64l-.311.935.807 1.29a3 3 0 1 1-.848.53l-.508-.812-2.076 3.322A.5.5 0 0 1 8 10.5H5.959a3 3 0 1 1-1.815-3.274L5 5.856V5h-.5a.5.5 0 0 1-.5-.5zm1.5 2.443-.508.814c.5.444.85 1.054.967 1.743h1.139L5.5 6.943zM8 9.057 9.598 6.5H6.402L8 9.057zM4.937 9.5a1.997 1.997 0 0 0-.487-.877l-.548.877h1.035zM3.603 8.092A2 2 0 1 0 4.937 10.5H3a.5.5 0 0 1-.424-.765l1.027-1.643zm7.947.53a2 2 0 1 0 .848-.53l1.026 1.643a.5.5 0 1 1-.848.53L11.55 8.623z"/>
+                    </svg>
+                    Leverer til: 8000 Aarhus C, 8200 Aarhus N, 8270 Højbjerg
+                  </div>
+                </small>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="row">
+        <div class="store row">
           <div class="col-12">
-            <div class="card mb-3">
-              <div class="row g-0 align-items-center">
-                <div class="col-md-2 text-center">
-                  <img class="img-fluid rounded-start" src="https://dev.greeting.dk/wp-content/uploads/2022/04/119550939_363089735070099_2663604500059929352_n-150x150.jpg" style="max-width: 100px;">
-                  <h6>Den blå dør</h6>
-                </div>
-                <div class="col-md-10">
-                  <div class="card-body row">
-                    <div class="col-4">
-                      <div class="card">
-                          <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/04/Jordbaer-1-aspect-ratio-1000-800-600x600.png" class="card-img-top" alt="REPLACEME"></a>
-                          <div class="card-body">
-                              <h6 class="card-title" style="font-size: 12px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                              <small>Fra 235 kr.</small>
-                          </div>
+            <div class="card shadow border-0 mb-3">
+              <div class="card-body">
+                <div class="row align-items-center">
+                  <div class="col-3 text-center">
+                    <img class="img-fluid rounded-start" src="https://dev.greeting.dk/wp-content/uploads/2022/04/119550939_363089735070099_2663604500059929352_n-150x150.jpg" style="max-width: 100px;">
+                    <h6>Den blå dør</h6>
+                    <a href="#" class="store-btn btn btn-secondary bg-teal border-0">Gå til butik ></a>
+                  </div>
+                  <div class="col-9">
+                    <div class="row">
+                      <div class="col-4">
+                        <div class="card border-0">
+                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/04/Jordbaer-1-aspect-ratio-1000-800-600x600.png" class="card-img-top" alt="REPLACEME"></a>
+                            <div class="card-body">
+                                <h6 class="card-title" style="font-size: 12px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
+                                <small>Fra 235 kr.</small>
+                            </div>
+                        </div>
                       </div>
-                    </div>
-                    <div class="col-4">
-                      <div class="card">
-                          <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/04/Jordbaer-1-aspect-ratio-1000-800-600x600.png" class="card-img-top" alt="REPLACEME"></a>
-                          <div class="card-body">
-                              <h6 class="card-title" style="font-size: 12px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                              <small>Fra 235 kr.</small>
-                          </div>
+                      <div class="col-4">
+                        <div class="card border-0">
+                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/04/Jordbaer-1-aspect-ratio-1000-800-600x600.png" class="card-img-top" alt="REPLACEME"></a>
+                            <div class="card-body">
+                                <h6 class="card-title" style="font-size: 12px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
+                                <small>Fra 235 kr.</small>
+                            </div>
+                        </div>
                       </div>
-                    </div>
-                    <div class="col-4">
-                      <div class="card">
-                          <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/04/Jordbaer-1-aspect-ratio-1000-800-600x600.png" class="card-img-top" alt="REPLACEME"></a>
-                          <div class="card-body">
-                              <h6 class="card-title" style="font-size: 12px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                              <small>Fra 235 kr.</small>
-                          </div>
+                      <div class="col-4">
+                        <div class="card border-0">
+                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/04/Jordbaer-1-aspect-ratio-1000-800-600x600.png" class="card-img-top" alt="REPLACEME"></a>
+                            <div class="card-body">
+                                <h6 class="card-title" style="font-size: 12px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
+                                <small>Fra 235 kr.</small>
+                            </div>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div class="card-footer ">
-                  <small class="text-muted">
-                    <div>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bicycle" viewBox="0 0 16 16">
-                        <path d="M4 4.5a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1v.5h4.14l.386-1.158A.5.5 0 0 1 11 4h1a.5.5 0 0 1 0 1h-.64l-.311.935.807 1.29a3 3 0 1 1-.848.53l-.508-.812-2.076 3.322A.5.5 0 0 1 8 10.5H5.959a3 3 0 1 1-1.815-3.274L5 5.856V5h-.5a.5.5 0 0 1-.5-.5zm1.5 2.443-.508.814c.5.444.85 1.054.967 1.743h1.139L5.5 6.943zM8 9.057 9.598 6.5H6.402L8 9.057zM4.937 9.5a1.997 1.997 0 0 0-.487-.877l-.548.877h1.035zM3.603 8.092A2 2 0 1 0 4.937 10.5H3a.5.5 0 0 1-.424-.765l1.027-1.643zm7.947.53a2 2 0 1 0 .848-.53l1.026 1.643a.5.5 0 1 1-.848.53L11.55 8.623z"/>
-                      </svg>
-                      Leverer til: 8000 Aarhus C, 8200 Aarhus N, 8270 Højbjerg
-                    </div>
-                  </small>
-                </div>
+              </div>
+              <div class="card-footer">
+                <small class="text-muted">
+                  <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bicycle" viewBox="0 0 16 16">
+                      <path d="M4 4.5a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1v.5h4.14l.386-1.158A.5.5 0 0 1 11 4h1a.5.5 0 0 1 0 1h-.64l-.311.935.807 1.29a3 3 0 1 1-.848.53l-.508-.812-2.076 3.322A.5.5 0 0 1 8 10.5H5.959a3 3 0 1 1-1.815-3.274L5 5.856V5h-.5a.5.5 0 0 1-.5-.5zm1.5 2.443-.508.814c.5.444.85 1.054.967 1.743h1.139L5.5 6.943zM8 9.057 9.598 6.5H6.402L8 9.057zM4.937 9.5a1.997 1.997 0 0 0-.487-.877l-.548.877h1.035zM3.603 8.092A2 2 0 1 0 4.937 10.5H3a.5.5 0 0 1-.424-.765l1.027-1.643zm7.947.53a2 2 0 1 0 .848-.53l1.026 1.643a.5.5 0 1 1-.848.53L11.55 8.623z"/>
+                    </svg>
+                    Leverer til: 8000 Aarhus C, 8200 Aarhus N, 8270 Højbjerg
+                  </div>
+                </small>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="row">
+        <div class="row store">
           <div class="col-12">
             <div class="card mb-3">
-              <div class="row g-0 align-items-center">
-                <div class="col-md-2 text-center">
-                  <img class="img-fluid rounded-start" src="https://dev.greeting.dk/wp-content/uploads/2022/04/119550939_363089735070099_2663604500059929352_n-150x150.jpg" style="max-width: 100px;">
-                  <h6>Den blå dør</h6>
-                </div>
-                <div class="col-md-10">
-                  <div class="card-body row">
-                    <div class="col-4">
-                      <div class="card">
-                          <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/04/Jordbaer-1-aspect-ratio-1000-800-600x600.png" class="card-img-top" alt="REPLACEME"></a>
-                          <div class="card-body">
-                              <h6 class="card-title" style="font-size: 12px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                              <small>Fra 235 kr.</small>
-                          </div>
+              <div class="card-body">
+                <div class="row align-items-center">
+                  <div class="col-2 text-center">
+                    <img class="img-fluid rounded-start" src="https://dev.greeting.dk/wp-content/uploads/2022/04/119550939_363089735070099_2663604500059929352_n-150x150.jpg" style="max-width: 100px;">
+                    <h6>Den blå dør</h6>
+                    <a href="#" class="store-btn btn btn-secondary bg-teal border-0">Gå til butik ></a>
+                  </div>
+                  <div class="col-10">
+                    <div class="row">
+                      <div class="col-4">
+                        <div class="card border-0 shadow">
+                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/04/Jordbaer-1-aspect-ratio-1000-800-600x600.png" class="card-img-top" alt="REPLACEME"></a>
+                            <div class="card-body">
+                                <h6 class="card-title" style="font-size: 12px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
+                                <small>Fra 235 kr.</small>
+                            </div>
+                        </div>
                       </div>
-                    </div>
-                    <div class="col-4">
-                      <div class="card">
-                          <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/04/Jordbaer-1-aspect-ratio-1000-800-600x600.png" class="card-img-top" alt="REPLACEME"></a>
-                          <div class="card-body">
-                              <h6 class="card-title" style="font-size: 12px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                              <small>Fra 235 kr.</small>
-                          </div>
+                      <div class="col-4">
+                        <div class="card border-0 shadow">
+                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/04/Jordbaer-1-aspect-ratio-1000-800-600x600.png" class="card-img-top" alt="REPLACEME"></a>
+                            <div class="card-body">
+                                <h6 class="card-title" style="font-size: 12px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
+                                <small>Fra 235 kr.</small>
+                            </div>
+                        </div>
                       </div>
-                    </div>
-                    <div class="col-4">
-                      <div class="card">
-                          <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/04/Jordbaer-1-aspect-ratio-1000-800-600x600.png" class="card-img-top" alt="REPLACEME"></a>
-                          <div class="card-body">
-                              <h6 class="card-title" style="font-size: 12px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                              <small>Fra 235 kr.</small>
-                          </div>
+                      <div class="col-4">
+                        <div class="card border-0 shadow">
+                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/04/Jordbaer-1-aspect-ratio-1000-800-600x600.png" class="card-img-top" alt="REPLACEME"></a>
+                            <div class="card-body">
+                                <h6 class="card-title" style="font-size: 12px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
+                                <small>Fra 235 kr.</small>
+                            </div>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div class="card-footer ">
-                  <small class="text-muted">
-                    <div>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bicycle" viewBox="0 0 16 16">
-                        <path d="M4 4.5a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1v.5h4.14l.386-1.158A.5.5 0 0 1 11 4h1a.5.5 0 0 1 0 1h-.64l-.311.935.807 1.29a3 3 0 1 1-.848.53l-.508-.812-2.076 3.322A.5.5 0 0 1 8 10.5H5.959a3 3 0 1 1-1.815-3.274L5 5.856V5h-.5a.5.5 0 0 1-.5-.5zm1.5 2.443-.508.814c.5.444.85 1.054.967 1.743h1.139L5.5 6.943zM8 9.057 9.598 6.5H6.402L8 9.057zM4.937 9.5a1.997 1.997 0 0 0-.487-.877l-.548.877h1.035zM3.603 8.092A2 2 0 1 0 4.937 10.5H3a.5.5 0 0 1-.424-.765l1.027-1.643zm7.947.53a2 2 0 1 0 .848-.53l1.026 1.643a.5.5 0 1 1-.848.53L11.55 8.623z"/>
-                      </svg>
-                      Leverer til: 8000 Aarhus C, 8200 Aarhus N, 8270 Højbjerg
-                    </div>
-                  </small>
-                </div>
+              </div>
+              <div class="card-footer">
+                <small class="text-muted">
+                  <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bicycle" viewBox="0 0 16 16">
+                      <path d="M4 4.5a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1v.5h4.14l.386-1.158A.5.5 0 0 1 11 4h1a.5.5 0 0 1 0 1h-.64l-.311.935.807 1.29a3 3 0 1 1-.848.53l-.508-.812-2.076 3.322A.5.5 0 0 1 8 10.5H5.959a3 3 0 1 1-1.815-3.274L5 5.856V5h-.5a.5.5 0 0 1-.5-.5zm1.5 2.443-.508.814c.5.444.85 1.054.967 1.743h1.139L5.5 6.943zM8 9.057 9.598 6.5H6.402L8 9.057zM4.937 9.5a1.997 1.997 0 0 0-.487-.877l-.548.877h1.035zM3.603 8.092A2 2 0 1 0 4.937 10.5H3a.5.5 0 0 1-.424-.765l1.027-1.643zm7.947.53a2 2 0 1 0 .848-.53l1.026 1.643a.5.5 0 1 1-.848.53L11.55 8.623z"/>
+                    </svg>
+                    Leverer til: 8000 Aarhus C, 8200 Aarhus N, 8270 Højbjerg
+                  </div>
+                </small>
               </div>
             </div>
           </div>
         </div>
 
+        <div class="row store">
+          <div class="col-12">
+            <div class="card mb-3">
+              <div class="card-body">
+                <div class="row align-items-center">
+                  <div class="col-2 text-center">
+                    <img class="img-fluid rounded-start" src="https://dev.greeting.dk/wp-content/uploads/2022/04/119550939_363089735070099_2663604500059929352_n-150x150.jpg" style="max-width: 100px;">
+                    <h6>Den blå dør</h6>
+                    <a href="#" class="store-btn btn btn-secondary bg-teal border-0">Gå til butik ></a>
+                  </div>
+                  <div class="col-10">
+                    <div class="row">
+                      <div class="col-4">
+                        <div class="card border-0 shadow">
+                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/04/Jordbaer-1-aspect-ratio-1000-800-600x600.png" class="card-img-top" alt="REPLACEME"></a>
+                            <div class="card-body">
+                                <h6 class="card-title" style="font-size: 12px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
+                                <small>Fra 235 kr.</small>
+                            </div>
+                        </div>
+                      </div>
+                      <div class="col-4">
+                        <div class="card border-0 shadow">
+                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/04/Jordbaer-1-aspect-ratio-1000-800-600x600.png" class="card-img-top" alt="REPLACEME"></a>
+                            <div class="card-body">
+                                <h6 class="card-title" style="font-size: 12px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
+                                <small>Fra 235 kr.</small>
+                            </div>
+                        </div>
+                      </div>
+                      <div class="col-4">
+                        <div class="card border-0 shadow">
+                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/04/Jordbaer-1-aspect-ratio-1000-800-600x600.png" class="card-img-top" alt="REPLACEME"></a>
+                            <div class="card-body">
+                                <h6 class="card-title" style="font-size: 12px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
+                                <small>Fra 235 kr.</small>
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="card-footer">
+                <small class="text-muted">
+                  <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bicycle" viewBox="0 0 16 16">
+                      <path d="M4 4.5a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1v.5h4.14l.386-1.158A.5.5 0 0 1 11 4h1a.5.5 0 0 1 0 1h-.64l-.311.935.807 1.29a3 3 0 1 1-.848.53l-.508-.812-2.076 3.322A.5.5 0 0 1 8 10.5H5.959a3 3 0 1 1-1.815-3.274L5 5.856V5h-.5a.5.5 0 0 1-.5-.5zm1.5 2.443-.508.814c.5.444.85 1.054.967 1.743h1.139L5.5 6.943zM8 9.057 9.598 6.5H6.402L8 9.057zM4.937 9.5a1.997 1.997 0 0 0-.487-.877l-.548.877h1.035zM3.603 8.092A2 2 0 1 0 4.937 10.5H3a.5.5 0 0 1-.424-.765l1.027-1.643zm7.947.53a2 2 0 1 0 .848-.53l1.026 1.643a.5.5 0 1 1-.848.53L11.55 8.623z"/>
+                    </svg>
+                    Leverer til: 8000 Aarhus C, 8200 Aarhus N, 8270 Højbjerg
+                  </div>
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
 
-
-
-        <div class="store">butik</div>
-        <div class="store">butik</div>
-        <div class="store">butik</div>
-        <div class="store">butik</div>
-        <div class="store">butik</div>
-        <div class="store">butik</div>
-        <div class="store">butik</div>
+        <div class="store row">
+          <div class="col-12">
+            <div class="card mb-3">
+              <div class="card-body">
+                <div class="row align-items-center">
+                  <div class="col-2 text-center">
+                    <img class="img-fluid rounded-start" src="https://dev.greeting.dk/wp-content/uploads/2022/04/119550939_363089735070099_2663604500059929352_n-150x150.jpg" style="max-width: 100px;">
+                    <h6>Den blå dør</h6>
+                    <a href="#" class="store-btn btn btn-secondary bg-teal border-0">Gå til butik ></a>
+                  </div>
+                  <div class="col-10">
+                    <div class="row">
+                      <div class="col-4">
+                        <div class="card">
+                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/04/Jordbaer-1-aspect-ratio-1000-800-600x600.png" class="card-img-top" alt="REPLACEME"></a>
+                            <div class="card-body">
+                                <h6 class="card-title" style="font-size: 12px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
+                                <small>Fra 235 kr.</small>
+                            </div>
+                        </div>
+                      </div>
+                      <div class="col-4">
+                        <div class="card">
+                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/04/Jordbaer-1-aspect-ratio-1000-800-600x600.png" class="card-img-top" alt="REPLACEME"></a>
+                            <div class="card-body">
+                                <h6 class="card-title" style="font-size: 12px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
+                                <small>Fra 235 kr.</small>
+                            </div>
+                        </div>
+                      </div>
+                      <div class="col-4">
+                        <div class="card">
+                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/04/Jordbaer-1-aspect-ratio-1000-800-600x600.png" class="card-img-top" alt="REPLACEME"></a>
+                            <div class="card-body">
+                                <h6 class="card-title" style="font-size: 12px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
+                                <small>Fra 235 kr.</small>
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="card-footer">
+                <small class="text-muted">
+                  <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bicycle" viewBox="0 0 16 16">
+                      <path d="M4 4.5a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1v.5h4.14l.386-1.158A.5.5 0 0 1 11 4h1a.5.5 0 0 1 0 1h-.64l-.311.935.807 1.29a3 3 0 1 1-.848.53l-.508-.812-2.076 3.322A.5.5 0 0 1 8 10.5H5.959a3 3 0 1 1-1.815-3.274L5 5.856V5h-.5a.5.5 0 0 1-.5-.5zm1.5 2.443-.508.814c.5.444.85 1.054.967 1.743h1.139L5.5 6.943zM8 9.057 9.598 6.5H6.402L8 9.057zM4.937 9.5a1.997 1.997 0 0 0-.487-.877l-.548.877h1.035zM3.603 8.092A2 2 0 1 0 4.937 10.5H3a.5.5 0 0 1-.424-.765l1.027-1.643zm7.947.53a2 2 0 1 0 .848-.53l1.026 1.643a.5.5 0 1 1-.848.53L11.55 8.623z"/>
+                    </svg>
+                    Leverer til: 8000 Aarhus C, 8200 Aarhus N, 8270 Højbjerg
+                  </div>
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -331,159 +721,11 @@
                     </div>
                     <div class="clear">
                     </div>
-
-                    <!-- category filter-->
-                    <div class="vendor_sort" style="margin-bottom:20px !important;">
-                        <p style="font-weight:500">Category</p>
-                        <?php
-                        // search users for get filtered category
-                        $cityPostalcode = get_post_meta($postId, 'postalcode', true);
-                            $userMetaQuery = $wpdb->get_results( "
-                            SELECT * FROM {$wpdb->prefix}usermeta
-                            WHERE meta_key = 'delivery_zips'
-                        " );
-
-                        $UserIdArrayForCityPostalcode = array();
-                        foreach($userMetaQuery as $userMeta){
-                            if (str_contains($userMeta->meta_value, $cityPostalcode)) {
-                                array_push($UserIdArrayForCityPostalcode, $userMeta->user_id);
-                            }
-                        }
-
-                        // for category
-                        $categoryTermListArray = array();
-
-                        foreach ($UserIdArrayForCityPostalcode as $vendorId) {
-                            $vendor = get_wcmp_vendor($vendorId);
-                            $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
-                            foreach ($vendorProducts as $productId) {
-                                $categoryTermList = wp_get_post_terms($productId, 'product_cat', array('fields' => 'ids'));
-                                foreach($categoryTermList as $catTerm){
-                                    array_push($categoryTermListArray, $catTerm);
-                                }
-                            }
-                        }
-                        $categoryTermListArrayUnique = array_unique($categoryTermListArray);
-
-                        // product category
-                        $categoryArgs = array(
-                            'taxonomy'   => "product_cat",
-                            'exclude' => 15,
-                            // 'pad_counts' => true,
-                            // 'hide_empty' => 1,
-                        );
-                        $productCategories = get_terms($categoryArgs);
-                        foreach($productCategories as $category){
-                            foreach($categoryTermListArrayUnique as $catTerm){
-                                if($catTerm == $category->term_id){ ?>
-                                    <div class="checkbox">
-                                        <label><input type="checkbox" name="type" class="vendor_sort_category" value="<?php echo $category->term_id; ?>"><?php echo $category->name; ?></label>
-                                    </div>
-                                <?php }
-                            }
-                        }
-                        ?>
-                    </div>
-
-                    <!-- occasion filter-->
-                    <div class="vendor_sort" style="margin-bottom:20px !important;">
-                        <p style="font-weight:500">Occasion</p>
-                        <?php
-                        // for used on occasion prepare here
-                        $occasionTermListArray = array();
-
-                        foreach ($UserIdArrayForCityPostalcode as $vendorId) {
-                            $vendor = get_wcmp_vendor($vendorId);
-                            $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
-                            foreach ($vendorProducts as $productId) {
-                                $occasionTermList = wp_get_post_terms($productId, 'occasion', array('fields' => 'ids'));
-                                foreach($occasionTermList as $occasionTerm){
-                                    array_push($occasionTermListArray, $occasionTerm);
-                                }
-                            }
-                        }
-                        $occasionTermListArrayUnique = array_unique($occasionTermListArray);
-                        // for occasion end
-
-                        $args = array(
-                            'taxonomy'   => "occasion",
-                            // 'hide_empty' => 1,
-                            // 'include'    => $ids
-                        );
-                        $productOccasions = get_terms($args);
-                        foreach($productOccasions as $occasion){
-                            foreach($occasionTermListArrayUnique as $occasionTerm){
-                                if($occasionTerm == $occasion->term_id){ ?>
-                                    <div class="checkbox">
-                                        <label><input type="checkbox" name="type" class="vendor_sort_category" value="<?php echo $occasion->term_id; ?>"><?php echo $occasion->name; ?></label>
-                                    </div>
-                        <?php   }
-                            }
-                        }
-                        ?>
-                    </div>
-
-                    <!-- delivery type filter-->
-                    <div class="vendor_sort" style="margin-bottom:20px !important;">
-                        <p style="font-weight:500">Delivery Type</p>
-                        <?php
-
-                        $args = array (
-                            'role' => 'dc_vendor'
-                        );
-
-                        // Create the WP_User_Query object
-                        $userQuery = new WP_User_Query($args);
-
-                        // Get the results
-                        $vendors = $userQuery->get_results();
-
-                        $deliveryTypeArray = array();
-
-                        foreach($vendors as $vendor){
-                            $userId = $vendor->ID;
-                            $userMetas = get_user_meta($userId, 'delivery_type', true);
-                            foreach($userMetas as $deliveryType){
-                                array_push($deliveryTypeArray, $deliveryType);
-                            }
-                        }
-
-                        // we need unique item
-                        $deliveryTypeArrayUnique = array_unique($deliveryTypeArray);
-
-                        foreach($deliveryTypeArrayUnique as $delivery){?>
-                            <div class="checkbox">
-                                <label><input type="checkbox" name="type" class="vendor_sort_category" value="<?php echo $delivery; ?>"><?php echo $delivery; ?></label>
-                            </div>
-                        <?php }
-                        ?>
-                    </div>
-                    <!--Filter end-->
                 </div>
             <!-- END OF SIDEBARS -->
 
             <div class="content_holder">
-                <?php
-                $cityPostalcode = get_post_meta($postId, 'postalcode', true);
 
-                // get user meta query
-                $userMetaQuery = $wpdb->get_results( "
-                    SELECT * FROM {$wpdb->prefix}usermeta
-                    WHERE meta_key = 'delivery_zips'
-                " );
-
-                $UserIdArrayForCityPostalcode = array();
-
-                foreach($userMetaQuery as $userMeta){
-                    if (str_contains($userMeta->meta_value, $cityPostalcode)) {
-                        array_push($UserIdArrayForCityPostalcode, $userMeta->user_id);
-                    }
-                }
-
-                // pass to backend
-                $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
-
-                <input type="hidden" id="cityDefaultUserIdAsString" value="<?php echo $cityDefaultUserIdAsString;?>">
 
                 <?php
                 global $WCMp;
@@ -617,4 +859,4 @@
         </div>
     </div>
 </div><!-- END OF MAIN CONTENT -->
-<?php get_footer();?>
+<?php wp_footer(); ?>

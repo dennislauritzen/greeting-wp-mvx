@@ -545,3 +545,63 @@ function greeting_custom_post_type() {
         )
 	);
 }
+
+/**
+*
+* Custom taxonomy for Greeting
+*
+**/
+add_action( 'init', 'greeting_custom_taxonomy_occasion', 0 );
+
+function greeting_custom_taxonomy_occasion()  {
+	$labels = array(
+		'name'                       => 'Occasions',
+		'singular_name'              => 'Occasion',
+		'menu_name'                  => 'Occasions',
+		'all_occasions'                  => 'All Occasions',
+		'parent_occasion'                => 'Parent Occasion',
+		'parent_occasion_colon'          => 'Parent Occasion:',
+		'new_occasion_name'              => 'New Occasion Name',
+		'add_new_occasion'               => 'Add New Occasion',
+		'edit_occasion'                  => 'Edit Occasion',
+		'update_occasion'                => 'Update Occasion',
+		'separate_occasions_with_commas' => 'Separate Occasion with commas',
+		'search_occasions'               => 'Search Occasions',
+		'add_or_remove_occasions'        => 'Add or remove Occasions',
+		'choose_from_most_used'      => 'Choose from the most used Occasions',
+	);
+	$args = array(
+		'labels'                     => $labels,
+		'hierarchical'               => false,
+		'public'                     => true,
+		'show_ui'                    => true,
+		'show_admin_column'          => true,
+		'show_in_nav_menus'          => true,
+		'show_tagcloud'              => true,
+	);
+	register_taxonomy( 'occasion', 'product', $args );
+
+	// $labels2 = array(
+	// 	'name'                       => 'Delivery Type',
+	// 	'singular_name'              => 'DeliveryType',
+	// 	'menu_name'                  => 'Delivery Type',
+	// 	'all_delivery_type'                  => 'All Delivery Type',
+	// 	'new_delivery_type_name'              => 'New Delivery Type',
+	// 	'add_new_delivery_type'               => 'Add New Delivery Type',
+	// 	'edit_delivery_type'                  => 'Edit Delivery Type',
+	// 	'update_delivery_type'                => 'Update Delivery Type',
+	// 	'separate_delivery_type_with_commas' => 'Separate delivery type with commas',
+	// 	'search_delivery_type'               => 'Search Delivery Type',
+	// 	'add_or_remove_delivery_type'        => 'Add or remove Delivery Type',
+	// 	'choose_from_most_used'      => 'Choose from the most used Delivery Type',
+	// );
+	// $args2 = array(
+	// 	'labels'                     => $labels2,
+	// 	'public'                     => true,
+	// 	'show_ui'                    => true,
+	// 	'show_admin_column'          => true,
+	// 	'show_in_nav_menus'          => true,
+	// 	'show_tagcloud'              => true,
+	// );
+	// register_taxonomy( 'deliv_type', 'product', $args2 );
+}
