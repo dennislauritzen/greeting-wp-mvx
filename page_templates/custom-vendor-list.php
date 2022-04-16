@@ -1,4 +1,3 @@
 <?php
 
  ?>
- Hej test

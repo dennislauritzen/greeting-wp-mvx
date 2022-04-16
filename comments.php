@@ -11,6 +11,9 @@
 if ( post_password_required() ) {
 	return;
 }
+if(is_product()){
+	return;
+}
 ?>
 <div id="comments">
 	<?php
