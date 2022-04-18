@@ -329,7 +329,6 @@
       <p>Cases</p>
       <p>Om Greeting.dk</p>
       <p>Kontakt</p>
-
     </div>
   </div>
 </div>

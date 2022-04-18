@@ -351,23 +351,532 @@ body.admin-bar {
 }
 
 .bg-pink {
-	background:#F0D0DB;
+	background:#F8F8F8;
+}
+.bg-rose {
+	background: #fecbca;
 }
 .bg-purple {
 	background:#3E246F;
 }
+.bg-teal {
+	background: #446a6b;
+}
+
+.bg-teal-75 {
+	background: rgba(68, 106, 107,0.75);
+}
+.bg-yellow {
+	background: #d6bf75;
+}
+.bg-light-grey {
+	background: #F8F8F8;
+}
+
+/* Text colors */
 .text-pink {
 	color:#F0D0DB;
 }
 .text-purple {
 	color:#3E246F;
 }
-.bg-teal {
-	background-color:#4d696b;
-}
 .text-teal {
 	color:#4d696b;
 }
-.bg-yellow {
-	background:$yellow;
+
+/* Borders */
+.border-teal {
+	border-color: #446a6b;
 }
+.border-teal {
+	border: 1px solid #446a6b;
+}
+.border-yellow {
+	border: 1px solid #d6bf75;
+}
+
+/*
+ * Create user CTA
+ *
+ */
+.btn-create {
+	border: 1px solid #58a2a2;
+}
+
+
+/* Top part */
+#top {
+	border-top: 3px solid #fecbca;
+
+	div.right-col {
+		font-family: 'Inter', sans-serif;
+
+		.btn {
+			font-size: 13px;
+		}
+	}
+
+	.top-search-btn {
+		width: 40px;
+		height: 35px;
+		margin-top: 2px;
+		z-index: 1000;
+		background-image: url('https://greeting.dk/wp-content/plugins/greeting-marketplace/assets/img/search-icon.svg');
+		background-repeat: no-repeat;
+		background-position: center center;
+	}
+
+	.top-search-input {
+		padding-left: 30px;
+	}
+
+	.store-loc {
+		font-family: 'Inter',sans-serif;
+		font-size: 14px;
+		font-weight: 300;
+	}
+
+	div.rating {
+		span.badge {
+			font-family: 'Inter',sans-serif;
+			font-weight: 300;
+		}
+	}
+}
+
+
+.sticky-top {
+	font-family: 'Inter',sans-serif;
+}
+
+.card {
+	transition: all .15s ease-in-out;
+}
+.card:hover {
+	transform: scale(1.015);
+	box-shadow: 0 .5rem .75rem rgba(150,150,150, .175);
+}
+
+
+
+
+#product {
+	h1 {
+		font-family: 'Rubik','Inter',sans-serif;
+	}
+	div.description {
+		font-family: 'Inter',sans-serif;
+	}
+}
+
+/* Content part */
+#content {
+	h1 {
+		padding-bottom: 15px;
+		position: relative;
+	}
+	h1::before {
+		position: absolute;
+		background: linear-gradient(to right, #555555 75px, #ffffff 75px);
+		height: 3px;
+		content: '';
+		bottom: 0;
+		right: 0;
+		left: 0;
+	}
+
+	#topoccassions {
+		.card {
+			.card-img-top
+			{
+				width: 100%;
+				height: 10vw;
+				object-fit: cover;
+			}
+
+			h5.card-title {
+				font-family: 'Inter',sans-serif;
+				font-size: 14px;
+			}
+		}
+
+/* Filter styles */
+.filter {
+	a[aria-expanded='true'] {
+		background: #d6bf75;
+	}
+
+	.accordion-button:not(.collapsed)::after {
+		background-image: url('data:image/svg+xml, %3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%23222222%22%20class%3D%22bi%20bi-chevron-down%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M1.646%204.646a.5.5%200%200%201%20.708%200L8%2010.293l5.646-5.647a.5.5%200%200%201%20.708.708l-6%206a.5.5%200%200%201-.708%200l-6-6a.5.5%200%200%201%200-.708z%22%2F%3E%3C%2Fsvg%3E');
+		transform: rotate(180deg);
+	}
+
+	h5 {
+		font-family: 'Rubik','Inter', serif;
+		font-weight: 500;
+		font-size: 12px;
+	}
+	h6 {
+		font-family: 'Inter','Rubik',serif;
+		font-weight: 800;
+		font-size: 13px;
+	}
+	ul {
+		font-family: 'Inter', sans-serif;
+		font-size: 12px;
+	}
+	span.price-filter-text {
+		font-size: 11px;
+	}
+	input[type="range"]::-webkit-slider-thumb {
+		background: #446a6b;
+		border: 1px solid #446a6b;
+	}
+	input[type="range"]::-ms-thumb {
+		background: #446a6b;
+		border: 1px solid #446a6b;
+	}
+	input[type="range"]::-moz-range-thumb {
+		background: #446a6b;
+		border: 1px solid #446a6b;
+	}
+}
+
+div.applied-filters {
+	font-family: 'Inter', sans-serif;
+	font-size: 15px;
+	font-weight: 200;
+}
+
+@include media-breakpoint-up(sm){
+	div.store {
+		a.cta {
+			font-size: 0.725rem;
+		}
+	}
+}
+div.store {
+	transition: all .15s ease-in-out;
+
+	&:hover {
+		transform: scale(1.015);
+	}
+
+	h6.card-title {
+		font-family: 'Rubik','Inter', sans-serif;
+		font-size: 14px;
+		font-weight: 600;
+	}
+	small {
+		font-family: 'Inter', sans-serif;
+		font-size: 10px;
+		font-weight: 400;
+	}
+	div.card {
+		p.price {
+			font-size: 13px;
+		}
+	}
+
+h1, h2 {
+	font-family: 'Rubik','Inter', sans-serif;
+	font-weight: 600;
+}
+
+
+
+/*
+* section#hotitworks
+* How it works section
+* --
+*/
+#howitworks {
+	h1, h2, h3 {
+		font-family: "Dela Gothic One", cursive, serif;
+		font-weight: 300;
+	}
+
+	ul.timeline {
+		width: 100%;
+		position: relative;
+		list-style: none;
+		line-height: 1.8em;
+		min-height: 50px;
+		float: left;
+		text-align: center;
+
+		&::before {
+			content: "";
+			display: block;
+			background-color: #446a6b;
+			height: 0.5px;
+			margin: 0 ;
+			position:relative;
+			top:23px;
+		}
+
+		li {
+			float: left;
+			width: 20%;
+			min-width: 125px;
+			padding: 0 10px;
+
+			figure {
+				position: relative;
+				z-index: 2;
+				background: #F8F8F8;
+				height: 50px;
+				width: 80px;
+				border-radius: 50%;
+				margin: 0 auto 10px auto;
+				box-sizing: inherit;
+			}
+		}
+	}
+}
+@include media-breakpoint-up(md){
+	#howitworks {
+		&::before {
+			margin: 0 100px;
+		}
+	}
+}
+
+@include media-breakpoint-down(sm){
+	ul.timeline {
+		text-align: left;
+	}
+	ul.timeline::before {
+		content: "";
+		position: absolute;
+		width: 1px;
+		top: 10px;
+		left: 59px;
+		margin-top: 25px;
+		height: calc(100% - 75px);
+	}
+	ul.timeline li {
+		display: flex;
+		align-items: center;
+		width: 100%;
+		min-width: 200px;
+		padding: 5px 10px 10px 10px;
+
+		figure {
+			width: 34px;
+			text-align: left;
+			margin: 0 15px 0 0;
+		}
+		svg {
+			width: 34px;
+		}
+	}
+}
+
+/*
+* #learnmore
+* Learn more section
+*/
+#learnmore  {
+	h1,
+	h2,
+	h3,
+	h4 {
+		font-family: "Dela Gothic One", cursive, serif;
+	}
+	.card {
+		.card-img-top {
+			width: 100%;
+			height: 10vw;
+			min-height: 200px;
+			object-fit: cover;
+		}
+		.card .card-title {
+			font-family: 'Rubik',sans-serif;
+		}
+		.card .card-text {
+			font-family: 'Inter',sans-serif;
+			font-size: 14px;
+			line-height: 23px;
+		}
+	}
+}
+
+/*
+ * Block for showing inspirational
+ * stores.
+ *
+ * .inspirationstores
+ */
+
+.inspirationstores {
+	h1,
+ 	h2,
+ 	h3,
+ 	h4 {
+ 		font-family: "Dela Gothic One", cursive, serif;
+ 	}
+ 	.card {
+		.card-img-top {
+	 		width: 100%;
+	 		height: 10vw;
+	 		min-height: 200px;
+	 		object-fit: cover;
+	 	}
+	 	.card-title {
+	 		font-family: 'Rubik',sans-serif;
+	 	}
+	 	.card-text {
+	 		font-family: 'Inter',sans-serif;
+	 		font-size: 14px;
+	 		line-height: 23px;
+	 	}
+	}
+}
+
+
+/*
+ *
+ * The green 'real' footer.
+ *
+ */
+#greeting-footer {
+	h6 {
+		font-family: 'Rubik', 'Inter', 'Comic Sans', sans-serif;
+		font-size: 20px;
+		color: #1b4949;
+	}
+	h6.light {
+		font-family: 'Rubik', 'Inter', 'Comic Sans', sans-serif;
+		font-size: 18px;
+		text-transform: uppercase;
+		color: #ffffff;
+	}
+	ul {
+		font-family: 'Inter', 'Comic Sans', sans-serif;
+		font-weight: 300;
+		font-size: 13px;
+	}
+	ul.social {
+		width: 100px;
+		list-style: none;
+		margin: -30px 0 0 -100px;
+		padding: 0 5px 0 0;
+
+		li {
+			float: left;
+			width: 45px;
+			margin: 0;
+			padding: 0;
+		}
+	}
+
+/*
+ *
+ * The footer with formal info.
+ *
+*/
+#formal-footer {
+	border-top: 3px solid #fecbca;
+	font-family: 'Inter',sans-serif;
+	font-size: 12px;
+	color: #555555;
+
+	ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+
+		li {
+			float: left;
+			margin: 0;
+			padding: 0 10px 0 0;
+		}
+	}
+}
+
+/*
+ * Spinner on frontpage
+ *
+ */
+ #spinner {
+   color:#fecbca;
+
+	 &:after {
+	   content:"";
+	   animation: spin 20s linear infinite;
+	 }
+ }
+ @keyframes spin {
+   0% { content:"en gavekurv"; }
+   10% { content:"en vingave"; }
+   20% { content:"et strikkesæt"; }
+   30% { content:"en overraskelse"; }
+   40% { content:"en buket blomster"; }
+   50% { content: "en lækker gin"; }
+   60% { content: "smukke roser"; }
+   70% { content: "tak for besøg-gaven"; }
+   80% { content: "bare fordi-gaven"; }
+   90% { content: "en gavehilsen"; }
+   100% { content:"en gavekurv"; }
+ }
+
+
+/*
+ *
+ * Recommandations for cities on frontpage search box
+ *
+ */
+ ul.recommandations {
+	 li.active {
+     background-color: #d6bf75;
+     border: 0;
+
+		 a {
+		   color: #ffffff;
+		 }
+   }
+
+	 li {
+		 &:hover {
+			 background-color: #d6bf75;
+
+			 a {
+				 color: #ffffff;
+			 }
+		 }
+
+		 a:hover {
+		   color: #ffffff;
+		 }
+	 }
+
+	 li:last-child {
+		 &:hover {
+	   border-bottom-left-radius: 3px !important;
+	   border-bottom-right-radius: 3px !important;
+	 }
+}
+
+/*
+ *
+ * Video on frontpage
+ */
+ #maintop {
+	 .video-wrapper {
+	   /* Telling our absolute positioned video to
+	   be relative to this element */
+	   width: 100vw;
+	   height: 700px;
+	   /* Will not allow the video to overflow the
+	   container */
+	   overflow: hidden;
+	 }
+
+	 video {
+		 /** Simulationg background-size: cover */
+		 object-fit: cover;
+		 height: 100%;
+		 width: 100%;
+	 }
+ }
