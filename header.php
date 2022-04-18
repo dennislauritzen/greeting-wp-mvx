@@ -24,29 +24,29 @@
 
 <div id="wrapper">
 	<header>
-        <div class="bg-pink small text-uppercase">
-            <div class="container d-flex justify-content-between">
-                <ul class="nav d-inline-flex m-0">
-                    <li class="nav-item">
-                        <a class="nav-link text-dark ps-0" href="#">Bliv butikspartner</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" href="#">Cases</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" href="#">Om Greeting</a>
-                    </li>
-                </ul>
-                <ul class="nav d-inline-flex m-0">
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" href="mailto:kontakt@greeting.dk">kontakt@greeting.dk</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" href="tel:61462512">61462512</a>
-                    </li>
-                </ul>
-            </div>
+    <div class="bg-pink small text-uppercase">
+        <div class="container d-flex justify-content-between">
+            <ul class="nav d-inline-flex m-0">
+                <li class="nav-item">
+                    <a class="nav-link text-dark ps-0" href="<?php echo site_url();?>/bliv-butikspartner">Bliv butikspartner</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="#">Cases</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="<?php echo site_url();?>/om-os">Om Greeting</a>
+                </li>
+            </ul>
+            <ul class="nav d-inline-flex m-0">
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="mailto:kontakt@greeting.dk">kontakt@greeting.dk</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="tel:+4571901834">(+45) 71 90 18 34</a>
+                </li>
+            </ul>
         </div>
+    </div>
         <!--
 		<nav id="header" class="navbar navbar-expand-md <?php echo esc_attr( $navbar_scheme ); if ( isset( $navbar_position ) && 'fixed_top' === $navbar_position ) : echo ' fixed-top'; elseif ( isset( $navbar_position ) && 'fixed_bottom' === $navbar_position ) : echo ' fixed-bottom'; endif; if ( is_home() || is_front_page() ) : echo ' home'; endif; ?>">
 			<div class="container">

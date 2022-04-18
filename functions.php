@@ -581,6 +581,97 @@ function greeting_custom_taxonomy_occasion()  {
 	);
 	register_taxonomy( 'occasion', 'product', $args );
 
+
+	/**
+	*
+	* Added functions for theme.
+	* @author Dennis
+	*
+	*/
+	// add the ajax fetch
+	// ** Custom formula for ajax fetch
+	add_action( 'wp_footer', 'ajax_fetch' );
+	function ajax_fetch() { ?>
+		<script type="text/javascript">
+			jQuery(document).ready(function(){
+				var currentRequest = null;
+
+				/*Do the search with delay 500ms*/
+				jQuery('#front_Search-new_ucsa').keyup(delay(function (e) {
+						var text = jQuery(this).val();
+
+						jQuery.ajax({
+							url: '<?php echo admin_url('admin-ajax.php'); ?>',
+							type: 'post',
+							data: { action: 'data_fetch', keyword: text },
+							beforeSend: function(){
+								if(currentRequest != null){
+									currentRequest.abort();
+								}
+							},
+							success: function(data) {
+								jQuery('#datafetch_wrapper').html( data );
+								if(jQuery('input[name="keyword"]').val().length > 0){
+									jQuery('#datafetch_wrapper').removeClass('d-none').addClass('d-inline');
+								} else {
+									jQuery('#datafetch_wrapper').addClass('d-none').removeClass('d-inline');
+								}
+							}
+						});
+					}, 500)
+				);
+			});
+
+			/** function for delaying ajax input**/
+			function delay(callback, ms) {
+			  var timer = 0;
+			  return function() {
+			    var context = this, args = arguments;
+			    clearTimeout(timer);
+			    timer = setTimeout(function () {
+			      callback.apply(context, args);
+			    }, ms || 0);
+			  };
+			}
+		</script>
+	<?php
+	}
+
+	// the ajax function
+	add_action('wp_ajax_data_fetch' , 'data_fetch');
+	add_action('wp_ajax_nopriv_data_fetch','data_fetch');
+
+	function data_fetch(){
+		$search_query = esc_attr( $_POST['keyword'] );
+		global $wpdb;
+
+		$prepared_statement = $wpdb->prepare("
+			SELECT *
+			FROM {$wpdb->prefix}posts
+			WHERE post_title LIKE %s
+			AND post_type = 'city'
+			LIMIT 5", '%'.$search_query.'%');
+		$landing_page_query = $wpdb->get_results($prepared_statement, OBJECT);
+
+		if (!empty($landing_page_query)) {?>
+				<?php
+				$array_count = count($landing_page_query);
+				$i = 0;
+				foreach ($landing_page_query as $key => $landing_page) {?>
+					<li class="list-group-item py-2 px-4 <?php echo ($key==0) ? 'active' : '';?>" aria-current="true">
+						<a href="<?php echo site_url() . '/city/' . $landing_page->post_name;?>" class="text-teal stretched-link"><?php echo ucfirst($landing_page->post_title);?></a>
+					</li>
+				<?php } ?>
+		<?php
+		// If there is no match for the city, then do this...
+		} else {?>
+			<li class="list-group-item py-2 px-4 <?php echo ($key==0) ? 'active' : '';?>" aria-current="true">
+				Der blev desværre ikke fundet nogle byer, der matcher søgekriterierne
+			</li>
+		<?php }
+		die();
+	}
+
 	// $labels2 = array(
 	// 	'name'                       => 'Delivery Type',
 	// 	'singular_name'              => 'DeliveryType',
