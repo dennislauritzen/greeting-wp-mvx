@@ -596,6 +596,16 @@ function greeting_custom_taxonomy_occasion()  {
 			jQuery(document).ready(function(){
 				var currentRequest = null;
 
+				jQuery("#searchform").submit(function(event){
+					event.preventDefault();
+					var val = jQuery("#datafetch_wrapper li.recomms:first-child a").prop('href');
+
+					if(val.length){
+						window.location.href = val;
+					}
+					return false;
+				});
+
 				/*Do the search with delay 500ms*/
 				jQuery('#front_Search-new_ucsa').keyup(delay(function (e) {
 						var text = jQuery(this).val();
@@ -640,7 +650,6 @@ function greeting_custom_taxonomy_occasion()  {
 	// the ajax function
 	add_action('wp_ajax_data_fetch' , 'data_fetch');
 	add_action('wp_ajax_nopriv_data_fetch','data_fetch');
-
 	function data_fetch(){
 		$search_query = esc_attr( $_POST['keyword'] );
 		global $wpdb;
@@ -658,7 +667,7 @@ function greeting_custom_taxonomy_occasion()  {
 				$array_count = count($landing_page_query);
 				$i = 0;
 				foreach ($landing_page_query as $key => $landing_page) {?>
-					<li class="list-group-item py-2 px-4 <?php echo ($key==0) ? 'active' : '';?>" aria-current="true">
+					<li class="recomms list-group-item py-2 px-4 <?php echo ($key==0) ? 'active' : '';?>" aria-current="true">
 						<a href="<?php echo site_url() . '/city/' . $landing_page->post_name;?>" class="text-teal stretched-link"><?php echo ucfirst($landing_page->post_title);?></a>
 					</li>
 				<?php } ?>
