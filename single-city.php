@@ -773,41 +773,43 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
                 </div>
               </div>
               <div class="row">
-                <div class="col pt-3 pt-lg-2 pt-xl-2 pb-4">
-                  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/bootstrap-slider.min.js"></script>
-                  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/css/bootstrap-slider.css">
-                  <style type="text/css">
-                  .slider.slider-horizontal{
-                    width:100%;
-                  }
-                  .slider .slider-handle {
-                    background-color: #446a6b;
-                    background-image: none;
-                  }
-                  </style>
-                  <input
-                    id="ex2"
-                    type="text"
-                    class="form-range py-3"
-                    value="array"
-                    data-slider-min="0"
-                    data-slider-max="<?php echo ceil($maxProductPrice); ?>"
-                    data-slider-step="1"
-                    data-slider-tooltip="hide"
-                    data-slider-value="[0,<?php echo ceil($maxProductPrice); ?>]"/>
+                <div class="col-12">
+                  <div class="px-3 px-lg-0 pt-3 pt-lg-2 pt-xl-2 pb-4">
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/bootstrap-slider.min.js"></script>
+                    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/css/bootstrap-slider.css">
+                    <style type="text/css">
+                    .slider.slider-horizontal{
+                      width:100%;
+                    }
+                    .slider .slider-handle {
+                      background-color: #446a6b;
+                      background-image: none;
+                    }
+                    </style>
+                    <input
+                      id="ex2"
+                      type="text"
+                      class="form-range py-3"
+                      value="array"
+                      data-slider-min="0"
+                      data-slider-max="<?php echo ceil($maxProductPrice); ?>"
+                      data-slider-step="1"
+                      data-slider-tooltip="hide"
+                      data-slider-value="[0,<?php echo ceil($maxProductPrice); ?>]"/>
 
-                  <script type="text/javascript">
-                    var slider = new Slider('#ex2', {
-                      'tooltip_split': true
-                    });
-                    slider.on("slideStop", function(sliderValue){
-                      var val = slider.getValue();
-                      var min_val = val[0];
-                      var max_val = val[1];
-                      document.getElementById("slideStartPoint").value = min_val;
-                      document.getElementById("slideEndPoint").value = max_val;
-                    });
-                  </script>
+                    <script type="text/javascript">
+                      var slider = new Slider('#ex2', {
+                        'tooltip_split': true
+                      });
+                      slider.on("slideStop", function(sliderValue){
+                        var val = slider.getValue();
+                        var min_val = val[0];
+                        var max_val = val[1];
+                        document.getElementById("slideStartPoint").value = min_val;
+                        document.getElementById("slideEndPoint").value = max_val;
+                      });
+                    </script>
+                  </div>
                 </div>
               </div>
             </div>
