@@ -315,6 +315,64 @@
     margin: 0;
     padding: 0 10px 0 0;
   }
+
+
+  /** price filter begin */
+
+	#priceSlider {
+		background-color: #ddd !important;
+	}
+
+	.ui-widget-content {
+		height: 7px !important;
+	}
+
+	.ui-slider .ui-slider-handle {
+		background-color: #494932 !important;
+		border-radius: 8px;
+		height: 17px !important;
+		width: 17px !important;
+	}
+
+	input[type='text'] {
+		padding: 4px 15px;
+		border: 1px solid #c1c1c1;
+	}
+	#slideStartPoint {
+		max-width: 60px;
+		background-color: #c6c6c6;
+		color: white;
+	}
+
+	#slideEndPoint {
+		max-width: 60px;
+		background-color: #c6c6c6;
+		float: right;
+		color: white;
+	}
+  /** price filter end */
+
+  /** loading begin */
+    .overlay {
+		display: none;
+		position: fixed;
+		width: 100%;
+		height: 100%;
+		top: 0;
+		left: 0;
+		z-index: 999;
+		background: rgba(255,255,255,0.8) url("<?php echo get_stylesheet_directory_uri() . '/image/loading3.gif';?>") center no-repeat;
+	}
+	/* Turn off scrollbar when body element has the loading class */
+	div.loading {
+		overflow: hidden;   
+	}
+	/* Make spinner image visible when body element has the loading class */
+	div.loading .overlay {
+		display: block;
+	}
+  /** loading end */
+
 </style>
 
 
@@ -386,6 +444,7 @@
  * Perform start setup
  *
 **/
+$postId = get_the_ID();
 $cityPostalcode = get_post_meta($postId, 'postalcode', true);
 
 // get user meta query
@@ -407,7 +466,6 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
 
 <input type="hidden" id="cityDefaultUserIdAsString" value="<?php echo $cityDefaultUserIdAsString;?>">
 
-
 <section id="content" class="row">
   <div class="container">
     <div class="row d-inline d-lg-none d-xl-none">
@@ -415,57 +473,50 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
         <h1 class="d-inline d-lg-none d-xl-none my-3 my-xs-3 my-sm-3 my-md-3 my-lg-0 my-xl-0 mb-lg-4 mb-xl-4">Find gavehilsner til <?php the_title();?></h1>
       </div>
     </div>
-    <div class="row mt-4 mb-5" id="topoccassions">
-      <div class="col-6 col-md-2">
-        <div class="card border-0 shadow-sm">
-          <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/a%CC%8A-aspect-ratio-1000-800-1-768x614.png" class="card-img-top" alt="Påskegaver">
-          <div class="card-body">
-            <h5 class="card-title">Påske</h5>
-          </div>
-        </div>
-      </div>
-      <div class="col-6 col-md-2">
-        <div class="card border-0 shadow-sm">
-          <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/blomst.jpg" class="card-img-top" alt="Påskegaver">
-          <div class="card-body">
-            <h5 class="card-title">Mors dag</h5>
-          </div>
-        </div>
-      </div>
-      <div class="col-6 col-md-2">
-        <div class="card border-0 shadow-sm">
-          <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/Skaermbillede-2022-04-17-kl.-19.17.03.png" class="card-img-top" alt="Påskegaver">
-          <div class="card-body">
-            <h5 class="card-title">Fars dag</h5>
-          </div>
-        </div>
-      </div>
-      <div class="col-6 col-md-2">
-        <div class="card border-0 shadow-sm">
-          <img src="https://dev.greeting.dk/wp-content/uploads/2022/02/DSC_0440-2.jpg" class="card-img-top" alt="Påskegaver">
-          <div class="card-body">
-            <h5 class="card-title">Forretningsforbindelse</h5>
-          </div>
-        </div>
-      </div>
-      <div class="col-6 col-md-2">
-        <div class="card border-0 shadow-sm">
-          <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/4-1-scaled-aspect-ratio-1000-800-1.jpg" class="card-img-top" alt="Påskegaver">
-          <div class="card-body">
-            <h5 class="card-title">Fejring</h5>
-          </div>
-        </div>
-      </div>
-      <div class="col-6 col-md-2">
-        <div class="card border-0 shadow-sm">
-          <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/strikke_garn_gave_400_brun_knitters_delight.I.png" class="card-img-top" alt="Påskegaver">
-          <div class="card-body">
-            <h5 class="card-title">Interiør</h5>
-          </div>
-        </div>
-      </div>
-    </div>
 
+    <div class="row mt-4 mb-5" id="topoccassions">
+    <?php
+    $occasionTermListArray = array();
+
+    $productPriceArray = array(); // for price filter
+
+    foreach ($UserIdArrayForCityPostalcode as $vendorId) {
+        $vendor = get_wcmp_vendor($vendorId);
+        $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
+        foreach ($vendorProducts as $productId) {
+            $occasionTermList = wp_get_post_terms($productId, 'occasion', array('fields' => 'all'));
+            // for price filter begin
+            $singleProduct = wc_get_product( $productId );
+            array_push($productPriceArray, $singleProduct->get_price()); // for price filter
+            // for price filter end
+            foreach($occasionTermList as $occasionTerm){
+                array_push($occasionTermListArray, $occasionTerm);
+            }
+        }
+    }
+
+    foreach($occasionTermListArray as $occasion){
+      $uploadedOccasionImage = '';
+      $placeHolderImage = wc_placeholder_img_src();
+      $occasionImageUrl;
+      if($uploadedOccasionImage != ''){
+        $occasionImageUrl = $uploadedOccasionImage;
+      } else {
+        $occasionImageUrl = $placeHolderImage;
+      }
+    ?>
+    <div class="col-6 col-md-2">
+        <div class="card border-0 shadow-sm">
+          <img src="<?php echo $occasionImageUrl;?>" class="card-img-top" alt="Påskegaver">
+          <div class="card-body">
+            <h5 class="card-title"><?php echo $occasion->name;?></h5>
+          </div>
+        </div>
+      </div>
+
+    <?php }
+    ?>
+    </div>
 
     <div class="row">
       <div class="col-md-12 col-lg-3 filter">
@@ -483,7 +534,7 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
           <h6 class="float-start d-none d-lg-inline d-xl-inline py-2 border-bottom filter-header">Filtrér</h6>
         </div>
         <div class="collapse d-lg-block accordion-collapse " id="colFilter">
-          <h5 class="text-uppercase">Anledninger</h5>
+          <!-- <h5 class="text-uppercase">Anledninger</h5>
           <ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4 px-0">
             <li class="px-0">
               <a class="dropdown-item d-flex align-items-center gap-2 py-2 px-2" href="#">
@@ -539,7 +590,7 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
                 Action
               </a>
             </li>
-          </ul>
+          </ul> -->
 
           <?php
           /**
@@ -592,17 +643,17 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
           foreach($productCategories as $category){
              foreach($categoryTermListArrayUnique as $catTerm){
                  if($catTerm == $category->term_id){ ?>
-                    <li>
-                     <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="#">
+                    <!-- <li>
+                     <a class="city-page-item dropdown-item d-flex align-items-center gap-2 py-2" href="#">
                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-square" viewBox="0 0 16 16">
                          <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
                        </svg>
-                       <?php echo $category->name; ?>
+                       <?php //echo $category->name; ?>
                      </a>
-                    </li>
-                    <!--<div class="checkbox">
+                    </li> -->
+                    <div class="checkbox">
                         <label><input type="checkbox" name="type" class="vendor_sort_category" value="<?php echo $category->term_id; ?>"><?php echo $category->name; ?></label>
-                    </div>-->
+                    </div>
                  <?php }
              }
           }
@@ -644,17 +695,17 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
           foreach($productOccasions as $occasion){
               foreach($occasionTermListArrayUnique as $occasionTerm){
                   if($occasionTerm == $occasion->term_id){ ?>
-                    <li>
+                    <!-- <li>
                       <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="#">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-square" viewBox="0 0 16 16">
                           <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
                         </svg>
-                        <?php echo $occasion->name; ?>
+                        <?php //echo $occasion->name; ?>
                       </a>
-                    </li>
-                    <!--<div class="checkbox">
+                    </li> -->
+                    <div class="checkbox">
                         <label><input type="checkbox" name="type" class="vendor_sort_category" value="<?php echo $occasion->term_id; ?>"><?php echo $occasion->name; ?></label>
-                    </div>-->
+                    </div>
           <?php   }
               }
           }
@@ -694,76 +745,130 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
           $deliveryTypeArrayUnique = array_unique($deliveryTypeArray);
 
           foreach($deliveryTypeArrayUnique as $delivery){?>
-              <li>
+              <!-- <li>
                 <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="#">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-square" viewBox="0 0 16 16">
                     <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
                   </svg>
-                  <?php echo $delivery; ?>
+                  <?php //echo $delivery; ?>
                 </a>
-              </li>
-              <!--<div class="checkbox">
+              </li> -->
+              <div class="checkbox">
                   <label><input type="checkbox" name="type" class="vendor_sort_category" value="<?php echo $delivery; ?>"><?php echo $delivery; ?></label>
-              </div>-->
+              </div>
           <?php }
           ?>
           </ul>
 
-          <h5>Pris</h5>
-          <!--<label for="price" class="form-label">Pris</label>-->
+          <!-- <h5>Pris</h5>
+          !--<label for="price" class="form-label">Pris</label>--
           <p style="width: 100%;">
             <span class="float-start price-filter-text">149,-</span>
             <span class="float-end price-filter-text">749,-</span>
           </p>
-          <input type="range" class="form-range" min="0" max="2500" id="price">
+          <input type="range" class="form-range" min="0" max="2500" id="price"> -->
+
+          <!-- price filter filter-->
+          <?php
+          // for price filter
+          $minProductPrice;
+          $maxProductPrice;
+
+          if(count($productPriceArray) == 0){
+            $minProductPrice = 0;
+            $maxProductPrice = 0;
+          }
+          elseif(min($productPriceArray) == max($productPriceArray)){
+            $minProductPrice = 0;
+            $maxProductPrice = max($productPriceArray);
+          }
+          else {
+            $minProductPrice = min($productPriceArray);
+            $maxProductPrice = max($productPriceArray);
+          } 
+          ?>
+
+          <div id="priceSliderWrap">
+            <h5>Price</h5>
+            <form>
+                <div id="slideInput">
+                    <input type="text" id="slideStartPoint" class="sliderValue text-" data-index="0" value="<?php echo $minProductPrice;?>" readonly/>
+                    <input type="text" id="slideEndPoint" class="sliderValue" data-index="1" value="<?php echo $maxProductPrice;?>" readonly/>
+                </div>
+                <br />
+                <div id="priceSlider"></div>
+            </form>
+          </div>
+
         </div> <!-- #colFilter -->
       </div>
 
       <div class="col-md-12 col-lg-9 mb-5">
         <h1 class="d-none d-lg-block d-xl-block my-3 my-xs-3 my-sm-3 my-md-3 my-lg-0 my-xl-0 mb-lg-4 mb-xl-4">Find gavehilsner til <?php the_title();?></h1>
         <div class="applied-filters row mt-xs-0 mt-sm-0 mt-md-0 mt-2 mb-4 lh-lg">
-          <div class="col-12">
+          <div class="col-12 filterItemShow">
+
             <a class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 text-dark">Påske <button type="button" class="btn-close" aria-label="Close"></button></a>
+
             <a class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 text-dark">Påske <button type="button" class="btn-close" aria-label="Close"></button></a>
             <a class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 text-dark">Pris: 250,- til 750,- <button type="button" class="btn-close" aria-label="Close"></button></a>
             <a class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 text-dark">5683 Haarby <button type="button" class="btn-close" aria-label="Close"></button></a>
+
             <a class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 bg-yellow text-white">Nulstil alle <button type="button" class="btn-close  btn-close-white" aria-label="Close"></button></a>
+
+            <button id="cityPageReset">Reset</button>
           </div>
         </div>
 
-        <div class="store row">
+      
+      <?php    
+      foreach ($UserIdArrayForCityPostalcode as $user) {
+        $vendor = get_wcmp_vendor($user);
+        $image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
+        ?>
+        <div id="defaultStore" class="store row">
           <div class="col-12">
             <div class="card shadow border-0 mb-3">
               <div class="card-body">
                 <div class="row align-items-center">
+
                   <div class="col-3 text-center">
-                    <img class="img-fluid rounded-start" src="https://dev.greeting.dk/wp-content/uploads/2022/04/119550939_363089735070099_2663604500059929352_n-150x150.jpg" style="max-width: 100px;">
-                    <h6>Den blå dør</h6>
-                    <a href="#" class="cta rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-3 px-md-4">
+                    <img class="img-fluid rounded-start" src="<?php echo $image;?>" style="max-width: 100px;">
+                    <?php $button_text = apply_filters('wcmp_vendor_lists_single_button_text', $vendor->page_title); ?>
+                    <h6><?php echo esc_html($button_text); ?></h6>
+                    <a href="<?php echo esc_url($vendor->get_permalink()); ?>" class="cta rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-3 px-md-4">
                       Gå til butik<span class="d-none d-md-inline"> ></span>
                     </a>
                   </div>
+
+
                   <div class="col-9">
                     <div class="row">
+                    <?php 
+                    $vendorProducts = $vendor->get_products(array('fields' => 'all'));
+                    foreach ($vendorProducts as $prod) {
+                      $product = wc_get_product($prod);
+                      $imageId = $product->get_image_id();
+                        $uploadedImage = wp_get_attachment_image_url($imageId);
+                        $placeHolderImage = wc_placeholder_img_src();
+                        $imageUrl;
+                        if($uploadedImage != ''){
+                          $imageUrl = $uploadedImage;
+                        } else {
+                          $imageUrl = $placeHolderImage;
+                        }
+                      ?>
                       <div class="col-6 col-xs-6 col-sm-6 col-md-4">
                         <div class="card border-0">
-                            <a href="#john"><img src="https://greeting.dk/wp-content/uploads/2022/01/Foraarsbombe_-scaled-aspect-ratio-1000-800-600x600.jpg" class="card-img-top" alt="REPLACEME"></a>
+                            <a href="<?php echo get_permalink($product->get_id());?>"><img src="<?php echo $imageUrl;?>" class="card-img-top" alt="REPLACEME"></a>
                             <div class="card-body">
-                                <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                                <p class="price">Fra 235 kr.</p>
+                                <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark"><?php echo $product->get_name();?></a></h6>
+                                <p class="price">Fra <?php echo $product->get_price();?> kr.</p>
                             </div>
                         </div>
                       </div>
-                      <div class="col-6 col-xs-6 col-sm-6 col-md-4">
-                        <div class="card border-0">
-                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/02/Valentinesbuket-aspect-ratio-1000-800-600x600.jpg" class="card-img-top" alt="REPLACEME"></a>
-                            <div class="card-body">
-                                <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                                <p class="price">Fra 235 kr.</p>
-                            </div>
-                        </div>
-                      </div>
-                      <div class="d-none d-md-inline d-lg-inline d-xl-inline col-6 col-xs-6 col-sm-6 col-md-4">
+                    <?php } ?>
+                      <!-- <div class="d-none d-md-inline d-lg-inline d-xl-inline col-6 col-xs-6 col-sm-6 col-md-4">
                         <div class="card border-0">
                             <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/02/Toerretmoerk-scaled-aspect-ratio-1000-800-1-600x600.jpg" class="card-img-top" alt="REPLACEME"></a>
                             <div class="card-body">
@@ -771,7 +876,7 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
                                 <p class="price">Fra 235 kr.</p>
                             </div>
                         </div>
-                      </div>
+                      </div> -->
                     </div>
                   </div>
                 </div>
@@ -782,549 +887,20 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bicycle" viewBox="0 0 16 16">
                       <path d="M4 4.5a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1v.5h4.14l.386-1.158A.5.5 0 0 1 11 4h1a.5.5 0 0 1 0 1h-.64l-.311.935.807 1.29a3 3 0 1 1-.848.53l-.508-.812-2.076 3.322A.5.5 0 0 1 8 10.5H5.959a3 3 0 1 1-1.815-3.274L5 5.856V5h-.5a.5.5 0 0 1-.5-.5zm1.5 2.443-.508.814c.5.444.85 1.054.967 1.743h1.139L5.5 6.943zM8 9.057 9.598 6.5H6.402L8 9.057zM4.937 9.5a1.997 1.997 0 0 0-.487-.877l-.548.877h1.035zM3.603 8.092A2 2 0 1 0 4.937 10.5H3a.5.5 0 0 1-.424-.765l1.027-1.643zm7.947.53a2 2 0 1 0 .848-.53l1.026 1.643a.5.5 0 1 1-.848.53L11.55 8.623z"/>
                     </svg>
-                    Leverer til: 8000 Aarhus C, 8200 Aarhus N, 8270 Højbjerg
+                    <!-- Leverer til: 8000 Aarhus C, 8200 Aarhus N, 8270 Højbjerg -->
+                    Leverer til: <?php
+                    $deliveryZip = get_user_meta($user, 'delivery_zips', true);
+                    echo $deliveryZip;?>
                   </div>
                 </small>
               </div>
             </div>
           </div>
         </div>
+      <?php } ?>
 
-
-
-        <div class="store row">
-          <div class="col-12">
-            <div class="card shadow border-0 mb-3">
-              <div class="card-body">
-                <div class="row align-items-center">
-                  <div class="col-3 text-center">
-                    <img class="img-fluid rounded-start" src="https://dev.greeting.dk/wp-content/uploads/2022/04/119550939_363089735070099_2663604500059929352_n-150x150.jpg" style="max-width: 100px;">
-                    <h6>Den blå dør</h6>
-                    <a href="#" class="cta rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-3 px-md-4">
-                      Gå til butik<span class="d-none d-md-inline"> ></span>
-                    </a>
-                  </div>
-                  <div class="col-9">
-                    <div class="row">
-                      <div class="col-6 col-xs-6 col-sm-6 col-md-4">
-                        <div class="card border-0">
-                            <a href="#john"><img src="https://greeting.dk/wp-content/uploads/2022/01/Foraarsbombe_-scaled-aspect-ratio-1000-800-600x600.jpg" class="card-img-top" alt="REPLACEME"></a>
-                            <div class="card-body">
-                                <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                                <p class="price">Fra 235 kr.</p>
-                            </div>
-                        </div>
-                      </div>
-                      <div class="col-6 col-xs-6 col-sm-6 col-md-4">
-                        <div class="card border-0">
-                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/02/Valentinesbuket-aspect-ratio-1000-800-600x600.jpg" class="card-img-top" alt="REPLACEME"></a>
-                            <div class="card-body">
-                                <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                                <p class="price">Fra 235 kr.</p>
-                            </div>
-                        </div>
-                      </div>
-                      <div class="d-none d-md-inline d-lg-inline d-xl-inline col-6 col-xs-6 col-sm-6 col-md-4">
-                        <div class="card border-0">
-                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/02/Toerretmoerk-scaled-aspect-ratio-1000-800-1-600x600.jpg" class="card-img-top" alt="REPLACEME"></a>
-                            <div class="card-body">
-                                <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                                <p class="price">Fra 235 kr.</p>
-                            </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="card-footer">
-                <small class="text-muted">
-                  <div>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bicycle" viewBox="0 0 16 16">
-                      <path d="M4 4.5a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1v.5h4.14l.386-1.158A.5.5 0 0 1 11 4h1a.5.5 0 0 1 0 1h-.64l-.311.935.807 1.29a3 3 0 1 1-.848.53l-.508-.812-2.076 3.322A.5.5 0 0 1 8 10.5H5.959a3 3 0 1 1-1.815-3.274L5 5.856V5h-.5a.5.5 0 0 1-.5-.5zm1.5 2.443-.508.814c.5.444.85 1.054.967 1.743h1.139L5.5 6.943zM8 9.057 9.598 6.5H6.402L8 9.057zM4.937 9.5a1.997 1.997 0 0 0-.487-.877l-.548.877h1.035zM3.603 8.092A2 2 0 1 0 4.937 10.5H3a.5.5 0 0 1-.424-.765l1.027-1.643zm7.947.53a2 2 0 1 0 .848-.53l1.026 1.643a.5.5 0 1 1-.848.53L11.55 8.623z"/>
-                    </svg>
-                    Leverer til: 8000 Aarhus C, 8200 Aarhus N, 8270 Højbjerg
-                  </div>
-                </small>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="store row">
-          <div class="col-12">
-            <div class="card shadow border-0 mb-3">
-              <div class="card-body">
-                <div class="row align-items-center">
-                  <div class="col-3 text-center">
-                    <img class="img-fluid rounded-start" src="https://dev.greeting.dk/wp-content/uploads/2022/04/119550939_363089735070099_2663604500059929352_n-150x150.jpg" style="max-width: 100px;">
-                    <h6>Den blå dør</h6>
-                    <a href="#" class="cta rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-3 px-md-4">
-                      Gå til butik<span class="d-none d-md-inline"> ></span>
-                    </a>
-                  </div>
-                  <div class="col-9">
-                    <div class="row">
-                      <div class="col-6 col-xs-6 col-sm-6 col-md-4">
-                        <div class="card border-0">
-                            <a href="#john"><img src="https://greeting.dk/wp-content/uploads/2022/01/Foraarsbombe_-scaled-aspect-ratio-1000-800-600x600.jpg" class="card-img-top" alt="REPLACEME"></a>
-                            <div class="card-body">
-                                <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                                <p class="price">Fra 235 kr.</p>
-                            </div>
-                        </div>
-                      </div>
-                      <div class="col-6 col-xs-6 col-sm-6 col-md-4">
-                        <div class="card border-0">
-                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/02/Valentinesbuket-aspect-ratio-1000-800-600x600.jpg" class="card-img-top" alt="REPLACEME"></a>
-                            <div class="card-body">
-                                <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                                <p class="price">Fra 235 kr.</p>
-                            </div>
-                        </div>
-                      </div>
-                      <div class="d-none d-md-inline d-lg-inline d-xl-inline col-6 col-xs-6 col-sm-6 col-md-4">
-                        <div class="card border-0">
-                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/02/Toerretmoerk-scaled-aspect-ratio-1000-800-1-600x600.jpg" class="card-img-top" alt="REPLACEME"></a>
-                            <div class="card-body">
-                                <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                                <p class="price">Fra 235 kr.</p>
-                            </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="card-footer">
-                <small class="text-muted">
-                  <div>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bicycle" viewBox="0 0 16 16">
-                      <path d="M4 4.5a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1v.5h4.14l.386-1.158A.5.5 0 0 1 11 4h1a.5.5 0 0 1 0 1h-.64l-.311.935.807 1.29a3 3 0 1 1-.848.53l-.508-.812-2.076 3.322A.5.5 0 0 1 8 10.5H5.959a3 3 0 1 1-1.815-3.274L5 5.856V5h-.5a.5.5 0 0 1-.5-.5zm1.5 2.443-.508.814c.5.444.85 1.054.967 1.743h1.139L5.5 6.943zM8 9.057 9.598 6.5H6.402L8 9.057zM4.937 9.5a1.997 1.997 0 0 0-.487-.877l-.548.877h1.035zM3.603 8.092A2 2 0 1 0 4.937 10.5H3a.5.5 0 0 1-.424-.765l1.027-1.643zm7.947.53a2 2 0 1 0 .848-.53l1.026 1.643a.5.5 0 1 1-.848.53L11.55 8.623z"/>
-                    </svg>
-                    Leverer til: 8000 Aarhus C, 8200 Aarhus N, 8270 Højbjerg
-                  </div>
-                </small>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="store row">
-          <div class="col-12">
-            <div class="card shadow border-0 mb-3">
-              <div class="card-body">
-                <div class="row align-items-center">
-                  <div class="col-3 text-center">
-                    <img class="img-fluid rounded-start" src="https://dev.greeting.dk/wp-content/uploads/2022/04/119550939_363089735070099_2663604500059929352_n-150x150.jpg" style="max-width: 100px;">
-                    <h6>Den blå dør</h6>
-                    <a href="#" class="cta rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-3 px-md-4">
-                      Gå til butik<span class="d-none d-md-inline"> ></span>
-                    </a>
-                  </div>
-                  <div class="col-9">
-                    <div class="row">
-                      <div class="col-6 col-xs-6 col-sm-6 col-md-4">
-                        <div class="card border-0">
-                            <a href="#john"><img src="https://greeting.dk/wp-content/uploads/2022/01/Foraarsbombe_-scaled-aspect-ratio-1000-800-600x600.jpg" class="card-img-top" alt="REPLACEME"></a>
-                            <div class="card-body">
-                                <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                                <p class="price">Fra 235 kr.</p>
-                            </div>
-                        </div>
-                      </div>
-                      <div class="col-6 col-xs-6 col-sm-6 col-md-4">
-                        <div class="card border-0">
-                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/02/Valentinesbuket-aspect-ratio-1000-800-600x600.jpg" class="card-img-top" alt="REPLACEME"></a>
-                            <div class="card-body">
-                                <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                                <p class="price">Fra 235 kr.</p>
-                            </div>
-                        </div>
-                      </div>
-                      <div class="d-none d-md-inline d-lg-inline d-xl-inline col-6 col-xs-6 col-sm-6 col-md-4">
-                        <div class="card border-0">
-                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/02/Toerretmoerk-scaled-aspect-ratio-1000-800-1-600x600.jpg" class="card-img-top" alt="REPLACEME"></a>
-                            <div class="card-body">
-                                <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                                <p class="price">Fra 235 kr.</p>
-                            </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="card-footer">
-                <small class="text-muted">
-                  <div>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bicycle" viewBox="0 0 16 16">
-                      <path d="M4 4.5a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1v.5h4.14l.386-1.158A.5.5 0 0 1 11 4h1a.5.5 0 0 1 0 1h-.64l-.311.935.807 1.29a3 3 0 1 1-.848.53l-.508-.812-2.076 3.322A.5.5 0 0 1 8 10.5H5.959a3 3 0 1 1-1.815-3.274L5 5.856V5h-.5a.5.5 0 0 1-.5-.5zm1.5 2.443-.508.814c.5.444.85 1.054.967 1.743h1.139L5.5 6.943zM8 9.057 9.598 6.5H6.402L8 9.057zM4.937 9.5a1.997 1.997 0 0 0-.487-.877l-.548.877h1.035zM3.603 8.092A2 2 0 1 0 4.937 10.5H3a.5.5 0 0 1-.424-.765l1.027-1.643zm7.947.53a2 2 0 1 0 .848-.53l1.026 1.643a.5.5 0 1 1-.848.53L11.55 8.623z"/>
-                    </svg>
-                    Leverer til: 8000 Aarhus C, 8200 Aarhus N, 8270 Højbjerg
-                  </div>
-                </small>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="store row">
-          <div class="col-12">
-            <div class="card shadow border-0 mb-3">
-              <div class="card-body">
-                <div class="row align-items-center">
-                  <div class="col-3 text-center">
-                    <img class="img-fluid rounded-start" src="https://dev.greeting.dk/wp-content/uploads/2022/04/119550939_363089735070099_2663604500059929352_n-150x150.jpg" style="max-width: 100px;">
-                    <h6>Den blå dør</h6>
-                    <a href="#" class="cta rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-3 px-md-4">
-                      Gå til butik<span class="d-none d-md-inline"> ></span>
-                    </a>
-                  </div>
-                  <div class="col-9">
-                    <div class="row">
-                      <div class="col-6 col-xs-6 col-sm-6 col-md-4">
-                        <div class="card border-0">
-                            <a href="#john"><img src="https://greeting.dk/wp-content/uploads/2022/01/Foraarsbombe_-scaled-aspect-ratio-1000-800-600x600.jpg" class="card-img-top" alt="REPLACEME"></a>
-                            <div class="card-body">
-                                <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                                <p class="price">Fra 235 kr.</p>
-                            </div>
-                        </div>
-                      </div>
-                      <div class="col-6 col-xs-6 col-sm-6 col-md-4">
-                        <div class="card border-0">
-                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/02/Valentinesbuket-aspect-ratio-1000-800-600x600.jpg" class="card-img-top" alt="REPLACEME"></a>
-                            <div class="card-body">
-                                <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                                <p class="price">Fra 235 kr.</p>
-                            </div>
-                        </div>
-                      </div>
-                      <div class="d-none d-md-inline d-lg-inline d-xl-inline col-6 col-xs-6 col-sm-6 col-md-4">
-                        <div class="card border-0">
-                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/02/Toerretmoerk-scaled-aspect-ratio-1000-800-1-600x600.jpg" class="card-img-top" alt="REPLACEME"></a>
-                            <div class="card-body">
-                                <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                                <p class="price">Fra 235 kr.</p>
-                            </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="card-footer">
-                <small class="text-muted">
-                  <div>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bicycle" viewBox="0 0 16 16">
-                      <path d="M4 4.5a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1v.5h4.14l.386-1.158A.5.5 0 0 1 11 4h1a.5.5 0 0 1 0 1h-.64l-.311.935.807 1.29a3 3 0 1 1-.848.53l-.508-.812-2.076 3.322A.5.5 0 0 1 8 10.5H5.959a3 3 0 1 1-1.815-3.274L5 5.856V5h-.5a.5.5 0 0 1-.5-.5zm1.5 2.443-.508.814c.5.444.85 1.054.967 1.743h1.139L5.5 6.943zM8 9.057 9.598 6.5H6.402L8 9.057zM4.937 9.5a1.997 1.997 0 0 0-.487-.877l-.548.877h1.035zM3.603 8.092A2 2 0 1 0 4.937 10.5H3a.5.5 0 0 1-.424-.765l1.027-1.643zm7.947.53a2 2 0 1 0 .848-.53l1.026 1.643a.5.5 0 1 1-.848.53L11.55 8.623z"/>
-                    </svg>
-                    Leverer til: 8000 Aarhus C, 8200 Aarhus N, 8270 Højbjerg
-                  </div>
-                </small>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="store row">
-          <div class="col-12">
-            <div class="card shadow border-0 mb-3">
-              <div class="card-body">
-                <div class="row align-items-center">
-                  <div class="col-3 text-center">
-                    <img class="img-fluid rounded-start" src="https://dev.greeting.dk/wp-content/uploads/2022/04/119550939_363089735070099_2663604500059929352_n-150x150.jpg" style="max-width: 100px;">
-                    <h6>Den blå dør</h6>
-                    <a href="#" class="cta rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-3 px-md-4">
-                      Gå til butik<span class="d-none d-md-inline"> ></span>
-                    </a>
-                  </div>
-                  <div class="col-9">
-                    <div class="row">
-                      <div class="col-6 col-xs-6 col-sm-6 col-md-4">
-                        <div class="card border-0">
-                            <a href="#john"><img src="https://greeting.dk/wp-content/uploads/2022/01/Foraarsbombe_-scaled-aspect-ratio-1000-800-600x600.jpg" class="card-img-top" alt="REPLACEME"></a>
-                            <div class="card-body">
-                                <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                                <p class="price">Fra 235 kr.</p>
-                            </div>
-                        </div>
-                      </div>
-                      <div class="col-6 col-xs-6 col-sm-6 col-md-4">
-                        <div class="card border-0">
-                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/02/Valentinesbuket-aspect-ratio-1000-800-600x600.jpg" class="card-img-top" alt="REPLACEME"></a>
-                            <div class="card-body">
-                                <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                                <p class="price">Fra 235 kr.</p>
-                            </div>
-                        </div>
-                      </div>
-                      <div class="d-none d-md-inline d-lg-inline d-xl-inline col-6 col-xs-6 col-sm-6 col-md-4">
-                        <div class="card border-0">
-                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/02/Toerretmoerk-scaled-aspect-ratio-1000-800-1-600x600.jpg" class="card-img-top" alt="REPLACEME"></a>
-                            <div class="card-body">
-                                <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                                <p class="price">Fra 235 kr.</p>
-                            </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="card-footer">
-                <small class="text-muted">
-                  <div>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bicycle" viewBox="0 0 16 16">
-                      <path d="M4 4.5a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1v.5h4.14l.386-1.158A.5.5 0 0 1 11 4h1a.5.5 0 0 1 0 1h-.64l-.311.935.807 1.29a3 3 0 1 1-.848.53l-.508-.812-2.076 3.322A.5.5 0 0 1 8 10.5H5.959a3 3 0 1 1-1.815-3.274L5 5.856V5h-.5a.5.5 0 0 1-.5-.5zm1.5 2.443-.508.814c.5.444.85 1.054.967 1.743h1.139L5.5 6.943zM8 9.057 9.598 6.5H6.402L8 9.057zM4.937 9.5a1.997 1.997 0 0 0-.487-.877l-.548.877h1.035zM3.603 8.092A2 2 0 1 0 4.937 10.5H3a.5.5 0 0 1-.424-.765l1.027-1.643zm7.947.53a2 2 0 1 0 .848-.53l1.026 1.643a.5.5 0 1 1-.848.53L11.55 8.623z"/>
-                    </svg>
-                    Leverer til: 8000 Aarhus C, 8200 Aarhus N, 8270 Højbjerg
-                  </div>
-                </small>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="store row">
-          <div class="col-12">
-            <div class="card shadow border-0 mb-3">
-              <div class="card-body">
-                <div class="row align-items-center">
-                  <div class="col-3 text-center">
-                    <img class="img-fluid rounded-start" src="https://dev.greeting.dk/wp-content/uploads/2022/04/119550939_363089735070099_2663604500059929352_n-150x150.jpg" style="max-width: 100px;">
-                    <h6>Den blå dør</h6>
-                    <a href="#" class="cta rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-3 px-md-4">
-                      Gå til butik<span class="d-none d-md-inline"> ></span>
-                    </a>
-                  </div>
-                  <div class="col-9">
-                    <div class="row">
-                      <div class="col-6 col-xs-6 col-sm-6 col-md-4">
-                        <div class="card border-0">
-                            <a href="#john"><img src="https://greeting.dk/wp-content/uploads/2022/01/Foraarsbombe_-scaled-aspect-ratio-1000-800-600x600.jpg" class="card-img-top" alt="REPLACEME"></a>
-                            <div class="card-body">
-                                <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                                <p class="price">Fra 235 kr.</p>
-                            </div>
-                        </div>
-                      </div>
-                      <div class="col-6 col-xs-6 col-sm-6 col-md-4">
-                        <div class="card border-0">
-                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/02/Valentinesbuket-aspect-ratio-1000-800-600x600.jpg" class="card-img-top" alt="REPLACEME"></a>
-                            <div class="card-body">
-                                <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                                <p class="price">Fra 235 kr.</p>
-                            </div>
-                        </div>
-                      </div>
-                      <div class="d-none d-md-inline d-lg-inline d-xl-inline col-6 col-xs-6 col-sm-6 col-md-4">
-                        <div class="card border-0">
-                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/02/Toerretmoerk-scaled-aspect-ratio-1000-800-1-600x600.jpg" class="card-img-top" alt="REPLACEME"></a>
-                            <div class="card-body">
-                                <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                                <p class="price">Fra 235 kr.</p>
-                            </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="card-footer">
-                <small class="text-muted">
-                  <div>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bicycle" viewBox="0 0 16 16">
-                      <path d="M4 4.5a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1v.5h4.14l.386-1.158A.5.5 0 0 1 11 4h1a.5.5 0 0 1 0 1h-.64l-.311.935.807 1.29a3 3 0 1 1-.848.53l-.508-.812-2.076 3.322A.5.5 0 0 1 8 10.5H5.959a3 3 0 1 1-1.815-3.274L5 5.856V5h-.5a.5.5 0 0 1-.5-.5zm1.5 2.443-.508.814c.5.444.85 1.054.967 1.743h1.139L5.5 6.943zM8 9.057 9.598 6.5H6.402L8 9.057zM4.937 9.5a1.997 1.997 0 0 0-.487-.877l-.548.877h1.035zM3.603 8.092A2 2 0 1 0 4.937 10.5H3a.5.5 0 0 1-.424-.765l1.027-1.643zm7.947.53a2 2 0 1 0 .848-.53l1.026 1.643a.5.5 0 1 1-.848.53L11.55 8.623z"/>
-                    </svg>
-                    Leverer til: 8000 Aarhus C, 8200 Aarhus N, 8270 Højbjerg
-                  </div>
-                </small>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="store row">
-          <div class="col-12">
-            <div class="card shadow border-0 mb-3">
-              <div class="card-body">
-                <div class="row align-items-center">
-                  <div class="col-3 text-center">
-                    <img class="img-fluid rounded-start" src="https://dev.greeting.dk/wp-content/uploads/2022/04/119550939_363089735070099_2663604500059929352_n-150x150.jpg" style="max-width: 100px;">
-                    <h6>Den blå dør</h6>
-                    <a href="#" class="cta rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-3 px-md-4">
-                      Gå til butik<span class="d-none d-md-inline"> ></span>
-                    </a>
-                  </div>
-                  <div class="col-9">
-                    <div class="row">
-                      <div class="col-6 col-xs-6 col-sm-6 col-md-4">
-                        <div class="card border-0">
-                            <a href="#john"><img src="https://greeting.dk/wp-content/uploads/2022/01/Foraarsbombe_-scaled-aspect-ratio-1000-800-600x600.jpg" class="card-img-top" alt="REPLACEME"></a>
-                            <div class="card-body">
-                                <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                                <p class="price">Fra 235 kr.</p>
-                            </div>
-                        </div>
-                      </div>
-                      <div class="col-6 col-xs-6 col-sm-6 col-md-4">
-                        <div class="card border-0">
-                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/02/Valentinesbuket-aspect-ratio-1000-800-600x600.jpg" class="card-img-top" alt="REPLACEME"></a>
-                            <div class="card-body">
-                                <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                                <p class="price">Fra 235 kr.</p>
-                            </div>
-                        </div>
-                      </div>
-                      <div class="d-none d-md-inline d-lg-inline d-xl-inline col-6 col-xs-6 col-sm-6 col-md-4">
-                        <div class="card border-0">
-                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/02/Toerretmoerk-scaled-aspect-ratio-1000-800-1-600x600.jpg" class="card-img-top" alt="REPLACEME"></a>
-                            <div class="card-body">
-                                <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                                <p class="price">Fra 235 kr.</p>
-                            </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="card-footer">
-                <small class="text-muted">
-                  <div>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bicycle" viewBox="0 0 16 16">
-                      <path d="M4 4.5a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1v.5h4.14l.386-1.158A.5.5 0 0 1 11 4h1a.5.5 0 0 1 0 1h-.64l-.311.935.807 1.29a3 3 0 1 1-.848.53l-.508-.812-2.076 3.322A.5.5 0 0 1 8 10.5H5.959a3 3 0 1 1-1.815-3.274L5 5.856V5h-.5a.5.5 0 0 1-.5-.5zm1.5 2.443-.508.814c.5.444.85 1.054.967 1.743h1.139L5.5 6.943zM8 9.057 9.598 6.5H6.402L8 9.057zM4.937 9.5a1.997 1.997 0 0 0-.487-.877l-.548.877h1.035zM3.603 8.092A2 2 0 1 0 4.937 10.5H3a.5.5 0 0 1-.424-.765l1.027-1.643zm7.947.53a2 2 0 1 0 .848-.53l1.026 1.643a.5.5 0 1 1-.848.53L11.55 8.623z"/>
-                    </svg>
-                    Leverer til: 8000 Aarhus C, 8200 Aarhus N, 8270 Højbjerg
-                  </div>
-                </small>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="store row">
-          <div class="col-12">
-            <div class="card shadow border-0 mb-3">
-              <div class="card-body">
-                <div class="row align-items-center">
-                  <div class="col-3 text-center">
-                    <img class="img-fluid rounded-start" src="https://dev.greeting.dk/wp-content/uploads/2022/04/119550939_363089735070099_2663604500059929352_n-150x150.jpg" style="max-width: 100px;">
-                    <h6>Den blå dør</h6>
-                    <a href="#" class="cta rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-3 px-md-4">
-                      Gå til butik<span class="d-none d-md-inline"> ></span>
-                    </a>
-                  </div>
-                  <div class="col-9">
-                    <div class="row">
-                      <div class="col-6 col-xs-6 col-sm-6 col-md-4">
-                        <div class="card border-0">
-                            <a href="#john"><img src="https://greeting.dk/wp-content/uploads/2022/01/Foraarsbombe_-scaled-aspect-ratio-1000-800-600x600.jpg" class="card-img-top" alt="REPLACEME"></a>
-                            <div class="card-body">
-                                <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                                <p class="price">Fra 235 kr.</p>
-                            </div>
-                        </div>
-                      </div>
-                      <div class="col-6 col-xs-6 col-sm-6 col-md-4">
-                        <div class="card border-0">
-                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/02/Valentinesbuket-aspect-ratio-1000-800-600x600.jpg" class="card-img-top" alt="REPLACEME"></a>
-                            <div class="card-body">
-                                <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                                <p class="price">Fra 235 kr.</p>
-                            </div>
-                        </div>
-                      </div>
-                      <div class="d-none d-md-inline d-lg-inline d-xl-inline col-6 col-xs-6 col-sm-6 col-md-4">
-                        <div class="card border-0">
-                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/02/Toerretmoerk-scaled-aspect-ratio-1000-800-1-600x600.jpg" class="card-img-top" alt="REPLACEME"></a>
-                            <div class="card-body">
-                                <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                                <p class="price">Fra 235 kr.</p>
-                            </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="card-footer">
-                <small class="text-muted">
-                  <div>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bicycle" viewBox="0 0 16 16">
-                      <path d="M4 4.5a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1v.5h4.14l.386-1.158A.5.5 0 0 1 11 4h1a.5.5 0 0 1 0 1h-.64l-.311.935.807 1.29a3 3 0 1 1-.848.53l-.508-.812-2.076 3.322A.5.5 0 0 1 8 10.5H5.959a3 3 0 1 1-1.815-3.274L5 5.856V5h-.5a.5.5 0 0 1-.5-.5zm1.5 2.443-.508.814c.5.444.85 1.054.967 1.743h1.139L5.5 6.943zM8 9.057 9.598 6.5H6.402L8 9.057zM4.937 9.5a1.997 1.997 0 0 0-.487-.877l-.548.877h1.035zM3.603 8.092A2 2 0 1 0 4.937 10.5H3a.5.5 0 0 1-.424-.765l1.027-1.643zm7.947.53a2 2 0 1 0 .848-.53l1.026 1.643a.5.5 0 1 1-.848.53L11.55 8.623z"/>
-                    </svg>
-                    Leverer til: 8000 Aarhus C, 8200 Aarhus N, 8270 Højbjerg
-                  </div>
-                </small>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="store row">
-          <div class="col-12">
-            <div class="card shadow border-0 mb-3">
-              <div class="card-body">
-                <div class="row align-items-center">
-                  <div class="col-3 text-center">
-                    <img class="img-fluid rounded-start" src="https://dev.greeting.dk/wp-content/uploads/2022/04/119550939_363089735070099_2663604500059929352_n-150x150.jpg" style="max-width: 100px;">
-                    <h6>Den blå dør</h6>
-                    <a href="#" class="cta rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-3 px-md-4">
-                      Gå til butik<span class="d-none d-md-inline"> ></span>
-                    </a>
-                  </div>
-                  <div class="col-9">
-                    <div class="row">
-                      <div class="col-6 col-xs-6 col-sm-6 col-md-4">
-                        <div class="card border-0">
-                            <a href="#john"><img src="https://greeting.dk/wp-content/uploads/2022/01/Foraarsbombe_-scaled-aspect-ratio-1000-800-600x600.jpg" class="card-img-top" alt="REPLACEME"></a>
-                            <div class="card-body">
-                                <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                                <p class="price">Fra 235 kr.</p>
-                            </div>
-                        </div>
-                      </div>
-                      <div class="col-6 col-xs-6 col-sm-6 col-md-4">
-                        <div class="card border-0">
-                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/02/Valentinesbuket-aspect-ratio-1000-800-600x600.jpg" class="card-img-top" alt="REPLACEME"></a>
-                            <div class="card-body">
-                                <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                                <p class="price">Fra 235 kr.</p>
-                            </div>
-                        </div>
-                      </div>
-                      <div class="d-none d-md-inline d-lg-inline d-xl-inline col-6 col-xs-6 col-sm-6 col-md-4">
-                        <div class="card border-0">
-                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/02/Toerretmoerk-scaled-aspect-ratio-1000-800-1-600x600.jpg" class="card-img-top" alt="REPLACEME"></a>
-                            <div class="card-body">
-                                <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                                <p class="price">Fra 235 kr.</p>
-                            </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="card-footer">
-                <small class="text-muted">
-                  <div>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bicycle" viewBox="0 0 16 16">
-                      <path d="M4 4.5a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1v.5h4.14l.386-1.158A.5.5 0 0 1 11 4h1a.5.5 0 0 1 0 1h-.64l-.311.935.807 1.29a3 3 0 1 1-.848.53l-.508-.812-2.076 3.322A.5.5 0 0 1 8 10.5H5.959a3 3 0 1 1-1.815-3.274L5 5.856V5h-.5a.5.5 0 0 1-.5-.5zm1.5 2.443-.508.814c.5.444.85 1.054.967 1.743h1.139L5.5 6.943zM8 9.057 9.598 6.5H6.402L8 9.057zM4.937 9.5a1.997 1.997 0 0 0-.487-.877l-.548.877h1.035zM3.603 8.092A2 2 0 1 0 4.937 10.5H3a.5.5 0 0 1-.424-.765l1.027-1.643zm7.947.53a2 2 0 1 0 .848-.53l1.026 1.643a.5.5 0 1 1-.848.53L11.55 8.623z"/>
-                    </svg>
-                    Leverer til: 8000 Aarhus C, 8200 Aarhus N, 8270 Højbjerg
-                  </div>
-                </small>
-              </div>
-            </div>
-          </div>
-        </div>
-
-
-
+      <!-- show filtered result here-->
+      <div class="filteredStore row"></div>
 
       </div>
     </div>
@@ -1629,161 +1205,36 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
 </section>
 
 
+<script src="https://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+<link rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css">
 
-<div id="content" class="has-sidebar rigid-right-sidebar" >
-	<div class="inner">
-		<!-- CONTENT WRAPPER -->
-		<div id="main" class="fixed box box-common">
+<script>
 
-            <!-- SIDEBARS -->
+	jQuery(document).ready(function() {
+		var minPrice = "<?php echo $minProductPrice;?>";
+		var maxPrice = "<?php echo $maxProductPrice;?>";
+		jQuery("#priceSlider").slider({
+			// min: minPrice,
+			min: 1,
+			max: maxPrice,
+			step: 1,
+			values: [minPrice, maxPrice],
+			slide: function(event, ui) {
+				for (var i = 0; i < ui.values.length; ++i) {
+					jQuery("input.sliderValue[data-index=" + i + "]").val(ui.values[i]);
+				}
+			}
+		});
+	
+		jQuery("input.sliderValue").change(function() {
+			var $this = jQuery(this);
+			jQuery("#priceSlider").slider("values", $this.data("index"), $this.val());
+			// var val = jQuery('#priceSlider').slider("option", "values");
+		});
+		// add class
+		jQuery("a").addClass("vendor_sort_category");
+	});
+</script>
 
-                <div class="sidebar">
 
-                    <!--Filter begin-->
-                    <?php
-                    $postId = get_the_ID();
-                    ?>
-                    <div style="float: left;">
-                        <span id="resetAll" style="border:1px solid salmon; border-radius: 15px; padding:4px 10px;cursor:pointer;">Reset All</span>
-                    </div>
-                    <div class="clear">
-                    </div>
-                </div>
-            <!-- END OF SIDEBARS -->
-
-            <div class="content_holder">
-
-
-                <?php
-                global $WCMp;
-                $frontend_assets_path = $WCMp->plugin_url . 'assets/frontend/';
-                $frontend_assets_path = str_replace(array('http:', 'https:'), '', $frontend_assets_path);
-                $suffix = defined('WCMP_SCRIPT_DEBUG') && WCMP_SCRIPT_DEBUG ? '' : '.min';
-                wp_register_style('wcmp_vendor_list', $frontend_assets_path . 'css/vendor-list' . $suffix . '.css', array(), $WCMp->version);
-                wp_style_add_data('wcmp_vendor_list', 'rtl', 'replace');
-                wp_enqueue_style('wcmp_vendor_list');
-                $block_vendors = wp_list_pluck(wcmp_get_all_blocked_vendors(), 'id');
-                $vendors = get_wcmp_vendors( array('exclude'   => $block_vendors), $return = 'id');
-                $verified_vendor_list = array();
-                foreach ($vendors as $vendor_id) {
-                    $vendor_verification_settings = get_user_meta($vendor_id, 'wcmp_vendor_verification_settings', true);
-                    $verified_vendor = get_user_meta( $vendor_id, '_verify_vendor', true);
-                    $verification_options = get_option('wcmp_vendor_verification_settings_name');
-                    $option_enable = $verified = $social = 0;
-                    if($verification_options) {
-                        foreach($verification_options as $key => $option) {
-                            if($option == 'Enable') {
-                                if(isset($vendor_verification_settings[$key]['is_verified']) && $vendor_verification_settings[$key]['is_verified'] == 'verified')
-                                    $verified++;
-
-                                $option_enable++;
-                            }
-                        }
-                    }
-                    if(isset($vendor_verification_settings['social_verification']) && count($vendor_verification_settings['social_verification']) > 1 ){
-                        foreach ($vendor_verification_settings['social_verification'] as $provider => $settings) {
-                            $key = strtolower(sanitize_text_field($provider));
-                            if(get_vendor_verification_settings($key.'_enable') == 'Enable')
-                                $social++;
-                        }
-                    }
-                    if( $option_enable == ($verified+$social) || $verified_vendor == 'Enable' ) {
-                        $verified_vendor_list[] = $vendor_id;
-                    }
-                }
-                ?>
-
-                <div id="wcmp-store-conatiner">
-                    <div id="defaultStoreList" class="wcmp-store-list-wrap">
-                        <?php
-                        if ($UserIdArrayForCityPostalcode) {
-                            foreach ($UserIdArrayForCityPostalcode as $user) {
-                                $vendor = get_wcmp_vendor($user);
-                                $image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
-                                $banner = $vendor->get_image('banner') ? $vendor->get_image('banner') : '';
-                                ?>
-
-                                <div class="wcmp-store-list">
-                                    <?php do_action('wcmp_vendor_lists_single_before_image', $vendor->term_id, $vendor->id); ?>
-                                    <div class="wcmp-profile-wrap">
-                                        <div class="wcmp-cover-picture" style="background-image: url('<?php if($banner) echo $banner; ?>');"></div>
-                                        <div class="store-badge-wrap">
-                                            <?php do_action('wcmp_vendor_lists_vendor_store_badges', $vendor); ?>
-                                        </div>
-                                        <div class="wcmp-store-info">
-                                            <div class="wcmp-store-picture">
-                                                <img class="vendor_img" src="<?php echo esc_url($image); ?>" id="vendor_image_display">
-                                            </div>
-                                            <?php
-                                                $rating_info = wcmp_get_vendor_review_info($vendor->term_id);
-                                                $WCMp->template->get_template('review/rating_vendor_lists.php', array('rating_val_array' => $rating_info));
-                                            ?>
-                                        </div>
-                                    </div>
-                                    <?php do_action('wcmp_vendor_lists_single_after_image', $vendor->term_id, $vendor->id); ?>
-                                    <div class="wcmp-store-detail-wrap">
-                                        <?php do_action('wcmp_vendor_lists_vendor_before_store_details', $vendor); ?>
-                                        <ul class="wcmp-store-detail-list">
-                                            <li>
-                                                <i class="wcmp-font ico-store-icon"></i>
-                                                <?php $button_text = apply_filters('wcmp_vendor_lists_single_button_text', $vendor->page_title); ?>
-                                                <a href="<?php echo esc_url($vendor->get_permalink()); ?>" class="store-name"><?php echo esc_html($button_text); ?></a>
-                                                <?php do_action('wcmp_vendor_lists_single_after_button', $vendor->term_id, $vendor->id); ?>
-                                                <?php do_action('wcmp_vendor_lists_vendor_after_title', $vendor); ?>
-                                            </li>
-                                            <?php if($vendor->get_formatted_address()) : ?>
-                                            <li>
-                                                <i class="wcmp-font ico-location-icon2"></i>
-                                                <p><?php echo esc_html($vendor->get_formatted_address()); ?></p>
-                                            </li>
-                                            <?php endif; ?>
-                                        </ul>
-                                        <?php do_action('wcmp_vendor_lists_vendor_after_store_details', $vendor); ?>
-                                    </div>
-                                </div>
-
-                                <?php
-                            }
-
-                        } else {
-                            _e('No verified vendor found!', 'dc-woocommerce-multi-vendor');
-                        }
-                        ?>
-                    </div>
-
-                    <!--show ajax filtered result-->
-                    <div id="filteredStoreList" class="wcmp-store-list-wrap">
-                    </div>
-
-                </div>
-            </div>
-
-            <div style="text-align: center;">
-                <div class="overlay"></div>
-            </div>
-
-            <style>
-                .overlay {
-                    display: none;
-                    position: fixed;
-                    width: 100%;
-                    height: 100%;
-                    top: 0;
-                    left: 0;
-                    z-index: 999;
-                    background: rgba(255,255,255,0.8) url("<?php echo get_stylesheet_directory_uri() . '/image/loading3.gif';?>") center no-repeat;
-                }
-                /* Turn off scrollbar when body element has the loading class */
-                div.loading-custom {
-                    overflow: hidden;
-                }
-                /* Make spinner image visible when body element has the loading class */
-                div.loading-custom .overlay {
-                    display: block;
-                }
-            </style>
-
-        </div>
-    </div>
-</div><!-- END OF MAIN CONTENT -->
 <?php wp_footer(); ?>
