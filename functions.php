@@ -1008,44 +1008,48 @@ function landpageActionJavascript() { ?>
 			
 			var ajaxurl = "<?php echo admin_url('admin-ajax.php');?>";
 			var occaDeliveryIdArray = [];
-			$('#resetAllLandPage').hide();
+			var inputPriceRangeArray = [];
+			$('#landingPageReset').hide();
 
 			jQuery('.vendor_sort_occasion_landpage').click(function(){
+				inputPriceRangeArray = jQuery('#priceSlider').slider("option", "values");
+				console.log("price range arr " + inputPriceRangeArray);
+
 				occaDeliveryIdArray = [];
 				$("input:checkbox[name=type_landpage]:checked").each(function(){					
 					occaDeliveryIdArray.push($(this).val());
 				});
 
-				var data = {'action': 'landpageAction', landingPageDefaultUserIdAsString: jQuery("#landingPageDefaultUserIdAsString").val(), occaDeliveryIdArray: occaDeliveryIdArray};
+				var data = {'action': 'landpageAction', landingPageDefaultUserIdAsString: jQuery("#landingPageDefaultUserIdAsString").val(), occaDeliveryIdArray: occaDeliveryIdArray, inputPriceRangeArray: inputPriceRangeArray};
 				jQuery.post(ajaxurl, data, function(response) {
-					jQuery('#defaultStoreListLandPage').hide();
-					jQuery('#filteredStoreListLandPage').show();
-					$('#resetAllLandPage').show();
-					jQuery('#filteredStoreListLandPage').html(response);
+					jQuery('.store').hide();
+					jQuery('.filteredStore').show();
+					$('#landingPageReset').show();
+					jQuery('.filteredStore').html(response);
 					if(occaDeliveryIdArray.length == 0){
-						jQuery('#defaultStoreListLandPage').show();
+						jQuery('.store').show();
 						jQuery('#noVendorFound').hide();
 					}
 				});
 			});
 
 			// reset filter
-			$('#resetAllLandPage').click(function(){
+			$('#landingPageReset').click(function(){
 				$("input:checkbox[name=type_landpage]").removeAttr("checked");
 				occaDeliveryIdArray.length = 0;
-				jQuery('#defaultStoreListLandPage').show();
-				jQuery('#filteredStoreListLandPage').hide();
-				$('#resetAllLandPage').hide();
+				jQuery('.store').show();
+				jQuery('.filteredStore').hide();
+				$('#landingPageReset').hide();
 			});
 		});
 
 		// Add remove loading class on body element based on Ajax request status
 		jQuery(document).on({
 			ajaxStart: function(){
-				jQuery("div").addClass("loading-custom"); 
+				jQuery("div").addClass("loading"); 
 			},
 			ajaxStop: function(){ 
-				jQuery("div").removeClass("loading-custom");
+				jQuery("div").removeClass("loading");
 			}    
 		});
 
@@ -1108,23 +1112,73 @@ function landpageAction() {
 		}
 	}
 
-	// Check condition
-	$userIdArrayGetFromOccaDelivery = array();
-	if(count($userIdArrayGetFromOcca) > 0 && count($userIdArrayGetFromDelivery) > 0){
-		$userIdArrayGetFromOccaDelivery = array_intersect($userIdArrayGetFromOcca, $userIdArrayGetFromDelivery);
-	}
-	elseif(count($userIdArrayGetFromOcca) > 0 && count($userIdArrayGetFromDelivery) == 0){
-		$userIdArrayGetFromOccaDelivery = $userIdArrayGetFromOcca;
-	}
-	elseif(count($userIdArrayGetFromOcca) == 0 && count($userIdArrayGetFromDelivery) > 0){
-		$userIdArrayGetFromOccaDelivery = $userIdArrayGetFromDelivery;
-	}
-	else {
-		//echo "No filter applicable!";
+
+	// input price filter data come from front end
+	$inputPriceRangeArray = $_POST['inputPriceRangeArray'];
+	$inputMinPrice = $inputPriceRangeArray[0];
+	$inputMaxPrice = $inputPriceRangeArray[1];
+
+	$query = array(
+		'post_status' => 'publish',
+		'post_type' => 'product',
+		'meta_query' => array(
+			array(
+				'key' => '_price',
+				// 'value' => array(302, 380),
+				'value' => array($inputMinPrice, $inputMaxPrice),
+				// 'value' => $inputPriceRangeArray,
+				'compare' => 'BETWEEN',
+				'type' => 'NUMERIC'
+			)
+		)
+	);
+	
+	$productQuery = new WP_Query($query);
+	$userIdArrayGetFromPriceFilter = wp_list_pluck( $productQuery->posts, 'post_author' );
+
+
+	// three array is
+	// $userIdArrayGetFromOcca
+	// $userIdArrayGetFromDelivery
+	// $userIdArrayGetFromPriceFilter
+
+	// check condition
+	$userIdArrayGetFromCatOccaDelivery = array();
+
+	if(!empty($userIdArrayGetFromOcca) && !empty($userIdArrayGetFromDelivery) && !empty($userIdArrayGetFromPriceFilter)){
+		// $userIdArrayGetFromCatOccaDelivery = [$userIdArrayGetFromCatOcca, $userIdArrayGetFromDelivery, $userIdArrayGetFromPriceFilter];
+		$arrOfArrs = [$userIdArrayGetFromOcca, $userIdArrayGetFromDelivery, $userIdArrayGetFromPriceFilter];
+		$userIdArrayGetFromCatOccaDelivery = array_intersect(...$arrOfArrs);
 	}
 
-	$filteredOccaDeliveryArray = array_intersect($defaultUserArray, $userIdArrayGetFromOccaDelivery);
-	$filteredOccaDeliveryArrayUnique = array_unique($filteredOccaDeliveryArray);
+	elseif(!empty($userIdArrayGetFromOcca) && !empty($userIdArrayGetFromDelivery) && empty($userIdArrayGetFromPriceFilter)){
+		$userIdArrayGetFromCatOccaDelivery = array_intersect($userIdArrayGetFromOcca, $userIdArrayGetFromDelivery);
+	}
+	elseif(!empty($userIdArrayGetFromOcca) && empty($userIdArrayGetFromDelivery) && !empty($userIdArrayGetFromPriceFilter)){
+		$userIdArrayGetFromCatOccaDelivery = array_intersect($userIdArrayGetFromOcca, $userIdArrayGetFromPriceFilter);
+	}
+	elseif(empty($userIdArrayGetFromOcca) && !empty($userIdArrayGetFromDelivery) && !empty($userIdArrayGetFromPriceFilter)){
+		$userIdArrayGetFromCatOccaDelivery = array_intersect($userIdArrayGetFromDelivery, $userIdArrayGetFromPriceFilter);
+	}
+
+
+	elseif(!empty($userIdArrayGetFromOcca) && empty($userIdArrayGetFromDelivery) && empty($userIdArrayGetFromPriceFilter)){
+		$userIdArrayGetFromCatOccaDelivery = $userIdArrayGetFromOcca;
+	}
+	elseif(empty($userIdArrayGetFromOcca) && empty($userIdArrayGetFromDelivery) && !empty($userIdArrayGetFromPriceFilter)){
+		$userIdArrayGetFromCatOccaDelivery = $userIdArrayGetFromPriceFilter;
+		//
+	}
+	elseif(empty($userIdArrayGetFromOcca) && !empty($userIdArrayGetFromDelivery) && empty($userIdArrayGetFromPriceFilter)){
+		$userIdArrayGetFromCatOccaDelivery = $userIdArrayGetFromDelivery;
+	}
+
+	else {
+
+	}
+	
+	$filteredCatOccaDeliveryArray = array_intersect($defaultUserArray, $userIdArrayGetFromCatOccaDelivery);
+	$filteredOccaDeliveryArrayUnique = array_unique($filteredCatOccaDeliveryArray);
 
 
 	if(count($filteredOccaDeliveryArrayUnique) > 0 ){ ?>
