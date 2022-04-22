@@ -316,10 +316,6 @@
     padding: 0 10px 0 0;
   }
 
-
-  /** price filter begin */
-  /** price filter end */
-
   /** loading begin */
     .overlay {
 		display: none;
@@ -664,22 +660,15 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
           );
           $productOccasions = get_terms($args);
           foreach($productOccasions as $occasion){
-              foreach($occasionTermListArrayUnique as $occasionTerm){
-                  if($occasionTerm == $occasion->term_id){ ?>
-                    <!-- <li>
-                      <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="#">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-square" viewBox="0 0 16 16">
-                          <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-                        </svg>
-                        <?php //echo $occasion->name; ?>
-                      </a>
-                    </li> -->
-                    <div class="form-check">
-                        <input type="checkbox" name="filter_occ[<?php echo $category->term_id; ?>]" class="form-check-input" id="filter_occ_<?php echo $occasion->term_id; ?>" value="<?php echo $occasion->term_id; ?>">
-                        <label class="form-check-label" for="filter_occ_<?php echo $occasion->term_id; ?>"><?php echo $occasion->name; ?></label>
-                    </div>
-          <?php   }
+            foreach($occasionTermListArrayUnique as $occasionTerm){
+              if($occasionTerm == $occasion->term_id){ ?>
+                <div class="form-check">
+                    <input type="checkbox" name="filter_occ[<?php echo $category->term_id; ?>]" class="form-check-input" id="filter_occ_<?php echo $occasion->term_id; ?>" value="<?php echo $occasion->term_id; ?>">
+                    <label class="form-check-label" for="filter_occ_<?php echo $occasion->term_id; ?>"><?php echo $occasion->name; ?></label>
+                </div>
+          <?php
               }
+            }
           }
           ?>
           </ul>
@@ -717,14 +706,6 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
           $deliveryTypeArrayUnique = array_unique($deliveryTypeArray);
 
           foreach($deliveryTypeArrayUnique as $delivery){?>
-              <!-- <li>
-                <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="#">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-square" viewBox="0 0 16 16">
-                    <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-                  </svg>
-                  <?php //echo $delivery; ?>
-                </a>
-              </li> -->
               <div class="form-check">
                   <input type="checkbox" name="filter_del[<?php echo $delivery; ?>]" class="form-check-input" id="filter_delivery_<?php echo $delivery; ?>" value="<?php echo $delivery; ?>">
                   <label class="form-check-label" for="filter_delivery_<?php echo $delivery; ?>"><?php echo $delivery; ?></label>
@@ -775,17 +756,6 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
               <div class="row">
                 <div class="col-12">
                   <div class="px-3 px-lg-0 pt-3 pt-lg-2 pt-xl-2 pb-4">
-                    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/bootstrap-slider.min.js"></script>
-                    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/css/bootstrap-slider.css">
-                    <style type="text/css">
-                    .slider.slider-horizontal{
-                      width:100%;
-                    }
-                    .slider .slider-handle {
-                      background-color: #446a6b;
-                      background-image: none;
-                    }
-                    </style>
                     <input
                       id="ex2"
                       type="text"
@@ -797,18 +767,29 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
                       data-slider-tooltip="hide"
                       data-slider-value="[0,<?php echo ceil($maxProductPrice); ?>]"/>
 
-                    <script type="text/javascript">
-                      var slider = new Slider('#ex2', {
-                        'tooltip_split': true
-                      });
-                      slider.on("slideStop", function(sliderValue){
-                        var val = slider.getValue();
-                        var min_val = val[0];
-                        var max_val = val[1];
-                        document.getElementById("slideStartPoint").value = min_val;
-                        document.getElementById("slideEndPoint").value = max_val;
-                      });
-                    </script>
+                      <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/css/bootstrap-slider.css">
+                      <style type="text/css">
+                      .slider.slider-horizontal{
+                        width:100%;
+                      }
+                      .slider .slider-handle {
+                        background-color: #446a6b;
+                        background-image: none;
+                      }
+                      </style>
+                      <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/bootstrap-slider.min.js"></script>
+                      <script type="text/javascript">
+                        var slider = new Slider('#ex2', {
+                          'tooltip_split': true
+                        });
+                        slider.on("slideStop", function(sliderValue){
+                          var val = slider.getValue();
+                          var min_val = val[0];
+                          var max_val = val[1];
+                          document.getElementById("slideStartPoint").value = min_val;
+                          document.getElementById("slideEndPoint").value = max_val;
+                        });
+                      </script>
                   </div>
                 </div>
               </div>
