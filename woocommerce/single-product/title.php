@@ -11,12 +11,12 @@
  * the readme will list any important changes.
  *
  * @see        https://docs.woocommerce.com/document/template-structure/
- * @package    WooCommerce/Templates
+ * @package    WooCommerce\Templates
  * @version    1.6.4
  */
 
-if (!defined('ABSPATH')) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-the_title( '<h1 class="d-none d-lg-inline-block d-xl-inline-block pb-1">', '</h1>' );
+the_title( '<h1 class="product_title entry-title">', '</h1>' );

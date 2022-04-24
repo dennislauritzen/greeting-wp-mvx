@@ -459,19 +459,41 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
         }
     }
 
-    foreach($occasionTermListArray as $occasion){
-      $uploadedOccasionImage = '';
+
+    // get user meta query
+    $occasion_featured_list = $wpdb->get_results( "
+    SELECT
+      tt.term_id,
+      tt.taxonomy,
+		  t.name,
+      t.slug,
+      (SELECT tm.meta_value FROM greeting_test.wp_termmeta tm WHERE tm.term_id = tt.term_id AND tm.meta_key = 'featured_image') as image_src
+    FROM
+      {$wpdb->prefix}term_taxonomy tt
+    INNER JOIN
+      {$wpdb->prefix}terms t
+    ON
+      t.term_id = tt.term_id
+    WHERE
+      tt.taxonomy IN ('occasion','product_cat')
+    AND
+      tt.term_id IN (SELECT term_id FROM {$wpdb->prefix}termmeta tm WHERE meta_key = 'featured' AND meta_value = 1)
+    ORDER BY
+		  tt.count DESC
+    LIMIT 6
+    ");
+    foreach($occasion_featured_list as $occasion){
       $placeHolderImage = wc_placeholder_img_src();
-      $occasionImageUrl;
-      if($uploadedOccasionImage != ''){
-        $occasionImageUrl = $uploadedOccasionImage;
+      $occasionImageUrl = '';
+      if(!empty($occasion->image_src)){
+        $occasionImageUrl = wp_get_attachment_image($occasion->image_src, 'thumbnail', false, array('class' => 'card-img-top', 'alt' => $occasion->name));
       } else {
         $occasionImageUrl = $placeHolderImage;
       }
     ?>
     <div class="col-6 col-md-2">
         <div class="card border-0 shadow-sm">
-          <img src="<?php echo $occasionImageUrl;?>" class="card-img-top" alt="Påskegaver">
+          <?php echo $occasionImageUrl;?>
           <div class="card-body">
             <h5 class="card-title"><?php echo $occasion->name;?></h5>
           </div>
@@ -498,64 +520,6 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
           <h6 class="float-start d-none d-lg-inline d-xl-inline py-2 border-bottom filter-header">Filtrér</h6>
         </div>
         <div class="collapse d-lg-block accordion-collapse " id="colFilter">
-          <!-- <h5 class="text-uppercase">Anledninger</h5>
-          <ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4 px-0">
-            <li class="px-0">
-              <a class="dropdown-item d-flex align-items-center gap-2 py-2 px-2" href="#">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-square" viewBox="0 0 16 16">
-                  <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-                </svg>
-                Valentinsdag
-              </a>
-            </li>
-            <li class="px-0">
-              <a class="dropdown-item d-flex align-items-center gap-2 py-2 px-2" href="#">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-square" viewBox="0 0 16 16">
-                  <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-                  <path d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.235.235 0 0 1 .02-.022z"/>
-                </svg>
-                Påske
-              </a>
-            </li>
-            <li class="px-0">
-              <a class="dropdown-item d-flex align-items-center gap-2 py-2 px-2" href="#">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-square" viewBox="0 0 16 16">
-                  <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-                </svg>
-                Action
-              </a>
-            </li>
-          </ul>
-
-          <h5 class="text-uppercase">Kategorier</h5>
-          <ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
-            <li class="px-0">
-              <a class="dropdown-item d-flex align-items-center gap-2 py-2 px-2" href="#">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-square" viewBox="0 0 16 16">
-                  <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-                </svg>
-                Valentinsdag
-              </a>
-            </li>
-            <li class="px-0">
-              <a class="dropdown-item d-flex align-items-center gap-2 py-2 px-2" href="#">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-square" viewBox="0 0 16 16">
-                  <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-                  <path d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.235.235 0 0 1 .02-.022z"/>
-                </svg>
-                Påske
-              </a>
-            </li>
-            <li class="px-0">
-              <a class="dropdown-item d-flex align-items-center gap-2 py-2 px-2" href="#">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-square" viewBox="0 0 16 16">
-                  <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-                </svg>
-                Action
-              </a>
-            </li>
-          </ul> -->
-
           <?php
           /**
            * ---------------------
@@ -841,11 +805,11 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
                   <div class="col-9">
                     <div class="row">
                     <?php
-                    $vendorProducts = $vendor->get_products(array('fields' => 'all'));
+                    $vendorProducts = $vendor->get_products(array('fields' => 'all', 'limit' => 3));
                     foreach ($vendorProducts as $prod) {
                       $product = wc_get_product($prod);
                       $imageId = $product->get_image_id();
-                        $uploadedImage = wp_get_attachment_image_url($imageId);
+                        $uploadedImage = wp_get_attachment_image_url($imageId, 'medium');
                         $placeHolderImage = wc_placeholder_img_src();
                         $imageUrl;
                         if($uploadedImage != ''){
@@ -856,23 +820,14 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
                       ?>
                       <div class="col-6 col-xs-6 col-sm-6 col-md-4">
                         <div class="card border-0">
-                            <a href="<?php echo get_permalink($product->get_id());?>"><img src="<?php echo $imageUrl;?>" class="card-img-top" alt="REPLACEME"></a>
+                            <a href="<?php echo get_permalink($product->get_id());?>"><img src="<?php echo $imageUrl;?>" class="card-img-top" alt="<?php echo $product->get_name();?>"></a>
                             <div class="card-body">
                                 <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark"><?php echo $product->get_name();?></a></h6>
-                                <p class="price">Fra <?php echo $product->get_price();?> kr.</p>
+                                <p class="price"><!--Fra --><?php echo $product->get_price();?> kr.</p>
                             </div>
                         </div>
                       </div>
                     <?php } ?>
-                      <!-- <div class="d-none d-md-inline d-lg-inline d-xl-inline col-6 col-xs-6 col-sm-6 col-md-4">
-                        <div class="card border-0">
-                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/02/Toerretmoerk-scaled-aspect-ratio-1000-800-1-600x600.jpg" class="card-img-top" alt="REPLACEME"></a>
-                            <div class="card-body">
-                                <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                                <p class="price">Fra 235 kr.</p>
-                            </div>
-                        </div>
-                      </div> -->
                     </div>
                   </div>
                 </div>
@@ -880,13 +835,24 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
               <div class="card-footer">
                 <small class="text-muted">
                   <div>
+                    <?php
+                    $delivery_type = get_field('_delivery_type','user_'.$vendor->id);
+
+                    if($delivery_type == 1){
+                    ?>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bicycle" viewBox="0 0 16 16">
                       <path d="M4 4.5a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1v.5h4.14l.386-1.158A.5.5 0 0 1 11 4h1a.5.5 0 0 1 0 1h-.64l-.311.935.807 1.29a3 3 0 1 1-.848.53l-.508-.812-2.076 3.322A.5.5 0 0 1 8 10.5H5.959a3 3 0 1 1-1.815-3.274L5 5.856V5h-.5a.5.5 0 0 1-.5-.5zm1.5 2.443-.508.814c.5.444.85 1.054.967 1.743h1.139L5.5 6.943zM8 9.057 9.598 6.5H6.402L8 9.057zM4.937 9.5a1.997 1.997 0 0 0-.487-.877l-.548.877h1.035zM3.603 8.092A2 2 0 1 0 4.937 10.5H3a.5.5 0 0 1-.424-.765l1.027-1.643zm7.947.53a2 2 0 1 0 .848-.53l1.026 1.643a.5.5 0 1 1-.848.53L11.55 8.623z"/>
+                    </svg> Personlig levering i <?php print the_title(); ?>
+                    <?php
+                    } else if($delivery_type == 0) {
+                    ?>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-truck" viewBox="0 0 16 16">
+                      <path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h9A1.5 1.5 0 0 1 12 3.5V5h1.02a1.5 1.5 0 0 1 1.17.563l1.481 1.85a1.5 1.5 0 0 1 .329.938V10.5a1.5 1.5 0 0 1-1.5 1.5H14a2 2 0 1 1-4 0H5a2 2 0 1 1-3.998-.085A1.5 1.5 0 0 1 0 10.5v-7zm1.294 7.456A1.999 1.999 0 0 1 4.732 11h5.536a2.01 2.01 0 0 1 .732-.732V3.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .294.456zM12 10a2 2 0 0 1 1.732 1h.768a.5.5 0 0 0 .5-.5V8.35a.5.5 0 0 0-.11-.312l-1.48-1.85A.5.5 0 0 0 13.02 6H12v4zm-9 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm9 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
                     </svg>
-                    <!-- Leverer til: 8000 Aarhus C, 8200 Aarhus N, 8270 Højbjerg -->
-                    Leverer til: <?php
-                    $deliveryZip = get_user_meta($user, 'delivery_zips', true);
-                    echo $deliveryZip;?>
+                      Sender med fragtfirma til <?php print the_title(); ?>
+                    <?php
+                    }
+                    ?>
                   </div>
                 </small>
               </div>

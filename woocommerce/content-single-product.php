@@ -41,23 +41,15 @@ global $product;
         //$rigid_single_product_gallery_classes = rigid_get_gallery_type_classes(array());
         ?>
         <div class="col-md-12 col-lg-6">
-          <div class="rigid-product-summary-wrapper<?php if(!empty($rigid_single_product_gallery_classes)) echo " " . implode(" ", $rigid_single_product_gallery_classes) ?>">
-              <?php
-                  /**
-                   * Hook: woocommerce_before_single_product_summary.
-                   *
-                   * @hooked woocommerce_show_product_sale_flash - 10
-                   * @hooked woocommerce_show_product_images - 20
-                   */
-                  do_action( 'woocommerce_before_single_product_summary' );
-              ?>
-              <?php
-              $rigid_has_product_addon = false;
-              if ( class_exists( 'WC_Product_Addons_Helper' ) && rigid_get_option( 'product_addons' ) === 'enabled' ) {
-                  $rigid_has_product_addon = count( WC_Product_Addons_Helper::get_product_addons( get_the_ID() ) );
-              }
-              ?>
-          </div>
+          <?php
+              /**
+               * Hook: woocommerce_before_single_product_summary.
+               *
+               * @hooked woocommerce_show_product_sale_flash - 10
+               * @hooked woocommerce_show_product_images - 20
+               */
+              do_action( 'woocommerce_before_single_product_summary' );
+          ?>
         </div>
         <div class="col-md-12 col-lg-6">
               <?php
@@ -78,18 +70,16 @@ global $product;
               ?>
         </div>
       </div><!-- .row -->
-        <?php
-            /**
-             * woocommerce_after_single_product_summary hook.
-             *
-             * @hooked woocommerce_output_product_data_tabs - 10
-             * @hooked woocommerce_upsell_display - 15
-             * @hooked woocommerce_output_related_products - 20
-             */
-            do_action( 'woocommerce_after_single_product_summary' );
-        ?>
-
 	</div><!-- closing div of content-holder -->
 </section><!-- #product-<?php the_ID(); ?> -->
-
+<?php
+    /**
+     * woocommerce_after_single_product_summary hook.
+     *
+     * @hooked woocommerce_output_product_data_tabs - 10
+     * @hooked woocommerce_upsell_display - 15
+     * @hooked woocommerce_output_related_products - 20
+     */
+    do_action( 'woocommerce_after_single_product_summary' );
+?>
 <?php do_action( 'woocommerce_after_single_product' ); ?>

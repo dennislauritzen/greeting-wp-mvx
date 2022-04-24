@@ -38,7 +38,7 @@ if(!is_product()){
 *
 */
 } else if(is_product()){
-	the_content();
+
 ?>
 
 
@@ -410,34 +410,7 @@ if(!is_product()){
 	<section id="product" class="mb-5">
 		<div class="container">
 			<div class="row">
-				<div class="col-md-12 col-lg-6">
-					<h1 class="d-none d-xs-inline-block d-sm-inline-block d-md-inline-block mb-2 d-lg-none d-xl-none">Gavekurv "Lækkert mix"</h1>
-					<img src="http://greeting/wp-content/uploads/2017/08/m_prod1_1.jpg" class="mb-3">
-				</div>
-				<div class="col-md-12 col-lg-6">
-					<h1 class="d-none d-lg-inline-block d-xl-inline-block pb-1">Gavekurv "Lækkert mix"</h1>
-					<div class="description">
-						<strong>Gavekurven indeholder:</strong>
-						<ul>
-						<li>Marabou</li>
-						<li>Ferrero Rocher</li>
-						<li>Kims Nødder</li>
-						<li>Pringles Chips</li>
-						<li>Bornholmsk Olie</li>
-						<li>Kinder Choko Bon Bon</li>
-						<li>Engelsk Vingummi</li>
-						</ul>
-						<p>Slikapoteket håndskriver en gratis hilsen fra dig inden de leverer gaven til modtageren.</p>
-					</div>
-					<div class="price">
-						210,00 kr.
-					</div>
-					<div class="addtocart">
-						<?php
-
-						?>
-					</div>
-				</div>
+				<?php 	the_content(); ?>
 			</div>
 		</div>
 	</section>
