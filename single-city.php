@@ -316,42 +316,6 @@
     padding: 0 10px 0 0;
   }
 
-
-  /** price filter begin */
-
-	#priceSlider {
-		background-color: #ddd !important;
-	}
-
-	.ui-widget-content {
-		height: 7px !important;
-	}
-
-	.ui-slider .ui-slider-handle {
-		background-color: #494932 !important;
-		border-radius: 8px;
-		height: 17px !important;
-		width: 17px !important;
-	}
-
-	input[type='text'] {
-		padding: 4px 15px;
-		border: 1px solid #c1c1c1;
-	}
-	#slideStartPoint {
-		max-width: 60px;
-		background-color: #c6c6c6;
-		color: white;
-	}
-
-	#slideEndPoint {
-		max-width: 60px;
-		background-color: #c6c6c6;
-		float: right;
-		color: white;
-	}
-  /** price filter end */
-
   /** loading begin */
     .overlay {
 		display: none;
@@ -365,7 +329,7 @@
 	}
 	/* Turn off scrollbar when body element has the loading class */
 	div.loading {
-		overflow: hidden;   
+		overflow: hidden;
 	}
 	/* Make spinner image visible when body element has the loading class */
 	div.loading .overlay {
@@ -651,8 +615,11 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
                        <?php //echo $category->name; ?>
                      </a>
                     </li> -->
-                    <div class="checkbox">
-                        <label><input type="checkbox" name="type" class="vendor_sort_category" value="<?php echo $category->term_id; ?>"><?php echo $category->name; ?></label>
+                    <div class="form-check">
+                        <input type="checkbox" name="filter_cat[<?php echo $category->term_id; ?>]" class="form-check-input" id="filter_cat<?php echo $category->term_id; ?>" value="<?php echo $category->term_id; ?>">
+                        <label for="filter_cat<?php echo $category->term_id; ?>" class="form-check-label">
+                          <?php echo $category->name; ?>
+                        </label>
                     </div>
                  <?php }
              }
@@ -693,21 +660,15 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
           );
           $productOccasions = get_terms($args);
           foreach($productOccasions as $occasion){
-              foreach($occasionTermListArrayUnique as $occasionTerm){
-                  if($occasionTerm == $occasion->term_id){ ?>
-                    <!-- <li>
-                      <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="#">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-square" viewBox="0 0 16 16">
-                          <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-                        </svg>
-                        <?php //echo $occasion->name; ?>
-                      </a>
-                    </li> -->
-                    <div class="checkbox">
-                        <label><input type="checkbox" name="type" class="vendor_sort_category" value="<?php echo $occasion->term_id; ?>"><?php echo $occasion->name; ?></label>
-                    </div>
-          <?php   }
+            foreach($occasionTermListArrayUnique as $occasionTerm){
+              if($occasionTerm == $occasion->term_id){ ?>
+                <div class="form-check">
+                    <input type="checkbox" name="filter_occ[<?php echo $category->term_id; ?>]" class="form-check-input" id="filter_occ_<?php echo $occasion->term_id; ?>" value="<?php echo $occasion->term_id; ?>">
+                    <label class="form-check-label" for="filter_occ_<?php echo $occasion->term_id; ?>"><?php echo $occasion->name; ?></label>
+                </div>
+          <?php
               }
+            }
           }
           ?>
           </ul>
@@ -719,7 +680,7 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
            * ---------------------
           **/
           ?>
-          <h5>Levering</h5>
+          <h5 class="text-uppercase">Levering</h5>
           <ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
           <?php
           $args = array (
@@ -745,16 +706,9 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
           $deliveryTypeArrayUnique = array_unique($deliveryTypeArray);
 
           foreach($deliveryTypeArrayUnique as $delivery){?>
-              <!-- <li>
-                <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="#">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-square" viewBox="0 0 16 16">
-                    <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-                  </svg>
-                  <?php //echo $delivery; ?>
-                </a>
-              </li> -->
-              <div class="checkbox">
-                  <label><input type="checkbox" name="type" class="vendor_sort_category" value="<?php echo $delivery; ?>"><?php echo $delivery; ?></label>
+              <div class="form-check">
+                  <input type="checkbox" name="filter_del[<?php echo $delivery; ?>]" class="form-check-input" id="filter_delivery_<?php echo $delivery; ?>" value="<?php echo $delivery; ?>">
+                  <label class="form-check-label" for="filter_delivery_<?php echo $delivery; ?>"><?php echo $delivery; ?></label>
               </div>
           <?php }
           ?>
@@ -785,20 +739,62 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
           else {
             $minProductPrice = min($productPriceArray);
             $maxProductPrice = max($productPriceArray);
-          } 
+          }
           ?>
 
-          <div id="priceSliderWrap">
-            <h5>Price</h5>
-            <form>
-                <div id="slideInput">
-                    <input type="text" id="slideStartPoint" class="sliderValue text-" data-index="0" value="<?php echo $minProductPrice;?>" readonly/>
-                    <input type="text" id="slideEndPoint" class="sliderValue" data-index="1" value="<?php echo $maxProductPrice;?>" readonly/>
+          <h5 class="text-uppercase">Pris</h5>
+          <form>
+            <div id="slideInput" class="my-3">
+              <div class="row">
+                <div class="col-2 col-xs-2 col-sm-2 col-md-2 col-lg-4 col-xl-3">
+                  <input type="text" id="slideStartPoint" class="form-control" data-index="0" value="<?php echo $minProductPrice;?>" readonly/>
                 </div>
-                <br />
-                <div id="priceSlider"></div>
-            </form>
-          </div>
+                <div class="col-2 offset-8 col-xs-2 col-sm-2 offset-xs-8 offset-sm-8 col-md-2 offset-md-8 col-lg-4 offset-lg-4 col-xl-3 offset-xl-6">
+                  <input type="text" id="slideEndPoint" class="form-control" data-index="1" value="<?php echo ceil($maxProductPrice);?>" readonly/>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <div class="px-3 px-lg-2 pt-3 pt-lg-2 pt-xl-2 pb-4">
+                    <input
+                      id="ex2"
+                      type="text"
+                      class="form-range py-3"
+                      value="array"
+                      data-slider-min="0"
+                      data-slider-max="<?php echo ceil($maxProductPrice); ?>"
+                      data-slider-step="1"
+                      data-slider-tooltip="hide"
+                      data-slider-value="[0,<?php echo ceil($maxProductPrice); ?>]"/>
+
+                      <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/css/bootstrap-slider.css">
+                      <style type="text/css">
+                      .slider.slider-horizontal{
+                        width:100%;
+                      }
+                      .slider .slider-handle {
+                        background-color: #446a6b;
+                        background-image: none;
+                      }
+                      </style>
+                      <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/bootstrap-slider.min.js"></script>
+                      <script type="text/javascript">
+                        var slider = new Slider('#ex2', {
+                          'tooltip_split': true
+                        });
+                        slider.on("slideStop", function(sliderValue){
+                          var val = slider.getValue();
+                          var min_val = val[0];
+                          var max_val = val[1];
+                          document.getElementById("slideStartPoint").value = min_val;
+                          document.getElementById("slideEndPoint").value = max_val;
+                        });
+                      </script>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
 
         </div> <!-- #colFilter -->
       </div>
@@ -820,8 +816,8 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
           </div>
         </div>
 
-      
-      <?php    
+
+      <?php
       foreach ($UserIdArrayForCityPostalcode as $user) {
         $vendor = get_wcmp_vendor($user);
         $image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
@@ -844,7 +840,7 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
 
                   <div class="col-9">
                     <div class="row">
-                    <?php 
+                    <?php
                     $vendorProducts = $vendor->get_products(array('fields' => 'all'));
                     foreach ($vendorProducts as $prod) {
                       $product = wc_get_product($prod);
@@ -1207,15 +1203,14 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
 
 <script src="https://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
 <link rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css">
-
 <script>
-
 	jQuery(document).ready(function() {
 		var minPrice = "<?php echo $minProductPrice;?>";
 		var maxPrice = "<?php echo $maxProductPrice;?>";
 		jQuery("#priceSlider").slider({
 			// min: minPrice,
-			min: 1,
+      range: true,
+      min: 0,
 			max: maxPrice,
 			step: 1,
 			values: [minPrice, maxPrice],
@@ -1225,7 +1220,7 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
 				}
 			}
 		});
-	
+
 		jQuery("input.sliderValue").change(function() {
 			var $this = jQuery(this);
 			jQuery("#priceSlider").slider("values", $this.data("index"), $this.val());

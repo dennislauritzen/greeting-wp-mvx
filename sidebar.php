@@ -23,7 +23,7 @@ if ( is_active_sidebar( 'primary_widget_area' ) || is_archive() || is_single() )
 	<?php
 		endif;
 
-		if ( (is_archive() || is_single()) && !is_product() ) :
+		if ( (is_archive() || is_single()) || !is_product() ) :
 	?>
 		<div class="bg-faded sidebar-nav">
 			<div id="primary-two" class="widget-area">

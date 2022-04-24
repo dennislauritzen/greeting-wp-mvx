@@ -365,7 +365,7 @@
 	}
 	/* Turn off scrollbar when body element has the loading class */
 	div.loading {
-		overflow: hidden;   
+		overflow: hidden;
 	}
 	/* Make spinner image visible when body element has the loading class */
 	div.loading .overlay {
@@ -564,66 +564,6 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
           <h6 class="float-start d-none d-lg-inline d-xl-inline py-2 border-bottom filter-header">Filtrér</h6>
         </div>
         <div class="collapse d-lg-block accordion-collapse " id="colFilter">
-          <!-- <h5 class="text-uppercase">Anledninger</h5>
-          <ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4 px-0">
-            <li class="px-0">
-              <a class="dropdown-item d-flex align-items-center gap-2 py-2 px-2" href="#">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-square" viewBox="0 0 16 16">
-                  <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-                </svg>
-                Valentinsdag
-              </a>
-            </li>
-            <li class="px-0">
-              <a class="dropdown-item d-flex align-items-center gap-2 py-2 px-2" href="#">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-square" viewBox="0 0 16 16">
-                  <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-                  <path d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.235.235 0 0 1 .02-.022z"/>
-                </svg>
-                Påske
-              </a>
-            </li>
-            <li class="px-0">
-              <a class="dropdown-item d-flex align-items-center gap-2 py-2 px-2" href="#">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-square" viewBox="0 0 16 16">
-                  <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-                </svg>
-                Action
-              </a>
-            </li>
-          </ul>
-
-          <h5 class="text-uppercase">Kategorier</h5>
-          <ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
-            <li class="px-0">
-              <a class="dropdown-item d-flex align-items-center gap-2 py-2 px-2" href="#">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-square" viewBox="0 0 16 16">
-                  <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-                </svg>
-                Valentinsdag
-              </a>
-            </li>
-            <li class="px-0">
-              <a class="dropdown-item d-flex align-items-center gap-2 py-2 px-2" href="#">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-square" viewBox="0 0 16 16">
-                  <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-                  <path d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.235.235 0 0 1 .02-.022z"/>
-                </svg>
-                Påske
-              </a>
-            </li>
-            <li class="px-0">
-              <a class="dropdown-item d-flex align-items-center gap-2 py-2 px-2" href="#">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-square" viewBox="0 0 16 16">
-                  <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-                </svg>
-                Action
-              </a>
-            </li>
-          </ul> -->
-
-          
-
           <?php
           /**
            * ---------------------
@@ -657,21 +597,15 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
           );
           $productOccasions = get_terms($args);
           foreach($productOccasions as $occasion){
-              foreach($occasionTermListArrayUnique as $occasionTerm){
-                  if($occasionTerm == $occasion->term_id){ ?>
-                    <!-- <li>
-                      <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="#">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-square" viewBox="0 0 16 16">
-                          <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-                        </svg>
-                        <?php //echo $occasion->name; ?>
-                      </a>
-                    </li> -->
-                    <div class="checkbox">
-                        <label><input type="checkbox" name="type_landpage" class="vendor_sort_occasion_landpage" value="<?php echo $occasion->term_id; ?>"><?php echo $occasion->name;?></label>
-                    </div>
-          <?php   }
+            foreach($occasionTermListArrayUnique as $occasionTerm){
+              if($occasionTerm == $occasion->term_id){ ?>
+                <div class="form-check">
+                    <input type="checkbox" name="filter_occ[<?php echo $category->term_id; ?>]" class="form-check-input" id="filter_occ_<?php echo $occasion->term_id; ?>" value="<?php echo $occasion->term_id; ?>">
+                    <label class="form-check-label" for="filter_occ_<?php echo $occasion->term_id; ?>"><?php echo $occasion->name; ?></label>
+                </div>
+          <?php
               }
+            }
           }
           ?>
           </ul>
@@ -683,7 +617,7 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
            * ---------------------
           **/
           ?>
-          <h5>Levering</h5>
+          <h5 class="text-uppercase">Levering</h5>
           <ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
           <?php
           $args = array (
@@ -709,30 +643,15 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
           $deliveryTypeArrayUnique = array_unique($deliveryTypeArray);
 
           foreach($deliveryTypeArrayUnique as $delivery){?>
-              <!-- <li>
-                <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="#">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-square" viewBox="0 0 16 16">
-                    <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-                  </svg>
-                  <?php //echo $delivery; ?>
-                </a>
-              </li> -->
-              <div class="checkbox">
-                  <label><input type="checkbox" name="type_landpage" class="vendor_sort_occasion_landpage" value="<?php echo $delivery; ?>"><?php echo $delivery; ?></label>
-              </div>
+            <div class="form-check">
+                <input type="checkbox" name="filter_del[<?php echo $delivery; ?>]" class="form-check-input" id="filter_delivery_<?php echo $delivery; ?>" value="<?php echo $delivery; ?>">
+                <label class="form-check-label" for="filter_delivery_<?php echo $delivery; ?>"><?php echo $delivery; ?></label>
+            </div>
           <?php }
           ?>
           </ul>
 
-          <!-- <h5>Pris</h5>
-          !--<label for="price" class="form-label">Pris</label>--
-          <p style="width: 100%;">
-            <span class="float-start price-filter-text">149,-</span>
-            <span class="float-end price-filter-text">749,-</span>
-          </p>
-          <input type="range" class="form-range" min="0" max="2500" id="price"> -->
 
-          <!-- price filter filter-->
           <?php
           // for price filter
           $minProductPrice;
@@ -749,26 +668,69 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
           else {
             $minProductPrice = min($productPriceArray);
             $maxProductPrice = max($productPriceArray);
-          } 
+          }
           ?>
-
-          <div id="priceSliderWrap">
-            <h5>Price</h5>
-            <form>
-                <div id="slideInput">
-                    <input type="text" id="slideStartPoint" class="sliderValue text-" data-index="0" value="<?php echo $minProductPrice;?>" readonly/>
-                    <input type="text" id="slideEndPoint" class="sliderValue" data-index="1" value="<?php echo $maxProductPrice;?>" readonly/>
+          <h5 class="text-uppercase">Pris</h5>
+          <form>
+            <div id="slideInput" class="my-3">
+              <div class="row">
+                <div class="col-2 col-xs-2 col-sm-2 col-md-2 col-lg-4 col-xl-3">
+                  <input type="text" id="slideStartPoint" class="form-control" data-index="0" value="<?php echo $minProductPrice;?>" readonly/>
                 </div>
-                <br />
-                <div id="priceSlider"></div>
-            </form>
-          </div>
+                <div class="col-2 offset-8 col-xs-2 col-sm-2 offset-xs-8 offset-sm-8 col-md-2 offset-md-8 col-lg-4 offset-lg-4 col-xl-3 offset-xl-6">
+                  <input type="text" id="slideEndPoint" class="form-control" data-index="1" value="<?php echo ceil($maxProductPrice);?>" readonly/>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <div class="px-3 px-lg-2 pt-3 pt-lg-2 pt-xl-2 pb-4">
+                    <input
+                      id="ex2"
+                      type="text"
+                      class="form-range py-3"
+                      value="array"
+                      data-slider-min="0"
+                      data-slider-max="<?php echo ceil($maxProductPrice); ?>"
+                      data-slider-step="1"
+                      data-slider-tooltip="hide"
+                      data-slider-value="[0,<?php echo ceil($maxProductPrice); ?>]"/>
+
+                      <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/css/bootstrap-slider.css">
+                      <style type="text/css">
+                      .slider.slider-horizontal{
+                        width:100%;
+                      }
+                      .slider .slider-handle {
+                        background-color: #446a6b;
+                        background-image: none;
+                      }
+                      </style>
+                      <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/bootstrap-slider.min.js"></script>
+                      <script type="text/javascript">
+                        var slider = new Slider('#ex2', {
+                          'tooltip_split': true
+                        });
+                        slider.on("slideStop", function(sliderValue){
+                          var val = slider.getValue();
+                          var min_val = val[0];
+                          var max_val = val[1];
+                          document.getElementById("slideStartPoint").value = min_val;
+                          document.getElementById("slideEndPoint").value = max_val;
+                        });
+                      </script>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
 
         </div> <!-- #colFilter -->
       </div>
 
       <div class="col-md-12 col-lg-9 mb-5">
-        <h1 class="d-none d-lg-block d-xl-block my-3 my-xs-3 my-sm-3 my-md-3 my-lg-0 my-xl-0 mb-lg-4 mb-xl-4">Find gavehilsner til <?php the_title();?></h1>
+        <h1 class="d-none d-lg-block d-xl-block my-3 my-xs-3 my-sm-3 my-md-3 my-lg-0 my-xl-0 mb-lg-4 mb-xl-4">
+          <?php the_title();?>
+        </h1>
         <div class="applied-filters row mt-xs-0 mt-sm-0 mt-md-0 mt-2 mb-4 lh-lg">
           <div class="col-12 filterItemShow">
 
@@ -784,8 +746,8 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
           </div>
         </div>
 
-      
-      <?php    
+
+      <?php
       foreach ($landingPageDefaultUserIdArray as $user) {
         $vendor = get_wcmp_vendor($user);
         $image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
@@ -808,7 +770,7 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
 
                   <div class="col-9">
                     <div class="row">
-                    <?php 
+                    <?php
                     $vendorProducts = $vendor->get_products(array('fields' => 'all'));
                     foreach ($vendorProducts as $prod) {
                       $product = wc_get_product($prod);
@@ -1188,7 +1150,7 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
 				}
 			}
 		});
-	
+
 		jQuery("input.sliderValue").change(function() {
 			var $this = jQuery(this);
 			jQuery("#priceSlider").slider("values", $this.data("index"), $this.val());
