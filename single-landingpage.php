@@ -683,7 +683,7 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
               </div>
               <div class="row">
                 <div class="col-12">
-                  <div class="px-3 px-lg-0 pt-3 pt-lg-2 pt-xl-2 pb-4">
+                  <div class="px-3 px-lg-2 pt-3 pt-lg-2 pt-xl-2 pb-4">
                     <input
                       id="ex2"
                       type="text"
