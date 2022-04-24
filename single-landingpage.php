@@ -668,7 +668,7 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
             $maxProductPrice = max($productPriceArray);
           }
           else {
-            $minProductPrice = min($productPriceArray);
+            $minProductPrice = 0;
             $maxProductPrice = max($productPriceArray);
           }
           ?>
