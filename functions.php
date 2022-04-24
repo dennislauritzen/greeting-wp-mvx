@@ -669,7 +669,7 @@ function data_fetch(){
 			$array_count = count($landing_page_query);
 			$i = 0;
 			foreach ($landing_page_query as $key => $landing_page) {?>
-				<li class="list-group-item py-2 px-4 <?php echo ($key==0) ? 'active' : '';?>" aria-current="true">
+				<li class="recomms list-group-item py-2 px-4 <?php echo ($key==0) ? 'active' : '';?>" aria-current="true">
 					<a href="<?php echo site_url() . '/city/' . $landing_page->post_name;?>" class="text-teal stretched-link"><?php echo ucfirst($landing_page->post_title);?></a>
 				</li>
 			<?php } ?>
