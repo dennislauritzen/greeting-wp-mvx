@@ -597,12 +597,22 @@ function ajax_fetch() { ?>
 		jQuery(document).ready(function(){
 			var currentRequest = null;
 
+			jQuery("#searchform").submit(function(event){
+				event.preventDefault();
+				var val = jQuery("#datafetch_wrapper li.recomms:first-child a").prop('href');
+
+				if(val.length){
+					window.location.href = val;
+				}
+				return false;
+			});
+
 			/*Do the search with delay 500ms*/
-			jQuery('#front_Search-new_ucsa').keyup(delay(function (e) {
+			jQuery('#front_Search-new_ucsa').keyup(.delay(function (e) {
 					var text = jQuery(this).val();
 
 					jQuery.ajax({
-						url: '<?php echo admin_url('admin-ajax.php'); ?>',
+						url: '<?php //echo admin_url('admin-ajax.php'); ?>',
 						type: 'post',
 						data: { action: 'data_fetch', keyword: text },
 						beforeSend: function(){
@@ -618,22 +628,28 @@ function ajax_fetch() { ?>
 								jQuery('#datafetch_wrapper').addClass('d-none').removeClass('d-inline');
 							}
 						}
-					});
-				}, 500)
-			);
-		});
+					}
+					
 
-		/** function for delaying ajax input**/
-		function delay(callback, ms) {
-			var timer = 0;
-			return function() {
-			var context = this, args = arguments;
-			clearTimeout(timer);
-			timer = setTimeout(function () {
-				callback.apply(context, args);
-			}, ms || 0);
-			};
-		}
+				}, 500)),
+
+
+
+			);// keyup
+
+	/** function for delaying ajax input**/
+	function delay(callback, ms) {
+		var timer = 0;
+		return function() {
+		var context = this, args = arguments;
+		clearTimeout(timer);
+		timer = setTimeout(function () {
+			callback.apply(context, args);
+		}, ms || 0);
+		};
+	}
+
+	});
 	</script>
 <?php
 }
@@ -1339,27 +1355,40 @@ function categoryPageFilterAction() {
 		//echo "No filter applicable!";
 	}
 
-	$filteredCatOccaDeliveryArray = array_intersect($defaultUserArray, $userIdArrayGetFromCatOccaDelivery);
-	$filteredCatOccaDeliveryArrayUnique = array_unique($filteredCatOccaDeliveryArray);
 
 
-	if(count($filteredCatOccaDeliveryArrayUnique) > 0 ){ ?>
 
-		<?php
-		foreach ($filteredCatOccaDeliveryArrayUnique as $filteredUser) {
-                                
-			$vendor = get_wcmp_vendor($filteredUser);
-			
-			// call the template with pass $vendor variable
-			get_template_part('template-parts/vendor-loop', null, array('vendor' => $vendor));
 
-			?>
 
+	// the ajax function
+	add_action('wp_ajax_data_fetch2' , 'data_fetch2');
+	add_action('wp_ajax_nopriv_data_fetch2','data_fetch2');
+	function data_fetch2(){
+		$search_query = esc_attr( $_POST['keyword'] );
+		global $wpdb;
+
+		$prepared_statement = $wpdb->prepare("
+			SELECT *
+			FROM {$wpdb->prefix}posts
+			WHERE post_title LIKE %s
+			AND post_type = 'city'
+			LIMIT 5", '%'.$search_query.'%');
+		$landing_page_query = $wpdb->get_results($prepared_statement, OBJECT);
+
+		if (!empty($landing_page_query)) {?>
+				<?php
+				$array_count = count($landing_page_query);
+				$i = 0;
+				foreach ($landing_page_query as $key => $landing_page) {?>
+					<li class="recomms list-group-item py-2 px-4 <?php echo ($key==0) ? 'active' : '';?>" aria-current="true">
+						<a href="<?php echo site_url() . '/city/' . $landing_page->post_name;?>" class="text-teal stretched-link"><?php echo ucfirst($landing_page->post_title);?></a>
+					</li>
+				<?php } ?>
 		<?php
 		}
 		?>
 
-	<?php } else { ?>
+	<?php }  { ?>
 
 	<div>
 		<p id="noVendorFound" style="margin-top: 50px; margin-bottom: 35px; padding: 15px 10px; background-color: #f8f8f8;">No vendors were found matching your selection.</p>

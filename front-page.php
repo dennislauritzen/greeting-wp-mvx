@@ -286,14 +286,16 @@ ul.recommandations li a:hover {
     <div class="row g-0">
       <div class="col-12 d-flex  align-items-bottom align-items-md-center align-items-lg-center align-items-xl-center video-wrapper">
         <video class="position-absolute top-0 start-0" playsinline autoplay muted loop poster="">
-          <source src="https://dev.greeting.dk/wp-content/uploads/2022/04/Greeting-short.mp4" type="video/mp4">
+          <source src="https://dev.greeting.dk/wp-content/uploads/2022/04/greeting_top_q23.mp4" type="video/mp4">
+          <source src="https://dev.greeting.dk/wp-content/uploads/2022/04/Greeting_webm_q33.webm" type="video/webm">
         </video>
         <div class="col-12 col-md-10 col-lg-7 col-xl-6 bg-teal-75 position-relative start-0 top-0">
-            <div class="py-5 px-3 px-md-2 px-lg-5 px-xl-5 m-5 top-text-content">
+            <div class="py-5 px-1 px-xs-1 px-sm-1 px-md-2 px-lg-5 px-xl-5 m-5 top-text-content">
+                <div><img src="https://dev.greeting.dk/wp-content/uploads/2022/04/greeting-logo-white.png" class="pb-4" style="max-height:60px;"></div>
                 <h4 class="text-teal fs-6">#STØTLOKALT</h4>
                 <h1 class="text-white pb-3">Skal vi levere <span id="spinner"></span> <br>til én du holder af?</h1>
                 <form role="search" method="get" autocomplete="off" id="searchform">
-                <div class="input-group pb-4 w-100 me-0 me-md-0 me-lg-5 me-xl-5">
+                <div class="input-group pb-4 w-100 me-0 me-xs-0 me-sm-0 me-md-0 me-lg-5 me-xl-5">
                   <input type="text" name="keyword" id="front_Search-new_ucsa" class="form-control border-0 ps-5 pe-3 py-3 shadow-sm rounded" placeholder="Indtast by eller postnr. (eks. 8000)">
                   <figure class="position-absolute mt-2 mb-3 ps-3" style="padding-top:5px; z-index:1000;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#333333" class="bi bi-geo-alt" viewBox="0 0 16 16">
@@ -301,7 +303,7 @@ ul.recommandations li a:hover {
                       <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
                     </svg>
                   </figure>
-                  <button type="button" class="btn bg-yellow text-white ms-3 px-4 rounded">Søg</button>
+                  <button type="submit" class="btn bg-yellow text-white ms-3 px-4 rounded">Søg</button>
                   <ul id="datafetch_wrapper" class="d-none list-group position-relative recommandations position-absolute list-unstyled rounded w-75 bg-white" style="top: 57px; ">
                   </ul>
                   </div>
