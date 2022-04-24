@@ -358,10 +358,12 @@
     <div class="container py-4">
       <div class="row">
         <div class="d-flex pb-3 pb-lg-0 pb-xl-0 position-relative justify-content-center justify-content-lg-start justify-content-xl-start col-md-12 col-lg-3">
-          <!--<img src="https://dev.greeting.dk/wp-content/uploads/2022/04/greeting-pink.png" style="width: 150px;">-->
-          <!--<img src="https://dev.greeting.dk/wp-content/uploads/2022/04/Greeting-1.png" style="width: 150px;">-->
-          <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/greeting-logo-white.png" style="text-align: center; width: 150px;">
-          <!-- <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/greeting-test.png" style="width: 150px;"> -->
+          <a href="<?php echo home_url(); ?>">
+            <!--<img src="https://dev.greeting.dk/wp-content/uploads/2022/04/greeting-pink.png" style="width: 150px;">-->
+            <!--<img src="https://dev.greeting.dk/wp-content/uploads/2022/04/Greeting-1.png" style="width: 150px;">-->
+            <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/greeting-logo-white.png" style="text-align: center; width: 150px;">
+            <!-- <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/greeting-test.png" style="width: 150px;"> -->
+          </a>
           <a class="position-absolute top-0 end-0 me-4 d-inline d-lg-none d-xl-none" data-bs-toggle="offcanvas" href="#offcanvasMenu" role="button" aria-controls="offcanvasExample">
             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#ffffff" class="bi bi-list" viewBox="0 0 16 16">
               <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
@@ -495,7 +497,11 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
         <div class="card border-0 shadow-sm">
           <?php echo $occasionImageUrl;?>
           <div class="card-body">
-            <h5 class="card-title"><?php echo $occasion->name;?></h5>
+            <h5 class="card-title">
+              <a href="#" class="stretched-link text-dark">
+                <?php echo $occasion->name;?>
+              </a>
+            </h5>
           </div>
         </div>
       </div>
@@ -656,23 +662,24 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
 
           // Get the results
           $vendors = $userQuery->get_results();
-
           $deliveryTypeArray = array();
-
           foreach($vendors as $vendor){
               $userMetas = get_user_meta($vendor->ID, 'delivery_type', true);
+              $label = get_field_object('delivery_type','user_'.$vendor->ID);
               foreach($userMetas as $deliveryType){
-                  array_push($deliveryTypeArray, $deliveryType);
+                  if(!array_key_exists($deliveryType, $deliveryTypeArray)){
+                      $deliveryTypeArray[$deliveryType] = array(
+                          'label' => $label['value']['0']['label'],
+                          'id' => $deliveryType
+                        );
+                  }
               }
           }
 
-          // we need unique item
-          $deliveryTypeArrayUnique = array_unique($deliveryTypeArray);
-
-          foreach($deliveryTypeArrayUnique as $delivery){?>
+          foreach($deliveryTypeArray as $delivery){?>
               <div class="form-check">
-                  <input type="checkbox" name="filter_del[<?php echo $delivery; ?>]" class="form-check-input" id="filter_delivery_<?php echo $delivery; ?>" value="<?php echo $delivery; ?>">
-                  <label class="form-check-label" for="filter_delivery_<?php echo $delivery; ?>"><?php echo $delivery; ?></label>
+                  <input type="checkbox" name="filter_del[<?php echo $delivery['id']; ?>]" class="form-check-input" id="filter_delivery_<?php echo $delivery['id']; ?>" value="<?php echo $delivery['id']; ?>">
+                  <label class="form-check-label" for="filter_delivery_<?php echo $delivery['id']; ?>"><?php echo $delivery['label']; ?></label>
               </div>
           <?php }
           ?>
@@ -701,7 +708,7 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
             $maxProductPrice = max($productPriceArray);
           }
           else {
-            $minProductPrice = min($productPriceArray);
+            $minProductPrice = 0;
             $maxProductPrice = max($productPriceArray);
           }
           ?>
