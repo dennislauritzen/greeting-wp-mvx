@@ -23,12 +23,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 global $post;
 
 $short_description = apply_filters( 'woocommerce_short_description', $post->post_excerpt );
+$description = $post->post_content;
 
-if ( ! $short_description ) {
+if ( ! $short_description && ! $description ) {
 	return;
 }
 
 ?>
-<div class="woocommerce-product-details__short-description description">
+<div class="description">
 	<?php echo wp_kses_post( $short_description ); // WPCS: XSS ok.  ?>
+	<?php echo $description; ?>
 </div>

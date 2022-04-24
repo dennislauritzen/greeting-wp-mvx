@@ -2262,7 +2262,7 @@ add_action( 'template_redirect', 'redirect_direct_access' );
 	}
 
 	// check array is unique or not
-	if(count(array_flip($vendor_id_array)) === 1 && end($vendor_id_array) === $last_inserted_vendor_id) {
+	if(count($vendor_id_array) === 1 && end($vendor_id_array) === $last_inserted_vendor_id) {
 	} else {
 		$single_vendor = 1;
 	}
@@ -2290,6 +2290,13 @@ add_action( 'template_redirect', 'redirect_direct_access' );
 function show_shop_only_one_store_same_time_notice(){
 	wc_print_notice('You can not shopping from different STORE once!, Please go to CART and keep only one STORE item in cart. If you want to shopping from several item please you can place another order.', 'error');
 }
+
+/**
+* @author Dennis Lauritzen
+* Remove report abuse link
+*
+*/
+add_filter('wcmp_show_report_abuse_link', '__return_false');
 
 /**
  * Trigger Holiday Mode

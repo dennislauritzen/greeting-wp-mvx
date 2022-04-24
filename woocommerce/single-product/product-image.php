@@ -34,22 +34,14 @@ $wrapper_classes   = apply_filters( 'woocommerce_single_product_image_gallery_cl
 ) );
 
 $rigid_product_video_url = get_post_meta($product->get_id(), 'rigid_product_video_url', true);
-
 ?>
-<div class="<?php echo esc_attr( implode( ' ', array_map( 'sanitize_html_class', $wrapper_classes ) ) ); ?>" data-columns="<?php echo esc_attr( $columns ); ?>" style="opacity: 0; transition: opacity .25s ease-in-out;">
-
-    <?php if($rigid_product_video_url): ?>
-        <a title="<?php esc_attr_e('Play Product Video', 'rigid')?>" class="rigid_product_video_trigger" href="<?php echo esc_url($rigid_product_video_url) ?>" ><span class="fa fa-play-circle"></span></a>
-	<?php endif; ?>
-
+<div class="<?php echo esc_attr( implode( ' ', array_map( 'sanitize_html_class', $wrapper_classes ) ) ); ?>"  data-columns="<?php echo esc_attr( $columns ); ?>">
 	<figure class="woocommerce-product-gallery__wrapper">
 		<?php
 		if ( $product->get_image_id() ) {
 			$html  = wc_get_gallery_image_html( $post_thumbnail_id, true );
 		} else {
-			$html  = '<div class="woocommerce-product-gallery__image--placeholder">';
-			$html .= sprintf( '<img src="%s" alt="%s" class="wp-post-image" />', esc_url( wc_placeholder_img_src('woocommerce_single') ), esc_html__( 'Awaiting product image', 'rigid' ) );
-			$html .= '</div>';
+			$html = sprintf( '<img src="%s" alt="%s" class="mb-3" />', esc_url( wc_placeholder_img_src('woocommerce_single') ), esc_html__( 'Awaiting product image', 'rigid' ) );
 		}
 
 		echo apply_filters( 'woocommerce_single_product_image_thumbnail_html', $html, $post_thumbnail_id ); // phpcs:disable WordPress.XSS.EscapeOutput.OutputNotEscaped
@@ -58,3 +50,7 @@ $rigid_product_video_url = get_post_meta($product->get_id(), 'rigid_product_vide
 		?>
 	</figure>
 </div>
+
+<?php if($rigid_product_video_url): ?>
+  <a title="<?php esc_attr_e('Play Product Video', 'rigid')?>" class="rigid_product_video_trigger" href="<?php echo esc_url($rigid_product_video_url) ?>" ><span class="fa fa-play-circle"></span></a>
+<?php endif; ?>

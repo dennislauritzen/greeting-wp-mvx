@@ -33,50 +33,51 @@ global $product;
 ?>
 
 
-<div id="product-<?php the_ID(); ?>" <?php wc_product_class( 'box box-common fixed rigid-single-product', $product ); ?>>
-    <div class="content_holder">
+<section id="product" class="mb-5">
+  <div class="container">
+    <div class="row">
         <?php
         // WooCommerce single product gallery type
         //$rigid_single_product_gallery_classes = rigid_get_gallery_type_classes(array());
         ?>
-        <div class="rigid-product-summary-wrapper<?php if(!empty($rigid_single_product_gallery_classes)) echo " " . implode(" ", $rigid_single_product_gallery_classes) ?>">
-            <?php
-                /**
-                 * Hook: woocommerce_before_single_product_summary.
-                 *
-                 * @hooked woocommerce_show_product_sale_flash - 10
-                 * @hooked woocommerce_show_product_images - 20
-                 */
-                do_action( 'woocommerce_before_single_product_summary' );
-            ?>
-            <?php
-            $rigid_has_product_addon = false;
-            if ( class_exists( 'WC_Product_Addons_Helper' ) && rigid_get_option( 'product_addons' ) === 'enabled' ) {
-                $rigid_has_product_addon = count( WC_Product_Addons_Helper::get_product_addons( get_the_ID() ) );
-            }
-            ?>
-            <div class="summary entry-summary<?php if($rigid_has_product_addon) echo ' rigid-product-has-addons' ?>">
-
-                <?php
-                    /**
-                     * Hook: woocommerce_single_product_summary.
-                     *
-                     * @hooked woocommerce_template_single_title - 5
-                     * @hooked woocommerce_template_single_excerpt - 6
-                     * @hooked rigid_product_sale_countdown - 7
-                     * @hooked woocommerce_template_single_rating - 10
-                     * @hooked woocommerce_template_single_price - 10
-                     * @hooked woocommerce_template_single_add_to_cart - 30
-                     * @hooked woocommerce_template_single_meta - 40
-                     * @hooked woocommerce_template_single_sharing - 50
-                     * @hooked WC_Structured_Data::generate_product_data() - 60
-                     */
-                    do_action( 'woocommerce_single_product_summary' );
-                ?>
-
-            </div><!-- .summary -->
-            <div class="clear"></div>
-        </div><!-- .rigid-product-summary-wrapper -->
+        <div class="col-md-12 col-lg-6">
+          <div class="rigid-product-summary-wrapper<?php if(!empty($rigid_single_product_gallery_classes)) echo " " . implode(" ", $rigid_single_product_gallery_classes) ?>">
+              <?php
+                  /**
+                   * Hook: woocommerce_before_single_product_summary.
+                   *
+                   * @hooked woocommerce_show_product_sale_flash - 10
+                   * @hooked woocommerce_show_product_images - 20
+                   */
+                  do_action( 'woocommerce_before_single_product_summary' );
+              ?>
+              <?php
+              $rigid_has_product_addon = false;
+              if ( class_exists( 'WC_Product_Addons_Helper' ) && rigid_get_option( 'product_addons' ) === 'enabled' ) {
+                  $rigid_has_product_addon = count( WC_Product_Addons_Helper::get_product_addons( get_the_ID() ) );
+              }
+              ?>
+          </div>
+        </div>
+        <div class="col-md-12 col-lg-6">
+              <?php
+                  /**
+                   * Hook: woocommerce_single_product_summary.
+                   *
+                   * @hooked woocommerce_template_single_title - 5
+                   * @hooked woocommerce_template_single_excerpt - 6
+                   * @hooked rigid_product_sale_countdown - 7
+                   * @hooked woocommerce_template_single_rating - 10
+                   * @hooked woocommerce_template_single_price - 10
+                   * @hooked woocommerce_template_single_add_to_cart - 30
+                   * @hooked woocommerce_template_single_meta - 40
+                   * @hooked woocommerce_template_single_sharing - 50
+                   * @hooked WC_Structured_Data::generate_product_data() - 60
+                   */
+                  do_action( 'woocommerce_single_product_summary' );
+              ?>
+        </div>
+      </div><!-- .row -->
         <?php
             /**
              * woocommerce_after_single_product_summary hook.
@@ -89,13 +90,6 @@ global $product;
         ?>
 
 	</div><!-- closing div of content-holder -->
-	<?php
-		if(rigid_get_option('show_sidebar_product'))
-		{
-			do_action( 'woocommerce_sidebar' );
-			echo '<div class="clear"></div>';
-		}
-  ?>
-</div><!-- #product-<?php the_ID(); ?> -->
+</section><!-- #product-<?php the_ID(); ?> -->
 
 <?php do_action( 'woocommerce_after_single_product' ); ?>
