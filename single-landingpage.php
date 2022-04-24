@@ -316,6 +316,42 @@
     padding: 0 10px 0 0;
   }
 
+
+  /** price filter begin */
+
+	#priceSlider {
+		background-color: #ddd !important;
+	}
+
+	.ui-widget-content {
+		height: 7px !important;
+	}
+
+	.ui-slider .ui-slider-handle {
+		background-color: #494932 !important;
+		border-radius: 8px;
+		height: 17px !important;
+		width: 17px !important;
+	}
+
+	input[type='text'] {
+		padding: 4px 15px;
+		border: 1px solid #c1c1c1;
+	}
+	#slideStartPoint {
+		max-width: 60px;
+		background-color: #c6c6c6;
+		color: white;
+	}
+
+	#slideEndPoint {
+		max-width: 60px;
+		background-color: #c6c6c6;
+		float: right;
+		color: white;
+	}
+  /** price filter end */
+
   /** loading begin */
     .overlay {
 		display: none;
@@ -408,27 +444,57 @@
  * Perform start setup
  *
 **/
-$postId = get_the_ID();
-$cityPostalcode = get_post_meta($postId, 'postalcode', true);
+$pageId = get_the_ID();
 
-// get user meta query
-$userMetaQuery = $wpdb->get_results( "
-    SELECT * FROM {$wpdb->prefix}usermeta
-    WHERE meta_key = 'delivery_zips'
+global $wpdb;
+
+$postRowCategory = $wpdb->get_row( "
+    SELECT * FROM {$wpdb->prefix}postmeta
+    WHERE post_id = $pageId
+    AND meta_key = 'landingpage_category'
 " );
 
-$UserIdArrayForCityPostalcode = array();
+$searchCategoryId = $postRowCategory->meta_value;
 
+$adminSettedCityPostcodeArray = get_post_meta($pageId, 'postal_code_relation', true);
+
+$adminSettedCityPostcodeFirstItem = $adminSettedCityPostcodeArray[0];
+
+$adminSettedCityPostcode = get_post_meta($adminSettedCityPostcodeFirstItem, 'postalcode', true);
+
+$userMetaQuery = $wpdb->get_results( "
+SELECT * FROM {$wpdb->prefix}usermeta
+WHERE meta_key = 'delivery_zips'");
+
+$userForThisPostcode = array();
 foreach($userMetaQuery as $userMeta){
-    if (str_contains($userMeta->meta_value, $cityPostalcode)) {
-        array_push($UserIdArrayForCityPostalcode, $userMeta->user_id);
+    if (str_contains($userMeta->meta_value, $adminSettedCityPostcode)) {
+        array_push($userForThisPostcode, $userMeta->user_id);
+    }
+}
+
+$userForThisCategory = array();
+
+foreach ($userForThisPostcode as $queryUserId) {
+    $vendor = get_wcmp_vendor($queryUserId);
+    $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
+    foreach ($vendorProducts as $productId) {
+        $categoryTermList = wp_get_post_terms($productId, 'product_cat', array('fields' => 'ids'));
+        foreach($categoryTermList as $catTerm){
+            if($catTerm == $searchCategoryId){
+                array_push($userForThisCategory, $queryUserId);
+            }
+        }
     }
 }
 
 // pass to backend
-$cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
+$landingPageDefaultUserIdArray = array_intersect($userForThisPostcode, $userForThisCategory);
 
-<input type="hidden" id="cityDefaultUserIdAsString" value="<?php echo $cityDefaultUserIdAsString;?>">
+$landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray); ?>
+
+<input type="hidden" id="landingPageDefaultUserIdAsString" value="<?php echo $landingPageDefaultUserIdAsString;?>">
+
 
 <section id="content" class="row">
   <div class="container">
@@ -444,7 +510,7 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
 
     $productPriceArray = array(); // for price filter
 
-    foreach ($UserIdArrayForCityPostalcode as $vendorId) {
+    foreach ($landingPageDefaultUserIdArray as $vendorId) {
         $vendor = get_wcmp_vendor($vendorId);
         $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
         foreach ($vendorProducts as $productId) {
@@ -498,135 +564,6 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
           <h6 class="float-start d-none d-lg-inline d-xl-inline py-2 border-bottom filter-header">Filtrér</h6>
         </div>
         <div class="collapse d-lg-block accordion-collapse " id="colFilter">
-          <!-- <h5 class="text-uppercase">Anledninger</h5>
-          <ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4 px-0">
-            <li class="px-0">
-              <a class="dropdown-item d-flex align-items-center gap-2 py-2 px-2" href="#">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-square" viewBox="0 0 16 16">
-                  <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-                </svg>
-                Valentinsdag
-              </a>
-            </li>
-            <li class="px-0">
-              <a class="dropdown-item d-flex align-items-center gap-2 py-2 px-2" href="#">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-square" viewBox="0 0 16 16">
-                  <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-                  <path d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.235.235 0 0 1 .02-.022z"/>
-                </svg>
-                Påske
-              </a>
-            </li>
-            <li class="px-0">
-              <a class="dropdown-item d-flex align-items-center gap-2 py-2 px-2" href="#">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-square" viewBox="0 0 16 16">
-                  <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-                </svg>
-                Action
-              </a>
-            </li>
-          </ul>
-
-          <h5 class="text-uppercase">Kategorier</h5>
-          <ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
-            <li class="px-0">
-              <a class="dropdown-item d-flex align-items-center gap-2 py-2 px-2" href="#">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-square" viewBox="0 0 16 16">
-                  <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-                </svg>
-                Valentinsdag
-              </a>
-            </li>
-            <li class="px-0">
-              <a class="dropdown-item d-flex align-items-center gap-2 py-2 px-2" href="#">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-square" viewBox="0 0 16 16">
-                  <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-                  <path d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.235.235 0 0 1 .02-.022z"/>
-                </svg>
-                Påske
-              </a>
-            </li>
-            <li class="px-0">
-              <a class="dropdown-item d-flex align-items-center gap-2 py-2 px-2" href="#">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-square" viewBox="0 0 16 16">
-                  <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-                </svg>
-                Action
-              </a>
-            </li>
-          </ul> -->
-
-          <?php
-          /**
-           * ---------------------
-           * Category filter
-           * ---------------------
-          **/
-          ?>
-          <h5 class="text-uppercase">Kategori</h5>
-          <ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
-
-          <?php
-          // search users for get filtered category
-          $cityPostalcode = get_post_meta($postId, 'postalcode', true);
-             $userMetaQuery = $wpdb->get_results( "
-             SELECT * FROM {$wpdb->prefix}usermeta
-             WHERE meta_key = 'delivery_zips'
-          " );
-
-          $UserIdArrayForCityPostalcode = array();
-          foreach($userMetaQuery as $userMeta){
-             if (str_contains($userMeta->meta_value, $cityPostalcode)) {
-                 array_push($UserIdArrayForCityPostalcode, $userMeta->user_id);
-             }
-          }
-
-          // for category
-          $categoryTermListArray = array();
-
-          foreach ($UserIdArrayForCityPostalcode as $vendorId) {
-             $vendor = get_wcmp_vendor($vendorId);
-             $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
-             foreach ($vendorProducts as $productId) {
-                 $categoryTermList = wp_get_post_terms($productId, 'product_cat', array('fields' => 'ids'));
-                 foreach($categoryTermList as $catTerm){
-                     array_push($categoryTermListArray, $catTerm);
-                 }
-             }
-          }
-          $categoryTermListArrayUnique = array_unique($categoryTermListArray);
-
-          // product category
-          $categoryArgs = array(
-             'taxonomy'   => "product_cat",
-             'exclude' => 15,
-             // 'pad_counts' => true,
-             // 'hide_empty' => 1,
-          );
-          $productCategories = get_terms($categoryArgs);
-          foreach($productCategories as $category){
-             foreach($categoryTermListArrayUnique as $catTerm){
-                 if($catTerm == $category->term_id){ ?>
-                    <!-- <li>
-                     <a class="city-page-item dropdown-item d-flex align-items-center gap-2 py-2" href="#">
-                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-square" viewBox="0 0 16 16">
-                         <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-                       </svg>
-                       <?php //echo $category->name; ?>
-                     </a>
-                    </li> -->
-                    <div class="form-check">
-                        <input type="checkbox" name="filter_cat[<?php echo $category->term_id; ?>]" class="form-check-input" id="filter_cat<?php echo $category->term_id; ?>" value="<?php echo $category->term_id; ?>">
-                        <label for="filter_cat<?php echo $category->term_id; ?>" class="form-check-label">
-                          <?php echo $category->name; ?>
-                        </label>
-                    </div>
-                 <?php }
-             }
-          }
-          ?>
-          </ul>
-
           <?php
           /**
            * ---------------------
@@ -640,7 +577,7 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
           // for used on occasion prepare here
           $occasionTermListArray = array();
 
-          foreach ($UserIdArrayForCityPostalcode as $vendorId) {
+          foreach ($landingPageDefaultUserIdArray as $vendorId) {
               $vendor = get_wcmp_vendor($vendorId);
               $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
               foreach ($vendorProducts as $productId) {
@@ -706,23 +643,15 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
           $deliveryTypeArrayUnique = array_unique($deliveryTypeArray);
 
           foreach($deliveryTypeArrayUnique as $delivery){?>
-              <div class="form-check">
-                  <input type="checkbox" name="filter_del[<?php echo $delivery; ?>]" class="form-check-input" id="filter_delivery_<?php echo $delivery; ?>" value="<?php echo $delivery; ?>">
-                  <label class="form-check-label" for="filter_delivery_<?php echo $delivery; ?>"><?php echo $delivery; ?></label>
-              </div>
+            <div class="form-check">
+                <input type="checkbox" name="filter_del[<?php echo $delivery; ?>]" class="form-check-input" id="filter_delivery_<?php echo $delivery; ?>" value="<?php echo $delivery; ?>">
+                <label class="form-check-label" for="filter_delivery_<?php echo $delivery; ?>"><?php echo $delivery; ?></label>
+            </div>
           <?php }
           ?>
           </ul>
 
-          <!-- <h5>Pris</h5>
-          !--<label for="price" class="form-label">Pris</label>--
-          <p style="width: 100%;">
-            <span class="float-start price-filter-text">149,-</span>
-            <span class="float-end price-filter-text">749,-</span>
-          </p>
-          <input type="range" class="form-range" min="0" max="2500" id="price"> -->
 
-          <!-- price filter filter-->
           <?php
           // for price filter
           $minProductPrice;
@@ -741,7 +670,6 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
             $maxProductPrice = max($productPriceArray);
           }
           ?>
-
           <h5 class="text-uppercase">Pris</h5>
           <form>
             <div id="slideInput" class="my-3">
@@ -800,7 +728,9 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
       </div>
 
       <div class="col-md-12 col-lg-9 mb-5">
-        <h1 class="d-none d-lg-block d-xl-block my-3 my-xs-3 my-sm-3 my-md-3 my-lg-0 my-xl-0 mb-lg-4 mb-xl-4">Find gavehilsner til <?php the_title();?></h1>
+        <h1 class="d-none d-lg-block d-xl-block my-3 my-xs-3 my-sm-3 my-md-3 my-lg-0 my-xl-0 mb-lg-4 mb-xl-4">
+          <?php the_title();?>
+        </h1>
         <div class="applied-filters row mt-xs-0 mt-sm-0 mt-md-0 mt-2 mb-4 lh-lg">
           <div class="col-12 filterItemShow">
 
@@ -812,13 +742,13 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
 
             <a class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 bg-yellow text-white">Nulstil alle <button type="button" class="btn-close  btn-close-white" aria-label="Close"></button></a>
 
-            <button id="cityPageReset">Reset</button>
+            <button id="landingPageReset">Reset</button>
           </div>
         </div>
 
 
       <?php
-      foreach ($UserIdArrayForCityPostalcode as $user) {
+      foreach ($landingPageDefaultUserIdArray as $user) {
         $vendor = get_wcmp_vendor($user);
         $image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
         ?>
@@ -903,7 +833,6 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
   </div>
 </section>
 </main>
-
 
 <section id="howitworks" class="bg-light-grey py-5">
   <div class="container text-center">
@@ -1203,14 +1132,15 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
 
 <script src="https://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
 <link rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css">
+
 <script>
+
 	jQuery(document).ready(function() {
 		var minPrice = "<?php echo $minProductPrice;?>";
 		var maxPrice = "<?php echo $maxProductPrice;?>";
 		jQuery("#priceSlider").slider({
 			// min: minPrice,
-      range: true,
-      min: 0,
+			min: 1,
 			max: maxPrice,
 			step: 1,
 			values: [minPrice, maxPrice],
@@ -1227,7 +1157,7 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
 			// var val = jQuery('#priceSlider').slider("option", "values");
 		});
 		// add class
-		jQuery("a").addClass("vendor_sort_category");
+		jQuery("a").addClass("vendor_sort_occasion_landpage");
 	});
 </script>
 
