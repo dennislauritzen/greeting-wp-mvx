@@ -586,7 +586,7 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
                      </a>
                     </li> -->
                     <div class="form-check">
-                        <input type="checkbox" name="filter_cat[<?php echo $category->term_id; ?>]" class="form-check-input" id="filter_cat<?php echo $category->term_id; ?>" value="<?php echo $category->term_id; ?>">
+                        <input type="checkbox" name="filter_city_page" class="form-check-input filter-on-city-page" id="filter_cat<?php echo $category->term_id; ?>" value="<?php echo $category->term_id; ?>">
                         <label for="filter_cat<?php echo $category->term_id; ?>" class="form-check-label">
                           <?php echo $category->name; ?>
                         </label>
@@ -633,7 +633,7 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
             foreach($occasionTermListArrayUnique as $occasionTerm){
               if($occasionTerm == $occasion->term_id){ ?>
                 <div class="form-check">
-                    <input type="checkbox" name="filter_occ[<?php echo $category->term_id; ?>]" class="form-check-input" id="filter_occ_<?php echo $occasion->term_id; ?>" value="<?php echo $occasion->term_id; ?>">
+                    <input type="checkbox" name="filter_city_page" class="form-check-input filter-on-city-page" id="filter_occ_<?php echo $occasion->term_id; ?>" value="<?php echo $occasion->term_id; ?>">
                     <label class="form-check-label" for="filter_occ_<?php echo $occasion->term_id; ?>"><?php echo $occasion->name; ?></label>
                 </div>
           <?php
@@ -669,7 +669,7 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
               foreach($userMetas as $deliveryType){
                   if(!array_key_exists($deliveryType, $deliveryTypeArray)){
                       $deliveryTypeArray[$deliveryType] = array(
-                          'label' => $label['value']['0']['label'],
+                          'label' => $label['value']['0'],
                           'id' => $deliveryType
                         );
                   }
@@ -678,7 +678,7 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
 
           foreach($deliveryTypeArray as $delivery){?>
               <div class="form-check">
-                  <input type="checkbox" name="filter_del[<?php echo $delivery['id']; ?>]" class="form-check-input" id="filter_delivery_<?php echo $delivery['id']; ?>" value="<?php echo $delivery['id']; ?>">
+                  <input type="checkbox" name="filter_city_page" class="form-check-input filter-on-city-page" id="filter_delivery_<?php echo $delivery['id']; ?>" value="<?php echo $delivery['id']; ?>">
                   <label class="form-check-label" for="filter_delivery_<?php echo $delivery['id']; ?>"><?php echo $delivery['label']; ?></label>
               </div>
           <?php }
@@ -728,7 +728,7 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
                 <div class="col-12">
                   <div class="px-3 px-lg-2 pt-3 pt-lg-2 pt-xl-2 pb-4">
                     <input
-                      id="ex2"
+                      id="sliderCityPage"
                       type="text"
                       class="form-range py-3"
                       value="array"
@@ -750,7 +750,7 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
                       </style>
                       <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/bootstrap-slider.min.js"></script>
                       <script type="text/javascript">
-                        var slider = new Slider('#ex2', {
+                        var slider = new Slider('#sliderCityPage', {
                           'tooltip_split': true
                         });
                         slider.on("slideStop", function(sliderValue){
@@ -782,8 +782,9 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
             <a class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 text-dark">5683 Haarby <button type="button" class="btn-close" aria-label="Close"></button></a>
 
             <a class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 bg-yellow text-white">Nulstil alle <button type="button" class="btn-close  btn-close-white" aria-label="Close"></button></a>
+            
+            <button id="cityPageReset" type="button" class="rounded-pill border-yellow bg-yellow text-white">Reset All</button>
 
-            <button id="cityPageReset">Reset</button>
           </div>
         </div>
 
@@ -860,6 +861,7 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
                     <?php
                     }
                     ?>
+                    <input type="hidden" id="cityName" value="<?php echo the_title();?>">
                   </div>
                 </small>
               </div>
@@ -1199,8 +1201,6 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
 			jQuery("#priceSlider").slider("values", $this.data("index"), $this.val());
 			// var val = jQuery('#priceSlider').slider("option", "values");
 		});
-		// add class
-		jQuery("a").addClass("vendor_sort_category");
 	});
 </script>
 

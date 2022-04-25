@@ -627,14 +627,12 @@ function ajax_fetch() { ?>
 								jQuery('#datafetch_wrapper').addClass('d-none').removeClass('d-inline');
 							}
 						}
-					}
+					});
 					
 
 				}, 500)),
 
 
-
-			);// keyup
 
 	/** function for delaying ajax input**/
 	function delay(callback, ms) {
@@ -812,19 +810,18 @@ function categoryActionJavascript() { ?>
 			var catOccaDeliveryIdArray = [];
 			var inputPriceRangeArray = [];
 			// $('#cityPageReset').hide();
-			jQuery('.vendor_sort_category').click(function(){
+			jQuery(".filter-on-city-page, .slider").click(function(){
+				// inputPriceRangeArray = jQuery('#priceSlider').slider("option", "values");
+				inputPriceRangeArray = slider.getValue();
 
-				inputPriceRangeArray = jQuery('#priceSlider').slider("option", "values");
-				console.log("price range arr " + inputPriceRangeArray);
-
-				// var categoryIdArray = [];
 				catOccaDeliveryIdArray = [];
-				$("input:checkbox[name=type]:checked").each(function(){
+				$("input:checkbox[name=filter_city_page]:checked").each(function(){
 					catOccaDeliveryIdArray.push($(this).val());
 				});
-				console.log(catOccaDeliveryIdArray)
 
-				var data = {'action': 'catOccaDeliveryAction', cityDefaultUserIdAsString: jQuery("#cityDefaultUserIdAsString").val(), catOccaDeliveryIdArray: catOccaDeliveryIdArray, inputPriceRangeArray:inputPriceRangeArray};
+				var cityName = $('#cityName').val();
+
+				var data = {'action': 'catOccaDeliveryAction', cityDefaultUserIdAsString: jQuery("#cityDefaultUserIdAsString").val(), catOccaDeliveryIdArray: catOccaDeliveryIdArray, inputPriceRangeArray:inputPriceRangeArray, cityName: cityName};
 				jQuery.post(ajaxurl, data, function(response) {
 					jQuery('.store').hide();
 					jQuery('.filteredStore').show();
@@ -839,7 +836,7 @@ function categoryActionJavascript() { ?>
 
 			// reset filter
 			$('#cityPageReset').click(function(){
-				$("input:checkbox[name=type]").removeAttr("checked");
+				$("input:checkbox[name=filter_city_page]").removeAttr("checked");
 				catOccaDeliveryIdArray.length = 0;
 				jQuery('.store').show();
 				jQuery('.filteredStore').hide();
@@ -947,7 +944,6 @@ function catOccaDeliveryAction() {
 	$userIdArrayGetFromCatOccaDelivery = array();
 
 	if(!empty($userIdArrayGetFromCatOcca) && !empty($userIdArrayGetFromDelivery) && !empty($userIdArrayGetFromPriceFilter)){
-		// $userIdArrayGetFromCatOccaDelivery = [$userIdArrayGetFromCatOcca, $userIdArrayGetFromDelivery, $userIdArrayGetFromPriceFilter];
 		$arrOfArrs = [$userIdArrayGetFromCatOcca, $userIdArrayGetFromDelivery, $userIdArrayGetFromPriceFilter];
 		$userIdArrayGetFromCatOccaDelivery = array_intersect(...$arrOfArrs);
 	}
@@ -981,21 +977,15 @@ function catOccaDeliveryAction() {
 	$filteredCatOccaDeliveryArray = array_intersect($defaultUserArray, $userIdArrayGetFromCatOccaDelivery);
 	$filteredCatOccaDeliveryArrayUnique = array_unique($filteredCatOccaDeliveryArray);
 
-	if(count($filteredCatOccaDeliveryArrayUnique) > 0 ){ ?>
-
-		<?php
+	if(count($filteredCatOccaDeliveryArrayUnique) > 0 ){
 		foreach ($filteredCatOccaDeliveryArrayUnique as $filteredUser) {
-
 			$vendor = get_wcmp_vendor($filteredUser);
-
+			$cityName = $_POST['cityName'];
 			// call the template with pass $vendor variable
-			get_template_part('template-parts/vendor-loop', null, array('vendor' => $vendor));
-			?>
-		<?php
+			get_template_part('template-parts/vendor-loop', null, array('vendor' => $vendor, 'cityName' => $cityName));
 		}
-		?>
 
-	<?php } else { ?>
+	} else { ?>
 
 	<div>
 		<p id="noVendorFound" style="margin-top: 50px; margin-bottom: 35px; padding: 15px 10px; background-color: #f8f8f8;">No vendors were found matching your selection.</p>
@@ -1024,22 +1014,22 @@ function landpageActionJavascript() { ?>
 			var ajaxurl = "<?php echo admin_url('admin-ajax.php');?>";
 			var occaDeliveryIdArray = [];
 			var inputPriceRangeArray = [];
-			$('#landingPageReset').hide();
+			// $('#landingPageReset').hide();
 
-			jQuery('.vendor_sort_occasion_landpage').click(function(){
-				inputPriceRangeArray = jQuery('#priceSlider').slider("option", "values");
-				console.log("price range arr " + inputPriceRangeArray);
-
+			jQuery('.filter-on-landing-page, .slider').click(function(){
+				alert("from landing page")
+				// inputPriceRangeArray = jQuery('#priceSlider').slider("option", "values");
+				inputPriceRangeArray = slider.getValue();
 				occaDeliveryIdArray = [];
-				$("input:checkbox[name=type_landpage]:checked").each(function(){
+				$("input:checkbox[name=filter_landing_page]:checked").each(function(){
 					occaDeliveryIdArray.push($(this).val());
 				});
 
-				var data = {'action': 'landpageAction', landingPageDefaultUserIdAsString: jQuery("#landingPageDefaultUserIdAsString").val(), occaDeliveryIdArray: occaDeliveryIdArray, inputPriceRangeArray: inputPriceRangeArray};
+				var cityName = $('#cityName').val();
+				var data = {'action': 'landpageAction', landingPageDefaultUserIdAsString: jQuery("#landingPageDefaultUserIdAsString").val(), occaDeliveryIdArray: occaDeliveryIdArray, inputPriceRangeArray: inputPriceRangeArray, cityName: cityName};
 				jQuery.post(ajaxurl, data, function(response) {
 					jQuery('.store').hide();
 					jQuery('.filteredStore').show();
-					$('#landingPageReset').show();
 					jQuery('.filteredStore').html(response);
 					if(occaDeliveryIdArray.length == 0){
 						jQuery('.store').show();
@@ -1050,11 +1040,10 @@ function landpageActionJavascript() { ?>
 
 			// reset filter
 			$('#landingPageReset').click(function(){
-				$("input:checkbox[name=type_landpage]").removeAttr("checked");
+				$("input:checkbox[name=filter_landing_page]").removeAttr("checked");
 				occaDeliveryIdArray.length = 0;
 				jQuery('.store').show();
 				jQuery('.filteredStore').hide();
-				$('#landingPageReset').hide();
 			});
 		});
 
@@ -1161,7 +1150,6 @@ function landpageAction() {
 	$userIdArrayGetFromCatOccaDelivery = array();
 
 	if(!empty($userIdArrayGetFromOcca) && !empty($userIdArrayGetFromDelivery) && !empty($userIdArrayGetFromPriceFilter)){
-		// $userIdArrayGetFromCatOccaDelivery = [$userIdArrayGetFromCatOcca, $userIdArrayGetFromDelivery, $userIdArrayGetFromPriceFilter];
 		$arrOfArrs = [$userIdArrayGetFromOcca, $userIdArrayGetFromDelivery, $userIdArrayGetFromPriceFilter];
 		$userIdArrayGetFromCatOccaDelivery = array_intersect(...$arrOfArrs);
 	}
@@ -1201,9 +1189,10 @@ function landpageAction() {
 		foreach ($filteredOccaDeliveryArrayUnique as $filteredUser) {
 
 			$vendor = get_wcmp_vendor($filteredUser);
+			$cityName = $_POST['cityName'];
 
 			// call the template with pass $vendor variable
-			get_template_part('template-parts/vendor-loop', null, array('vendor' => $vendor));
+			get_template_part('template-parts/vendor-loop', null, array('vendor' => $vendor, 'cityName' => $cityName));
 			?>
 
 		<?php
