@@ -38,7 +38,7 @@ if(!is_product()){
 *
 */
 } else if(is_product()){
-	the_content();
+
 ?>
 
 
@@ -288,10 +288,12 @@ if(!is_product()){
   <div class="container py-4">
     <div class="row">
 			<div class="d-flex pb-3 pb-lg-0 pb-xl-0 position-relative justify-content-center justify-content-lg-start justify-content-xl-start col-md-12 col-lg-3">
-        <!--<img src="https://dev.greeting.dk/wp-content/uploads/2022/04/greeting-pink.png" style="width: 150px;">-->
-        <!--<img src="https://dev.greeting.dk/wp-content/uploads/2022/04/Greeting-1.png" style="width: 150px;">-->
-        <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/greeting-logo-white.png" style="text-align: center; width: 150px;">
-        <!-- <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/greeting-test.png" style="width: 150px;"> -->
+        <a href="<?php echo home_url(); ?>">
+					<!--<img src="https://dev.greeting.dk/wp-content/uploads/2022/04/greeting-pink.png" style="width: 150px;">-->
+	        <!--<img src="https://dev.greeting.dk/wp-content/uploads/2022/04/Greeting-1.png" style="width: 150px;">-->
+	        <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/greeting-logo-white.png" style="text-align: center; width: 150px;">
+	        <!-- <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/greeting-test.png" style="width: 150px;"> -->
+				</a>
         <a class="position-absolute top-0 end-0 me-4 d-inline d-lg-none d-xl-none" data-bs-toggle="offcanvas" href="#offcanvasMenu" role="button" aria-controls="offcanvasExample">
           <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#ffffff" class="bi bi-list" viewBox="0 0 16 16">
             <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
@@ -410,34 +412,7 @@ if(!is_product()){
 	<section id="product" class="mb-5">
 		<div class="container">
 			<div class="row">
-				<div class="col-md-12 col-lg-6">
-					<h1 class="d-none d-xs-inline-block d-sm-inline-block d-md-inline-block mb-2 d-lg-none d-xl-none">Gavekurv "Lækkert mix"</h1>
-					<img src="http://greeting/wp-content/uploads/2017/08/m_prod1_1.jpg" class="mb-3">
-				</div>
-				<div class="col-md-12 col-lg-6">
-					<h1 class="d-none d-lg-inline-block d-xl-inline-block pb-1">Gavekurv "Lækkert mix"</h1>
-					<div class="description">
-						<strong>Gavekurven indeholder:</strong>
-						<ul>
-						<li>Marabou</li>
-						<li>Ferrero Rocher</li>
-						<li>Kims Nødder</li>
-						<li>Pringles Chips</li>
-						<li>Bornholmsk Olie</li>
-						<li>Kinder Choko Bon Bon</li>
-						<li>Engelsk Vingummi</li>
-						</ul>
-						<p>Slikapoteket håndskriver en gratis hilsen fra dig inden de leverer gaven til modtageren.</p>
-					</div>
-					<div class="price">
-						210,00 kr.
-					</div>
-					<div class="addtocart">
-						<?php
-
-						?>
-					</div>
-				</div>
+				<?php 	the_content(); ?>
 			</div>
 		</div>
 	</section>

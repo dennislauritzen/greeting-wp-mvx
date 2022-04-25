@@ -115,7 +115,6 @@ if ( ! function_exists( 'greeting2_add_user_fields' ) ) :
 		$fields['facebook_profile'] = 'Facebook URL';
 		$fields['twitter_profile']  = 'Twitter URL';
 		$fields['linkedin_profile'] = 'LinkedIn URL';
-		$fields['xing_profile']     = 'Xing URL';
 		$fields['github_profile']   = 'GitHub URL';
 
 		return $fields;
@@ -2292,6 +2291,13 @@ add_action( 'template_redirect', 'redirect_direct_access' );
 	}
 }
 
+/**
+ *
+ * The notice when someone shops in more than one store.
+ * Should be localized and danish
+ * @todo Dennis - translate
+ * @todo Dennis - set up with localization.
+ */
 // show shop only one store same time notice
 function show_shop_only_one_store_same_time_notice(){
 	wc_print_notice('You can not shopping from different STORE once!, Please go to CART and keep only one STORE item in cart. If you want to shopping from several item please you can place another order.', 'error');
@@ -2307,7 +2313,6 @@ add_filter('wcmp_show_report_abuse_link', '__return_false');
 /**
  * Trigger Holiday Mode
  */
-
 // add_action ('init', 'greeting_woocommerce_holiday_mode');
 
 function greeting_woocommerce_holiday_mode() {
@@ -2323,9 +2328,22 @@ function greeting_woocommerce_holiday_mode() {
 	add_action( 'woocommerce_before_checkout_form', 'greeting_wc_shop_disabled', 5 );
 }
 
-
 // Show Holiday Notice
-
 function greeting_wc_shop_disabled() {
     wc_print_notice( 'Our Online Shop is Closed Today :)', 'error');
+}
+
+add_action( 'woocommerce_single_product_summary', 'reorder_product_page_hooks', 1 );
+function reorder_product_page_hooks(){
+	remove_action('woocommerce_single_product_summary','woocommerce_template_single_rating', 10);
+	remove_action('woocommerce_single_product_summary','woocommerce_template_single_excerpt', 20);
+	remove_action('woocommerce_single_product_summary','woocommerce_template_single_price', 10);
+	remove_action('woocommerce_single_product_summary','woocommerce_template_single_add_to_cart', 30);
+	remove_action('woocommerce_single_product_summary','woocommerce_template_single_meta', 40);
+	remove_action('woocommerce_single_product_summary','woocommerce_template_single_sharing', 50);
+
+	add_action('woocommerce_single_product_summary','woocommerce_template_single_title', 5);
+	add_action('woocommerce_single_product_summary','woocommerce_template_single_excerpt', 10);
+	add_action('woocommerce_single_product_summary','woocommerce_template_single_price', 15);
+	add_action('woocommerce_single_product_summary','woocommerce_template_single_add_to_cart', 15);
 }
