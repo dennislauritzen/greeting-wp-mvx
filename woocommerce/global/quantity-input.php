@@ -27,26 +27,64 @@ if ( $max_value && $min_value === $max_value ) {
 	/* translators: %s: Quantity. */
 	$label = ! empty( $args['product_name'] ) ? sprintf( esc_html__( '%s quantity', 'rigid' ), wp_strip_all_tags( $args['product_name'] ) ) : esc_html__( 'Quantity', 'rigid' );
 ?>
-    <div class="quantity">
-	    <?php do_action( 'woocommerce_before_quantity_input_field' ); ?>
-        <label class="screen-reader-text" for="<?php echo esc_attr( $input_id ); ?>"><?php echo esc_attr( $label ); ?></label>
-        <input
-            type="number"
-            id="<?php echo esc_attr( $input_id ); ?>"
-            class="<?php echo esc_attr( join( ' ', (array) $classes ) ); ?>"
-            step="<?php echo esc_attr( $step ); ?>"
-            min="<?php echo esc_attr( $min_value ); ?>"
-            max="<?php echo esc_attr( 0 < $max_value ? $max_value : '' ); ?>"
-            name="<?php echo esc_attr( $input_name ); ?>"
-            value="<?php echo esc_attr( $input_value ); ?>"
-            title="<?php echo esc_attr_x( 'Qty', 'Product quantity input tooltip', 'rigid' ); ?>"
-            size="4"
-            placeholder="<?php echo esc_attr( $placeholder ); ?>"
-            inputmode="<?php echo esc_attr( $inputmode ); ?>" />
+    <?php do_action( 'woocommerce_before_quantity_input_field' ); ?>
+      <label class="screen-reader-text" for="<?php echo esc_attr( $input_id ); ?>"><?php echo esc_attr( $label ); ?></label>
 
-        <input type="button" value="+" class="rigid-qty-plus" />
-        <input type="button" value="-" class="rigid-qty-minus" />
-	    <?php do_action( 'woocommerce_after_quantity_input_field' ); ?>
-    </div>
+			<div class="input-group input-group-lg">
+	      <input
+	          type="number"
+	          id="<?php echo esc_attr( $input_id ); ?>"
+	          class="form-control input-text text<?php //echo esc_attr( join( ' ', (array) $classes ) ); ?>"
+	          step="<?php echo esc_attr( $step ); ?>"
+	          min="<?php echo esc_attr( $min_value ); ?>"
+	          max="<?php echo esc_attr( 0 < $max_value ? $max_value : '' ); ?>"
+	          name="<?php echo esc_attr( $input_name ); ?>"
+	          value="<?php echo esc_attr( $input_value ); ?>"
+	          title="<?php echo esc_attr_x( 'Qty', 'Product quantity input tooltip', 'rigid' ); ?>"
+	          size="4"
+						aria-label=""
+	          placeholder="<?php echo esc_attr( $placeholder ); ?>"
+	          inputmode="<?php echo esc_attr( $inputmode ); ?>" />
+
+						<button type="button" class="btn btn-outline-secondary plus-qty" style="min-width: 50px;"  data-field="<?php echo esc_attr( $input_name ); ?>">+</button>
+						<button type="button" class="btn btn-outline-secondary minus-qty" style="min-width: 50px;" data-field="<?php echo esc_attr( $input_name ); ?>">-</button>
+
+						<script type="text/javascript">
+							function incrementValue(e) {
+								e.preventDefault();
+								var fieldName = jQuery(e.target).data('field');
+								var parent = jQuery(e.target).closest('div');
+								var currentVal = parseInt(parent.find('input[name=' + fieldName + ']').val(), 10);
+
+								if (!isNaN(currentVal)) {
+										parent.find('input[name=' + fieldName + ']').val(currentVal + 1);
+								} else {
+										parent.find('input[name=' + fieldName + ']').val(0);
+								}
+							}
+
+							function decrementValue(e) {
+									e.preventDefault();
+									var fieldName = jQuery(e.target).data('field');
+									var parent = jQuery(e.target).closest('div');
+									var currentVal = parseInt(parent.find('input[name=' + fieldName + ']').val(), 10);
+
+									if (!isNaN(currentVal) && currentVal > 0) {
+											parent.find('input[name=' + fieldName + ']').val(currentVal - 1);
+									} else {
+											parent.find('input[name=' + fieldName + ']').val(0);
+									}
+							}
+
+							jQuery('.input-group').on('click', '.plus-qty', function(e) {
+									incrementValue(e);
+							});
+
+							jQuery('.input-group').on('click', '.minus-qty', function(e) {
+									decrementValue(e);
+							});
+						</script>
+			</div>
+    <?php do_action( 'woocommerce_after_quantity_input_field' ); ?>
 	<?php
 }

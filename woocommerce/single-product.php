@@ -25,7 +25,7 @@ get_header( 'shop' ); ?>
 	<?php
 		/**
 		 * woocommerce_before_main_content hook.
-		 *
+
 		 * @hooked woocommerce_output_content_wrapper - 10 (outputs opening divs for the content)
 		 * @hooked woocommerce_breadcrumb - 20
 		 */

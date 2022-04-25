@@ -15,18 +15,29 @@
  * @version     1.6.4
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
-}
+ if ( ! defined( 'ABSPATH' ) ) {
+ 	exit; // Exit if accessed directly
+ }
+ global $post, $product;
+ ?>
 
-global $post, $product;
+ <?php if ( $product->is_on_sale() ) : ?>
 
-?>
-<?php if ( $product->is_on_sale() ) : ?>
+ 	<?php
+ 	if ($product->is_type( 'simple' )) {
+ 		$sale_price     =  $product->get_sale_price();
+ 		$regular_price  =  $product->get_regular_price();
+ 	}
+ 	elseif($product->is_type('variable')){
+ 		$sale_price     =  $product->get_variation_sale_price( 'min', true );
+ 		$regular_price  =  $product->get_variation_regular_price( 'max', true );
+ 	}
 
-	<?php // echo apply_filters( 'woocommerce_sale_flash', '<span class="onsale">' . esc_html__( 'Sale!', 'woocommerce' ) . '</span>', $post, $product ); ?>
 
-	<?php
-endif;
+ 	$discount = round (($sale_price / $regular_price -1 ) * 100);
 
-/* Omit closing PHP tag at the end of PHP files to avoid "headers already sent" issues. */
+ 	?>
+
+ 	<?php # echo apply_filters( 'woocommerce_sale_flash', '<span class="onsale-icon"> ' . $discount . ' %</span>', $post, $product ); ?>
+
+ <?php endif;

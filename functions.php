@@ -2337,7 +2337,87 @@ function reorder_product_page_hooks(){
 	remove_action('woocommerce_single_product_summary','woocommerce_template_single_sharing', 50);
 
 	add_action('woocommerce_single_product_summary','woocommerce_template_single_title', 5);
-	add_action('woocommerce_single_product_summary','woocommerce_template_single_excerpt', 10);
-	add_action('woocommerce_single_product_summary','woocommerce_template_single_price', 15);
-	add_action('woocommerce_single_product_summary','woocommerce_template_single_add_to_cart', 15);
+	add_action('woocommerce_single_product_summary','woocommerce_template_single_price', 10);
+	add_action('woocommerce_single_product_summary','woocommerce_template_single_excerpt', 15);
+	add_action('woocommerce_single_product_summary','woocommerce_template_single_add_to_cart', 20);
+}
+
+
+add_action( 'woocommerce_after_single_product_summary', 'reorder_product_page_after_product_hooks', 1 );
+function reorder_product_page_after_product_hooks(){
+	remove_action('woocommerce_after_single_product_summary','woocommerce_output_product_data_tabs', 10);
+	remove_action('woocommerce_after_single_product_summary','woocommerce_upsell_display', 15);
+	remove_action('woocommerce_after_single_product_summary','woocommerce_output_related_products', 20);
+
+	add_action('woocommerce_after_single_product_summary','add_vendor_info_to_product_page', 5);
+	add_action('woocommerce_after_single_product_summary','woocommerce_output_related_products', 10);
+}
+function add_vendor_info_to_product_page(){
+		wc_get_template( 'single-product/vendor-information.php' );
+}
+
+add_filter( 'woocommerce_get_price_html', 'change_variable_products_price_display', 10, 2 );
+function change_variable_products_price_display( $price, $product ) {
+    // Only for variable products type
+    if( ! $product->is_type('variable') ) return $price;
+
+    $prices = $product->get_variation_prices( true );
+
+    if ( empty( $prices['price'] ) )
+        return apply_filters( 'woocommerce_variable_empty_price_html', '', $product );
+
+    $min_price = current( $prices['price'] );
+    $max_price = end( $prices['price'] );
+    $prefix_html = '<span class="price-prefix">' . __('Fra ') . '</span>';
+
+    $prefix = $min_price !== $max_price ? $prefix_html : ''; // HERE the prefix
+
+    return apply_filters( 'woocommerce_variable_price_html', $prefix . wc_price( $min_price ) . $product->get_price_suffix(), $product );
+}
+
+/**
+ *
+ *	Change currency symbol for danish goods.
+ *
+ */
+function greeting_change_dk_currency_symbol( $currency_symbol, $currency ) {
+    switch( $currency ) {
+        // DKK til kr
+        case 'DKK': $currency_symbol = 'kr.'; break;
+    }
+    return $currency_symbol;
+}
+add_filter('woocommerce_currency_symbol', 'greeting_change_dk_currency_symbol', 10, 2);
+
+
+add_filter( 'woocommerce_variation_option_name','display_price_in_variation_option_name');
+function display_price_in_variation_option_name( $term ) {
+    global $product;
+
+    if ( empty( $term ) ) {
+        return $term;
+    }
+    if ( empty( $product->id ) ) {
+        return $term;
+    }
+
+    $variation_id = $product->get_children();
+
+    foreach ( $variation_id as $id ) {
+        $_product       = new WC_Product_Variation( $id );
+        $variation_data = $_product->get_variation_attributes();
+
+        foreach ( $variation_data as $key => $data ) {
+
+            if ( $data == $term ) {
+							$html = ( $_product->get_stock_quantity() ) ? ' - ' . $_product->get_stock_quantity() : '';
+							$html .= $term . ' - ';
+              $html .= wp_kses( woocommerce_price( $_product->get_price() ), array() );
+
+              return $html;
+            }
+        }
+    }
+
+    return $term;
 }

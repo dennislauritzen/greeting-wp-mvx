@@ -11,6 +11,7 @@ get_header( 'shop' );
 do_action( 'wcmp_before_main_content' );
 
 global $WCMp;
+global $product;
 
 ?>
 <?php
@@ -170,50 +171,50 @@ $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
 				$vendorProducts = $vendor->get_products(array('fields' => 'ids'));
 				foreach ($vendorProducts as $productId) {
 					array_push($productIdArray, $productId);
-					$singleProduct = wc_get_product( $productId );
-					$uploadedImage = wp_get_attachment_url( $singleProduct->get_image_id() );
+					$product = wc_get_product( $productId );
+					$uploadedImage = wp_get_attachment_url( $product->get_image_id() );
 					$uploadDir = wp_upload_dir();
 					$uploadDirBaseUrl = $uploadDir['baseurl'];
 					?>
 					<div class="col-6 col-xs-6 col-sm-6 col-md-6 col-lg-4 col-xl-3">
 						<div class="card mb-4 border-0">
-								<a href="<?php echo get_permalink($singleProduct->get_id());?>">
+								<a href="<?php echo get_permalink($product->get_id());?>">
 								<?php if($uploadedImage != ''){?>
 									<img
-									src="<?php echo wp_get_attachment_url( $singleProduct->get_image_id() ); ?>"
+									src="<?php echo wp_get_attachment_url( $product->get_image_id() ); ?>"
 									class="attachment-shop_catalog size-shop_catalog"
 									alt=""
 									loading="lazy"
-									title="<?php echo $singleProduct->get_name();?>"
+									title="<?php echo $product->get_name();?>"
 									srcset="
-										<?php echo wp_get_attachment_url( $singleProduct->get_image_id() ); ?> 370w,
-										<?php echo wp_get_attachment_url( $singleProduct->get_image_id() ); ?> 150w,
-										<?php echo wp_get_attachment_url( $singleProduct->get_image_id() ); ?> 300w,
-										<?php echo wp_get_attachment_url( $singleProduct->get_image_id() ); ?> 768w,
-										<?php echo wp_get_attachment_url( $singleProduct->get_image_id() ); ?> 640w,
-										<?php echo wp_get_attachment_url( $singleProduct->get_image_id() ); ?> 100w,
-										<?php echo wp_get_attachment_url( $singleProduct->get_image_id() ); ?> 60w,
-										<?php echo wp_get_attachment_url( $singleProduct->get_image_id() ); ?> 620w,
-										<?php echo wp_get_attachment_url( $singleProduct->get_image_id() ); ?> 800w"
+										<?php echo wp_get_attachment_url( $product->get_image_id() ); ?> 370w,
+										<?php echo wp_get_attachment_url( $product->get_image_id() ); ?> 150w,
+										<?php echo wp_get_attachment_url( $product->get_image_id() ); ?> 300w,
+										<?php echo wp_get_attachment_url( $product->get_image_id() ); ?> 768w,
+										<?php echo wp_get_attachment_url( $product->get_image_id() ); ?> 640w,
+										<?php echo wp_get_attachment_url( $product->get_image_id() ); ?> 100w,
+										<?php echo wp_get_attachment_url( $product->get_image_id() ); ?> 60w,
+										<?php echo wp_get_attachment_url( $product->get_image_id() ); ?> 620w,
+										<?php echo wp_get_attachment_url( $product->get_image_id() ); ?> 800w"
 									class="card-img-top"
-									alt="<?php echo $singleProduct->get_name();?>">
+									alt="<?php echo $product->get_name();?>">
 								<?php } else { ?>
 									<img
 									src="<?php echo $uploadDirBaseUrl;?>/woocommerce-placeholder-300x300.png"
 									class="card-img-top"
-									alt="<?php echo $singleProduct->get_name();?>">
+									alt="<?php echo $product->get_name();?>">
 								<?php } ?>
 								</a>
 								<div class="card-body">
 										<h6 class="card-title">
-											<a href="<?php echo get_permalink($singleProduct->get_id());?>" class="text-dark">
-												<?php echo $singleProduct->get_name();?>
+											<a href="<?php echo get_permalink($product->get_id());?>" class="text-dark">
+												<?php echo $product->get_name();?>
 											</a>
 										</h6>
-										<p class="price"><?php echo $singleProduct->get_price();?> kr.</small>
+										<p class="price"><?php echo woocommerce_template_loop_price();?></small>
 										<div class="links" style="display: none;">
-											<a href="?add-to-cart=<?php echo $singleProduct->get_id();?>" data-quantity="1" class="button product_type_simple add_to_cart_button ajax_add_to_cart" title="Add to cart" data-product_id="<?php echo $singleProduct->get_id();?>" data-product_sku="RGD-00010-1" aria-label="Add “Framed Poster” to your cart" rel="nofollow">Add to cart</a>
-											<a href="<?php echo get_permalink($singleProduct->get_id());?>" class="rigid-quick-view-link" data-id="<?php echo $singleProduct->get_id();?>" title="Quick View"><i class="fa fa-eye"></i></a>
+											<a href="?add-to-cart=<?php echo $product->get_id();?>" data-quantity="1" class="button product_type_simple add_to_cart_button ajax_add_to_cart" title="Add to cart" data-product_id="<?php echo $product->get_id();?>" data-product_sku="RGD-00010-1" aria-label="Add “Framed Poster” to your cart" rel="nofollow">Add to cart</a>
+											<a href="<?php echo get_permalink($product->get_id());?>" class="rigid-quick-view-link" data-id="<?php echo $product->get_id();?>" title="Quick View"><i class="fa fa-eye"></i></a>
 										</div>
 								</div>
 						</div>

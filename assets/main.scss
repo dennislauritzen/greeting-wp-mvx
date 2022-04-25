@@ -573,7 +573,9 @@ div.store {
 		font-weight: 400;
 	}
 	div.card {
-		p.price {
+		p.price,
+		bdi,
+		div.price_hold {
 			font-size: 13px;
 		}
 	}
