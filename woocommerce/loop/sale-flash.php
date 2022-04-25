@@ -26,16 +26,8 @@ $post, $product;
 ?>
 <?php if ( $product->is_on_sale() ) : ?>
 	<?php if ( $product->is_type( 'combo' ) ): ?>
-		<?php echo apply_filters( 'woocommerce_sale_flash', '<span class="sale">' . esc_html__( 'save', 'rigid' ) . '</span>', $post, $product ); ?>
+		<?php // echo apply_filters( 'woocommerce_sale_flash', '<span class="sale">' . esc_html__( 'save', 'rigid' ) . '</span>', $post, $product ); ?>
 	<?php else: ?>
-		<?php echo apply_filters( 'woocommerce_sale_flash', '<span class="sale">' . ' -' . rigid_get_product_saving( $product ) . '%</span>', $post, $product ); ?>
+		<?php //echo apply_filters( 'woocommerce_sale_flash', '<span class="sale">' . ' -' . rigid_get_product_saving( $product ) . '%</span>', $post, $product ); ?>
 	<?php endif; ?>
 <?php endif; ?>
-
-<?php if ( rigid_is_product_new( $product ) ): ?>
-    <span class="new_prod"><?php esc_html_e( 'New', 'rigid' ) ?></span>
-<?php endif; ?>
-
-<?php if ( rigid_get_option('show_out_of_stock') && !$product->is_in_stock() ): ?>
-    <span class="rigid-product-out-of-stock"><?php esc_html_e( 'Out of Stock', 'rigid' ) ?></span>
-<?php endif;

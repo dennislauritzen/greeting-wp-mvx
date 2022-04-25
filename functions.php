@@ -597,19 +597,19 @@ function ajax_fetch() { ?>
 		jQuery(document).ready(function(){
 			var currentRequest = null;
 
-			jQuery("#searchform").submit(function(event){
-				event.preventDefault();
-				var val = jQuery("#datafetch_wrapper li.recomms:first-child a").prop('href');
+				jQuery("#searchform").submit(function(event){
+					event.preventDefault();
+					var val = jQuery("#datafetch_wrapper li.recomms:first-child a").prop('href');
 
-				if(val.length){
-					window.location.href = val;
-				}
-				return false;
-			});
+					if(val.length){
+						window.location.href = val;
+					}
+					return false;
+				});
 
-			/*Do the search with delay 500ms*/
-			jQuery('#front_Search-new_ucsa').keyup(.delay(function (e) {
-					var text = jQuery(this).val();
+				/*Do the search with delay 500ms*/
+				jQuery('#front_Search-new_ucsa').keyup(delay(function (e) {
+						var text = jQuery(this).val();
 
 					jQuery.ajax({
 						url: '<?php //echo admin_url('admin-ajax.php'); ?>',
@@ -675,7 +675,7 @@ function data_fetch(){
 			$array_count = count($landing_page_query);
 			$i = 0;
 			foreach ($landing_page_query as $key => $landing_page) {?>
-				<li class="list-group-item py-2 px-4 <?php echo ($key==0) ? 'active' : '';?>" aria-current="true">
+				<li class="recomms list-group-item py-2 px-4 <?php echo ($key==0) ? 'active' : '';?>" aria-current="true">
 					<a href="<?php echo site_url() . '/city/' . $landing_page->post_name;?>" class="text-teal stretched-link"><?php echo ucfirst($landing_page->post_title);?></a>
 				</li>
 			<?php } ?>
@@ -820,7 +820,7 @@ function categoryActionJavascript() { ?>
 
 				// var categoryIdArray = [];
 				catOccaDeliveryIdArray = [];
-				$("input:checkbox[name=type]:checked").each(function(){					
+				$("input:checkbox[name=type]:checked").each(function(){
 					catOccaDeliveryIdArray.push($(this).val());
 				});
 				console.log(catOccaDeliveryIdArray)
@@ -850,11 +850,11 @@ function categoryActionJavascript() { ?>
 		// Add remove loading class on body element based on Ajax request status
 		jQuery(document).on({
 			ajaxStart: function(){
-				jQuery("div").addClass("loading"); 
+				jQuery("div").addClass("loading");
 			},
-			ajaxStop: function(){ 
+			ajaxStop: function(){
 				jQuery("div").removeClass("loading");
-			}    
+			}
 		});
 
 	</script><?php
@@ -865,7 +865,7 @@ function catOccaDeliveryAction() {
 	// default user array come from front end
 	$cityDefaultUserIdAsString = $_POST['cityDefaultUserIdAsString'];
 	$defaultUserArray = explode(",", $cityDefaultUserIdAsString);
-	
+
 	// category, occasion and delivery  filter data
 	$catOccaDeliveryIdArray = $_POST['catOccaDeliveryIdArray'];
 
@@ -878,7 +878,7 @@ function catOccaDeliveryAction() {
 	global $wpdb;
 
 	foreach($catOccaDeliveryIdArray as $catOccaDeliveryId){
-		
+
 		if(is_numeric($catOccaDeliveryId)){
 			$productData = $wpdb->get_results(
 				"
@@ -896,7 +896,7 @@ function catOccaDeliveryAction() {
 						WHERE ID = $singleProductId
 					"
 				);
-			
+
 				$postAuthorId = $postAuthor->post_author;
 
 				array_push($userIdArrayGetFromCatOcca, $postAuthorId);
@@ -935,7 +935,7 @@ function catOccaDeliveryAction() {
 			)
 		)
 	);
-	
+
 	$productQuery = new WP_Query($query);
 	$userIdArrayGetFromPriceFilter = wp_list_pluck( $productQuery->posts, 'post_author' );
 
@@ -986,7 +986,7 @@ function catOccaDeliveryAction() {
 
 		<?php
 		foreach ($filteredCatOccaDeliveryArrayUnique as $filteredUser) {
-                                
+
 			$vendor = get_wcmp_vendor($filteredUser);
 
 			// call the template with pass $vendor variable
@@ -1001,9 +1001,9 @@ function catOccaDeliveryAction() {
 	<div>
 		<p id="noVendorFound" style="margin-top: 50px; margin-bottom: 35px; padding: 15px 10px; background-color: #f8f8f8;">No vendors were found matching your selection.</p>
 	</div>
-	
+
 	<?php }
-	
+
 	wp_die();
 }
 
@@ -1021,7 +1021,7 @@ function landpageActionJavascript() { ?>
 	<script type="text/javascript">
 
 		jQuery(document).ready(function($) {
-			
+
 			var ajaxurl = "<?php echo admin_url('admin-ajax.php');?>";
 			var occaDeliveryIdArray = [];
 			var inputPriceRangeArray = [];
@@ -1032,7 +1032,7 @@ function landpageActionJavascript() { ?>
 				console.log("price range arr " + inputPriceRangeArray);
 
 				occaDeliveryIdArray = [];
-				$("input:checkbox[name=type_landpage]:checked").each(function(){					
+				$("input:checkbox[name=type_landpage]:checked").each(function(){
 					occaDeliveryIdArray.push($(this).val());
 				});
 
@@ -1062,11 +1062,11 @@ function landpageActionJavascript() { ?>
 		// Add remove loading class on body element based on Ajax request status
 		jQuery(document).on({
 			ajaxStart: function(){
-				jQuery("div").addClass("loading"); 
+				jQuery("div").addClass("loading");
 			},
-			ajaxStop: function(){ 
+			ajaxStop: function(){
 				jQuery("div").removeClass("loading");
-			}    
+			}
 		});
 
 	</script><?php
@@ -1079,7 +1079,7 @@ function landpageAction() {
 	// default user array come from front end
 	$landingPageDefaultUserIdAsString = $_POST['landingPageDefaultUserIdAsString'];
 	$defaultUserArray = explode(",", $landingPageDefaultUserIdAsString);
-	
+
 	// Occasion and Delivery type  filter data
 	$occaDeliveryIdArray = $_POST['occaDeliveryIdArray'];
 
@@ -1090,7 +1090,7 @@ function landpageAction() {
 	$userIdArrayGetFromDelivery = array();
 
 	foreach($occaDeliveryIdArray as $occaDeliveryId){
-		
+
 		if(is_numeric($occaDeliveryId)){
 			$productData = $wpdb->get_results(
 				"
@@ -1108,7 +1108,7 @@ function landpageAction() {
 						WHERE ID = $singleProductId
 					"
 				);
-			
+
 				$postAuthorId = $postAuthor->post_author;
 
 				array_push($userIdArrayGetFromOcca, $postAuthorId);
@@ -1148,7 +1148,7 @@ function landpageAction() {
 			)
 		)
 	);
-	
+
 	$productQuery = new WP_Query($query);
 	$userIdArrayGetFromPriceFilter = wp_list_pluck( $productQuery->posts, 'post_author' );
 
@@ -1192,7 +1192,7 @@ function landpageAction() {
 	else {
 
 	}
-	
+
 	$filteredCatOccaDeliveryArray = array_intersect($defaultUserArray, $userIdArrayGetFromCatOccaDelivery);
 	$filteredOccaDeliveryArrayUnique = array_unique($filteredCatOccaDeliveryArray);
 
@@ -1200,7 +1200,7 @@ function landpageAction() {
 	if(count($filteredOccaDeliveryArrayUnique) > 0 ){ ?>
 		<?php
 		foreach ($filteredOccaDeliveryArrayUnique as $filteredUser) {
-                                
+
 			$vendor = get_wcmp_vendor($filteredUser);
 
 			// call the template with pass $vendor variable
@@ -1216,9 +1216,9 @@ function landpageAction() {
 	<div>
 		<p id="noVendorFound" style="margin-top: 50px; margin-bottom: 35px; padding: 15px 10px; background-color: #f8f8f8;">No vendors were found matching your selection.</p>
 	</div>
-	
+
 	<?php }
-	
+
 	wp_die();
 }
 
@@ -1242,7 +1242,7 @@ function categoryPageActionJavascript() { ?>
 
 			jQuery('.vendor_sort_categorypage_item').click(function(){
 				itemArrayForStoreFilter = [];
-				$("input:checkbox[name=type_categorypage]:checked").each(function(){					
+				$("input:checkbox[name=type_categorypage]:checked").each(function(){
 					itemArrayForStoreFilter.push($(this).val());
 				});
 
@@ -1274,11 +1274,11 @@ function categoryPageActionJavascript() { ?>
 		// Add remove loading class on body element based on Ajax request status
 		jQuery(document).on({
 			ajaxStart: function(){
-				jQuery("div").addClass("loading-custom"); 
+				jQuery("div").addClass("loading-custom");
 			},
-			ajaxStop: function(){ 
+			ajaxStop: function(){
 				jQuery("div").removeClass("loading-custom");
-			}    
+			}
 		});
 
 	</script><?php
@@ -1289,7 +1289,7 @@ function categoryPageFilterAction() {
 	// default user array come from front end
 	$categoryPageDefaultUserIdAsString = $_POST['categoryPageDefaultUserIdAsString'];
 	$defaultUserArray = explode(",", $categoryPageDefaultUserIdAsString);
-	
+
 	// category, occasion and delivery  filter data
 	$itemArrayForStoreFilter = $_POST['itemArrayForStoreFilter'];
 
@@ -1302,7 +1302,7 @@ function categoryPageFilterAction() {
 	global $wpdb;
 
 	foreach($itemArrayForStoreFilter as $frontendFilterItem){
-		
+
 		if(is_numeric($frontendFilterItem)){
 			$productData = $wpdb->get_results(
 				"
@@ -1320,7 +1320,7 @@ function categoryPageFilterAction() {
 						WHERE ID = $singleProductId
 					"
 				);
-			
+
 				$postAuthorId = $postAuthor->post_author;
 
 				array_push($userIdArrayGetFromCatOcca, $postAuthorId);
@@ -1355,35 +1355,22 @@ function categoryPageFilterAction() {
 		//echo "No filter applicable!";
 	}
 
+	$filteredCatOccaDeliveryArray = array_intersect($defaultUserArray, $userIdArrayGetFromCatOccaDelivery);
+	$filteredCatOccaDeliveryArrayUnique = array_unique($filteredCatOccaDeliveryArray);
 
 
+	if(count($filteredCatOccaDeliveryArrayUnique) > 0 ){ ?>
 
+		<?php
+		foreach ($filteredCatOccaDeliveryArrayUnique as $filteredUser) {
 
+			$vendor = get_wcmp_vendor($filteredUser);
 
-	// the ajax function
-	add_action('wp_ajax_data_fetch2' , 'data_fetch2');
-	add_action('wp_ajax_nopriv_data_fetch2','data_fetch2');
-	function data_fetch2(){
-		$search_query = esc_attr( $_POST['keyword'] );
-		global $wpdb;
+			// call the template with pass $vendor variable
+			get_template_part('template-parts/vendor-loop', null, array('vendor' => $vendor));
 
-		$prepared_statement = $wpdb->prepare("
-			SELECT *
-			FROM {$wpdb->prefix}posts
-			WHERE post_title LIKE %s
-			AND post_type = 'city'
-			LIMIT 5", '%'.$search_query.'%');
-		$landing_page_query = $wpdb->get_results($prepared_statement, OBJECT);
+			?>
 
-		if (!empty($landing_page_query)) {?>
-				<?php
-				$array_count = count($landing_page_query);
-				$i = 0;
-				foreach ($landing_page_query as $key => $landing_page) {?>
-					<li class="recomms list-group-item py-2 px-4 <?php echo ($key==0) ? 'active' : '';?>" aria-current="true">
-						<a href="<?php echo site_url() . '/city/' . $landing_page->post_name;?>" class="text-teal stretched-link"><?php echo ucfirst($landing_page->post_title);?></a>
-					</li>
-				<?php } ?>
 		<?php
 		}
 		?>
@@ -1393,9 +1380,9 @@ function categoryPageFilterAction() {
 	<div>
 		<p id="noVendorFound" style="margin-top: 50px; margin-bottom: 35px; padding: 15px 10px; background-color: #f8f8f8;">No vendors were found matching your selection.</p>
 	</div>
-	
+
 	<?php }
-	
+
 	wp_die();
 }
 
@@ -1417,12 +1404,12 @@ function vendStoreActionJavascript() { ?>
 			$('#productResetAll').hide();
 
 			jQuery('.vendor_sort_product').click(function(){
-				
+
 				inputPriceRangeArray = jQuery('#priceSlider').slider("option", "values");
 				// window.history.replaceState(null, null, `?min_price=${inputPriceRangeArray[0]}&max_price=${inputPriceRangeArray[1]}`);
 				productFilterDataArray = [];
 
-				$("input:checkbox[name=product_type]:checked").each(function(){					
+				$("input:checkbox[name=product_type]:checked").each(function(){
 					productFilterDataArray.push($(this).val());
 				});
 				var data = {'action': 'productFilterAction', defaultProductIdAsString: jQuery("#defaultProductIdAsString").val(), productFilterDataArray: productFilterDataArray, inputPriceRangeArray: inputPriceRangeArray};
@@ -1446,11 +1433,11 @@ function vendStoreActionJavascript() { ?>
 		// Add remove loading class on body element based on Ajax request status
 		jQuery(document).on({
 			ajaxStart: function(){
-				jQuery("div").addClass("loading-custom3"); 
+				jQuery("div").addClass("loading-custom3");
 			},
-			ajaxStop: function(){ 
+			ajaxStop: function(){
 				jQuery("div").removeClass("loading-custom3");
-			}    
+			}
 		});
 
 	</script><?php
@@ -1460,7 +1447,7 @@ function productFilterAction() {
 	// default product id array come from front end
 	$defaultProductIdAsString = $_POST['defaultProductIdAsString'];
 	$defaultProductIdArray = explode(",", $defaultProductIdAsString);
-	
+
 	// after click filter data keep on this array
 	$productFilterDataArray = $_POST['productFilterDataArray'];
 
@@ -1499,7 +1486,7 @@ function productFilterAction() {
 			)
 		)
 	);
-	
+
 	$productQuery = new WP_Query($query);
 	$storePriceFilterProductArray = wp_list_pluck( $productQuery->posts, 'ID' );
 
@@ -1524,16 +1511,16 @@ function productFilterAction() {
 	if(count($filteredProductArrayUnique) > 0 ){
 		// call the template with pass $filteredProductArrayUnique variable
 		get_template_part('template-parts/product-loop', null, array('filteredProductArrayUnique' => $filteredProductArrayUnique));
-		
+
 	?>
 	<?php } else { ?>
 
 	<div>
 		<p id="noProductFound" style="margin-top: 50px; margin-bottom: 35px; padding: 15px 10px; background-color: #f8f8f8;">No products were found matching your selection.</p>
 	</div>
-	
+
 	<?php }
-	
+
 	wp_die();
 }
 
@@ -2281,7 +2268,7 @@ add_action( 'template_redirect', 'redirect_direct_access' );
 	}
 
 	// check array is unique or not
-	if(count(array_flip($vendor_id_array)) === 1 && end($vendor_id_array) === $last_inserted_vendor_id) {
+	if(count($vendor_id_array) === 1 && end($vendor_id_array) === $last_inserted_vendor_id) {
 	} else {
 		$single_vendor = 1;
 	}
@@ -2309,6 +2296,13 @@ add_action( 'template_redirect', 'redirect_direct_access' );
 function show_shop_only_one_store_same_time_notice(){
 	wc_print_notice('You can not shopping from different STORE once!, Please go to CART and keep only one STORE item in cart. If you want to shopping from several item please you can place another order.', 'error');
 }
+
+/**
+* @author Dennis Lauritzen
+* Remove report abuse link
+*
+*/
+add_filter('wcmp_show_report_abuse_link', '__return_false');
 
 /**
  * Trigger Holiday Mode

@@ -22,18 +22,6 @@ if (!defined('ABSPATH')) {
 
 global $product;
 
-$product_excerpt = '';
-
-if (rigid_get_option('shop_default_product_columns') == 'rigid-products-list-view') {
-	$product_excerpt = wp_trim_words(get_the_excerpt(), 30, ' ...');
-}
-?>
-<?php if (rigid_get_option('shop_default_product_columns') == 'rigid-products-list-view') : ?>
-	<div class="rigid-product-excerpt">
-		<?php echo esc_html($product_excerpt) ?>
-	</div>
-<?php endif; ?>
-
-<?php if ($price_html = $product->get_price_html()) : ?>
-	<div class="price_hold"><?php echo wp_kses_post($price_html); ?></div>
+if ($price_html = $product->get_price_html()) : ?>
+	<div class="price_hold"><?php echo $price_html; ?></div>
 <?php endif; ?>

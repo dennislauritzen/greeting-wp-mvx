@@ -26,71 +26,56 @@ if ( empty( $product ) || false === wc_get_loop_product_visibility( $product->ge
 
 // Extra post classes
 $classes = array('prod_hold');
-
-// Hover Product Behaviour on Product List - product_hover_onproduct
-if ( rigid_get_option( 'product_hover_onproduct' ) != 'none' ) {
-    // Check if swap effect is selected but second image is not present
-	if ( ! ( rigid_get_option( 'product_hover_onproduct' ) == 'rigid-prodhover-swap' && ! rigid_get_second_product_image_id( $product ) ) ) {
-		$classes[] = rigid_get_option( 'product_hover_onproduct' );
-	}
-}
-// Manage Buttons Visibility on Listings
-$classes[] = rigid_get_option('product_list_buttons_visibility');
-
-// Accent Shadow on Hover for Product Lists
-if(rigid_get_option('products_hover_shadow')) {
-    $classes[] = 'rigid-products-hover-shadow';
-}
-
 ?>
-<div <?php wc_product_class( $classes, $product ); ?>>
-
 	<?php
 	/**
 	 * Hook: woocommerce_before_shop_loop_item.
 	 *
 	 * @hooked woocommerce_template_loop_product_link_open - 10 - removed
 	 */
-    do_action('woocommerce_before_shop_loop_item'); ?>
-	<div class="rigid-list-prod-summary">
-		<?php rigid_display_attributes_in_listings(); ?>
-		<a class="wrap_link" href="<?php the_permalink(); ?>">
-			<span class="name">
-				<?php if (rigid_get_option('shop_default_product_columns') == 'rigid-products-list-view'): ?>
-					<?php echo rigid_short_product_title(get_the_title()); ?>
-				<?php else: ?>
-					<?php echo rigid_short_product_title(get_the_title(), 35); ?>
-				<?php endif; ?>
-			</span>
-		</a>
-		<?php woocommerce_template_loop_price() ?>
-	</div>
-	<?php
-	/**
-	 * Hook: woocommerce_before_shop_loop_item_title.
-	 *
-	 * @hooked woocommerce_show_product_loop_sale_flash - 10
-	 *
-	 */
-	do_action('woocommerce_before_shop_loop_item_title');
+    //Wdo_action('woocommerce_before_shop_loop_item'); ?>
+		<div class="col-6 col-md-3">
+			<div class="card mb-4 border-0">
+					<a href="<?php the_permalink(); ?>">
+						<?php
+						/**
+						 * Hook: woocommerce_before_shop_loop_item_title.
+						 *
+						 * @hooked woocommerce_show_product_loop_sale_flash - 10
+						 *
+						 */
+						do_action('woocommerce_before_shop_loop_item_title');
 
-	/**
-	 * Hook: woocommerce_after_shop_loop_item_title.
-	 *
-	 * @hooked woocommerce_template_loop_rating - 5
-	 * @hooked woocommerce_template_loop_price - 10 (removed by rigid)
-	 */
-	do_action('woocommerce_after_shop_loop_item_title');
-	?>
+						?>
+					</a>
+					<div class="card-body">
+							<h6 class="card-title" style="font-size: 12px;">
+								<a href="<?php the_permalink(); ?>" class="text-dark">
+									<?php echo $product->get_name(); ?>
+								</a>
+							</h6>
+							<?
+								/**
+								 * Hook: woocommerce_after_shop_loop_item_title.
+								 *
+								 * @hooked woocommerce_template_loop_rating - 5
+								 * @hooked woocommerce_template_loop_price - 10 (removed by rigid)
+								 */
 
-	<?php
-	/**
-	 * Hook: woocommerce_after_shop_loop_item.
-	 *
-	 * @hooked woocommerce_template_loop_product_link_close - 5
-	 * @hooked woocommerce_template_loop_add_to_cart - 10 (removed by rigid when list view is selected)
-	 */
-	do_action('woocommerce_after_shop_loop_item');
-	?>
-
-</div>
+								do_action('woocommerce_after_shop_loop_item_title'); ?>
+							<small><?php woocommerce_template_loop_price() ?></small>
+					</div>
+			</div>
+		</div>
+		<?php
+		/**
+		 * Hook: woocommerce_after_shop_loop_item.
+		 *
+		 * @hooked woocommerce_template_loop_product_link_close - 5
+		 * @hooked woocommerce_template_loop_add_to_cart - 10 (removed by rigid when list view is selected)
+		 *
+		 *
+		 * @author Dennis Lauritzen - Removed this action since we don't want add to cart button on related products
+		 */
+		//do_action('woocommerce_after_shop_loop_item');
+		?>

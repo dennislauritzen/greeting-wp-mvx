@@ -23,7 +23,6 @@ if (!defined('ABSPATH')) {
 
 global $product;
 echo '<div class="links">';
-echo apply_filters('rigid_links_before_add_to_cart', '');
 echo apply_filters('woocommerce_loop_add_to_cart_link', // WPCS: XSS ok.
 				sprintf('<a href="%s" data-quantity="%s" class="%s" title="%s" %s>%s</a>',
 								esc_url($product->add_to_cart_url()),
@@ -34,17 +33,4 @@ echo apply_filters('woocommerce_loop_add_to_cart_link', // WPCS: XSS ok.
 								esc_html($product->add_to_cart_text())
 				), $product, $args);
 
-// Do not show quickview link for composite products as it is too complex for the user
-if ( rigid_get_option( 'use_quickview' ) && ! in_array( $product->get_type(), array( 'composite', 'bundle', 'combo' ), true ) ) {
-	echo '<a href="#" class="rigid-quick-view-link" data-id="' . esc_attr($product->get_id()) . '" title="' . esc_attr__('Quick View', 'rigid') . '"><i class="fa fa-eye"></i></a>';
-}
-// show compare link
-if (defined('YITH_WOOCOMPARE')) {
-	rigid_add_compare_link();
-}
-
-// Append Add to wishlist shortcode if it exists
-if (shortcode_exists('yith_wcwl_add_to_wishlist')) {
-	echo do_shortcode('[yith_wcwl_add_to_wishlist]');
-}
 echo '</div>';
