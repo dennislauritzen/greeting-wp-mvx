@@ -33,8 +33,20 @@ $vendor = get_wcmp_vendor($vendor_id);
             <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
           </svg>
           <?php
-					$location = get_user_meta($vendor_id, '_vendor_address_1', true).', '.get_user_meta($vendor_id, '_vendor_postcode', true).' '.get_user_meta($vendor_id, '_vendor_city', true);
-					echo esc_html($location); ?>
+          $vendor_address = !empty(get_user_meta($vendor_id, '_vendor_address_1', true)) ? get_user_meta($vendor_id, '_vendor_address_1', true) : '';
+          $vendor_postal = !empty(get_user_meta($vendor_id, '_vendor_postcode', true)) ? get_user_meta($vendor_id, '_vendor_postcode', true) : '';
+          $vendor_city = !empty(get_user_meta($vendor_id, '_vendor_city', true)) ? get_user_meta($vendor_id, '_vendor_city', true) : '';
+          $location = '';
+          if(!empty($vendor_address)){
+            $location .= $vendor_address.', ';
+          }
+          if(!empty($vendor_postal)){
+            $location .= $vendor_postal.' ';
+          }
+          if(!empty($vendor_city)){
+            $location .= $vendor_city.' ';
+          }
+          echo esc_html($location); ?>
         </p>
         <?php
 				$vendor_hide_description = apply_filters('wcmp_vendor_store_header_hide_description', get_user_meta($vendor_id, '_vendor_hide_description', true), $vendor_id);

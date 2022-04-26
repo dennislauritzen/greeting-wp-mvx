@@ -30,7 +30,20 @@ $vendor_lists = !empty($wcmp_customer_follow_vendor) ? wp_list_pluck( $wcmp_cust
 $follow_status = in_array($vendor_id, $vendor_lists) ? __( 'Unfollow', 'dc-woocommerce-multi-vendor' ) : __( 'Follow', 'dc-woocommerce-multi-vendor' );
 $follow_status_key = in_array($vendor_id, $vendor_lists) ? 'Unfollow' : 'Follow';
 
-$location = get_user_meta($vendor->id, '_vendor_address_1', true).', '.get_user_meta($vendor->id, '_vendor_postcode', true).' '.get_user_meta($vendor->id, '_vendor_city', true);
+// Generate location
+$vendor_address = !empty(get_user_meta($vendor_id, '_vendor_address_1', true)) ? get_user_meta($vendor_id, '_vendor_address_1', true) : '';
+$vendor_postal = !empty(get_user_meta($vendor_id, '_vendor_postcode', true)) ? get_user_meta($vendor_id, '_vendor_postcode', true) : '';
+$vendor_city = !empty(get_user_meta($vendor_id, '_vendor_city', true)) ? get_user_meta($vendor_id, '_vendor_city', true) : '';
+$location = '';
+if(!empty($vendor_address)){
+  $location .= $vendor_address.', ';
+}
+if(!empty($vendor_postal)){
+  $location .= $vendor_postal.' ';
+}
+if(!empty($vendor_city)){
+  $location .= $vendor_city.' ';
+}
 ?>
 
 
@@ -394,7 +407,10 @@ $location = get_user_meta($vendor->id, '_vendor_address_1', true).', '.get_user_
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
             <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
           </svg>
-          <?php echo esc_html($location); ?>
+          <?php
+            if(!empty($location)){
+              echo esc_html($location);
+            } ?>
         </div>
       </div>
     </div>
@@ -424,49 +440,51 @@ $location = get_user_meta($vendor->id, '_vendor_address_1', true).', '.get_user_
             function build_intervals($items, $is_contiguous, $make_interval) {
                   $intervals = array();
                   $end   = false;
-                  foreach ($items as $item) {
-                      if (false === $end) {
-                          $begin = (int) $item;
-                          $end   = (int) $item;
-                          continue;
-                      }
-                      if ($is_contiguous($end, $item)) {
-                          $end = (int) $item;
-                          continue;
-                      }
-                      $intervals[] = $make_interval($begin, $end);
-                      $begin = (int) $item;
-                      $end   = (int) $item;
+                  if(is_array($items) || is_object($items)){
+                    foreach ($items as $item) {
+                        if (false === $end) {
+                            $begin = (int) $item;
+                            $end   = (int) $item;
+                            continue;
+                        }
+                        if ($is_contiguous($end, $item)) {
+                            $end = (int) $item;
+                            continue;
+                        }
+                        $intervals[] = $make_interval($begin, $end);
+                        $begin = (int) $item;
+                        $end   = (int) $item;
+                    }
                   }
                   if (false !== $end) {
                       $intervals[] = $make_interval($begin, $end);
                   }
                   return $intervals;
               }
-              $returnval = explode("..",$intervals[0]);
-              $var = $items[$returnval[0]]."-".$items[$returnval[1]];
 
               $opening = get_field('openning', 'user_'.$vendor->id);
               $interv = array();
               if(!empty($opening) && is_array($opening) && count($opening) > 0){
-                $interv = $interv = build_intervals($opening,  function($a, $b) { return ($b - $a) <= 1; }, function($a, $b) { return "{$a}..{$b}"; });
+                $interv = build_intervals($opening,  function($a, $b) { return ($b - $a) <= 1; }, function($a, $b) { return "{$a}..{$b}"; });
               }
               $i = 1;
-              foreach($interv as $v){
-                $val = explode('..',$v);
-                $start = $day_array[$val[0]];
-                $end = $day_array[$val[1]];
-                if($val[0] != $val[1])
-                {
-                  print $start."-".$end;
-                } else {
-                  print $start;
+              if(count($interv) > 0){
+                foreach($interv as $v){
+                  $val = explode('..',$v);
+                  $start = $day_array[$val[0]];
+                  $end = $day_array[$val[1]];
+                  if($val[0] != $val[1])
+                  {
+                    print $start."-".$end;
+                  } else {
+                    print $start;
+                  }
+                  if(count($interv) > 1){
+                    if(count($interv)-1 == $i){ print " og "; }
+                    else if(count($interv) > $i) { print ', ';}
+                  }
+                  $i++;
                 }
-                if(count($interv) > 1){
-                  if(count($interv)-1 == $i){ print " og "; }
-                  else if(count($interv) > $i) { print ', ';}
-                }
-                $i++;
               }
             ?>
           </div>
@@ -487,7 +505,11 @@ $location = get_user_meta($vendor->id, '_vendor_address_1', true).', '.get_user_
               {
                 echo ' i morgen';
               } else {
-                echo 'om '.get_field('vendor_require_delivery_day', 'user_'.$vendor->id)." hverdage";
+                if(!empty(get_field('vendor_require_delivery_day', 'user_'.$vendor->id))){
+                  echo ' om '.get_field('vendor_require_delivery_day', 'user_'.$vendor->id)." hverdage";
+                } else {
+                  echo 'om 2 hverdage';
+                }
               }
             ?>
           </div>
