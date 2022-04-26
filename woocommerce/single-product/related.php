@@ -20,20 +20,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( $related_products ) : ?>
+if ( $related_products ) :
+
+global $product;
+$product_id = $product->ID;
+$product_meta = get_post($product_id);
+$vendor_id = $product_meta->post_author;
+$vendor = get_wcmp_vendor($vendor_id);
+unset($product);
+$vendorProducts = $vendor->get_products(array('fields' => 'all', 'posts_per_page' => 3));
+
+?>
 
 <section id="related">
 	<div class="container">
 		<div class="row">
 			<div class="col-lg-12 pb-5">
-				<h4>💝 Andre produkter fra Slikapoteket</h4>
+				<h4>💝 Andre produkter fra <?php echo esc_html($vendor->user_data->data->display_name); ?></h4>
 			</div>
 			<?php woocommerce_product_loop_start(); ?>
-				<?php foreach ( $related_products as $related_product ) : ?>
+				<?php foreach ( $vendorProducts as $related_product ) :
 
-					<?php
 					/** @var WC_Product $related_product */
-					$post_object = get_post( $related_product->get_id() );
+					$post_object = get_post( $related_product->ID );
 
 					// Althemist edit - removed pass by ref as it is unnecessary
 					setup_postdata( $GLOBALS['post'] = $post_object );

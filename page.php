@@ -6,6 +6,7 @@
  */
 
 get_header();
+get_header('green');
 
 the_post();
 ?>

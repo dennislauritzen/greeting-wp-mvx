@@ -38,15 +38,27 @@ $classes = array('prod_hold');
 			<div class="card mb-4 border-0">
 					<a href="<?php the_permalink(); ?>">
 						<?php
-						/**
-						 * Hook: woocommerce_before_shop_loop_item_title.
-						 *
-						 * @hooked woocommerce_show_product_loop_sale_flash - 10
-						 *
-						 */
-						do_action('woocommerce_before_shop_loop_item_title');
-
-						?>
+						$uploadedImage = wp_get_attachment_image_url($product->get_image_id(), 'medium');
+						$img_src = wc_placeholder_img_src();
+						if(!empty($uploadedImage)){
+							$img_src = $uploadedImage;
+						} ?>
+							<img
+							width="370"
+							height="370"
+							src="<?php echo $img_src; ?>"
+							class="attachment-woocommerce_thumbnail size-woocommerce_thumbnail"
+							alt=""
+							loading="lazy"
+							srcset="<?php echo $img_src; ?> 370w,
+							<?php echo $img_src; ?> 150w,
+							<?php echo $img_src; ?> 300w,
+							<?php echo $img_src; ?> 768w,
+							<?php echo $img_src; ?> 640w,
+							<?php echo $img_src; ?> 100w,
+							<?php echo $img_src; ?> 60w,
+							<?php echo $img_src; ?> 620w,
+							<?php echo $img_src; ?> 800w" sizes="(max-width: 370px) 100vw, 370px">
 					</a>
 					<div class="card-body">
 							<h6 class="card-title" style="font-size: 12px;">
@@ -63,7 +75,7 @@ $classes = array('prod_hold');
 								 */
 
 								do_action('woocommerce_after_shop_loop_item_title'); ?>
-							<small><?php woocommerce_template_loop_price() ?></small>
+							<small><?php woocommerce_template_loop_price(); ?></small>
 					</div>
 			</div>
 		</div>

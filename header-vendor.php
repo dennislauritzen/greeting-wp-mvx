@@ -1,55 +1,6 @@
-<?php
-/**
- * The template for displaying archive vendor info
- *
- * Override this template by copying it to yourtheme/dc-product-vendor/archive_vendor_info.php
- *
- * @author      WC Marketplace
- * @package     WCMp/Templates
- * @version     3.7
- */
-global $WCMp;
-$vendor = get_wcmp_vendor($vendor_id);
-
-$vendor_hide_address = apply_filters('wcmp_vendor_store_header_hide_store_address', get_user_meta($vendor_id, '_vendor_hide_address', true), $vendor->id);
-$vendor_hide_phone = apply_filters('wcmp_vendor_store_header_hide_store_phone', get_user_meta($vendor_id, '_vendor_hide_phone', true), $vendor->id);
-$vendor_hide_email = apply_filters('wcmp_vendor_store_header_hide_store_email', get_user_meta($vendor_id, '_vendor_hide_email', true), $vendor->id);
-$template_class = get_wcmp_vendor_settings('wcmp_vendor_shop_template', 'vendor', 'dashboard', 'template1');
-$template_class = apply_filters('can_vendor_edit_shop_template', false) && get_user_meta($vendor_id, '_shop_template', true) ? get_user_meta($vendor_id, '_shop_template', true) : $template_class;
-$vendor_hide_description = apply_filters('wcmp_vendor_store_header_hide_description', get_user_meta($vendor_id, '_vendor_hide_description', true), $vendor->id);
-
-$vendor_fb_profile = get_user_meta($vendor_id, '_vendor_fb_profile', true);
-$vendor_twitter_profile = get_user_meta($vendor_id, '_vendor_twitter_profile', true);
-$vendor_linkdin_profile = get_user_meta($vendor_id, '_vendor_linkdin_profile', true);
-$vendor_google_plus_profile = get_user_meta($vendor_id, '_vendor_google_plus_profile', true);
-$vendor_youtube = get_user_meta($vendor_id, '_vendor_youtube', true);
-$vendor_instagram = get_user_meta($vendor_id, '_vendor_instagram', true);
-// Follow code
-$wcmp_customer_follow_vendor = get_user_meta( get_current_user_id(), 'wcmp_customer_follow_vendor', true ) ? get_user_meta( get_current_user_id(), 'wcmp_customer_follow_vendor', true ) : array();
-$vendor_lists = !empty($wcmp_customer_follow_vendor) ? wp_list_pluck( $wcmp_customer_follow_vendor, 'user_id' ) : array();
-$follow_status = in_array($vendor_id, $vendor_lists) ? __( 'Unfollow', 'dc-woocommerce-multi-vendor' ) : __( 'Follow', 'dc-woocommerce-multi-vendor' );
-$follow_status_key = in_array($vendor_id, $vendor_lists) ? 'Unfollow' : 'Follow';
-
-// Generate location
-$vendor_address = !empty(get_user_meta($vendor_id, '_vendor_address_1', true)) ? get_user_meta($vendor_id, '_vendor_address_1', true) : '';
-$vendor_postal = !empty(get_user_meta($vendor_id, '_vendor_postcode', true)) ? get_user_meta($vendor_id, '_vendor_postcode', true) : '';
-$vendor_city = !empty(get_user_meta($vendor_id, '_vendor_city', true)) ? get_user_meta($vendor_id, '_vendor_city', true) : '';
-$location = '';
-if(!empty($vendor_address)){
-  $location .= $vendor_address.', ';
-}
-if(!empty($vendor_postal)){
-  $location .= $vendor_postal.' ';
-}
-if(!empty($vendor_city)){
-  $location .= $vendor_city.' ';
-}
-?>
-
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Rubik:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Merriweather:wght@300;400;700;900&family=Roboto+Slab:wght@100;200;300;400;500;600;700;800;900&family=Rubik:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <style type="text/css">
   body { background: #ffffff; }
@@ -59,20 +10,13 @@ if(!empty($vendor_city)){
   .bg-rose {
     background: #fecbca;
   }
-  .bg-yellow {
-    background: #d6bf75;
-  }
-  .border-teal {
-    border: 1px solid #446a6b;
-  }
-  .border-yellow {
-    border: 1px solid #d6bf75;
+  .bg-teal {
+    background: #446a6b;
   }
   .bg-light-grey {
     background: #F8F8F8;
   }
-
-  h1 {
+	h1 {
     font-family: 'Rubik','Inter', sans-serif;
     font-weight: 500;
     font-size: 60px;
@@ -112,47 +56,8 @@ if(!empty($vendor_city)){
     font-weight: 300;
   }
 
-
   .sticky-top {
     font-family: 'Inter',sans-serif;
-  }
-
-  .filter a[aria-expanded='true'] {
-    background: #d6bf75;
-  }
-  .accordion-button:not(.collapsed)::after {
-    background-image: url('data:image/svg+xml, %3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%23222222%22%20class%3D%22bi%20bi-chevron-down%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M1.646%204.646a.5.5%200%200%201%20.708%200L8%2010.293l5.646-5.647a.5.5%200%200%201%20.708.708l-6%206a.5.5%200%200%201-.708%200l-6-6a.5.5%200%200%201%200-.708z%22%2F%3E%3C%2Fsvg%3E');
-    transform: rotate(180deg);
-  }
-
-  .filter h5 {
-    font-family: 'Rubik','Inter', serif;
-    font-weight: 500;
-    font-size: 12px;
-  }
-  .filter h6 {
-    font-family: 'Inter','Rubik',serif;
-    font-weight: 800;
-    font-size: 13px;
-  }
-  .filter ul {
-    font-family: 'Inter', sans-serif;
-    font-size: 12px;
-  }
-  .filter span.price-filter-text {
-    font-size: 11px;
-  }
-  .filter input[type="range"]::-webkit-slider-thumb {
-    background: #446a6b;
-    border: 1px solid #446a6b;
-  }
-  .filter input[type="range"]::-ms-thumb {
-    background: #446a6b;
-    border: 1px solid #446a6b;
-  }
-  .filter input[type="range"]::-moz-range-thumb {
-    background: #446a6b;
-    border: 1px solid #446a6b;
   }
   .card {
     transition: all .15s ease-in-out;
@@ -161,20 +66,8 @@ if(!empty($vendor_city)){
     transform: scale(1.015);
     box-shadow: 0 .5rem .75rem rgba(150,150,150, .175);
   }
-  div.card h6.card-title {
-    font-family: 'Rubik','Inter', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-  }
-  div.card p.price,
-  div.card bdi,
-  div.card div.price_hold {
-    font-family: 'Inter', sans-serif;
-    font-size: 13px;
-    font-weight: 400;
-  }
 
-3
+
   .top-search-btn {
     width: 40px;
     height: 35px;
@@ -188,8 +81,47 @@ if(!empty($vendor_city)){
     padding-left: 30px;
   }
 
+	#product h1 {
+		font-family: 'Rubik','Inter',sans-serif;
+	}
+	#product div.description {
+		font-family: 'Inter',sans-serif;
+	}
 
-  /*
+	#product div.single_variation {
+		margin-bottom: 10px;
+	}
+	#product .quantity {
+		float: left;
+	}
+	#product .quantity input.qty {
+		height: 100%;
+	}
+	#product button.single_add_to_cart_button  {
+		font-family: 'Rubik','Inter',sans-serif;
+		background: #446a6b;
+	}
+	#product button.single_add_to_cart_button:hover {
+		font-family: 'Rubik','Inter',sans-serif;
+		background: #2e4748;
+	}
+	#product .woocommerce-product-gallery__trigger {
+	  display: none;
+	}
+
+	#product div.woocommerce-product-gallery ol.flex-control-thumbs {
+		list-style: none;
+		float: left;
+		margin: 10px 0 0 0;
+		padding: 0;
+	}
+	#product div.woocommerce-product-gallery ol.flex-control-thumbs li {
+		padding: 0 10px 0 0;
+		float: left;
+	}
+
+
+	/*
   * section#hotitworks
   * How it works section
   * --
@@ -218,12 +150,12 @@ if(!empty($vendor_city)){
     position:relative;
     top:23px;
   }
-  ul.timeline li {
-    float: left;
-    width: 20%;
-    min-width: 125px;
-    padding: 0 10px;
-  }
+	ul.timeline li {
+		float: left;
+		width: 20%;
+		min-width: 125px;
+		padding: 0 10px;
+	}
   ul.timeline li figure {
     position: relative;
     z-index: 2;
@@ -269,89 +201,102 @@ if(!empty($vendor_city)){
     }
   }
 
-  /*
-  * #learnmore
-  * Learn more section
-  */
-  #learnmore h1,
-  #learnmore h2,
-  #learnmore h3,
-  #learnmore h4 {
-    font-family: "Dela Gothic One", cursive, serif;
-  }
-  #learnmore .card .card-img-top {
-    width: 100%;
-    height: 10vw;
-    min-height: 200px;
-    object-fit: cover;
-  }
-  #learnmore .card .card-title {
-    font-family: 'Rubik',sans-serif;
-  }
-  #learnmore .card .card-text {
-    font-family: 'Inter',sans-serif;
-    font-size: 14px;
-    line-height: 23px;
-  }
 
+	.inspirationstores h1,
+	.inspirationstores h2,
+	.inspirationstores h3,
+	.inspirationstores h4 {
+		font-family: "Dela Gothic One", cursive, serif;
+	}
+	.inspirationstores .card .card-img-top {
+		width: 100%;
+		height: 10vw;
+		min-height: 200px;
+		object-fit: cover;
+	}
+	.inspirationstores .card .card-title {
+		font-family: 'Rubik',sans-serif;
+	}
+	.inspirationstores .card .card-text {
+		font-family: 'Inter',sans-serif;
+		font-size: 14px;
+		line-height: 23px;
+	}
 
-  #greeting-footer h6 {
-    font-family: 'Rubik', 'Inter', 'Comic Sans', sans-serif;
-    font-size: 20px;
-    color: #1b4949;
-  }
-  #greeting-footer h6.light {
-    font-family: 'Rubik', 'Inter', 'Comic Sans', sans-serif;
-    font-size: 18px;
-    text-transform: uppercase;
-    color: #ffffff;
-  }
-  #greeting-footer ul {
-    font-family: 'Inter', 'Comic Sans', sans-serif;
-    font-weight: 300;
-    font-size: 13px;
-  }
-  #greeting-footer ul.social {
-    width: 100px;
-    list-style: none;
-    margin: -30px 0 0 -100px;
-    padding: 0 5px 0 0;
-  }
-  #greeting-footer ul.social li {
-    float: left;
-    width: 45px;
-    margin: 0;
-    padding: 0;
-  }
+	#greeting-footer h6 {
+		font-family: 'Rubik', 'Inter', 'Comic Sans', sans-serif;
+		font-size: 20px;
+		color: #1b4949;
+	}
+	#greeting-footer h6.light {
+		font-family: 'Rubik', 'Inter', 'Comic Sans', sans-serif;
+		font-size: 18px;
+		text-transform: uppercase;
+		color: #ffffff;
+	}
+	#greeting-footer ul {
+		font-family: 'Inter', 'Comic Sans', sans-serif;
+		font-weight: 300;
+		font-size: 13px;
+	}
+	#greeting-footer ul.social {
+		width: 100px;
+		list-style: none;
+		margin: -30px 0 0 -100px;
+		padding: 0 5px 0 0;
+	}
+	#greeting-footer ul.social li {
+		float: left;
+		width: 45px;
+		margin: 0;
+		padding: 0;
+	}
 
-  #formal-footer {
-    border-top: 3px solid #fecbca;
-    font-family: 'Inter',sans-serif;
-    font-size: 12px;
-    color: #555555;
-  }
-  #formal-footer ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-  #formal-footer ul li {
-    float: left;
-    margin: 0;
-    padding: 0 10px 0 0;
-  }
+	#formal-footer {
+		border-top: 3px solid #fecbca;
+		font-family: 'Inter',sans-serif;
+		font-size: 12px;
+		color: #555555;
+	}
+	#formal-footer ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+	#formal-footer ul li {
+		float: left;
+		margin: 0;
+		padding: 0 10px 0 0;
+	}
 </style>
 
-<section id="top" class="pt-1" style="min-height: 350px; background-size: cover; background-position: center center; background-image: linear-gradient(rgba(0, 0, 0, 0.35),rgba(0, 0, 0, 0.35)),url('<?php echo (empty($banner) ? 'https://dev.greeting.dk/wp-content/uploads/2022/04/pexels-furkanfdemir-6309844-1-scaled.jpg' : esc_url($banner)); ?>');">
+<?php
+
+/**
+ * Handle all vendor information
+ * For product pages top.
+ */
+
+ global $product;
+ global $WCMp;
+ $product_id = $product->get_id();
+ $product_meta = get_post($product_id);
+ $vendor_id = $product_meta->post_author;
+ $vendor = get_wcmp_vendor($vendor_id);
+
+ ?>
+
+
+ <section id="top" class="pt-1" style="min-height: 350px; background-size: cover; background-position: center center; background-image: linear-gradient(rgba(0, 0, 0, 0.35),rgba(0, 0, 0, 0.35)),url('<?php echo (empty($banner) ? 'https://dev.greeting.dk/wp-content/uploads/2022/04/pexels-furkanfdemir-6309844-1-scaled.jpg' : esc_url($banner)); ?>');">
   <div class="container py-4">
     <div class="row">
-      <div class="d-flex pb-3 pb-lg-0 pb-xl-0 position-relative justify-content-center justify-content-lg-start justify-content-xl-start col-md-12 col-lg-3">
+			<div class="d-flex pb-3 pb-lg-0 pb-xl-0 position-relative justify-content-center justify-content-lg-start justify-content-xl-start col-md-12 col-lg-3">
         <a href="<?php echo home_url(); ?>">
-          <!--<img src="https://dev.greeting.dk/wp-content/uploads/2022/04/greeting-pink.png" style="width: 150px;">-->
-          <!--<img src="https://dev.greeting.dk/wp-content/uploads/2022/04/Greeting-1.png" style="width: 150px;">-->
-          <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/greeting-logo-white.png" style="text-align: center; width: 150px;">
-          <!-- <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/greeting-test.png" style="width: 150px;"> -->
-        </a>
+					<!--<img src="https://dev.greeting.dk/wp-content/uploads/2022/04/greeting-pink.png" style="width: 150px;">-->
+	        <!--<img src="https://dev.greeting.dk/wp-content/uploads/2022/04/Greeting-1.png" style="width: 150px;">-->
+	        <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/greeting-logo-white.png" style="text-align: center; width: 150px;">
+	        <!-- <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/greeting-test.png" style="width: 150px;"> -->
+				</a>
         <a class="position-absolute top-0 end-0 me-4 d-inline d-lg-none d-xl-none" data-bs-toggle="offcanvas" href="#offcanvasMenu" role="button" aria-controls="offcanvasExample">
           <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#ffffff" class="bi bi-list" viewBox="0 0 16 16">
             <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
@@ -374,23 +319,29 @@ if(!empty($vendor_city)){
       </div>
       <div class="d-none d-lg-inline d-xl-inline d-lg-inline col-lg-4 col-xl-3 right-col text-end">
         <a href="#" class="btn text-white">Log ind</a>
-        <a href="#" class="btn bg-teal rounded text-white">Opret</a>
+        <a href="#" class="btn btn-create rounded text-white">Opret</a>
         <div class="btn position-relative ms-lg-0 ms-xl-1">
-          <span class="position-relative" aria-label="Se kurv">
-            <svg width="21" height="23" viewBox="0 0 21 23" xmlns="http://www.w3.org/2000/svg">
-              <path d="M6.434 6.967H3.306l-1.418 14.47h17.346L17.82 6.967h-3.124c.065.828.097 1.737.097 2.729h-1.5c0-1.02-.031-1.927-.093-2.729H7.93a35.797 35.797 0 00-.093 2.729h-1.5c0-.992.032-1.9.097-2.729zm.166-1.5C7.126 1.895 8.443.25 10.565.25s3.44 1.645 3.965 5.217h4.65l1.708 17.47H.234l1.712-17.47H6.6zm6.432 0c-.407-2.65-1.27-3.717-2.467-3.717-1.196 0-2.06 1.066-2.467 3.717h4.934z" fill="#ffffff">
-              </path>
-            </svg>
-            <span class="position-absolute start-50 top-0 badge rounded-circle text-white" style="background: #cea09f;">0</span>
-          </span>
-          <span class="d-inline px-lg-2 px-xl-3 hide-lg text-white">Kurv</span>
+					<?php
+					$cart_count = WC()->cart->cart_contents_count; // Set variable for cart item count
+        	$cart_url = wc_get_cart_url();  // Set Cart URL
+					?>
+					<a href="<?php echo$cart_url; ?>">
+	          <span class="position-relative" aria-label="Se kurv">
+	            <svg width="21" height="23" viewBox="0 0 21 23" xmlns="http://www.w3.org/2000/svg">
+	              <path d="M6.434 6.967H3.306l-1.418 14.47h17.346L17.82 6.967h-3.124c.065.828.097 1.737.097 2.729h-1.5c0-1.02-.031-1.927-.093-2.729H7.93a35.797 35.797 0 00-.093 2.729h-1.5c0-.992.032-1.9.097-2.729zm.166-1.5C7.126 1.895 8.443.25 10.565.25s3.44 1.645 3.965 5.217h4.65l1.708 17.47H.234l1.712-17.47H6.6zm6.432 0c-.407-2.65-1.27-3.717-2.467-3.717-1.196 0-2.06 1.066-2.467 3.717h4.934z" fill="#ffffff">
+	              </path>
+	            </svg>
+	            <span class="position-absolute start-50 top-0 badge rounded-circle text-white" style="background: #cea09f;"><?php echo $cart_count; ?></span>
+	          </span>
+	          <span class="d-inline px-lg-2 px-xl-3 hide-lg text-white">Kurv</span>
+					</a>
         </div>
       </div>
     </div>
   </div>
   <div class="container d-flex align-items-end" style="height: inherit; min-height: inherit;">
     <div class="row">
-      <div class="col-12 m-0 p-0">
+			<div class="col-12 m-0 p-0">
         <h1 class="text-white m-0 p-0"><?php echo ucfirst(esc_html($vendor->page_title)); ?></h1>
       </div>
       <div class="col-12">
@@ -410,13 +361,35 @@ if(!empty($vendor_city)){
             <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
           </svg>
           <?php
-            if(!empty($location)){
-              echo esc_html($location);
-            } ?>
+          $vendor_address = !empty(get_user_meta($vendor_id, '_vendor_address_1', true)) ? get_user_meta($vendor_id, '_vendor_address_1', true) : '';
+          $vendor_postal = !empty(get_user_meta($vendor_id, '_vendor_postcode', true)) ? get_user_meta($vendor_id, '_vendor_postcode', true) : '';
+          $vendor_city = !empty(get_user_meta($vendor_id, '_vendor_city', true)) ? get_user_meta($vendor_id, '_vendor_city', true) : '';
+          $location = '';
+          if(!empty($vendor_address)){
+            $location .= $vendor_address.', ';
+          }
+          if(!empty($vendor_postal)){
+            $location .= $vendor_postal.' ';
+          }
+          if(!empty($vendor_city)){
+            $location .= $vendor_city.' ';
+          }
+          echo esc_html($location); ?>
         </div>
       </div>
-    </div>
-  </div>
+			<div class="col-4">
+        <?php
+        if (get_wcmp_vendor_settings('is_sellerreview', 'general') == 'Enable') {
+            if (wcmp_is_store_page()) {
+                $vendor_term_id = get_user_meta( wcmp_find_shop_page_vendor(), '_vendor_term_id', true );
+                $rating_val_array = wcmp_get_vendor_review_info($vendor_term_id);
+                $WCMp->template->get_template('review/rating.php', array('rating_val_array' => $rating_val_array));
+            }
+        }
+        ?>
+      </div>
+	  </div>
+	</div>
 </section>
 <section class="sticky-top mt-n3 mb-5" style="margin-top: -25px;">
   <div class="container">
@@ -467,7 +440,7 @@ if(!empty($vendor_city)){
               $opening = get_field('openning', 'user_'.$vendor->id);
               $interv = array();
               if(!empty($opening) && is_array($opening) && count($opening) > 0){
-                //$interv = build_intervals($opening,  function($a, $b) { return ($b - $a) <= 1; }, function($a, $b) { return "{$a}..{$b}"; });
+                $interv = build_intervals($opening,  function($a, $b) { return ($b - $a) <= 1; }, function($a, $b) { return "{$a}..{$b}"; });
               }
               $i = 1;
               if(count($interv) > 0){

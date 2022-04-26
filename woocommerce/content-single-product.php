@@ -19,12 +19,7 @@ defined( 'ABSPATH' ) || exit;
 
 global $product;
 
-/**
- * Hook: woocommerce_before_single_product.
- *
- * @hooked wc_print_notices - 10
- */
- do_action( 'woocommerce_before_single_product' );
+
 
  if ( post_password_required() ) {
     echo get_the_password_form();
@@ -36,6 +31,16 @@ global $product;
 <section id="product" class="mb-5">
   <div class="container">
     <div class="row">
+        <div class="col-12">
+          <?php
+          /**
+           * Hook: woocommerce_before_single_product.
+           *
+           * @hooked wc_print_notices - 10
+           */
+           do_action( 'woocommerce_before_single_product' );
+          ?>
+        </div>
         <?php
         // WooCommerce single product gallery type
         //$rigid_single_product_gallery_classes = rigid_get_gallery_type_classes(array());
