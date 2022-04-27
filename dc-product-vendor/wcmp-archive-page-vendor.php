@@ -83,7 +83,7 @@ $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
 						?>
 						<li class="px-0">
 							<div class="form-check">
-									<input type="checkbox" name="filter_del[<?php echo $category->term_id; ?>]" class="form-check-input" id="filter_delivery_<?php echo $category->term_id; ?>" value="<?php echo $category->term_id; ?>">
+									<input type="checkbox" name="filter_product_page" class="form-check-input filter-on-product-page" id="filter_delivery_<?php echo $category->term_id; ?>" value="<?php echo $category->term_id; ?>">
 									<label class="form-check-label" for="filter_delivery_<?php echo $category->term_id; ?>"><?php echo $category->name; ?></label>
 							</div>
 						</li>
@@ -111,7 +111,7 @@ $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
 						?>
 						<li class="px-0">
 							<div class="form-check">
-								<input type="checkbox" name="filter_del[<?php echo $occasion->term_id; ?>]" class="form-check-input" id="filter_delivery_<?php echo $occasion->term_id; ?>" value="<?php echo $occasion->term_id; ?>">
+								<input type="checkbox" name="filter_product_page" class="form-check-input filter-on-product-page" id="filter_delivery_<?php echo $occasion->term_id; ?>" value="<?php echo $occasion->term_id; ?>">
 								<label class="form-check-label" for="filter_delivery_<?php echo $occasion->term_id; ?>"><?php echo $occasion->name; ?></label>
 							</div>
 						</li>
@@ -138,7 +138,7 @@ $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
 					foreach($tagTermListArray as $tag){ ?>
 						<li class="px-0">
 							<div class="form-check">
-								<input type="checkbox" name="filter_del[<?php echo $tag->term_id; ?>]" class="form-check-input" id="filter_delivery_<?php echo $tag->term_id; ?>" value="<?php echo $tag->term_id; ?>">
+								<input type="checkbox" name="filter_product_page" class="form-check-input filter-on-product-page" id="filter_delivery_<?php echo $tag->term_id; ?>" value="<?php echo $tag->term_id; ?>">
 								<label class="form-check-label" for="filter_delivery_<?php echo $tag->term_id; ?>"><?php echo $tag->name; ?></label>
 							</div>
 						</li>
@@ -146,6 +146,90 @@ $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
 					}
 					?>
 					</ul>
+
+					<!-- price filter filter-->
+					<?php	
+					// Get vendor 
+					$vendorId = wcmp_find_shop_page_vendor();
+					$vendor = get_wcmp_vendor($vendorId);
+					$productPriceArray = array();
+					$vendorProducts = $vendor->get_products(array('fields' => 'ids'));
+
+					foreach ($vendorProducts as $productId) {
+						$singleProduct = wc_get_product( $productId );
+						array_push($productPriceArray, $singleProduct->get_price()); // for price filter
+					}
+
+					$minProductPrice;
+					$maxProductPrice;
+
+					if(count($productPriceArray) == 0){
+						$minProductPrice = 0;
+						$maxProductPrice = 0;
+					}
+					elseif(min($productPriceArray) == max($productPriceArray)){
+						$minProductPrice = 0;
+						$maxProductPrice = max($productPriceArray);
+					}
+					else {
+						$minProductPrice = 0;
+						$maxProductPrice = max($productPriceArray);
+					}
+					?>
+		  
+					<h5 class="text-uppercase">Pris</h5>
+					<form>
+						<div id="slideInput" class="my-3">
+						<div class="row">
+							<div class="col-2 col-xs-2 col-sm-2 col-md-2 col-lg-4 col-xl-3">
+							<input type="text" id="slideStartPoint" class="form-control" data-index="0" value="<?php echo $minProductPrice;?>" readonly/>
+							</div>
+							<div class="col-2 offset-8 col-xs-2 col-sm-2 offset-xs-8 offset-sm-8 col-md-2 offset-md-8 col-lg-4 offset-lg-4 col-xl-3 offset-xl-6">
+							<input type="text" id="slideEndPoint" class="form-control" data-index="1" value="<?php echo ceil($maxProductPrice);?>" readonly/>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-12">
+							<div class="px-3 px-lg-2 pt-3 pt-lg-2 pt-xl-2 pb-4">
+								<input
+								id="sliderCityPage"
+								type="text"
+								class="form-range py-3"
+								value="array"
+								data-slider-min="0"
+								data-slider-max="<?php echo ceil($maxProductPrice); ?>"
+								data-slider-step="1"
+								data-slider-tooltip="hide"
+								data-slider-value="[0,<?php echo ceil($maxProductPrice); ?>]"/>
+
+								<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/css/bootstrap-slider.css">
+								<style type="text/css">
+								.slider.slider-horizontal{
+									width:100%;
+								}
+								.slider .slider-handle {
+									background-color: #446a6b;
+									background-image: none;
+								}
+								</style>
+								<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/bootstrap-slider.min.js"></script>
+								<script type="text/javascript">
+									var slider = new Slider('#sliderCityPage', {
+									'tooltip_split': true
+									});
+									slider.on("slideStop", function(sliderValue){
+									var val = slider.getValue();
+									var min_val = val[0];
+									var max_val = val[1];
+									document.getElementById("slideStartPoint").value = min_val;
+									document.getElementById("slideEndPoint").value = max_val;
+									});
+								</script>
+							</div>
+							</div>
+						</div>
+						</div>
+					</form>
 				</div>
 			</div><!-- div.filter end -->
 
@@ -157,10 +241,12 @@ $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
 						<a class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 text-dark">Pris: 250,- til 750,- <button type="button" class="btn-close" aria-label="Close"></button></a>
 						<a class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 text-dark">Butik: Den Blå Dør <button type="button" class="btn-close" aria-label="Close"></button></a>
 						<a class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 bg-yellow text-white">Nulstil alle <button type="button" class="btn-close  btn-close-white" aria-label="Close"></button></a>
+
+						<button id="productPageReset" type="button" class="rounded-pill border-yellow bg-yellow text-white">Reset All</button>
 					</div>
 				</div>
 
-				<div class="row">
+				<div id="products" class="row">
 				<?php
 				// Get vendor
 				$vendorId = wcmp_find_shop_page_vendor();
@@ -223,20 +309,16 @@ $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
 				}
 				?>
 				</div>
+				<!-- show filtered result here-->
+				<div id="filteredProduct" class="row">
+				</div>
 			</div>
 		</div>
 	</div>
 </section>
 
-<?php
-$defaultProductIdAsString = implode(",", $productIdArray);
-?>
+<?php $defaultProductIdAsString = implode(",", $productIdArray);?>
 <input type="hidden" id="defaultProductIdAsString" value="<?php echo $defaultProductIdAsString;?>">
-
-<!--show ajax filtered result-->
-<div id="filteredProductList" class="box-product-list">
-</div>
-
 
 
 <div style="text-align: center;">
@@ -274,10 +356,10 @@ do_action('after_wcmp_vendor_description', $vendorId);
   <div class="container">
     <div class="row">
       <div class="col-lg-2">
-				<?php
-					$image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
-				?>
-				<img class="d-inline-block pb-3" src="<?php echo esc_attr($image); ?>">
+		<?php
+			$image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
+		?>
+		<img class="d-inline-block pb-3" src="<?php echo esc_attr($image); ?>">
       </div>
       <div class="col-lg-6">
         <h6><?php echo ucfirst(esc_html($vendor->user_data->data->display_name)); ?></h6>
@@ -286,8 +368,8 @@ do_action('after_wcmp_vendor_description', $vendorId);
             <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
           </svg>
           <?php
-					$location = get_user_meta($vendorId, '_vendor_address_1', true).', '.get_user_meta($vendorId, '_vendor_postcode', true).' '.get_user_meta($vendorId, '_vendor_city', true);
-					echo esc_html($location); ?>
+			$location = get_user_meta($vendorId, '_vendor_address_1', true).', '.get_user_meta($vendorId, '_vendor_postcode', true).' '.get_user_meta($vendorId, '_vendor_city', true);
+			echo esc_html($location); ?>
         </p>
         <?php
 				$vendor_hide_description = apply_filters('wcmp_vendor_store_header_hide_description', get_user_meta($vendorId, '_vendor_hide_description', true), $vendor->id);
@@ -308,21 +390,21 @@ do_action('after_wcmp_vendor_description', $vendorId);
 
 					$i = 0;
           foreach($del_days as $v){
-            $day = $day_array[$v];
+            //$day = $day_array[$v];
             if ($i == 0){
-              $day = ucfirst($day);
+              //$day = ucfirst($day);
             }
 
             if(count($del_days) > 1)
             {
               if($i < count($del_days)-2){
-                $day .= ', ';
+               // $day .= ', ';
               } else if($i == count($del_days)-1) {
-                $day = ' og '.$day;
+                // $day = ' og '.$day;
               }
             }
 
-            print $day;
+            // print $day;
             $i++;
           }
           ?>.

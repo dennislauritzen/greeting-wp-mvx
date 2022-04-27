@@ -382,7 +382,17 @@
 **/
 $pageId = get_the_ID();
 
+$cityIdArr = get_post_meta($pageId, 'postal_code_relation', true);
+$cityId = $cityIdArr[0];
+
 global $wpdb;
+
+$cityPostRow = $wpdb->get_row( "
+    SELECT * FROM {$wpdb->prefix}posts
+    WHERE ID = $cityId
+" );
+
+$cityName = $cityPostRow->post_title;
 
 $postRowCategory = $wpdb->get_row( "
     SELECT * FROM {$wpdb->prefix}postmeta
@@ -536,7 +546,7 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
             foreach($occasionTermListArrayUnique as $occasionTerm){
               if($occasionTerm == $occasion->term_id){ ?>
                 <div class="form-check">
-                    <input type="checkbox" name="filter_occ[<?php echo $category->term_id; ?>]" class="form-check-input" id="filter_occ_<?php echo $occasion->term_id; ?>" value="<?php echo $occasion->term_id; ?>">
+                    <input type="checkbox" name="filter_landing_page" class="form-check-input filter-on-landing-page" id="filter_occ_<?php echo $occasion->term_id; ?>" value="<?php echo $occasion->term_id; ?>">
                     <label class="form-check-label" for="filter_occ_<?php echo $occasion->term_id; ?>"><?php echo $occasion->name; ?></label>
                 </div>
           <?php
@@ -565,24 +575,25 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
 
           // Get the results
           $vendors = $userQuery->get_results();
-
           $deliveryTypeArray = array();
-
           foreach($vendors as $vendor){
               $userMetas = get_user_meta($vendor->ID, 'delivery_type', true);
+              $label = get_field_object('delivery_type','user_'.$vendor->ID);
               foreach($userMetas as $deliveryType){
-                  array_push($deliveryTypeArray, $deliveryType);
+                  if(!array_key_exists($deliveryType, $deliveryTypeArray)){
+                      $deliveryTypeArray[$deliveryType] = array(
+                          'label' => $label['value']['0'],
+                          'id' => $deliveryType
+                        );
+                  }
               }
           }
 
-          // we need unique item
-          $deliveryTypeArrayUnique = array_unique($deliveryTypeArray);
-
-          foreach($deliveryTypeArrayUnique as $delivery){?>
-            <div class="form-check">
-                <input type="checkbox" name="filter_del[<?php echo $delivery; ?>]" class="form-check-input" id="filter_delivery_<?php echo $delivery; ?>" value="<?php echo $delivery; ?>">
-                <label class="form-check-label" for="filter_delivery_<?php echo $delivery; ?>"><?php echo $delivery; ?></label>
-            </div>
+          foreach($deliveryTypeArray as $delivery){?>
+              <div class="form-check">
+                  <input type="checkbox" name="filter_landing_page" class="form-check-input filter-on-landing-page" id="filter_delivery_<?php echo $delivery['id']; ?>" value="<?php echo $delivery['id']; ?>">
+                  <label class="form-check-label" for="filter_delivery_<?php echo $delivery['id']; ?>"><?php echo $delivery['label']; ?></label>
+              </div>
           <?php }
           ?>
           </ul>
@@ -621,7 +632,7 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
                 <div class="col-12">
                   <div class="px-3 px-lg-2 pt-3 pt-lg-2 pt-xl-2 pb-4">
                     <input
-                      id="ex2"
+                      id="sliderLandingPage"
                       type="text"
                       class="form-range py-3"
                       value="array"
@@ -643,7 +654,7 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
                       </style>
                       <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/bootstrap-slider.min.js"></script>
                       <script type="text/javascript">
-                        var slider = new Slider('#ex2', {
+                        var slider = new Slider('#sliderLandingPage', {
                           'tooltip_split': true
                         });
                         slider.on("slideStop", function(sliderValue){
@@ -678,7 +689,8 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
 
             <a class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 bg-yellow text-white">Nulstil alle <button type="button" class="btn-close  btn-close-white" aria-label="Close"></button></a>
 
-            <button id="landingPageReset">Reset</button>
+            <button id="landingPageReset" type="button" class="rounded-pill border-yellow bg-yellow text-white">Reset All</button>
+
           </div>
         </div>
 
@@ -750,9 +762,8 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
                       <path d="M4 4.5a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1v.5h4.14l.386-1.158A.5.5 0 0 1 11 4h1a.5.5 0 0 1 0 1h-.64l-.311.935.807 1.29a3 3 0 1 1-.848.53l-.508-.812-2.076 3.322A.5.5 0 0 1 8 10.5H5.959a3 3 0 1 1-1.815-3.274L5 5.856V5h-.5a.5.5 0 0 1-.5-.5zm1.5 2.443-.508.814c.5.444.85 1.054.967 1.743h1.139L5.5 6.943zM8 9.057 9.598 6.5H6.402L8 9.057zM4.937 9.5a1.997 1.997 0 0 0-.487-.877l-.548.877h1.035zM3.603 8.092A2 2 0 1 0 4.937 10.5H3a.5.5 0 0 1-.424-.765l1.027-1.643zm7.947.53a2 2 0 1 0 .848-.53l1.026 1.643a.5.5 0 1 1-.848.53L11.55 8.623z"/>
                     </svg>
                     <!-- Leverer til: 8000 Aarhus C, 8200 Aarhus N, 8270 Højbjerg -->
-                    Leverer til: <?php
-                    $deliveryZip = get_user_meta($user, 'delivery_zips', true);
-                    echo $deliveryZip;?>
+                    Leverer til: <?php echo $cityName;?>
+                    <input type="hidden" id="cityName" value="<?php echo $cityName;?>">
                   </div>
                 </small>
               </div>
@@ -1092,8 +1103,6 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
 			jQuery("#priceSlider").slider("values", $this.data("index"), $this.val());
 			// var val = jQuery('#priceSlider').slider("option", "values");
 		});
-		// add class
-		jQuery("a").addClass("vendor_sort_occasion_landpage");
 	});
 </script>
 

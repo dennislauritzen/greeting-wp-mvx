@@ -477,7 +477,7 @@ if(!empty($vendor_city)){
               $opening = get_field('openning', 'user_'.$vendor->id);
               $interv = array();
               if(!empty($opening) && is_array($opening) && count($opening) > 0){
-                $interv = build_intervals($opening,  function($a, $b) { return ($b - $a) <= 1; }, function($a, $b) { return "{$a}..{$b}"; });
+                //$interv = build_intervals($opening,  function($a, $b) { return ($b - $a) <= 1; }, function($a, $b) { return "{$a}..{$b}"; });
               }
               $i = 1;
               if(count($interv) > 0){
