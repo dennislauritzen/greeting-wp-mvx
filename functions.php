@@ -2650,3 +2650,35 @@ function woocommerce_thankyou_redirect( $order_id ) {
      exit;
 	 }
 }
+
+/**
+ * Function for generating breadcrumbs.
+ * Has to be called on the template pages (not called automatically).
+ * @used on landing pages
+ *
+ * @author Dennis Lauritzen
+ */
+ /**
+  * Generate breadcrumbs
+  * @author CodexWorld
+  * @authorURL www.codexworld.com
+  */
+function get_breadcrumb() {
+   echo '<a href="'.home_url().'" rel="nofollow" style="color: #777777;">Forside</a>';
+   if (is_category() || is_single()) {
+       echo "&nbsp;/&nbsp;";
+       the_category(' &bull; ');
+           if (is_single()) {
+               echo " &nbsp;/&nbsp; ";
+               the_title();
+           }
+   } elseif (is_page()) {
+       echo "&nbsp;/&nbsp;";
+       echo the_title();
+   } elseif (is_search()) {
+       echo "&nbsp;/&nbsp; Search Results for... ";
+       echo '"<em>';
+       echo the_search_query();
+       echo '</em>"';
+   }
+}
