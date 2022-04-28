@@ -245,7 +245,6 @@ get_header('checkout');
 				if(!empty($vendor_city)){
 					$location .= $vendor_city.' ';
 				}
-				
 				echo esc_html($location); ?>
 			</div>
 			<p></p>
