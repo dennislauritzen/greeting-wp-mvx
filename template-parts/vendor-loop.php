@@ -32,6 +32,7 @@ if($args['cityName']){
             $uploadedImage = wp_get_attachment_image_url($imageId);
             $placeHolderImage = $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
 
+            $imageUrl = '';
             if($uploadedImage != ''){
               $imageUrl = $uploadedImage;
             } else {
