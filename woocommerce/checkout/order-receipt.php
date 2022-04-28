@@ -42,8 +42,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 </ul>
 
 
-JOHN
-
 <?php do_action( 'woocommerce_receipt_' . $order->get_payment_method(), $order->get_id() ); ?>
 
 <div class="clear"></div>

@@ -51,7 +51,6 @@
 <body <?php body_class(); ?>>
 
 <?php wp_body_open(); ?>
-
 <section id="top" class="bg-teal pt-1">
     <div class="container py-4">
       <div class="row">
