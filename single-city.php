@@ -616,7 +616,7 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
           foreach($deliveryTypeArray as $delivery){?>
               <div class="form-check">
                   <input type="checkbox" name="filter_city_page" class="form-check-input filter-on-city-page" id="filter_delivery_<?php echo $delivery['id']; ?>" value="<?php echo $delivery['id']; ?>">
-                  <label class="form-check-label" for="filter_delivery_<?php echo $delivery['id']; ?>"><?php echo $delivery['label']; ?></label>
+                  <label class="form-check-label" for="filter_delivery_<?php echo $delivery['id']; ?>"><?php echo $delivery['label']['label']; ?></label>
               </div>
           <?php }
           ?>
@@ -728,7 +728,6 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
             <div class="card shadow border-0 mb-3">
               <div class="card-body">
                 <div class="row align-items-center">
-
                   <div class="col-3 text-center">
                     <img class="img-fluid rounded-start" src="<?php echo $image;?>" style="max-width: 100px;">
                     <?php $button_text = apply_filters('wcmp_vendor_lists_single_button_text', $vendor->page_title); ?>
@@ -800,7 +799,7 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
       <?php } ?>
 
       <!-- show filtered result here-->
-      <div class="filteredStore row"></div>
+      <div class="filteredStore row store"></div>
 
       </div>
     </div>

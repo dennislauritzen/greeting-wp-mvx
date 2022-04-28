@@ -46,12 +46,12 @@ foreach ($vendorProducts as $productId) {
 			<?php } ?>
 			</a>
 			<div class="card-body">
-				<h6 class="card-title">
+				<h6 class="card-title text-dark" style="font-size: 14px;">
 					<a href="<?php echo get_permalink($product->get_id());?>" class="text-dark">
 						<?php echo $product->get_name();?>
 					</a>
 				</h6>
-				<p class="price"><?php echo $product->get_price();?></small>
+				<p class="price"><?php echo $product->get_price();?></p>
 				<div class="links" style="display: none;">
 					<a href="?add-to-cart=<?php echo $product->get_id();?>" data-quantity="1" class="button product_type_simple add_to_cart_button ajax_add_to_cart" title="Add to cart" data-product_id="<?php echo $product->get_id();?>" data-product_sku="RGD-00010-1" aria-label="Add “Framed Poster” to your cart" rel="nofollow">Add to cart</a>
 					<a href="<?php echo get_permalink($product->get_id());?>" class="rigid-quick-view-link" data-id="<?php echo $product->get_id();?>" title="Quick View"><i class="fa fa-eye"></i></a>

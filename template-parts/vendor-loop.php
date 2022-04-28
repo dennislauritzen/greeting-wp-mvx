@@ -1,9 +1,11 @@
 <?php
+global $WCMp;
+
 if($args['vendor']){
   $vendor = $args['vendor'];
   // $vendor = get_wcmp_vendor($user);
   // $image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
-  $image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : wc_placeholder_img_src();
+  $image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
 }
 if($args['cityName']){
   $cityName = $args['cityName'];
@@ -28,8 +30,8 @@ if($args['cityName']){
             $product = wc_get_product($prod);
             $imageId = $product->get_image_id();
             $uploadedImage = wp_get_attachment_image_url($imageId);
-            $placeHolderImage = wc_placeholder_img_src();
-            $imageUrl;
+            $placeHolderImage = $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
+
             if($uploadedImage != ''){
               $imageUrl = $uploadedImage;
             } else {
@@ -41,7 +43,7 @@ if($args['cityName']){
               <div class="card border-0">
                   <a href="<?php echo get_permalink($product->get_id());?>"><img src="<?php echo $imageUrl;?>" class="card-img-top" alt="REPLACEME"></a>
                   <div class="card-body">
-                      <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark"><?php echo $product->get_name();?></a></h6>
+                      <h6 class="card-title" style="font-size: 14px;"><?php echo $product->get_name();?></a></h6>
                       <p class="price">Fra <?php echo $product->get_price();?> kr.</p>
                   </div>
               </div>

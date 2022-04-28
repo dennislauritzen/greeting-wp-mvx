@@ -592,7 +592,7 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
           foreach($deliveryTypeArray as $delivery){?>
               <div class="form-check">
                   <input type="checkbox" name="filter_landing_page" class="form-check-input filter-on-landing-page" id="filter_delivery_<?php echo $delivery['id']; ?>" value="<?php echo $delivery['id']; ?>">
-                  <label class="form-check-label" for="filter_delivery_<?php echo $delivery['id']; ?>"><?php echo $delivery['label']; ?></label>
+                  <label class="form-check-label" for="filter_delivery_<?php echo $delivery['id']; ?>"><?php echo $delivery['label']['label']; ?></label>
               </div>
           <?php }
           ?>
@@ -742,15 +742,6 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
                         </div>
                       </div>
                     <?php } ?>
-                      <!-- <div class="d-none d-md-inline d-lg-inline d-xl-inline col-6 col-xs-6 col-sm-6 col-md-4">
-                        <div class="card border-0">
-                            <a href="#"><img src="https://greeting.dk/wp-content/uploads/2021/02/Toerretmoerk-scaled-aspect-ratio-1000-800-1-600x600.jpg" class="card-img-top" alt="REPLACEME"></a>
-                            <div class="card-body">
-                                <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark">Gavepakke "Forkæl"</a></h6>
-                                <p class="price">Fra 235 kr.</p>
-                            </div>
-                        </div>
-                      </div> -->
                     </div>
                   </div>
                 </div>
