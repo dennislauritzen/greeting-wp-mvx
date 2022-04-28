@@ -8,10 +8,12 @@ if($args['vendor']){
 if($args['cityName']){
   $cityName = $args['cityName'];
 } ?>
+
 <div class="col-12">
   <div class="card shadow border-0 mb-3">
     <div class="card-body">
       <div class="row align-items-center">
+
         <div class="col-3 text-center">
           <img class="img-fluid rounded-start" src="<?php echo $image;?>" style="max-width: 100px;">
           <?php $button_text = apply_filters('wcmp_vendor_lists_single_button_text', $vendor->page_title); ?>
@@ -20,6 +22,8 @@ if($args['cityName']){
             Gå til butik<span class="d-none d-md-inline"></span>
           </a>
         </div>
+
+
         <div class="col-9">
           <div class="row">
           <?php
@@ -50,6 +54,7 @@ if($args['cityName']){
         </div>
       </div>
     </div>
+
     <div class="card-footer">
       <small class="text-muted">
         <div>
@@ -61,5 +66,7 @@ if($args['cityName']){
         </div>
       </small>
     </div><!--/-card footer-->
+
+
   </div><!--/-card-->
 </div><!--/-col-12-->
