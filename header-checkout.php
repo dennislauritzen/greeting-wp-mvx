@@ -1,26 +1,76 @@
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Rubik:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<!DOCTYPE html>
+<html <?php language_attributes(); ?>>
+<head>
+	<meta charset="<?php bloginfo( 'charset' ); ?>">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<?php wp_head(); ?>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Merriweather:wght@300;400;700;900&family=Roboto+Slab:wght@100;200;300;400;500;600;700;800;900&family=Rubik:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
+		<style type="text/css">
+		#ship-to-different-address {
+			display: none;
+		}
+		label {
+			font-family: 'Inter', sans-serif;
+		}
+		div.argmc-tab-text {
+			font-family: 'Inter', sans-serif;
+			font-size: 11px;
+			margin:5px 0 10px 0;
+		}
+		h1, h2, h3, h4 {
+			font-family: 'Merriweather';
+		}
+		h1 {
+			font-size: 28px;
+			font-weight: 500;
+		}
+		h2 {
+			font-size: 25px;
+			font-weight: 500;
+		}
+		h3 {
+			font-size: 22px !important;
+			font-weight: 500 !important;
+		}
+		input {
+			font-family: 'Inter', sans-serif;
+		}
+		input[type="radio"] {
+			width: 4%;
+			min-width: 20px;
+		}
+		.form-row-label {
+			width: 95%;
+		}
+		</style>
+</head>
 
-<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasMenu" aria-labelledby="offcanvasMenu">
-  <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="offcanvasMenuLabel">Menu</h5>
-    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
-  <div class="offcanvas-body">
-    <div class="">
-      <p>Bliv Butikspartner</p>
-      <p>Cases</p>
-      <p>Om Greeting.dk</p>
-      <p>Kontakt</p>
-    </div>
-  </div>
-</div>
+<body <?php body_class(); ?>>
+
+<?php wp_body_open(); ?>
+
 <section id="top" class="bg-teal pt-1">
     <div class="container py-4">
       <div class="row">
-        <div class="d-flex pb-3 pb-lg-0 pb-xl-0 position-relative justify-content-center justify-content-lg-start justify-content-xl-start col-md-12 col-lg-3">
+        <div class="col-12 col-lg-3 justify-content-center justify-content-lg-start  order-2 order-lg-1">
+          <!-- TrustBox script -->
+          <script type="text/javascript" src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
+          <!-- End TrustBox script -->
+          <!-- TrustBox widget - Micro Review Count -->
+          <div
+            class="trustpilot-widget"
+						style="text-align: left; overflow-x: visible;"
+            data-locale="da-DK"
+            data-template-id="5419b6a8b0d04a076446a9ad"
+            data-businessunit-id="60133f8342c1850001d9606a" data-style-height="24px" data-style-width="100%" data-theme="dark" data-min-review-count="10">
+            <a href="https://dk.trustpilot.com/review/greeting.dk" target="_blank" rel="noopener">Trustpilot</a>
+          </div>
+          <!-- End TrustBox widget -->
+        </div>
+        <div class="d-flex pb-3 pb-lg-0 pb-xl-0 position-relative justify-content-center col-md-12 col-lg-6 order-first order-lg-2">
           <a href="<?php echo home_url(); ?>">
               <svg viewBox="0 0 524 113" width="175" fill="#ffffff"  xmlns="http://www.w3.org/2000/svg">
               <path d="m77.206 77.399c-1.3564 0.9013-3.0143 2.0655-4.9737 3.4925-1.884 1.352-4.1824 2.6664-6.8954 3.9432-2.6376 1.2017-5.7273 2.2532-9.2692 3.1545s-7.5736 1.352-12.095 1.352c-6.707 0-12.773-1.0891-18.199-3.2672-5.4259-2.2533-10.06-5.2951-13.904-9.1256-3.768-3.9057-6.707-8.4497-8.817-13.632-2.0347-5.2576-3.0521-10.891-3.0521-16.899 0-6.0086 1.055-11.604 3.1651-16.787 2.1101-5.2576 5.1244-9.8016 9.0431-13.632 3.9941-3.9056 8.8171-6.9475 14.469-9.1256 5.652-2.2532 12.058-3.3799 19.217-3.3799 3.2404 0 6.2548 0.18777 9.0431 0.56331 2.8637 0.37554 5.5013 0.86375 7.9128 1.4646 2.4868 0.52575 4.7099 1.0891 6.6693 1.6899 1.9593 0.60086 3.7303 1.1642 5.3128 1.6899l2.2608 18.364-1.0174 0.338c-2.7129-3.9056-5.3128-7.2104-7.7997-9.9143-2.4115-2.779-4.8606-5.0322-7.3475-6.7597-2.4115-1.8026-4.936-3.117-7.5736-3.9432-2.6376-0.82619-5.4636-1.2393-8.478-1.2393-5.1998 0-9.7213 1.0515-13.565 3.1545-3.8433 2.103-7.0084 4.9947-9.4952 8.675-2.4869 3.6803-4.3709 7.999-5.652 12.956-1.2058 4.9571-1.8086 10.29-1.8086 15.998s0.5652 11.041 1.6956 15.998c1.1303 4.882 2.8636 9.1632 5.1998 12.844 2.4115 3.6052 5.4635 6.4593 9.1561 8.5623 3.768 2.103 8.2896 3.1545 13.565 3.1545 6.1795 0 11.191-1.5021 15.034-4.5064 3.8434-3.0044 5.765-7.4733 5.765-13.407 0-2.0279-0.0753-3.8305-0.2261-5.4078-0.1507-1.5773-0.4521-3.0794-0.9043-4.5065-0.3768-1.427-0.9043-2.8165-1.5825-4.1685-0.6782-1.427-1.5072-2.9667-2.4869-4.6191v-0.2253h22.156v0.2253c-0.9043 1.7275-1.6579 3.3423-2.2608 4.8445-0.6029 1.427-1.0927 2.8916-1.4695 4.3938-0.3014 1.5021-0.5275 3.117-0.6782 4.8444-0.0754 1.7275-0.1131 3.7554-0.1131 6.0838v6.7597z"/>
@@ -42,33 +92,8 @@
             </svg>
           </a>
         </div>
-        <div class="col-md-12 col-lg-5 col-xl-6">
-          <form action="" method="" class="position-relative mx-5">
-            <label for="" class="screen-reader-text">Indtast det postnummer, du ønsker at sende en gave til - og se udvalget af butikker</label>
-            <button type="submit" name="submit" class="top-search-btn rounded-pill position-absolute border-0 end-0 bg-teal p-3 me-1"></button>
-            <input type="text" class="top-search-input form-control rounded-pill border-0 py-2" value="5683 Haarby" placeholder="Indtast by eller postnr.">
-            <figure class="location-pin position-absolute ms-2 mt-1 top-0" style="padding-top:1px;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#333333" class="bi bi-geo-alt" viewBox="0 0 16 16">
-                <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A31.493 31.493 0 0 1 8 14.58a31.481 31.481 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94zM8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10z"/>
-                <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
-              </svg>
-            </figure>
-            <input type="hidden" name="greeting_topsearch_submit_" value="re54813wfq1_!fe515">
-          </form>
-        </div>
-        <div class="d-none d-lg-inline d-xl-inline d-lg-inline col-lg-4 col-xl-3 right-col text-end">
-          <a href="#" class="btn text-white">Log ind</a>
-          <a href="#" class="btn btn-create rounded text-white">Opret</a>
-          <div class="btn position-relative ms-lg-0 ms-xl-1">
-            <span class="position-relative" aria-label="Se kurv">
-              <svg width="21" height="23" viewBox="0 0 21 23" xmlns="http://www.w3.org/2000/svg">
-                <path d="M6.434 6.967H3.306l-1.418 14.47h17.346L17.82 6.967h-3.124c.065.828.097 1.737.097 2.729h-1.5c0-1.02-.031-1.927-.093-2.729H7.93a35.797 35.797 0 00-.093 2.729h-1.5c0-.992.032-1.9.097-2.729zm.166-1.5C7.126 1.895 8.443.25 10.565.25s3.44 1.645 3.965 5.217h4.65l1.708 17.47H.234l1.712-17.47H6.6zm6.432 0c-.407-2.65-1.27-3.717-2.467-3.717-1.196 0-2.06 1.066-2.467 3.717h4.934z" fill="#ffffff">
-                </path>
-              </svg>
-              <span class="position-absolute start-50 top-0 badge rounded-circle text-white" style="background: #cea09f;">0</span>
-            </span>
-            <span class="d-inline px-lg-2 px-xl-3 hide-lg text-white">Kurv</span>
-          </div>
+        <div class="d-flex col-lg-3 justify-content-center justify-content-lg-end order-3 pt-3 pt-lg-0">
+          Telefon - Mail - Chat
         </div>
       </div>
     </div>

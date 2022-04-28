@@ -34,7 +34,7 @@ if ( $max_value && $min_value === $max_value ) {
 	      <input
 	          type="number"
 	          id="<?php echo esc_attr( $input_id ); ?>"
-	          class="form-control input-text text<?php //echo esc_attr( join( ' ', (array) $classes ) ); ?>"
+	          class="form-control input-text text input-qty <?php //echo esc_attr( join( ' ', (array) $classes ) ); ?>"
 	          step="<?php echo esc_attr( $step ); ?>"
 	          min="<?php echo esc_attr( $min_value ); ?>"
 	          max="<?php echo esc_attr( 0 < $max_value ? $max_value : '' ); ?>"
@@ -46,44 +46,8 @@ if ( $max_value && $min_value === $max_value ) {
 	          placeholder="<?php echo esc_attr( $placeholder ); ?>"
 	          inputmode="<?php echo esc_attr( $inputmode ); ?>" />
 
-						<button type="button" class="btn btn-outline-secondary plus-qty" style="min-width: 50px;"  data-field="<?php echo esc_attr( $input_name ); ?>">+</button>
-						<button type="button" class="btn btn-outline-secondary minus-qty" style="min-width: 50px;" data-field="<?php echo esc_attr( $input_name ); ?>">-</button>
-
-						<script type="text/javascript">
-							function incrementValue(e) {
-								e.preventDefault();
-								var fieldName = jQuery(e.target).data('field');
-								var parent = jQuery(e.target).closest('div');
-								var currentVal = parseInt(parent.find('input[name=' + fieldName + ']').val(), 10);
-
-								if (!isNaN(currentVal)) {
-										parent.find('input[name=' + fieldName + ']').val(currentVal + 1);
-								} else {
-										parent.find('input[name=' + fieldName + ']').val(0);
-								}
-							}
-
-							function decrementValue(e) {
-									e.preventDefault();
-									var fieldName = jQuery(e.target).data('field');
-									var parent = jQuery(e.target).closest('div');
-									var currentVal = parseInt(parent.find('input[name=' + fieldName + ']').val(), 10);
-
-									if (!isNaN(currentVal) && currentVal > 0) {
-											parent.find('input[name=' + fieldName + ']').val(currentVal - 1);
-									} else {
-											parent.find('input[name=' + fieldName + ']').val(0);
-									}
-							}
-
-							jQuery('.input-group').on('click', '.plus-qty', function(e) {
-									incrementValue(e);
-							});
-
-							jQuery('.input-group').on('click', '.minus-qty', function(e) {
-									decrementValue(e);
-							});
-						</script>
+						<button type="button" class="btn btn-outline-secondary plus-qty" style="min-width: 50px;"  data-field="<?php echo esc_attr( $input_id ); ?>">+</button>
+						<button type="button" class="btn btn-outline-secondary minus-qty" style="min-width: 50px;" data-field="<?php echo esc_attr( $input_id ); ?>">-</button>
 			</div>
     <?php do_action( 'woocommerce_after_quantity_input_field' ); ?>
 	<?php

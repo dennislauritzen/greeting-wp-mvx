@@ -1763,109 +1763,6 @@ function attach_pdf_to_email ( $attachments, $email_id , $order ) {
 // vendor attachment end
 
 
-/** order date begin */
-
-add_action( 'woocommerce_review_order_before_payment', 'greeting_echo_date_picker' );
-
-$closed_days_date = array();
-
-function greeting_echo_date_picker( $checkout ) {
-
-	$storeProductId = '';
-	// Get $product object from Cart object
-	$cart = WC()->cart->get_cart();
-
-	foreach( $cart as $cart_item_key => $cart_item ){
-		$product = $cart_item['data'];
-		$storeProductId = $product->get_id();
-	}
-
-	$vendor_id = get_post_field( 'post_author', $storeProductId );
-
-	global $wpdb;
-
-	// get vendor drop off time
-	$vendorDropOffTimeRow = $wpdb->get_row( "
-		SELECT * FROM {$wpdb->prefix}usermeta
-		WHERE user_id = $vendor_id
-		AND meta_key = 'vendor_drop_off_time'
-	" );
-	$vendorDropOffTime = $vendorDropOffTimeRow->meta_value;
-
-	// get vendor closed day
-	$vendorClosedDayRow = $wpdb->get_row( "
-		SELECT * FROM {$wpdb->prefix}usermeta
-		WHERE user_id = $vendor_id
-		AND meta_key = 'vendor_closed_day'
-	" );
-
-	// get vendor delivery day
-	$vendorDeliverDay = $wpdb->get_row( "
-		SELECT * FROM {$wpdb->prefix}usermeta
-		WHERE user_id = $vendor_id
-		AND meta_key = 'vendor_require_delivery_day'
-	" );
-	$vendorDeliverDayReq = $vendorDeliverDay->meta_value;
-
-	echo '<div id="show-if-shipping"><h6>Delivery Date</h6><span>Delivery day required: '.$vendorDeliverDayReq.', Drop off time: '.$vendorDropOffTime.':00 Closed Day: </span>';
-
-	// open close days begin
-	$default_days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-	$openning_days = get_user_meta($vendor_id, 'openning', true); // true for not array return
-	$closed_days = array_diff($default_days, $openning_days);
-
-	global $closed_days_date;
-	foreach($closed_days as $closed){
-		$today_day = date("l");
-		$today_date = date_create($today_day);
-		date_modify($today_date, $closed);
-		$modified_date = date_format($today_date, "d-m-Y");
-		$closed_days_date[] = $modified_date;
-	}
-
-	$closed_days_date[] = $vendorClosedDayRow->meta_value;
-
-	$date_now = new dateTime();
-	$closed_days_date_exist_check = array();
-
-	foreach($closed_days_date as $ok_date){
-		$date_time_object = new dateTime($ok_date);
-		if($date_time_object > $date_now){
-			$closed_days_date_exist_check[] = $ok_date;
-		}
-	}
-
-	rsort($closed_days_date_exist_check); // reverse sort the array
-
-	$closed_days_date_iteration = count($closed_days_date_exist_check);
-	$cdi = 0;
-	foreach($closed_days_date_exist_check as $closed_date){
-		if(++$cdi == $closed_days_date_iteration){
-			echo $closed_date;
-		} else {
-			echo $closed_date.", ";
-		}
-	}
-	// open close days end
-
-	woocommerce_form_field( 'delivery_date', array(
-			'type'          => 'text',
-			'class'         => array('form-row-wide'),
-			'id'            => 'datepicker',
-			'required'      => true,
-			'label'         => __('Select Delivery Date'),
-			'placeholder'       => __('Click to open calendar'),
-			));
-
-	echo '</div>';?>
-
-	<input type="hidden" id="vendorDeliverDay" value="<?php echo $vendorDeliverDayReq;?>"/>
-	<input type="hidden" id="vendorDropOffTimeId" value="<?php echo $vendorDropOffTime;?>"/>
-	<?php
-}
-
-add_action( 'woocommerce_after_checkout_validation', 'greeting_check_billing_postcode', 10, 2);
-
 function greeting_check_billing_postcode( $fields, $errors ){
 
 	$storeProductId = '';
@@ -2034,67 +1931,7 @@ function custom_display_order_data_in_admin(){
 }
 
 
-/** Receiver info and message begin */
-add_action( 'woocommerce_after_order_notes', 'greeting_echo_receiver_info' );
-
-function greeting_echo_receiver_info( $checkout ) {
-
-	echo '<div>';
-		woocommerce_form_field( 'receiver_info', array(
-			'type'          => 'text',
-			'class'         => array('form-row-wide', 'greeting-custom-input'),
-			'required'      => true,
-			'label'         => __('Receiver info'),
-			'placeholder'       => __('Enter receiver info'),
-			));
-		echo '<tr class="message-pro-radio"><td>';
-
-		$chosenMessage = WC()->session->get( 'message-pro' );
-		$chosenMessage = empty( $chosenMessage ) ? WC()->checkout->get_value( 'message-pro' ) : $chosenMessage;
-		$chosenMessage = empty( $chosenMessage ) ? '0' : $chosenMessage;
-
-		woocommerce_form_field( 'message-pro',  array(
-		'type'      => 'radio',
-		'class'     => array( 'form-row-wide', 'update_totals_on_change' ),
-		'options'   => array(
-			'4'  => 'Premium Message: (+4 kr.)',
-			'0'     => 'Standard Message',
-		),
-		), $chosenMessage );
-
-		woocommerce_form_field( 'greeting_message', array(
-			'type'          => 'textarea',
-			'id'			=> 'greetingMessage',
-			'class'         => array('form-row-wide'),
-			'required'      => true,
-			'label'         => __('Greeting Message'),
-			'placeholder'       => __('Write your greeting message!'),
-			));
-
-	echo '</div>';?>
-	<style>
-		#receiver_info {
-			width:750px;
-		}
-		#greetingMessage {
-			width:750px;
-		}
-		#datepicker {
-			width:255px;
-		}
-		@media screen and (max-width:768px){
-			#receiver_info {
-				width:400px;
-			}
-			#greetingMessage {
-				width:400px;
-			}
-		}
-	</style>
-<?php }
-
 add_action( 'woocommerce_cart_calculate_fees', 'checkout_message_fee', 20, 1 );
-
 function checkout_message_fee( $cart ) {
     if ( $radio2 = WC()->session->get( 'message-pro' ) ) {
         $cart->add_fee( 'Message Fee', $radio2 );
@@ -2102,7 +1939,6 @@ function checkout_message_fee( $cart ) {
 }
 
 add_action( 'woocommerce_checkout_update_order_review', 'checkout_message_choice_to_session' );
-
 function checkout_message_choice_to_session( $posted_data ) {
     parse_str( $posted_data, $output );
     if ( isset( $output['message-pro'] ) ){
@@ -2125,7 +1961,6 @@ function greeting_validate_new_receiver_info_fields() {
 add_action( 'woocommerce_checkout_update_order_meta', 'greeting_save_receiver_info_with_order' );
 
 function greeting_save_receiver_info_with_order( $order_id ) {
-
     global $woocommerce;
 
     if ( $_POST['receiver_info'] ) update_post_meta( $order_id, 'receiver_info', esc_attr( $_POST['receiver_info'] ) );
@@ -2420,4 +2255,349 @@ function display_price_in_variation_option_name( $term ) {
     }
 
     return $term;
+}
+
+/**
+ *
+ * Add javascript and some styles to header only on cart page
+ * for qty updates
+ *
+ * @author Dennis Lauritzen
+ */
+add_action( 'wp_footer', 'add_javascript_on_cart_page', 9999 );
+
+function add_javascript_on_cart_page() {
+  if ( is_cart() ) {
+     ?>
+		 <style type="text/css">
+		 .woocommerce button[name="update_cart"],
+		 .woocommerce input[name="update_cart"] {
+			 display: none;
+		 }
+		 </style>
+		 <script type="text/javascript">
+		 var timeout;
+		 jQuery('.woocommerce').on('change', 'input.input-qty', function(){
+				 if ( timeout !== undefined ) {
+						 clearTimeout( timeout );
+				 }
+				 timeout = setTimeout(function() {
+						 jQuery("[name='update_cart']").removeAttr("disabled");
+						 jQuery("[name='update_cart']").trigger("click");
+				 }, 1000 ); // 1 second delay, half a second (500) seems comfortable too
+		 });
+
+		 jQuery('.woocommerce').on('click', 'button.plus-qty', function(){
+				 if ( timeout !== undefined ) {
+						 clearTimeout( timeout );
+				 }
+				 timeout = setTimeout(function() {
+						 jQuery("[name='update_cart']").removeAttr("disabled");
+						 jQuery("[name='update_cart']").trigger("click");
+				 }, 1000 ); // 1 second delay, half a second (500) seems comfortable too
+		 });
+
+		 jQuery('.woocommerce').on('click', 'button.minus-qty', function(){
+				 if ( timeout !== undefined ) {
+						 clearTimeout( timeout );
+				 }
+				 timeout = setTimeout(function() {
+						 jQuery("[name='update_cart']").removeAttr("disabled");
+						 jQuery("[name='update_cart']").trigger("click");
+				 }, 1000 ); // 1 second delay, half a second (500) seems comfortable too
+		 });
+		 </script>
+		 <?php
+  }
+}
+
+/**
+ *
+ * Add update javascript for quantity buttons in footer.
+ *
+ * @author Dennis Lauritzen
+ */
+ add_action( 'wp_footer', 'add_quantity_plus_and_minus_in_footer', 9999 );
+function add_quantity_plus_and_minus_in_footer(){
+	?>
+	<script type="text/javascript">
+		function incrementValue(e) {
+			e.preventDefault();
+			var fieldName = jQuery(e.target).data('field');
+			var parent = jQuery(e.target).closest('div');
+			var currentVal = parseInt(parent.find('input#' + fieldName).val(), 10);
+
+			if (!isNaN(currentVal)) {
+					parent.find('input#' + fieldName).val(currentVal + 1);
+			} else {
+					parent.find('input#' + fieldName).val(0);
+			}
+		}
+
+		function decrementValue(e) {
+				e.preventDefault();
+				var fieldName = jQuery(e.target).data('field');
+				var parent = jQuery(e.target).closest('div');
+				var currentVal = parseInt(parent.find('input#' + fieldName).val(), 10);
+
+				if (!isNaN(currentVal) && currentVal > 0) {
+						parent.find('input#' + fieldName).val(currentVal - 1);
+				} else {
+						parent.find('input#' + fieldName).val(0);
+				}
+		}
+
+		jQuery('.woocommerce').on('click', '.plus-qty', function(e) {
+				incrementValue(e);
+		});
+
+		jQuery('.woocommerce').on('click', '.minus-qty', function(e) {
+				decrementValue(e);
+		});
+	</script>
+	<?php
+}
+
+/**
+/**
+ * Add New Custom Step
+ * @param array $fields
+ * return array
+ */
+
+function argmcAddNewSteps($fields) {
+	//Add First Step
+	$position = 6;     //Set Step Position
+	$fields['steps'] = array_slice($fields['steps'] , 0, $position - 1, true) +
+            array(
+                'step_6' => array(
+                    'text'  => __('Hilsen & leveringsdato', 'argMC'),     //"Tab Name" - Set First Tab Name
+                    'class' => 'greeting-message'             //'my-custom-step' - Set First Tab Class Name
+                ),
+            ) +
+            array_slice($fields['steps'], $position - 1, count($fields['steps']) - 1, true);
+
+
+
+	return $fields;
+
+}
+add_filter('arg-mc-init-options', 'argmcAddNewSteps');
+
+
+
+/** Receiver info and message begin */
+#add_action( 'woocommerce_before_order_notes', 'greeting_echo_receiver_info' );
+function greeting_echo_receiver_info( ) {
+
+	echo '<div>';
+
+		echo '<h3>Din hilsen til modtager</h3>';
+
+		$chosenMessage = WC()->session->get( 'message-pro' );
+		$chosenMessage = empty( $chosenMessage ) ? WC()->checkout->get_value( 'message-pro' ) : $chosenMessage;
+		$chosenMessage = empty( $chosenMessage ) ? '0' : $chosenMessage;
+
+		woocommerce_form_field( 'message-pro',  array(
+			'type'      => 'radio',
+			'label'			=> 'Hvor lang er din hilsen?',
+			'class'     => array( 'form-row-wide', 'update_totals_on_change' ),
+			'label_class' =>	array('form-row-label'),
+			'options'   => array(
+				'0'				=> 'Standardhilsen, håndskrevet (op til 165 tegn)',
+				'4'				=> 'Lang hilsen, håndkrevet (op til 400 tegn), +10 kr.'
+			),
+		), $chosenMessage );
+
+		// @todo - If message-pro == 4, then this should be allowed to be 400 characters.
+		woocommerce_form_field( 'greeting_message', array(
+			'type'				=> 'textarea',
+			'id'					=> 'greetingMessage',
+			'class'				=> array('form-row-wide'),
+			'required'		=> true,
+			'label'				=> __('Din hilsen til modtager'),
+			'placeholder'	=> __('Skriv din hilsen til din modtager her :)'),
+			));
+
+		woocommerce_form_field( 'receiver_info', array(
+			'type'          => 'text',
+			'class'         => array('form-row-wide', 'greeting-custom-input'),
+			'required'      => true,
+			'label'         => __('Receiver info'),
+			'placeholder'       => __('Enter receiver info'),
+			));
+		#echo '<tr class="message-pro-radio"><td>';
+
+	echo '<h3 class="pt-4">Leveringsdato</h3>';
+
+	greeting_echo_date_picker();
+
+	echo '</div>';
+}
+
+/**
+ * @author amdad
+ * Functions for setting the order delivery date.
+ * On step 3 in checkout.
+ *
+ * order date begin
+ */
+# add_action( 'woocommerce_review_order_before_payment', 'greeting_echo_date_picker' );
+$closed_days_date = array();
+function greeting_echo_date_picker( ) {
+	$storeProductId = '';
+	// Get $product object from Cart object
+	$cart = WC()->cart->get_cart();
+
+	foreach( $cart as $cart_item_key => $cart_item ){
+		$product = $cart_item['data'];
+		$storeProductId = $product->get_id();
+	}
+
+	$vendor_id = get_post_field( 'post_author', $storeProductId );
+
+	global $wpdb;
+
+	// get vendor drop off time
+	$vendorDropOffTimeRow = $wpdb->get_row( "
+		SELECT * FROM {$wpdb->prefix}usermeta
+		WHERE user_id = $vendor_id
+		AND meta_key = 'vendor_drop_off_time'
+	" );
+	$vendorDropOffTime = $vendorDropOffTimeRow->meta_value;
+
+	// get vendor closed day
+	$vendorClosedDayRow = $wpdb->get_row( "
+		SELECT * FROM {$wpdb->prefix}usermeta
+		WHERE user_id = $vendor_id
+		AND meta_key = 'vendor_closed_day'
+	" );
+
+	// get vendor delivery day
+	$vendorDeliverDay = $wpdb->get_row( "
+		SELECT * FROM {$wpdb->prefix}usermeta
+		WHERE user_id = $vendor_id
+		AND meta_key = 'vendor_require_delivery_day'
+	" );
+	$vendorDeliverDayReq = $vendorDeliverDay->meta_value;
+
+	// open close days begin
+	$default_days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+	$openning_days = get_user_meta($vendor_id, 'openning', true); // true for not array return
+	$closed_days = array_diff($default_days, $openning_days);
+
+	global $closed_days_date;
+	foreach($closed_days as $closed){
+		$today_day = date("l");
+		$today_date = date_create($today_day);
+		date_modify($today_date, $closed);
+		$modified_date = date_format($today_date, "d-m-Y");
+		$closed_days_date[] = $modified_date;
+	}
+
+	$closed_days_date[] = $vendorClosedDayRow->meta_value;
+
+	$date_now = new dateTime();
+	$closed_days_date_exist_check = array();
+
+	foreach($closed_days_date as $ok_date){
+		$date_time_object = new dateTime($ok_date);
+		if($date_time_object > $date_now){
+			$closed_days_date_exist_check[] = $ok_date;
+		}
+	}
+
+	rsort($closed_days_date_exist_check); // reverse sort the array
+
+
+	echo '<div id="show-if-shipping">';
+	echo '<span>Butikken kan levere om ';
+	echo $vendorDeliverDayReq. ' leveringsdage, hvis du ';
+	echo 'bestiller inden kl.';
+	echo $vendorDropOffTime;
+	echo ':00</span>';
+
+
+	woocommerce_form_field( 'delivery_date', array(
+		'type'          => 'text',
+		'class'         => array('form-row-wide'),
+		'id'            => 'datepicker',
+		'required'      => false,
+		'label'         => __('Hvornår skal gaven leveres?'),
+		'placeholder'   => __('Hurtigst muligt'),
+	));
+
+
+	$closed_days_date_iteration = count($closed_days_date_exist_check);
+	$cdi = 0;
+	foreach($closed_days_date_exist_check as $closed_date){
+		if(++$cdi == $closed_days_date_iteration){
+			echo $closed_date;
+		} else {
+			echo $closed_date.", ";
+		}
+	}
+	// open close days end
+
+	echo '</div>';?>
+
+	<input type="hidden" id="vendorDeliverDay" value="<?php echo $vendorDeliverDayReq;?>"/>
+	<input type="hidden" id="vendorDropOffTimeId" value="<?php echo $vendorDropOffTime;?>"/>
+	<?php
+}
+add_action( 'woocommerce_after_checkout_validation', 'greeting_check_billing_postcode', 10, 2);
+
+/**
+ * Add Content to the Related Steps Created Above
+ * @param string $step
+ * return void
+ */
+function argmcAddStepsContent($step) {
+	//First Step Content
+  if ($step == 'step_6') {
+		greeting_echo_receiver_info( );
+	}
+}
+add_action('arg-mc-checkout-step', 'argmcAddStepsContent');
+
+/**
+ * Disable order shipping options
+ * @since 1.0.1
+ * @author Dennis Lauritzen
+ */
+add_filter('woocommerce_checkout_fields' , 'greeting_marketplace_checkout_fields', 10, 1);
+function greeting_marketplace_checkout_fields($fields) {
+  // Remove billing fields
+  //unset($fields['billing']['billing_first_name']);
+  //unset($fields['billing']['billing_last_name']);
+  unset($fields['billing']['billing_company']);
+  // unset($fields['billing']['billing_address_1']);
+  unset($fields['billing']['billing_address_2']);
+  // unset($fields['billing']['billing_city']);
+  // unset($fields['billing']['billing_postcode']);
+  unset($fields['billing']['billing_country']);
+  unset($fields['billing']['billing_state']);
+  //unset($fields['billing']['billing_phone']);
+  //unset($fields['billing']['billing_email']);
+
+  // Remove shipping fields
+  //unset($fields['shipping']['shipping_first_name']);
+  //unset($fields['shipping']['shipping_last_name']);
+  //unset($fields['shipping']['shipping_company']);
+  //unset($fields['shipping']['shipping_address_1']);
+  unset($fields['shipping']['shipping_address_2']);
+  //unset($fields['shipping']['shipping_city']);
+  //unset($fields['shipping']['shipping_postcode']);
+	unset($fields['shipping']['shipping_country']);
+	unset($fields['shipping']['shipping_state']);
+
+    // Remove order comment fields
+	unset($fields['order']['order_comments']);
+
+	$disable_autocomplete = 'nope';
+	$fields['shipping']['shipping_address_1']['autocomplete'] = $disable_autocomplete;
+	$fields['shipping']['shipping_postcode']['autocomplete'] = $disable_autocomplete;
+	$fields['shipping']['shipping_city']['autocomplete'] = $disable_autocomplete;
+
+  return $fields;
 }
