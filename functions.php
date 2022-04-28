@@ -628,7 +628,7 @@ function ajax_fetch() { ?>
 							}
 						}
 					});
-					
+
 
 				}, 500)),
 
@@ -2600,4 +2600,53 @@ function greeting_marketplace_checkout_fields($fields) {
 	$fields['shipping']['shipping_city']['autocomplete'] = $disable_autocomplete;
 
   return $fields;
+}
+
+
+/**
+ * Add additional terms to checkout if cart contains product that has an age restriction of 18+
+ * @since 1.0.1
+ * @author Dennis
+ */
+add_action('woocommerce_review_order_before_submit', 'greeting_marketplace_checkout_age_restriction');
+function greeting_marketplace_checkout_age_restriction() {
+	$age_restricted_items_in_cart = false;
+	foreach(WC()->cart->get_cart() as $cart_item_key => $cart_item) {
+		$product_alchohol = get_post_meta($cart_item['product_id'], 'alcholic_content', true);
+		if($product_alchohol){
+			$age_restricted_items_in_cart = true;
+			break;
+		}
+	}
+	if($age_restricted_items_in_cart){
+		woocommerce_form_field('age_restriction', array(
+			'type'          => 'checkbox',
+			'class'         => array('form-row mycheckbox'),
+			'label_class'   => array('woocommerce-form__label woocommerce-form__label-for-checkbox checkbox'),
+			'input_class'   => array('woocommerce-form__input woocommerce-form__input-checkbox input-checkbox'),
+			'required'      => true,
+			'label'         => esc_html__('I confirm that I\'m 18+ years old.', 'woocommerce'),
+		));
+	}
+}
+
+/**
+ * Function for redirecting to a new receipt page, that has custom theme.
+ *
+ * @author Dennis Lauritzen
+ * @return void
+ */
+add_action( 'woocommerce_thankyou', 'woocommerce_thankyou_redirect', 4 );
+function woocommerce_thankyou_redirect( $order_id ) {
+     //$order_id. // This contains the specific ID of the order
+     $order       = wc_get_order( $order_id );
+     $order_key   = $order->get_order_key();
+		 if(empty($order) || (!is_object($order) && !is_array($order) && count($order) == 0)){
+			 wp_redirect( site_url() .'/' );
+		 }
+		 global $wp;
+		 if ( is_checkout() && !empty( $wp->query_vars['order-received'] ) ) {
+     wp_redirect( site_url() . '/order-received?o='.$order->ID.'&key='.$order_key );
+     exit;
+	 }
 }
