@@ -83,8 +83,8 @@ $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
 						?>
 						<li class="px-0">
 							<div class="form-check">
-									<input type="checkbox" name="filter_product_page" class="form-check-input filter-on-product-page" id="filter_delivery_<?php echo $category->term_id; ?>" value="<?php echo $category->term_id; ?>">
-									<label class="form-check-label" for="filter_delivery_<?php echo $category->term_id; ?>"><?php echo $category->name; ?></label>
+									<input type="checkbox" name="filter_catocca_vendor" class="form-check-input filter-on-vendor-page" id="filter_catocca_<?php echo $category->term_id; ?>" value="<?php echo $category->term_id; ?>">
+									<label class="form-check-label" for="filter_catocca_<?php echo $category->term_id; ?>"><?php echo $category->name; ?></label>
 							</div>
 						</li>
 					<?php
@@ -111,8 +111,8 @@ $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
 						?>
 						<li class="px-0">
 							<div class="form-check">
-								<input type="checkbox" name="filter_product_page" class="form-check-input filter-on-product-page" id="filter_delivery_<?php echo $occasion->term_id; ?>" value="<?php echo $occasion->term_id; ?>">
-								<label class="form-check-label" for="filter_delivery_<?php echo $occasion->term_id; ?>"><?php echo $occasion->name; ?></label>
+								<input type="checkbox" name="filter_catocca_vendor" class="form-check-input filter-on-vendor-page" id="filter_catocca_<?php echo $occasion->term_id; ?>" value="<?php echo $occasion->term_id; ?>">
+								<label class="form-check-label" for="filter_catocca_<?php echo $occasion->term_id; ?>"><?php echo $occasion->name; ?></label>
 							</div>
 						</li>
 					<?php
@@ -121,7 +121,7 @@ $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
 					</ul>
 
 					<!-- tag filter-->
-					<h5 class="text-uppercase">Tags</h5>
+					<!--<h5 class="text-uppercase">Tags</h5>
 					<ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
 					<?php
 					$tagTermListArray = array();
@@ -145,11 +145,11 @@ $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
 					<?php
 					}
 					?>
-					</ul>
+        </ul>-->
 
 					<!-- price filter filter-->
-					<?php	
-					// Get vendor 
+					<?php
+					// Get vendor
 					$vendorId = wcmp_find_shop_page_vendor();
 					$vendor = get_wcmp_vendor($vendorId);
 					$productPriceArray = array();
@@ -176,7 +176,7 @@ $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
 						$maxProductPrice = max($productPriceArray);
 					}
 					?>
-		  
+
 					<h5 class="text-uppercase">Pris</h5>
 					<form>
 						<div id="slideInput" class="my-3">
@@ -192,7 +192,7 @@ $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
 							<div class="col-12">
 							<div class="px-3 px-lg-2 pt-3 pt-lg-2 pt-xl-2 pb-4">
 								<input
-								id="sliderCityPage"
+								id="sliderPrice"
 								type="text"
 								class="form-range py-3"
 								value="array"
@@ -212,19 +212,6 @@ $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
 									background-image: none;
 								}
 								</style>
-								<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/bootstrap-slider.min.js"></script>
-								<script type="text/javascript">
-									var slider = new Slider('#sliderCityPage', {
-									'tooltip_split': true
-									});
-									slider.on("slideStop", function(sliderValue){
-									var val = slider.getValue();
-									var min_val = val[0];
-									var max_val = val[1];
-									document.getElementById("slideStartPoint").value = min_val;
-									document.getElementById("slideEndPoint").value = max_val;
-									});
-								</script>
 							</div>
 							</div>
 						</div>
@@ -240,10 +227,13 @@ $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
 						<a class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 text-dark">Påske <button type="button" class="btn-close" aria-label="Close"></button></a>
 						<a class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 text-dark">Pris: 250,- til 750,- <button type="button" class="btn-close" aria-label="Close"></button></a>
 						<a class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 text-dark">Butik: Den Blå Dør <button type="button" class="btn-close" aria-label="Close"></button></a>
-						<a class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 bg-yellow text-white">Nulstil alle <button type="button" class="btn-close  btn-close-white" aria-label="Close"></button></a>
 
-						<button id="productPageReset" type="button" class="rounded-pill border-yellow bg-yellow text-white">Reset All</button>
-					</div>
+            <a href="#" id="vendorPageReset" onclick="event.preventDefault();" class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 bg-yellow text-white">
+              Nulstil alle
+              <button type="button" class="btn-close  btn-close-white" aria-label="Close">
+              </button>
+            </a>
+          </div>
 				</div>
 
 				<div id="products" class="row">

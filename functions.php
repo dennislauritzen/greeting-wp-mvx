@@ -593,6 +593,18 @@ function greeting_custom_taxonomy_occasion()  {
 add_action( 'wp_footer', 'ajax_fetch' );
 function ajax_fetch() { ?>
 	<script type="text/javascript">
+		/** function for delaying ajax input**/
+		function delay(ms, callback) {
+			var timer = 0;
+			return function() {
+				var context = this, args = arguments;
+				clearTimeout(timer);
+				timer = setTimeout(function () {
+					callback.apply(context, args);
+				}, ms || 0);
+			};
+		}
+
 		jQuery(document).ready(function(){
 			var currentRequest = null;
 
@@ -607,11 +619,11 @@ function ajax_fetch() { ?>
 				});
 
 				/*Do the search with delay 500ms*/
-				jQuery('#front_Search-new_ucsa').keyup(delay(function (e) {
-						var text = jQuery(this).val();
+				jQuery('#front_Search-new_ucsa').keyup(delay(500, function (e) {
+					var text = jQuery(this).val();
 
 					jQuery.ajax({
-						url: '<?php //echo admin_url('admin-ajax.php'); ?>',
+						url: '<?php echo admin_url('admin-ajax.php'); ?>',
 						type: 'post',
 						data: { action: 'data_fetch', keyword: text },
 						beforeSend: function(){
@@ -628,25 +640,11 @@ function ajax_fetch() { ?>
 							}
 						}
 					});
+				})
+			);
 
 
-				}, 500)),
-
-
-
-	/** function for delaying ajax input**/
-	function delay(callback, ms) {
-		var timer = 0;
-		return function() {
-		var context = this, args = arguments;
-		clearTimeout(timer);
-		timer = setTimeout(function () {
-			callback.apply(context, args);
-		}, ms || 0);
-		};
-	}
-
-	});
+	}); // jquery ready
 	</script>
 <?php
 }
@@ -802,27 +800,63 @@ function greeting_save_product_cat_meta( $post_id ) {
 add_action( 'wp_footer', 'categoryActionJavascript' );
 
 function categoryActionJavascript() { ?>
-	<script type="text/javascript">
 
+	<script type="text/javascript">
+		// Set the slider.
+		var slider = new Slider('#sliderPrice', {
+			'tooltip_split': true
+		});
+		slider.on("slideStop", function(sliderValue){
+			var val = slider.getValue();
+			var min_val = val[0];
+			var max_val = val[1];
+			document.getElementById("slideStartPoint").value = min_val;
+			document.getElementById("slideEndPoint").value = max_val;
+		});
+	</script>
+	<script type="text/javascript">
+		// Start the jQuery
 		jQuery(document).ready(function($) {
 
 			var ajaxurl = "<?php echo admin_url('admin-ajax.php');?>";
 			var catOccaDeliveryIdArray = [];
 			var inputPriceRangeArray = [];
 			// $('#cityPageReset').hide();
-			jQuery(".filter-on-city-page, .slider").click(function(){
-				alert("from city page")
-				// inputPriceRangeArray = jQuery('#priceSlider').slider("option", "values");
-				inputPriceRangeArray = slider.getValue();
 
-				catOccaDeliveryIdArray = [];
-				$("input:checkbox[name=filter_city_page]:checked").each(function(){
-					catOccaDeliveryIdArray.push($(this).val());
-				});
+			jQuery(".filter-on-city-page").click(function(){
+				update();
+			});
+			slider.on("slideStop", function(sliderValue){
+				update();
+			});
 
+			function update(){
 				var cityName = $('#cityName').val();
 
-				var data = {'action': 'catOccaDeliveryAction', cityDefaultUserIdAsString: jQuery("#cityDefaultUserIdAsString").val(), catOccaDeliveryIdArray: catOccaDeliveryIdArray, inputPriceRangeArray:inputPriceRangeArray, cityName: cityName};
+				catOccaIdArray = [];
+				$("input:checkbox[name=filter_catocca_city]:checked").each(function(){
+					catOccaIdArray.push($(this).val());
+				});
+				deliveryIdArray = [];
+				$("input:checkbox[name=filter_del_city]:checked").each(function(){
+					deliveryIdArray.push($(this).val());
+				});
+
+				inputPriceRangeArray = [
+					document.getElementById("slideStartPoint").value,
+					document.getElementById("slideEndPoint").value
+				];
+
+				alert(JSON.stringify(catOccaIdArray)+" - "+JSON.stringify(inputPriceRangeArray));
+
+				var data = {
+					'action': 'catOccaDeliveryAction',
+					cityDefaultUserIdAsString: jQuery("#cityDefaultUserIdAsString").val(),
+					catOccaIdArray: catOccaIdArray,
+					deliveryIdArray: deliveryIdArray,
+					inputPriceRangeArray: inputPriceRangeArray,
+					cityName: cityName
+				};
 				jQuery.post(ajaxurl, data, function(response) {
 					jQuery('.store').hide();
 					jQuery('.filteredStore').show();
@@ -833,12 +867,22 @@ function categoryActionJavascript() { ?>
 						jQuery('#noVendorFound').hide();
 					}
 				});
-			});
+			}
 
 			// reset filter
 			$('#cityPageReset').click(function(){
-				$("input:checkbox[name=filter_city_page]").removeAttr("checked");
+				$("input:checkbox[name=filter_catocca_city], input:checkbox[name=filter_del_city]").removeAttr("checked");
+				var val_max = $("input#sliderPrice").data('slider-max');
+
+				slider.setValue([0,val_max]);
+				$("input#sliderPrice").data('slider-value', '[0,'+val_max+']');
+				$("input#sliderPrice").data('slider-max', val_max);
+
+				$("input#slideEndPoint").val(val_max);
+				$("input#slideStartPoint").val(0);
+
 				catOccaDeliveryIdArray.length = 0;
+
 				jQuery('.store').show();
 				jQuery('.filteredStore').hide();
 			});
@@ -858,13 +902,13 @@ function categoryActionJavascript() { ?>
 }
 
 function catOccaDeliveryAction() {
-
 	// default user array come from front end
 	$cityDefaultUserIdAsString = $_POST['cityDefaultUserIdAsString'];
 	$defaultUserArray = explode(",", $cityDefaultUserIdAsString);
 
 	// category, occasion and delivery  filter data
-	$catOccaDeliveryIdArray = $_POST['catOccaDeliveryIdArray'];
+	$catOccaDeliveryIdArray = $_POST['catOccaIdArray'];
+	$deliveryIdArray = $_POST['deliveryIdArray'];
 
 	// declare array for store user ID get from occasion
 	$userIdArrayGetFromCatOcca = array();
@@ -872,52 +916,65 @@ function catOccaDeliveryAction() {
 	// declare array for store user ID got from delivery type
 	$userIdArrayGetFromDelivery = array();
 
+
 	global $wpdb;
+	// Prepare the where and where-placeholders for term_id (cat and occassion ID's).
+	$where = array();
+	$placeholder_arr = array_fill(0, count($catOccaDeliveryIdArray), '%s');
 
-	foreach($catOccaDeliveryIdArray as $catOccaDeliveryId){
-
-		if(is_numeric($catOccaDeliveryId)){
-			$productData = $wpdb->get_results(
-				"
-					SELECT *
-					FROM {$wpdb->prefix}term_relationships
-					WHERE term_taxonomy_id = $catOccaDeliveryId
-				"
-			);
-			foreach($productData as $product){
-				$singleProductId = $product->object_id;
-				$postAuthor = $wpdb->get_row(
-					"
-						SELECT *
-						FROM {$wpdb->prefix}posts
-						WHERE ID = $singleProductId
-					"
-				);
-
-				$postAuthorId = $postAuthor->post_author;
-
-				array_push($userIdArrayGetFromCatOcca, $postAuthorId);
+	if(count($catOccaDeliveryIdArray) > 0){
+		foreach($catOccaDeliveryIdArray as $catOccaDeliveryId){
+			if(is_numeric($catOccaDeliveryId)){
+				$where[] = $catOccaDeliveryId;
 			}
-		} else {
+		}
 
-			foreach($defaultUserArray as $defaultUserId){
+		$getStoreUserDataBasedOnProduct = $wpdb->prepare("
+		SELECT
+			p.post_author
+		FROM ".$wpdb->prefix."posts p
+		WHERE
+			p.ID IN (
+				SELECT
+					tm.object_id
+				FROM ".$wpdb->prefix."term_relationships tm
+				WHERE tm.term_taxonomy_id IN (".implode(", ",$placeholder_arr).")
+		  )
+			AND p.post_status = 'publish'
+		GROUP BY p.post_author
+		", $where);
+		$storeUserCatOccaResults = $wpdb->get_results($getStoreUserDataBasedOnProduct);
 
-				$userMetas = get_user_meta($defaultUserId, 'delivery_type', true);
+		foreach($storeUserCatOccaResults as $product){
+			array_push($userIdArrayGetFromCatOcca, $product->post_author);
+		}
+	}
 
-				foreach($userMetas as $deliveryType){
-					if($deliveryType == $catOccaDeliveryId){
-						array_push($userIdArrayGetFromDelivery, $defaultUserId);
-					}
+	////////////////////////
+	// FILTER: Delivery
+	// Prepare the statement for delivery array
+	$where = array();
+	$placeholder_arr = array_fill(0, count($deliveryIdArray), '%s');
+
+	if(count($deliveryIdArray) > 0){
+		var_dump($deliveryIdArray);
+		foreach($deliveryIdArray as $post_id){
+			var_dump($post_id);
+			foreach($post_id as $deliveryType){
+				if($deliveryType == $catOccaDeliveryId){
+					array_push($userIdArrayGetFromDelivery, $defaultUserId);
 				}
 			}
 		}
 	}
 
+	////////////////
+	// Filter: Price
+	// Location: City Page
 	// input price filter data come from front end
 	$inputPriceRangeArray = $_POST['inputPriceRangeArray'];
-	$inputMinPrice = $inputPriceRangeArray[0];
-	$inputMaxPrice = $inputPriceRangeArray[1];
-
+	$inputMinPrice = (int) $inputPriceRangeArray[0];
+	$inputMaxPrice = (int) $inputPriceRangeArray[1];
 	$query = array(
 		'post_status' => 'publish',
 		'post_type' => 'product',
@@ -987,13 +1044,13 @@ function catOccaDeliveryAction() {
 		}
 
 	} else { ?>
-
-	<div>
-		<p id="noVendorFound" style="margin-top: 50px; margin-bottom: 35px; padding: 15px 10px; background-color: #f8f8f8;">No vendors were found matching your selection.</p>
-	</div>
-
-	<?php }
-
+		<div>
+			<p id="noVendorFound" style="margin-top: 50px; margin-bottom: 35px; padding: 15px 10px; background-color: #f8f8f8;">
+				Der blev desværre ikke fundet nogle butikker, der matcher dine søgekriterier.
+			</p>
+		</div>
+	<?php
+	}
 	wp_die();
 }
 
@@ -1005,8 +1062,7 @@ add_action( 'wp_ajax_nopriv_catOccaDeliveryAction', 'catOccaDeliveryAction' );
  * Vendor filter on Landing Page
  */
 
-add_action( 'wp_footer', 'landpageActionJavascript' );
-
+//add_action( 'wp_footer', 'landpageActionJavascript' );
 function landpageActionJavascript() { ?>
 	<script type="text/javascript">
 
@@ -1018,7 +1074,7 @@ function landpageActionJavascript() { ?>
 			// $('#landingPageReset').hide();
 
 			jQuery('.filter-on-landing-page, .slider').click(function(){
-				alert("from landing page")
+				// alert("from landing page");
 				// inputPriceRangeArray = jQuery('#priceSlider').slider("option", "values");
 				inputPriceRangeArray = slider.getValue();
 				occaDeliveryIdArray = [];
@@ -1218,8 +1274,7 @@ add_action( 'wp_ajax_nopriv_landpageAction', 'landpageAction' );
 /**
  * Vendor filter on Product Category Page
  */
-add_action( 'wp_footer', 'categoryPageActionJavascript' );
-
+//add_action( 'wp_footer', 'categoryPageActionJavascript' );
 function categoryPageActionJavascript() { ?>
 	<script type="text/javascript">
 
@@ -1381,46 +1436,68 @@ add_action( 'wp_ajax_nopriv_categoryPageFilterAction', 'categoryPageFilterAction
 
 /**
  * Filter on vendor store page
+ * @usedon /vendor/*
+ * Updated 30/4 by Dennis Lauritzen
  */
 add_action( 'wp_footer', 'vendStoreActionJavascript' );
-
 function vendStoreActionJavascript() { ?>
 	<script type="text/javascript">
 		jQuery(document).ready(function($) {
 			var ajaxurl = "<?php echo admin_url('admin-ajax.php');?>";
-			var productFilterDataArray = [];
+			var catOccaIdArray = [];
 			var inputPriceRangeArray = [];
-			// $('#productPageReset').hide();
 
-			jQuery('.filter-on-product-page, .slider').click(function(){
-				alert("vendor store page")
-
-				// inputPriceRangeArray = jQuery('#priceSlider').slider("option", "values");
-				inputPriceRangeArray = slider.getValue();
-				console.log("price range" + inputPriceRangeArray)
-				// window.history.replaceState(null, null, `?min_price=${inputPriceRangeArray[0]}&max_price=${inputPriceRangeArray[1]}`);
-				productFilterDataArray = [];
-
-				$("input:checkbox[name=filter_product_page]:checked").each(function(){
-					productFilterDataArray.push($(this).val());
+			$(".filter-on-vendor-page").click(function(){
+				updateVendor();
+			});
+			slider.on("slideStop", function(sliderValue){
+				updateVendor();
+			});
+			function updateVendor(){
+				catOccaIdArray = [];
+				$("input:checkbox[name=filter_catocca_vendor]:checked").each(function(){
+					catOccaIdArray.push($(this).val());
 				});
 
-				console.log("cat occ tag" + productFilterDataArray)
+				inputPriceRangeArray = [
+					document.getElementById("slideStartPoint").value,
+					document.getElementById("slideEndPoint").value
+				];
 
-				var data = {'action': 'productFilterAction', defaultProductIdAsString: jQuery("#defaultProductIdAsString").val(), productFilterDataArray: productFilterDataArray, inputPriceRangeArray: inputPriceRangeArray};
+				alert(JSON.stringify(catOccaIdArray)+" - "+JSON.stringify(inputPriceRangeArray));
+
+				var data = {
+					'action': 'productFilterAction',
+					defaultProductIdAsString: jQuery("#defaultProductIdAsString").val(),
+					productFilterDataArray: catOccaIdArray,
+					inputPriceRangeArray: inputPriceRangeArray
+				};
 				jQuery.post(ajaxurl, data, function(response) {
 					jQuery('#products').hide();
 					jQuery('#filteredProduct').show();
 					jQuery('#filteredProduct').html(response);
 				});
-			});
+			}
+
 
 			// reset filter
-			$('#productPageReset').click(function(){
-				$("input:checkbox[name=filter_product_page]").removeAttr("checked");
+			$('#vendorPageReset').click(function(){
+				$("input:checkbox[name=filter_catocca_vendor]").removeAttr("checked");
+				var val_max = $("input#sliderPrice").data('slider-max');
+
+				slider.setValue([0,val_max]);
+				$("input#sliderVendorPage").data('slider-value', '[0,'+val_max+']');
+				$("input#sliderVendorPage").data('slider-max', val_max);
+
+				$("input#slideEndPoint").val(val_max);
+				$("input#slideStartPoint").val(0);
+
+				//catOccaDeliveryIdArray.length = 0;
+
 				jQuery('#products').show();
 				jQuery('#filteredProduct').hide();
 			});
+
 		});
 
 		// Add remove loading class on body element based on Ajax request status
@@ -1437,6 +1514,47 @@ function vendStoreActionJavascript() { ?>
 }
 
 function productFilterAction() {
+
+
+	$where = array();
+	$placeholder_arr = array_fill(0, count($catOccaDeliveryIdArray), '%s');
+
+	if(count($catOccaDeliveryIdArray) > 0){
+		foreach($catOccaDeliveryIdArray as $catOccaDeliveryId){
+			if(is_numeric($catOccaDeliveryId)){
+				$where[] = $catOccaDeliveryId;
+			}
+		}
+
+		$getStoreUserDataBasedOnProduct = $wpdb->prepare("
+		SELECT
+			p.post_author
+		FROM ".$wpdb->prefix."posts p
+		WHERE
+			p.ID IN (
+				SELECT
+					tm.object_id
+				FROM ".$wpdb->prefix."term_relationships tm
+				WHERE tm.term_taxonomy_id IN (".implode(", ",$placeholder_arr).")
+		  )
+			AND p.post_status = 'publish'
+		GROUP BY p.post_author
+		", $where);
+		$storeUserCatOccaResults = $wpdb->get_results($getStoreUserDataBasedOnProduct);
+
+		foreach($storeUserCatOccaResults as $product){
+			array_push($userIdArrayGetFromCatOcca, $product->post_author);
+		}
+	}
+
+
+
+
+
+// ------------------------------
+
+
+
 	// default product id array come from front end
 	$defaultProductIdAsString = $_POST['defaultProductIdAsString'];
 	$defaultProductIdArray = explode(",", $defaultProductIdAsString);
@@ -1448,6 +1566,17 @@ function productFilterAction() {
 	$proIdArrGetFromProductFilterDataArray = array();
 
 	global $wpdb;
+
+	$where = array();
+	$placeholder_arr = array_fill(0, count($productFilterDataArray), '%s');
+
+	if(count($productFilterDataArray) > 0){
+		foreach($productFilterDataArray as $productFilterData){
+			if(is_numeric($productFilterData)){
+				$where[] = $productFilterData;
+			}
+		}
+	}
 
 	foreach($productFilterDataArray as $productFilterData){
 		$productData = $wpdb->get_results(
