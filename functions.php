@@ -1515,16 +1515,8 @@ function vendStoreActionJavascript() { ?>
 
 function productFilterAction() {
 
-
-	$where = array();
-	$placeholder_arr = array_fill(0, count($catOccaDeliveryIdArray), '%s');
-
 	if(count($catOccaDeliveryIdArray) > 0){
-		foreach($catOccaDeliveryIdArray as $catOccaDeliveryId){
-			if(is_numeric($catOccaDeliveryId)){
-				$where[] = $catOccaDeliveryId;
-			}
-		}
+
 
 		$getStoreUserDataBasedOnProduct = $wpdb->prepare("
 		SELECT
@@ -1638,7 +1630,9 @@ function productFilterAction() {
 	<?php } else { ?>
 
 	<div>
-		<p id="noProductFound" style="margin-top: 50px; margin-bottom: 35px; padding: 15px 10px; background-color: #f8f8f8;">No products were found matching your selection.</p>
+		<p id="noProductFound" style="margin-top: 50px; margin-bottom: 35px; padding: 15px 10px; background-color: #f8f8f8;">
+			No products were found matching your selection.
+		</p>
 	</div>
 
 	<?php }
