@@ -1108,45 +1108,9 @@ function catOccaDeliveryAction() {
 
 	$return_arr = array_unique($full_arr2);
 
-	var_dump($full_arr);
-	var_dump($full_arr2);
-	var_dump($return_arr);
-
-	if(!empty($userIdArrayGetFromCatOcca) && !empty($userIdArrayGetFromDelivery) && !empty($userIdArrayGetFromPriceFilter)){
-		$arrOfArrs = [$userIdArrayGetFromCatOcca, $userIdArrayGetFromDelivery, $userIdArrayGetFromPriceFilter];
-		$userIdArrayGetFromCatOccaDelivery = array_intersect(...$arrOfArrs);
-	}
-
-	elseif(!empty($userIdArrayGetFromCatOcca) && !empty($userIdArrayGetFromDelivery) && empty($userIdArrayGetFromPriceFilter)){
-		$userIdArrayGetFromCatOccaDelivery = array_intersect($userIdArrayGetFromCatOcca, $userIdArrayGetFromDelivery);
-	}
-	elseif(!empty($userIdArrayGetFromCatOcca) && empty($userIdArrayGetFromDelivery) && !empty($userIdArrayGetFromPriceFilter)){
-		$userIdArrayGetFromCatOccaDelivery = array_intersect($userIdArrayGetFromCatOcca, $userIdArrayGetFromPriceFilter);
-	}
-	elseif(empty($userIdArrayGetFromCatOcca) && !empty($userIdArrayGetFromDelivery) && !empty($userIdArrayGetFromPriceFilter)){
-		$userIdArrayGetFromCatOccaDelivery = array_intersect($userIdArrayGetFromDelivery, $userIdArrayGetFromPriceFilter);
-	}
-
-
-	elseif(!empty($userIdArrayGetFromCatOcca) && empty($userIdArrayGetFromDelivery) && empty($userIdArrayGetFromPriceFilter)){
-		$userIdArrayGetFromCatOccaDelivery = $userIdArrayGetFromCatOcca;
-	}
-	elseif(empty($userIdArrayGetFromCatOcca) && empty($userIdArrayGetFromDelivery) && !empty($userIdArrayGetFromPriceFilter)){
-		$userIdArrayGetFromCatOccaDelivery = $userIdArrayGetFromPriceFilter;
-	}
-	elseif(empty($userIdArrayGetFromCatOcca) && !empty($userIdArrayGetFromDelivery) && empty($userIdArrayGetFromPriceFilter)){
-		$userIdArrayGetFromCatOccaDelivery = $userIdArrayGetFromDelivery;
-	}
-
-	else {
-
-	}
-
-	$filteredCatOccaDeliveryArray = array_intersect($defaultUserArray, $userIdArrayGetFromCatOccaDelivery);
-	$filteredCatOccaDeliveryArrayUnique = array_unique($filteredCatOccaDeliveryArray);
-
-	if(count($filteredCatOccaDeliveryArrayUnique) > 0 ){
-		foreach ($filteredCatOccaDeliveryArrayUnique as $filteredUser) {
+	if(count($return_arr) > 0 ){
+		foreach ($return_arr as $filteredUser) {
+			var_dump($filteredUser);
 			$vendor = get_wcmp_vendor($filteredUser);
 			$cityName = $_POST['cityName'];
 			// call the template with pass $vendor variable
