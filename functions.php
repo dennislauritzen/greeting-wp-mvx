@@ -520,13 +520,23 @@ function greeting_custom_post_type() {
 	register_post_type('landingpage',
         array(
             'labels' => array(
-                'name'          => __('Landing Pages', 'rigid'),
-                'singular_name' => __('Landing Page', 'rigid'),
+                'name'          => __('Landing Pages', 'woocommerce'),
+                'singular_name' => __('Landing Page', 'woocommerce'),
             ),
             'menu_icon' => 'dashicons-flag',
             'public'      => true,
             'has_archive' => true,
-            'supports' => array('title')
+            'supports' => array('title'),
+						'capabilities' => array(
+								'publish_posts' => 'edit_dashboard',
+				        'edit_posts' => 'edit_dashboard',
+				        'edit_others_posts' => 'edit_dashboard',
+				        'delete_posts' => 'edit_dashboard',
+				        'delete_others_posts' => 'edit_dashboard',
+				        'read_private_posts' => 'edit_dashboard',
+				        'edit_post' => 'edit_dashboard',
+				        'delete_post' => 'edit_dashboard',
+				        'read_post' => 'edit_dashboard' )
         )
 	);
 
@@ -534,13 +544,23 @@ function greeting_custom_post_type() {
 	register_post_type('city',
         array(
             'labels' => array(
-                'name'          => __('City', 'rigid'),
-                'singular_name' => __('Cities', 'rigid'),
+                'name'          => __('City', 'woocommerce'),
+                'singular_name' => __('Cities', 'woocommerce'),
             ),
             'menu_icon' => 'dashicons-location-alt',
             'public'      => true,
             'has_archive' => true,
-            'supports' => array('title')
+            'supports' => array('title'),
+						'capabilities' => array(
+								'publish_posts' => 'edit_dashboard',
+				        'edit_posts' => 'edit_dashboard',
+				        'edit_others_posts' => 'edit_dashboard',
+				        'delete_posts' => 'edit_dashboard',
+				        'delete_others_posts' => 'edit_dashboard',
+				        'read_private_posts' => 'edit_dashboard',
+				        'edit_post' => 'edit_dashboard',
+				        'delete_post' => 'edit_dashboard',
+				        'read_post' => 'edit_dashboard' )
         )
 	);
 }
@@ -577,10 +597,48 @@ function greeting_custom_taxonomy_occasion()  {
 		'show_admin_column'          => true,
 		'show_in_nav_menus'          => true,
 		'show_tagcloud'              => true,
+		'capabilities' 							 => array(
+				'publish_posts' => 'edit_posts',
+        'edit_posts' => 'edit_posts',
+        'edit_others_posts' => 'edit_posts',
+        'delete_posts' => 'edit_posts',
+        'delete_others_posts' => 'edit_posts',
+        'read_private_posts' => 'edit_posts',
+        'edit_post' => 'edit_posts',
+        'delete_post' => 'edit_posts',
+        'read_post' => 'edit_posts' )
 	);
 	register_taxonomy( 'occasion', 'product', $args );
 
 }
+
+/**
+ *
+ *
+ *
+ *
+ */
+function removeAdminVisibilityForSomeUSers(){
+	$user = wp_get_current_user();
+
+	if ( in_array( 'editor', (array) $user->roles ) ) {
+      global $wp_admin_bar;
+      $wp_admin_bar->remove_menu('new-content');
+  }
+
+	//remove_submenu_page( 'index.php', 'update-core.php');  // Update
+
+		/* REMOVE DEFAULT MENUS */
+	remove_menu_page('edit.php?post_type=landingpage');
+	remove_menu_page('edit.php?post_type=city');
+	remove_menu_page('acoplw_badges_ui');
+	remove_menu_page('upload.php');
+	if(user_can($user->ID,'vendor'))
+	{
+		print 'hej';
+	}
+}
+add_action( 'admin_head', 'removeAdminVisibilityForSomeUSers' );
 
 /**
 *
@@ -825,6 +883,21 @@ function categoryActionJavascript() { ?>
 
 			jQuery(".filter-on-city-page").click(function(){
 				update();
+
+				if(this.checked){
+					setFilterBadgeCity(
+						$('label[for='+this.id+']').text(),
+						this.value,
+						'filter_cat'+this.value
+					);
+				} else {
+					removeFilterBadgeCity(
+						$('label[for='+this.id+']').text(),
+						this.value,
+						'filter_cat'+this.value,
+						false
+					);
+				}
 			});
 			slider.on("slideStop", function(sliderValue){
 				update();
@@ -847,8 +920,6 @@ function categoryActionJavascript() { ?>
 					document.getElementById("slideEndPoint").value
 				];
 
-				alert(JSON.stringify(catOccaIdArray)+" - "+JSON.stringify(inputPriceRangeArray));
-
 				var data = {
 					'action': 'catOccaDeliveryAction',
 					cityDefaultUserIdAsString: jQuery("#cityDefaultUserIdAsString").val(),
@@ -869,6 +940,35 @@ function categoryActionJavascript() { ?>
 				});
 			}
 
+			// Filter badges on the vendor page.
+			function setFilterBadgeCity(label, id, dataRemove){
+				var elm = document.createElement('div');
+				elm.id = 'filter'+dataRemove;
+				elm.classList.add('badge', 'rounded-pill', 'border-yellow', 'py-2', 'px-2', 'me-1', 'my-1', 'my-lg-0', 'my-xl-0', 'text-dark', 'dynamic-filters');
+				elm.href = '#';
+				elm.innerHTML = label;
+
+				elmbtn = document.createElement('button');
+				elmbtn.type = 'button';
+				elmbtn.classList.add('btn-close', 'filter-btn-delete');
+				elmbtn.dataset.filterId = id;
+				elmbtn.dataset.label = label.replace(/ /g,'');
+				elmbtn.onclick = function(){removeFilterBadgeCity('"'+label.replace(/ /g,'')+'"', id, dataRemove, true);};
+				elmbtn.dataset.filterRemove = dataRemove;
+				elm.appendChild(elmbtn);
+
+				jQuery('div.filter-list').prepend(elm);
+			}
+			function removeFilterBadgeCity(label, id, dataRemove, updateVendors){
+				if(updateVendors === true){
+					var elmId = dataRemove;
+					console.log(elmId+' '+dataRemove);
+					document.getElementById(elmId).checked = false;
+					update();
+				}
+				jQuery('#filter'+dataRemove).remove();
+			}
+
 			// reset filter
 			$('#cityPageReset').click(function(){
 				$("input:checkbox[name=filter_catocca_city], input:checkbox[name=filter_del_city]").removeAttr("checked");
@@ -882,6 +982,8 @@ function categoryActionJavascript() { ?>
 				$("input#slideStartPoint").val(0);
 
 				catOccaDeliveryIdArray.length = 0;
+
+				$('div.filter-list div.dynamic-filters').remove();
 
 				jQuery('.store').show();
 				jQuery('.filteredStore').hide();
@@ -906,8 +1008,9 @@ function catOccaDeliveryAction() {
 	$cityDefaultUserIdAsString = $_POST['cityDefaultUserIdAsString'];
 	$defaultUserArray = explode(",", $cityDefaultUserIdAsString);
 
-	// category, occasion and delivery  filter data
+	// category & occasion filter data
 	$catOccaDeliveryIdArray = $_POST['catOccaIdArray'];
+	// delivery filter data
 	$deliveryIdArray = $_POST['deliveryIdArray'];
 
 	// declare array for store user ID get from occasion
@@ -957,9 +1060,7 @@ function catOccaDeliveryAction() {
 	$placeholder_arr = array_fill(0, count($deliveryIdArray), '%s');
 
 	if(count($deliveryIdArray) > 0){
-		var_dump($deliveryIdArray);
 		foreach($deliveryIdArray as $post_id){
-			var_dump($post_id);
 			foreach($post_id as $deliveryType){
 				if($deliveryType == $catOccaDeliveryId){
 					array_push($userIdArrayGetFromDelivery, $defaultUserId);
@@ -1449,6 +1550,21 @@ function vendStoreActionJavascript() { ?>
 
 			$(".filter-on-vendor-page").click(function(){
 				updateVendor();
+
+				if(this.checked){
+					setFilterBadge(
+						$('label[for='+this.id+']').text(),
+						this.value,
+						'filter_catocca_'+this.value
+					);
+				} else {
+					removeFilterBadge(
+						$('label[for='+this.id+']').text(),
+						this.value,
+						'filter_catocca_'+this.value,
+						false
+					);
+				}
 			});
 			slider.on("slideStop", function(sliderValue){
 				updateVendor();
@@ -1464,8 +1580,6 @@ function vendStoreActionJavascript() { ?>
 					document.getElementById("slideEndPoint").value
 				];
 
-				alert(JSON.stringify(catOccaIdArray)+" - "+JSON.stringify(inputPriceRangeArray));
-
 				var data = {
 					'action': 'productFilterAction',
 					defaultProductIdAsString: jQuery("#defaultProductIdAsString").val(),
@@ -1477,6 +1591,36 @@ function vendStoreActionJavascript() { ?>
 					jQuery('#filteredProduct').show();
 					jQuery('#filteredProduct').html(response);
 				});
+			}
+
+
+			// Filter badges on the vendor page.
+			function setFilterBadge(label, id, dataRemove){
+				var elm = document.createElement('div');
+				elm.id = 'filter'+dataRemove;
+				elm.classList.add('badge', 'rounded-pill', 'border-yellow', 'py-2', 'px-2', 'me-1', 'my-1', 'my-lg-0', 'my-xl-0', 'text-dark', 'dynamic-filters');
+				elm.href = '#';
+				elm.innerHTML = label;
+
+				elmbtn = document.createElement('button');
+				elmbtn.type = 'button';
+				elmbtn.classList.add('btn-close', 'filter-btn-delete');
+				elmbtn.dataset.filterId = id;
+				elmbtn.dataset.label = label;
+				elmbtn.onclick = function(){removeFilterBadge('"'+label+'"', id, dataRemove, true);};
+				elmbtn.dataset.filterRemove = dataRemove;
+				elm.appendChild(elmbtn);
+
+				jQuery('div.filter-list').prepend(elm);
+			}
+			function removeFilterBadge(label, id, dataRemove, updateVendors){
+				if(updateVendors === true){
+					var elmId = dataRemove;
+					console.log(elmId+' '+dataRemove);
+					document.getElementById(elmId).checked = false;
+					updateVendor();
+				}
+				jQuery('#filter'+dataRemove).remove();
 			}
 
 
@@ -1492,12 +1636,13 @@ function vendStoreActionJavascript() { ?>
 				$("input#slideEndPoint").val(val_max);
 				$("input#slideStartPoint").val(0);
 
+				$('div.filter-list div.dynamic-filters').remove();
+
 				//catOccaDeliveryIdArray.length = 0;
 
 				jQuery('#products').show();
 				jQuery('#filteredProduct').hide();
 			});
-
 		});
 
 		// Add remove loading class on body element based on Ajax request status
@@ -1514,38 +1659,6 @@ function vendStoreActionJavascript() { ?>
 }
 
 function productFilterAction() {
-
-	if(count($catOccaDeliveryIdArray) > 0){
-
-
-		$getStoreUserDataBasedOnProduct = $wpdb->prepare("
-		SELECT
-			p.post_author
-		FROM ".$wpdb->prefix."posts p
-		WHERE
-			p.ID IN (
-				SELECT
-					tm.object_id
-				FROM ".$wpdb->prefix."term_relationships tm
-				WHERE tm.term_taxonomy_id IN (".implode(", ",$placeholder_arr).")
-		  )
-			AND p.post_status = 'publish'
-		GROUP BY p.post_author
-		", $where);
-		$storeUserCatOccaResults = $wpdb->get_results($getStoreUserDataBasedOnProduct);
-
-		foreach($storeUserCatOccaResults as $product){
-			array_push($userIdArrayGetFromCatOcca, $product->post_author);
-		}
-	}
-
-
-
-
-
-// ------------------------------
-
-
 
 	// default product id array come from front end
 	$defaultProductIdAsString = $_POST['defaultProductIdAsString'];
@@ -1570,22 +1683,22 @@ function productFilterAction() {
 		}
 	}
 
-	foreach($productFilterDataArray as $productFilterData){
-		$productData = $wpdb->get_results(
-			"
-				SELECT *
-				FROM {$wpdb->prefix}term_relationships
-				WHERE term_taxonomy_id = $productFilterData
-			"
-		);
-		foreach($productData as $product){
-			$singleProductId = $product->object_id;
-			array_push($proIdArrGetFromProductFilterDataArray, $singleProductId);
-		}
+	$query = $wpdb->prepare("
+		SELECT *
+		FROM ".$wpdb->prefix."term_relationships
+		WHERE term_taxonomy_id IN (".implode(', ',$placeholder_arr).")
+	", $where);
+	$productData = $wpdb->get_results($query);
+
+	foreach($productData as $product){
+		$singleProductId = $product->object_id;
+		array_push($proIdArrGetFromProductFilterDataArray, $singleProductId);
 	}
 
 	// input price filter data come from front end
 	$inputPriceRangeArray = $_POST['inputPriceRangeArray'];
+	$inputMinPrice = (int) $inputPriceRangeArray[0];
+	$inputMaxPrice = (int) $inputPriceRangeArray[1];
 
 	$query = array(
 		'post_status' => 'publish',
@@ -1594,7 +1707,7 @@ function productFilterAction() {
 			array(
 				'key' => '_price',
 				// 'value' => array(50, 100),
-				'value' => $inputPriceRangeArray,
+				'value' => array($inputMinPrice, $inputMaxPrice),
 				'compare' => 'BETWEEN',
 				'type' => 'NUMERIC'
 			)

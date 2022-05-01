@@ -603,6 +603,7 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
           foreach($vendors as $vendor){
               $userMetas = get_user_meta($vendor->ID, 'delivery_type', true);
               $label = get_field_object('delivery_type','user_'.$vendor->ID);
+
               foreach($userMetas as $deliveryType){
                   if(!array_key_exists($deliveryType, $deliveryTypeArray)){
                       $deliveryTypeArray[$deliveryType] = array(
@@ -688,13 +689,11 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
       <div class="col-md-12 col-lg-9 mb-5">
         <h1 class="d-none d-lg-block d-xl-block my-3 my-xs-3 my-sm-3 my-md-3 my-lg-0 my-xl-0 mb-lg-4 mb-xl-4">Find gavehilsner til <?php the_title();?></h1>
         <div class="applied-filters row mt-xs-0 mt-sm-0 mt-md-0 mt-2 mb-4 lh-lg">
-          <div class="col-12 filterItemShow">
-            <a class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 text-dark">Påske <button type="button" class="btn-close" aria-label="Close"></button></a>
-
-            <a class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 text-dark">Påske <button type="button" class="btn-close" aria-label="Close"></button></a>
-            <a class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 text-dark">Pris: 250,- til 750,- <button type="button" class="btn-close" aria-label="Close"></button></a>
-            <a class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 text-dark">5683 Haarby <button type="button" class="btn-close" aria-label="Close"></button></a>
-
+          <div class="col-12 filter-list">
+            <a href="<?php echo home_url(); ?>"class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 text-dark">
+              5683 Haarby
+              <button type="button" class="btn-close" aria-label="Close"></button>
+            </a>
             <a href="#" id="cityPageReset" onclick="event.preventDefault();" class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 bg-yellow text-white">
               Nulstil alle
               <button type="button" class="btn-close  btn-close-white" aria-label="Close">
@@ -703,13 +702,13 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
           </div>
         </div>
 
-
+        <div id="defaultStore">
       <?php
       foreach ($UserIdArrayForCityPostalcode as $user) {
         $vendor = get_wcmp_vendor($user);
         $image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
         ?>
-        <div id="defaultStore" class="store row">
+        <div class="row store">
           <div class="col-12">
             <div class="card shadow border-0 mb-3">
               <div class="card-body">
@@ -783,9 +782,10 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
           </div>
         </div>
       <?php } ?>
+      </div>
 
       <!-- show filtered result here-->
-      <div class="filteredStore row store"></div>
+      <div class="filteredStore row"></div>
 
       </div>
     </div>
@@ -1090,8 +1090,8 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
 </section>
 
 
-<script src="https://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
-<link rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css">
+<script src="//code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+<link rel="stylesheet" type="text/css" href="//code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css">
 
 
 <?php wp_footer(); ?>

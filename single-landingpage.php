@@ -1068,11 +1068,10 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
 </section>
 
 
-<script src="https://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
-<link rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css">
+<script src="//code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+<link rel="stylesheet" type="text/css" href="//code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css">
 
 <script>
-
 	jQuery(document).ready(function() {
 		var minPrice = "<?php echo $minProductPrice;?>";
 		var maxPrice = "<?php echo $maxProductPrice;?>";

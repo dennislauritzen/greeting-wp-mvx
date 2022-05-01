@@ -222,13 +222,8 @@ $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
 
 			<div class="col-12 col-xs-12 col-sm-12 col-md-12 col-lg-10">
 				<div class="applied-filters row mt-xs-0 mt-sm-0 mt-md-0 mb-3 lh-lg">
-					<div class="col-12">
-						<a class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 text-dark">Påske <button type="button" class="btn-close" aria-label="Close"></button></a>
-						<a class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 text-dark">Påske <button type="button" class="btn-close" aria-label="Close"></button></a>
-						<a class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 text-dark">Pris: 250,- til 750,- <button type="button" class="btn-close" aria-label="Close"></button></a>
-						<a class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 text-dark">Butik: Den Blå Dør <button type="button" class="btn-close" aria-label="Close"></button></a>
-
-            <a href="#" id="vendorPageReset" onclick="event.preventDefault();" class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 bg-yellow text-white">
+					<div class="col-12 filter-list"><a class="badge rounded-pill border-yellow py-2 px-2 me-1 my-lg-0 my-xl-0 text-dark filter-static">Butik: Den Blå Dør <button type="button" class="btn-close" aria-label="Close"></button>
+            </a><a href="#" id="vendorPageReset" onclick="event.preventDefault();" class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 bg-yellow text-white">
               Nulstil alle
               <button type="button" class="btn-close  btn-close-white" aria-label="Close">
               </button>
