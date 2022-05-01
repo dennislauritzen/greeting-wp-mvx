@@ -1073,6 +1073,7 @@ function catOccaDeliveryAction() {
 	// Filter: Price
 	// Location: City Page
 	// input price filter data come from front end
+	$userIdArrayGetFromPriceFilter = array();
 	$inputPriceRangeArray = $_POST['inputPriceRangeArray'];
 	$inputMinPrice = (int) $inputPriceRangeArray[0];
 	$inputMaxPrice = (int) $inputPriceRangeArray[1];
@@ -1102,12 +1103,8 @@ function catOccaDeliveryAction() {
 	// check condition
 	$userIdArrayGetFromCatOccaDelivery = array();
 
-	$useridarray = !empty($userIdArrayGetFromCatOcca) ?: array();
-	$deliveryarray = !empty($userIdArrayGetFromDelivery) ?: array();
-	$pricearray = !empty($userIdArrayGetFromPriceFilter) ?: array();
-
-	$full_arr = array_merge($useridarray, $userIdArrayGetFromDelivery);
-	$full_arr2 = array_merge($full_arr, $pricearray);
+	$full_arr = array_merge($userIdArrayGetFromCatOcca, $userIdArrayGetFromDelivery);
+	$full_arr2 = array_merge($full_arr, $userIdArrayGetFromPriceFilter);
 
 	$return_arr = array_unique($full_arr2);
 
