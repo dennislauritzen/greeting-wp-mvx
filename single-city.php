@@ -406,7 +406,7 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
       tt.taxonomy,
 		  t.name,
       t.slug,
-      (SELECT tm.meta_value FROM greeting_test.wp_termmeta tm WHERE tm.term_id = tt.term_id AND tm.meta_key = 'featured_image') as image_src
+      (SELECT tm.meta_value FROM {$wpdb->prefix}wp_termmeta tm WHERE tm.term_id = tt.term_id AND tm.meta_key = 'featured_image') as image_src
     FROM
       {$wpdb->prefix}term_taxonomy tt
     INNER JOIN
