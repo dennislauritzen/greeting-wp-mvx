@@ -1032,6 +1032,7 @@ function catOccaDeliveryAction() {
 			}
 		}
 
+
 		$sql = "SELECT
 			p.post_author
 		FROM ".$wpdb->prefix."posts p
@@ -1114,8 +1115,9 @@ function catOccaDeliveryAction() {
 
 	if(!empty($return_arr)){
 		foreach ($return_arr as $filteredUser) {
-
+			var_dump($filteredUser);
 			$vendor = get_wcmp_vendor($filteredUser);
+			var_dump($vendor);
 			$cityName = $_POST['cityName'];
 			// call the template with pass $vendor variable
 			get_template_part('template-parts/vendor-loop', null, array('vendor' => $vendor, 'cityName' => $cityName));

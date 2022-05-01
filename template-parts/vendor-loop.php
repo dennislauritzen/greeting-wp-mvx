@@ -17,9 +17,8 @@ if($args['cityName']){
         <div class="row align-items-center">
           <div class="col-3 text-center">
             <img class="img-fluid rounded-start" src="<?php echo $image;?>" style="max-width: 100px;">
-            <?php $button_text = apply_filters('wcmp_vendor_lists_single_button_text', $vendor->page_title); ?>
-            <h6><?php echo esc_html($button_text); ?></h6>
-            <a href="<?php echo esc_url($vendor->get_permalink()); ?>" class="cta rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-3 px-md-4">
+            <h6><?php echo esc_html($vendor->page_title); ?></h6>
+            <a href="<?php echo $vendor->get_permalink(); ?>" class="cta rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-3 px-md-4">
               Gå til butik<span class="d-none d-md-inline"></span>
             </a>
           </div>
