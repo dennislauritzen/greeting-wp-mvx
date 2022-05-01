@@ -1115,6 +1115,10 @@ function catOccaDeliveryAction() {
 
 	$return_arr = array_unique($full_arr2);
 
+	var_dump($full_arr);
+	var_dump($full_arr2);
+	var_dump($return_arr);
+
 	if(!empty($userIdArrayGetFromCatOcca) && !empty($userIdArrayGetFromDelivery) && !empty($userIdArrayGetFromPriceFilter)){
 		$arrOfArrs = [$userIdArrayGetFromCatOcca, $userIdArrayGetFromDelivery, $userIdArrayGetFromPriceFilter];
 		$userIdArrayGetFromCatOccaDelivery = array_intersect(...$arrOfArrs);
