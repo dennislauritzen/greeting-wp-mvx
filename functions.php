@@ -1032,8 +1032,7 @@ function catOccaDeliveryAction() {
 			}
 		}
 
-		$getStoreUserDataBasedOnProduct = $wpdb->prepare("
-		SELECT
+		$sql = "SELECT
 			p.post_author
 		FROM ".$wpdb->prefix."posts p
 		WHERE
@@ -1044,8 +1043,9 @@ function catOccaDeliveryAction() {
 				WHERE tm.term_taxonomy_id IN (".implode(", ",$placeholder_arr).")
 		  )
 			AND p.post_status = 'publish'
-		GROUP BY p.post_author
-		", $where);
+		GROUP BY p.post_author";
+		print $sql;
+		$getStoreUserDataBasedOnProduct = $wpdb->prepare($sql, $where);
 		$storeUserCatOccaResults = $wpdb->get_results($getStoreUserDataBasedOnProduct);
 
 		foreach($storeUserCatOccaResults as $product){
@@ -1102,6 +1102,19 @@ function catOccaDeliveryAction() {
 	// check condition
 	$userIdArrayGetFromCatOccaDelivery = array();
 
+	var_dump($userIdArrayGetFromCatOcca);
+	var_dump($userIdArrayGetFromDelivery);
+	var_dump($userIdArrayGetFromPriceFilter);
+
+	$useridarray = !empty($userIdArrayGetFromCatOcca) ?: array();
+	$deliveryarray = !empty($userIdArrayGetFromDelivery) ?: array();
+	$pricearray = !empty($userIdArrayGetFromPriceFilter) ?: array();
+
+	$full_arr = array_merge($useridarray, $userIdArrayGetFromDelivery);
+	$full_arr2 = array_merge($full_arr, $pricearray);
+
+	$return_arr = array_unique($full_arr2);
+
 	if(!empty($userIdArrayGetFromCatOcca) && !empty($userIdArrayGetFromDelivery) && !empty($userIdArrayGetFromPriceFilter)){
 		$arrOfArrs = [$userIdArrayGetFromCatOcca, $userIdArrayGetFromDelivery, $userIdArrayGetFromPriceFilter];
 		$userIdArrayGetFromCatOccaDelivery = array_intersect(...$arrOfArrs);
@@ -1131,7 +1144,6 @@ function catOccaDeliveryAction() {
 	else {
 
 	}
-
 
 	$filteredCatOccaDeliveryArray = array_intersect($defaultUserArray, $userIdArrayGetFromCatOccaDelivery);
 	$filteredCatOccaDeliveryArrayUnique = array_unique($filteredCatOccaDeliveryArray);
