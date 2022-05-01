@@ -1108,17 +1108,13 @@ function catOccaDeliveryAction() {
 
 	$return_arr = array_unique($full_arr2);
 
-	var_dump($full_arr);
-	var_dump($full_arr2);
-	var_dump($return_arr);
-
 
 	$filteredCatOccaDeliveryArray = array_intersect($defaultUserArray, $userIdArrayGetFromCatOccaDelivery);
 	$filteredCatOccaDeliveryArrayUnique = array_unique($filteredCatOccaDeliveryArray);
 
 	if(!empty($return_arr)){
 		foreach ($return_arr as $filteredUser) {
-			var_dump($filteredUser);
+
 			$vendor = get_wcmp_vendor($filteredUser);
 			$cityName = $_POST['cityName'];
 			// call the template with pass $vendor variable
