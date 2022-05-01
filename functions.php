@@ -633,10 +633,6 @@ function removeAdminVisibilityForSomeUSers(){
 	remove_menu_page('edit.php?post_type=city');
 	remove_menu_page('acoplw_badges_ui');
 	remove_menu_page('upload.php');
-	if(user_can($user->ID,'vendor'))
-	{
-		print 'hej';
-	}
 }
 add_action( 'admin_head', 'removeAdminVisibilityForSomeUSers' );
 
@@ -915,10 +911,16 @@ function categoryActionJavascript() { ?>
 					deliveryIdArray.push($(this).val());
 				});
 
+				var sliderValMin = jQuery("#sliderPrice").data("slider-min");
+				var sliderValMax = jQuery("#sliderPrice").data("slider-max");
 				inputPriceRangeArray = [
 					document.getElementById("slideStartPoint").value,
 					document.getElementById("slideEndPoint").value
 				];
+				var priceChange = 0;
+				if(sliderValMin < document.getElementById("slideStartPoint").value || sliderValMax > document.getElementById("slideEndPoint").value){
+					priceChange = 1;
+				}
 
 				var data = {
 					'action': 'catOccaDeliveryAction',
@@ -929,13 +931,16 @@ function categoryActionJavascript() { ?>
 					cityName: cityName
 				};
 				jQuery.post(ajaxurl, data, function(response) {
-					jQuery('.store').hide();
+					jQuery('#defaultStore').hide();
 					jQuery('.filteredStore').show();
 					jQuery('.filteredStore').html(response);
-					if(catOccaDeliveryIdArray.length == 0 && inputPriceRangeArray.length == 0){
-						jQuery('.store').show();
+					
+					if(catOccaIdArray.length == 0 && priceChange == 1){
+						jQuery('#defaultStore').show();
 						jQuery('.filteredStore').hide();
 						jQuery('#noVendorFound').hide();
+					} else {
+
 					}
 				});
 			}
@@ -1025,7 +1030,7 @@ function catOccaDeliveryAction() {
 	$where = array();
 	$placeholder_arr = array_fill(0, count($catOccaDeliveryIdArray), '%s');
 
-	if(count($catOccaDeliveryIdArray) > 0){
+	if(!empty($catOccaDeliveryIdArray)){
 		foreach($catOccaDeliveryIdArray as $catOccaDeliveryId){
 			if(is_numeric($catOccaDeliveryId)){
 				$where[] = $catOccaDeliveryId;
@@ -1060,7 +1065,7 @@ function catOccaDeliveryAction() {
 	$where = array();
 	$placeholder_arr = array_fill(0, count($deliveryIdArray), '%s');
 
-	if(count($deliveryIdArray) > 0){
+	if(!empty($deliveryIdArray)){
 		foreach($deliveryIdArray as $post_id){
 			foreach($post_id as $deliveryType){
 				if($deliveryType == $catOccaDeliveryId){
@@ -1108,19 +1113,17 @@ function catOccaDeliveryAction() {
 	$full_arr2 = array_merge($full_arr, $userIdArrayGetFromPriceFilter);
 
 	$return_arr = array_unique($full_arr2);
-
-
-	$filteredCatOccaDeliveryArray = array_intersect($defaultUserArray, $userIdArrayGetFromCatOccaDelivery);
-	$filteredCatOccaDeliveryArrayUnique = array_unique($filteredCatOccaDeliveryArray);
+	$return_arr = array_intersect($defaultUserArray, $return_arr);
 
 	if(!empty($return_arr)){
 		foreach ($return_arr as $filteredUser) {
-			var_dump($filteredUser);
-			$vendor = get_wcmp_vendor($filteredUser);
-			var_dump($vendor);
+			$vendor_int = (int) $filteredUser;
+
+			$vendor = get_wcmp_vendor($vendor_int);
+
 			$cityName = $_POST['cityName'];
 			// call the template with pass $vendor variable
-			get_template_part('template-parts/vendor-loop', null, array('vendor' => $vendor, 'cityName' => $cityName));
+			get_template_part('dc-product-vendor/vendor-loop', null, array('vendor' => $vendor, 'cityName' => $cityName));
 		}
 	} else { ?>
 		<div>
@@ -2297,10 +2300,12 @@ add_action( 'template_redirect', 'redirect_direct_access' );
 			foreach ($cart_data as $cart_item_key => $cart_item) {
 				$product_id = $cart_item['product_id'];
 				$vendor_data = get_wcmp_product_vendors($product_id);
-				$vendor_id = $vendor_data->user_data->ID;
-				$vendor_id_array[] = $vendor_id;
-				if ($i == $length - 1) {
-					$last_inserted_vendor_id = $vendor_id;
+				if(is_object($vendor_data)){
+					$vendor_id = $vendor_data->user_data->ID;
+					$vendor_id_array[] = $vendor_id;
+					if ($i == $length - 1) {
+						$last_inserted_vendor_id = $vendor_id;
+					}
 				}
 				$i++;
 			}
@@ -2572,7 +2577,6 @@ function add_quantity_plus_and_minus_in_footer(){
 	<?php
 }
 
-/**
 /**
  * Add New Custom Step
  * @param array $fields

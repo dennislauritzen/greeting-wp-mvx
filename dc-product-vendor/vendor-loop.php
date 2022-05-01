@@ -1,8 +1,7 @@
 <?php
-global $WCMp;
-if($args['vendor']){
-  $vendor = (int) $args['vendor'];
 
+if($args['vendor']){
+  $vendor = $args['vendor'];
   // $vendor = get_wcmp_vendor($user);
   // $image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
   $image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
@@ -20,7 +19,7 @@ if($args['cityName']){
           <div class="col-3 text-center">
             <img class="img-fluid rounded-start" src="<?php echo $image;?>" style="max-width: 100px;">
             <h6><?php echo esc_html($vendor->page_title); ?></h6>
-            <a href="<?php //echo $vendor->get_permalink(); ?>" class="cta rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-3 px-md-4">
+            <a href="<?php echo $vendor->get_permalink(); ?>" class="cta rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-3 px-md-4">
               Gå til butik<span class="d-none d-md-inline"></span>
             </a>
           </div>
