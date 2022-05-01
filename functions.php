@@ -1102,10 +1102,6 @@ function catOccaDeliveryAction() {
 	// check condition
 	$userIdArrayGetFromCatOccaDelivery = array();
 
-	var_dump($userIdArrayGetFromCatOcca);
-	var_dump($userIdArrayGetFromDelivery);
-	var_dump($userIdArrayGetFromPriceFilter);
-
 	$useridarray = !empty($userIdArrayGetFromCatOcca) ?: array();
 	$deliveryarray = !empty($userIdArrayGetFromDelivery) ?: array();
 	$pricearray = !empty($userIdArrayGetFromPriceFilter) ?: array();
