@@ -1108,7 +1108,15 @@ function catOccaDeliveryAction() {
 
 	$return_arr = array_unique($full_arr2);
 
-	if(count($return_arr) > 0 ){
+	var_dump($full_arr);
+	var_dump($full_arr2);
+	var_dump($return_arr);
+
+
+	$filteredCatOccaDeliveryArray = array_intersect($defaultUserArray, $userIdArrayGetFromCatOccaDelivery);
+	$filteredCatOccaDeliveryArrayUnique = array_unique($filteredCatOccaDeliveryArray);
+
+	if(!empty($return_arr)){
 		foreach ($return_arr as $filteredUser) {
 			var_dump($filteredUser);
 			$vendor = get_wcmp_vendor($filteredUser);
@@ -1116,7 +1124,6 @@ function catOccaDeliveryAction() {
 			// call the template with pass $vendor variable
 			get_template_part('template-parts/vendor-loop', null, array('vendor' => $vendor, 'cityName' => $cityName));
 		}
-
 	} else { ?>
 		<div>
 			<p id="noVendorFound" style="margin-top: 50px; margin-bottom: 35px; padding: 15px 10px; background-color: #f8f8f8;">
