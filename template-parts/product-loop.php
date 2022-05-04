@@ -51,7 +51,7 @@ foreach ($vendorProducts as $productId) {
 						<?php echo $product->get_name();?>
 					</a>
 				</h6>
-				<p class="price"><?php echo $product->get_price();?></p>
+				<p class="price"><?php echo woocommerce_template_loop_price();?></p>
 				<div class="links" style="display: none;">
 					<a href="?add-to-cart=<?php echo $product->get_id();?>" data-quantity="1" class="button product_type_simple add_to_cart_button ajax_add_to_cart" title="Tilføj til kurv" data-product_id="<?php echo $product->get_id();?>" data-product_sku="RGD-00010-1" aria-label="Tilføj til kurv" rel="nofollow">Tilføj til kurv</a>
 					<a href="<?php echo get_permalink($product->get_id());?>" class="rigid-quick-view-link" data-id="<?php echo $product->get_id();?>" title="Hurtig visning"><i class="fa fa-eye"></i></a>

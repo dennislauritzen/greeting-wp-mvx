@@ -575,32 +575,37 @@ ul.recommandations li a:hover {
       </div>
       <div class="col-lg-4">
         <div class="card" style="">
-          <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/pexels-furkanfdemir-6309844-scaled.jpg" class="card-img-top" alt="<?php echo $store_name; ?>">
+          <img src="<?php echo get_field('howdy_block1_picture'); ?>" class="card-img-top" alt="<?php echo $store_name; ?>">
           <div class="card-body">
-            <h5 class="card-title">Skal din butik være med?</h5>
-            <p class="card-text">Skal din butik også være med på Greeting.dk? Vi arbejder altid for et ligeværdigt samarbejde -
-              og vil til enhver tid arbejde sammen med dig om at sikre den bedste oplevelse for vores fælles kunder. Vil du være med?</p>
-            <a href="#" class="rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link">Du starter lige her</a>
+            <h5 class="card-title"><?php echo get_field('howdy_block1_header'); ?></h5>
+            <p class="card-text"><?php echo get_field('howdy_block1_text'); ?></p>
+            <a href="<?php echo get_field('howdy_block1_link'); ?>" class="rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link">
+              <?php echo get_field('howdy_block1_button_cta'); ?>
+            </a>
           </div>
         </div>
       </div>
       <div class="col-lg-4">
         <div class="card" style="">
-          <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/pexels-secret-garden-931154-scaled.jpg" class="card-img-top" alt="<?php echo $store_name; ?>">
+          <img src="<?php echo get_field('howdy_block2_picture'); ?>" class="card-img-top" alt="<?php echo $store_name; ?>">
           <div class="card-body">
-            <h5 class="card-title">Fortjener dine medarbejdere en hilsen?</h5>
-            <p class="card-text">Det er vigtigt at huske dem, du sætter pris på - også på jobbet. Derfor tilbyder vi også firmaer at levere større partiere af medarbejder gaver til eks. jul, påske, sommer - eller gaven til den kommende jubilar.</p>
-            <a href="#" class="rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link">Se butikkens udvalg</a>
+            <h5 class="card-title"><?php echo get_field('howdy_block2_header'); ?></h5>
+            <p class="card-text"><?php echo get_field('howdy_block2_text'); ?></p>
+            <a href="<?php echo get_field('howdy_block2_link'); ?>" class="rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link">
+              <?php echo get_field('howdy_block2_button_cta'); ?>
+            </a>
           </div>
         </div>
       </div>
       <div class="col-lg-4">
         <div class="card" style="">
-          <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/pexels-florent-b-2664149-scaled.jpg" class="card-img-top" alt="<?php echo $store_name; ?>">
+          <img src="<?php echo get_field('howdy_block3_picture'); ?>" class="card-img-top" alt="<?php echo $store_name; ?>">
           <div class="card-body">
-            <h5 class="card-title">Spørgsmål? Så fang os her :)</h5>
-            <p class="card-text">Vil du gerne høre, hvad vi er for nogen - og hvordan det hele fungerer? Eller har du konkrete spørgsmål til udvalget i en af butikkerne? Vi sidder altid klar - så ræk endelig ud.</p>
-            <a href="#" class="rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link">Se butikkens udvalg</a>
+            <h5 class="card-title"><?php echo get_field('howdy_block3_header'); ?></h5>
+            <p class="card-text"><?php echo get_field('howdy_block3_text'); ?></p>
+            <a href="<?php echo get_field('howdy_block3_link'); ?>" class="rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link">
+              <?php echo get_field('howdy_block3_button_cta'); ?>
+            </a>
           </div>
         </div>
       </div>
