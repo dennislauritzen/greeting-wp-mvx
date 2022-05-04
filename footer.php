@@ -99,12 +99,12 @@
 		      <div class="col-6 col-xs-6 col-sm-6 col-md-6 col-lg-3 col-xl-3">
 		        <h6 class=" mt-3 mt-lg-0 mt-xl-0 pb-3 text-uppercase">Greeting.dk</h6>
 		        <ul class="list-unstyled mb-0">
-		          <li class="pb-1"><a href="<?php echo site_url(; ?>/handelsbetingelser" class="text-white">Handelsbetingelser</a></li>
-		          <li class="pb-1"><a href="<?php echo site_url(; ?>/privatlivspolitik" class="text-white">Privatlivspolitik</a></li>
-		          <li class="pb-1"><a href="<?php echo site_url(; ?>/bliv-butikspartner" class="text-white">Bliv butikspartner</a></li>
-		          <li class="pb-1"><a href="<?php echo site_url(; ?>/om-os" class="text-white">Om Greeting.dk</a></li>
-		          <li class="pb-1"><a href="#" class="text-white">Trustpilot</a></li>
-		          <li class="pb-1"><a href="<?php echo site_url(; ?>/kontakt" class="text-white">Kontakt</a></li>
+		          <li class="pb-1"><a href="<?php echo site_url(); ?>/handelsbetingelser" class="text-white">Handelsbetingelser</a></li>
+		          <li class="pb-1"><a href="<?php echo site_url(); ?>/privatlivspolitik" class="text-white">Privatlivspolitik</a></li>
+		          <li class="pb-1"><a href="<?php echo site_url(); ?>/bliv-butikspartner" class="text-white">Bliv butikspartner</a></li>
+		          <li class="pb-1"><a href="<?php echo site_url(); ?>/om-os" class="text-white">Om Greeting.dk</a></li>
+		          <li class="pb-1"><a href="https://dk.trustpilot.com/review/greeting.dk" class="text-white">Trustpilot</a></li>
+		          <li class="pb-1"><a href="<?php echo site_url(); ?>/kontakt" class="text-white">Kontakt</a></li>
 		        </ul>
 		      </div>
 		      <div class="d-none d-lg-inline d-xl-inline col-lg-1">
