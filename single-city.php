@@ -683,7 +683,7 @@ jQuery(document).ready(function(){
         <div class="applied-filters row mt-xs-0 mt-sm-0 mt-md-0 mt-2 mb-4 lh-lg">
           <div class="col-12 filter-list">
             <a href="<?php echo home_url(); ?>"class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 text-dark">
-              5683 Haarby
+              <?php echo $cityPostalcode.' '.$cityName; ?>
               <button type="button" class="btn-close" aria-label="Close"></button>
             </a>
             <a href="#" id="cityPageReset" onclick="event.preventDefault();" class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 bg-yellow text-white">
