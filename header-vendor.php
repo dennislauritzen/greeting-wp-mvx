@@ -317,7 +317,21 @@
         <form action="" method="" class="position-relative mx-5">
           <label for="" class="screen-reader-text">Indtast det postnummer, du ønsker at sende en gave til - og se udvalget af butikker</label>
           <button type="submit" name="submit" class="top-search-btn rounded-pill position-absolute border-0 end-0 bg-teal p-3 me-1"></button>
-          <input type="text" class="top-search-input form-control rounded-pill border-0 py-2" value="5683 Haarby" placeholder="Indtast by eller postnr.">
+          <?php
+          if(!empty($args['city']) && !empty($args['postalcode'])){
+            $val = $args['postalcode'] . ' ' . $args['city'];
+          } else {
+            $val = '';
+          ?>
+          <script type="text/javascript">
+            jQuery(document).ready(function(){
+              document.getElementById('topGreenSearch').value = window.localStorage.getItem('postalcode')+' '+window.localStorage.getItem('city');
+            });
+          </script>
+          <?php
+          }
+          ?>
+          <input type="text" class="top-search-input form-control rounded-pill border-0 py-2" id="topGreenSearch" value="<?php echo $val; ?>" placeholder="Indtast by eller postnr.">
           <figure class="location-pin position-absolute ms-2 mt-1 top-0" style="padding-top:1px;">
             <svg width="14" height="18" viewBox="0 0 13 17" xmlns="http://www.w3.org/2000/svg">
               <path fill="#4d696b" d="M6.5 0C3.115 0 .361 2.7.361 6.02c0 5.822 5.662 10.69 5.903 10.894a.366.366 0 00.472 0c.241-.205 5.903-5.073 5.903-10.893C12.639 2.7 9.885 0 6.5 0zm0 9.208c-1.795 0-3.25-1.427-3.25-3.187 0-1.76 1.455-3.188 3.25-3.188s3.25 1.428 3.25 3.188c0 1.76-1.455 3.187-3.25 3.187z">
@@ -419,7 +433,6 @@
               <path d="M8.5 10c-.276 0-.5-.448-.5-1s.224-1 .5-1 .5.448.5 1-.224 1-.5 1z"/>
               <path d="M10.828.122A.5.5 0 0 1 11 .5V1h.5A1.5 1.5 0 0 1 13 2.5V15h1.5a.5.5 0 0 1 0 1h-13a.5.5 0 0 1 0-1H3V1.5a.5.5 0 0 1 .43-.495l7-1a.5.5 0 0 1 .398.117zM11.5 2H11v13h1V2.5a.5.5 0 0 0-.5-.5zM4 1.934V15h6V1.077l-6 .857z"/>
             </svg>
-            Butikken leverer
             <?php
             $day_array = array('mandag','tirsdag','onsdag','torsdag','fredag','lørdag','søndag');
             function build_intervals($items, $is_contiguous, $make_interval) {
@@ -449,8 +462,11 @@
 
               $opening = get_field('openning', 'user_'.$vendor->id);
               $interv = array();
-              if(!empty($opening) && is_array($opening) && count($opening) > 0){
-                $interv = build_intervals($opening,  function($a, $b) { return ($b - $a) <= 1; }, function($a, $b) { return "{$a}..{$b}"; });
+              if(!empty($opening) && is_array($opening) && count($opening) > 0 && is_numeric($opening)){
+                print 'Butikken leverer ';
+                $interv = build_intervals($opening, function($a, $b) { return ($b - $a) <= 1; }, function($a, $b) { return "{$a}..{$b}"; });
+              } else {
+                print 'Butikkens leveringsdage er ukendte';
               }
               $i = 1;
               if(count($interv) > 0){
@@ -504,20 +520,24 @@
               <path d="M10.828.122A.5.5 0 0 1 11 .5V1h.5A1.5 1.5 0 0 1 13 2.5V15h1.5a.5.5 0 0 1 0 1h-13a.5.5 0 0 1 0-1H3V1.5a.5.5 0 0 1 .43-.495l7-1a.5.5 0 0 1 .398.117zM11.5 2H11v13h1V2.5a.5.5 0 0 0-.5-.5zM4 1.934V15h6V1.077l-6 .857z"/>
             </svg>
             <?php
-            $delivery_type = get_field('delivery_type', 'user_'.$vendor->id)[0];
-            $del_type = '';
-            if(empty($delivery_type['label'])){
-              $del_value = $delivery_type;
-              $del_type = $delivery_type;
-            } else {
-              $del_value = $delivery_type['value'];
-              $del_type = $delivery_type['label'];
-            }
+            if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
+              $delivery_type = get_field('delivery_type', 'user_'.$vendor->id)[0];
+              $del_type = '';
+              if(empty($delivery_type['label'])){
+                $del_value = $delivery_type;
+                $del_type = $delivery_type;
+              } else {
+                $del_value = $delivery_type['value'];
+                $del_type = $delivery_type['label'];
+              }
 
-            if($del_value == "1"){
-              echo 'Personlig levering til døren';
-            } else if($del_value == "0"){
-              echo 'Forsendelse med fragtfirma (2-3 hverdages transporttid)';
+              if($del_value == "1"){
+                echo 'Personlig levering til døren';
+              } else if($del_value == "0"){
+                echo 'Forsendelse med fragtfirma (2-3 hverdages transporttid)';
+              }
+            } else {
+              echo 'Butikkens leveringstype er ukendt.';
             }
             ?>
           </div>

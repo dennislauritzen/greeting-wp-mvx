@@ -55,36 +55,56 @@
 		        </div>
 		      </div>
 		      <div class="col-6 col-xs-6 col-sm-6 col-md-6 col-lg-2 col-xl-2">
-		        <h6 class="pb-3 text-uppercase">Opdag</h6>
+		        <h6 class="pb-3 text-uppercase">Jylland</h6>
 		        <ul class="list-unstyled mb-0">
-		          <li class="pb-1"><a href="#" class="text-white">Påskegaver</a></li>
-		          <li class="pb-1"><a href="#" class="text-white">Påskegaver</a></li>
-		          <li class="pb-1"><a href="#" class="text-white">Påskegaver</a></li>
-		          <li class="pb-1"><a href="#" class="text-white">Påskegaver</a></li>
-		          <li class="pb-1"><a href="#" class="text-white">Påskegaver</a></li>
-		          <li class="pb-1"><a href="#" class="text-white">Påskegaver</a></li>
-		          <li class="pb-1"><a href="#" class="text-white">Påskegaver</a></li>
+							<li class="pb-1"><a href="<?php echo site_url(); ?>/c/6000-kolding/" class="text-white">6000 Kolding</a></li>
+							<li class="pb-1"><a href="<?php echo site_url(); ?>/c/6100-haderslev/" class="text-white">6100 Haderslev</a></li>
+							<li class="pb-1"><a href="<?php echo site_url(); ?>/c/6700-esbjerg/" class="text-white">6700 Esbjerg</a></li>
+							<li class="pb-1"><a href="<?php echo site_url(); ?>/c/6710-esbjerg-v/" class="text-white">6710 Esbjerg V</a></li>
+		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/7000-fredericia/" class="text-white">7000 Fredericia</a></li>
+		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/7100-vejle/" class="text-white">7100 Vejle</a></li>
+		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/7400-herning/" class="text-white">7400 Herning</a></li>
+		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/7500-holstebro/" class="text-white">7500 Holstebro</a></li>
+		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/8000-aarhus-c/" class="text-white">8000 Aarhus C</a></li>
+		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/8200-aarhus-n/" class="text-white">8200 Aarhus N</a></li>
+		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/8240-risskov/" class="text-white">8240 Risskov</a></li>
+		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/8600-silkeborg/" class="text-white">8600 Silkeborg</a></li>
+		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/8800-viborg/" class="text-white">8800 Viborg</a></li>
+		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/8900-randers-c/" class="text-white">8900 Randers C</a></li>
+		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/8920-randers-nv/" class="text-white">8920 Randers NV</a></li>
+		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/9000-aalborg-c/" class="text-white">9000 Aalborg C</a></li>
+		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/9800-hjoerring/" class="text-white">9800 Hjørring</a></li>
 		        </ul>
 		      </div>
 		      <div class="col-6 col-xs-6 col-sm-6 col-md-6 col-lg-3 col-xl-3">
-		        <h6 class="pb-3 text-uppercase">Byer på Greeting.dk</h6>
+		        <h6 class="pb-3 text-uppercase">Fyn, Sjælland & øer</h6>
 		        <ul class="list-unstyled mb-0">
-		          <li class="pb-1"><a href="#" class="text-white">Påskegaver</a></li>
-		          <li class="pb-1"><a href="#" class="text-white">Påskegaver</a></li>
-		          <li class="pb-1"><a href="#" class="text-white">Påskegaver</a></li>
-		          <li class="pb-1"><a href="#" class="text-white">Påskegaver</a></li>
-		          <li class="pb-1"><a href="#" class="text-white">Påskegaver</a></li>
-		          <li class="pb-1"><a href="#" class="text-white">Påskegaver</a></li>
-		          <li class="pb-1"><a href="#" class="text-white">Påskegaver</a></li>
+							<li class="pb-1"><a href="<?php echo site_url(); ?>/c/2000-frederiksberg/" class="text-white">2000 Frederiksberg C</a></li>
+		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/2200-koebenhavn-n/" class="text-white">2200 København N</a></li>
+		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/2300-koebenhavn-s/" class="text-white">2300 København S</a></li>
+		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/2400-koebenhavn-nv/" class="text-white">2400 København NV</a></li>
+							<li class="pb-1"><a href="<?php echo site_url(); ?>/c/2700-broenshoej/" class="text-white">2700 Brønshøj</a></li>
+							<li class="pb-1"><a href="<?php echo site_url(); ?>/c/3400-hilleroed" class="text-white">3400 Hillerød</a></li>
+							<li class="pb-1"><a href="<?php echo site_url(); ?>/c/3500-vaerloese" class="text-white">3500 Værløse</a></li>
+		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/4000-roskilde" class="text-white">4000 Roskilde</a></li>
+		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/4600-koege" class="text-white">4600 Køge</a></li>
+		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/4700-naestved" class="text-white">4700 Næstved</a></li>
+		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/5000-odense-c" class="text-white">5000 Odense C</a></li>
+		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/5250-odense-sv" class="text-white">5250 Odense SV</a></li>
+		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/5500-middelfart" class="text-white">5500 Middelfart</a></li>
+		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/5700-svendborg" class="text-white">5700 Svendborg</a></li>
+
 		        </ul>
 		      </div>
 		      <div class="col-6 col-xs-6 col-sm-6 col-md-6 col-lg-3 col-xl-3">
 		        <h6 class=" mt-3 mt-lg-0 mt-xl-0 pb-3 text-uppercase">Greeting.dk</h6>
 		        <ul class="list-unstyled mb-0">
-		          <li class="pb-1"><a href="#" class="text-white">Handelsbetingelser</a></li>
-		          <li class="pb-1"><a href="#" class="text-white">Privatlivspolitik</a></li>
+		          <li class="pb-1"><a href="<?php echo site_url(; ?>/handelsbetingelser" class="text-white">Handelsbetingelser</a></li>
+		          <li class="pb-1"><a href="<?php echo site_url(; ?>/privatlivspolitik" class="text-white">Privatlivspolitik</a></li>
+		          <li class="pb-1"><a href="<?php echo site_url(; ?>/bliv-butikspartner" class="text-white">Bliv butikspartner</a></li>
+		          <li class="pb-1"><a href="<?php echo site_url(; ?>/om-os" class="text-white">Om Greeting.dk</a></li>
 		          <li class="pb-1"><a href="#" class="text-white">Trustpilot</a></li>
-		          <li class="pb-1"><a href="#" class="text-white">Kontakt</a></li>
+		          <li class="pb-1"><a href="<?php echo site_url(; ?>/kontakt" class="text-white">Kontakt</a></li>
 		        </ul>
 		      </div>
 		      <div class="d-none d-lg-inline d-xl-inline col-lg-1">
@@ -98,8 +118,8 @@
 		        </p>
 		        <p>
 		          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#1b4949" class="pr-2 bi bi-envelope" viewBox="0 0 16 16">
-		            <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z"/>
-		          </svg>
+								<path fill-rule="evenodd" d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l3.235 1.94a2.76 2.76 0 0 0-.233 1.027L1 5.384v5.721l3.453-2.124c.146.277.329.556.55.835l-3.97 2.443A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741l-3.968-2.442c.22-.28.403-.56.55-.836L15 11.105V5.383l-3.002 1.801a2.76 2.76 0 0 0-.233-1.026L15 4.217V4a1 1 0 0 0-1-1H2Zm6 2.993c1.664-1.711 5.825 1.283 0 5.132-5.825-3.85-1.664-6.843 0-5.132Z"/>
+							</svg>
 		          <a href="mailto:kontakt@greeting.dk" class="ms-2 text-white">kontakt@greeting.dk</a>
 		        </p>
 		        <p>

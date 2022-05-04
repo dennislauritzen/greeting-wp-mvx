@@ -526,6 +526,7 @@ function greeting_custom_post_type() {
             'menu_icon' => 'dashicons-flag',
             'public'      => true,
             'has_archive' => true,
+						'rewrite' => array('slug' => 'l'),
             'supports' => array('title'),
 						'capabilities' => array(
 								'publish_posts' => 'publish_wcmppages',
@@ -546,6 +547,7 @@ function greeting_custom_post_type() {
                 'name'          => __('City', 'woocommerce'),
                 'singular_name' => __('Cities', 'woocommerce'),
             ),
+						'rewrite' => array('slug' => 'c'),
             'menu_icon' => 'dashicons-location-alt',
             'public'      => true,
             'has_archive' => true,
@@ -679,42 +681,44 @@ function ajax_fetch() { ?>
 		jQuery(document).ready(function(){
 			var currentRequest = null;
 
-				jQuery("#searchform").submit(function(event){
-					event.preventDefault();
-					var val = jQuery("#datafetch_wrapper li.recomms:first-child a").prop('href');
+			jQuery("#searchform").submit(function(event){
+				event.preventDefault();
+				var val = jQuery("#datafetch_wrapper li.recomms:first-child a").prop('href');
+				var postalcode = '';
+				var city = '';
 
-					if(val.length){
-						window.location.href = val;
-					}
-					return false;
-				});
+				window.localStorage.setItem('greeting_postalcode', text);
 
-				/*Do the search with delay 500ms*/
-				jQuery('#front_Search-new_ucsa').keyup(delay(500, function (e) {
-					var text = jQuery(this).val();
+				if(val.length){
+					window.location.href = val;
+				}
+				return false;
+			});
 
-					jQuery.ajax({
-						url: '<?php echo admin_url('admin-ajax.php'); ?>',
-						type: 'post',
-						data: { action: 'data_fetch', keyword: text },
-						beforeSend: function(){
-							if(currentRequest != null){
-								currentRequest.abort();
-							}
-						},
-						success: function(data) {
-							jQuery('#datafetch_wrapper').html( data );
-							if(jQuery('input[name="keyword"]').val().length > 0){
-								jQuery('#datafetch_wrapper').removeClass('d-none').addClass('d-inline');
-							} else {
-								jQuery('#datafetch_wrapper').addClass('d-none').removeClass('d-inline');
-							}
+			/*Do the search with delay 500ms*/
+			jQuery('#front_Search-new_ucsa').keyup(delay(500, function (e) {
+				var text = jQuery(this).val();
+
+
+				jQuery.ajax({
+					url: '<?php echo admin_url('admin-ajax.php'); ?>',
+					type: 'post',
+					data: { action: 'data_fetch', keyword: text },
+					beforeSend: function(){
+						if(currentRequest != null){
+							currentRequest.abort();
 						}
-					});
-				})
-			);
-
-
+					},
+					success: function(data) {
+						jQuery('#datafetch_wrapper').html( data );
+						if(jQuery('input[name="keyword"]').val().length > 0){
+							jQuery('#datafetch_wrapper').removeClass('d-none').addClass('d-inline');
+						} else {
+							jQuery('#datafetch_wrapper').addClass('d-none').removeClass('d-inline');
+						}
+					}
+				});
+			})); // keyup + delay
 	}); // jquery ready
 	</script>
 <?php
@@ -740,9 +744,11 @@ function data_fetch(){
 			<?php
 			$array_count = count($landing_page_query);
 			$i = 0;
-			foreach ($landing_page_query as $key => $landing_page) {?>
+
+			foreach ($landing_page_query as $key => $landing_page) {
+				?>
 				<li class="recomms list-group-item py-2 px-4 <?php echo ($key==0) ? 'active' : '';?>" aria-current="true">
-					<a href="<?php echo site_url() . '/city/' . $landing_page->post_name;?>" class="text-teal stretched-link"><?php echo ucfirst($landing_page->post_title);?></a>
+					<a href="<?php print get_permalink( $landing_page->ID ) ;?>" class="recomms-link text-teal stretched-link"><?php echo ucfirst($landing_page->post_title);?></a>
 				</li>
 			<?php } ?>
 	<?php

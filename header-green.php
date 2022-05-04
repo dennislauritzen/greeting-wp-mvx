@@ -46,7 +46,21 @@
           <form action="" method="" class="position-relative mx-5">
             <label for="" class="screen-reader-text">Indtast det postnummer, du ønsker at sende en gave til - og se udvalget af butikker</label>
             <button type="submit" name="submit" class="top-search-btn rounded-pill position-absolute border-0 end-0 bg-teal p-3 me-1"></button>
-            <input type="text" class="top-search-input form-control rounded-pill border-0 py-2" value="5683 Haarby" placeholder="Indtast by eller postnr.">
+            <?php
+            if(!empty($args['city']) && !empty($args['postalcode'])){
+              $val = $args['postalcode'] . ' ' . $args['city'];
+            } else {
+              $val = '';
+            ?>
+            <script type="text/javascript">
+              jQuery(document).ready(function(){
+                document.getElementById('topGreenSearch').value = window.localStorage.getItem('postalcode')+' '+window.localStorage.getItem('city');
+              });
+            </script>
+            <?php
+            }
+            ?>
+            <input type="text" class="top-search-input form-control rounded-pill border-0 py-2" id="topGreenSearch" value="<?php echo $val; ?>" placeholder="Indtast by eller postnr.">
             <figure class="location-pin position-absolute ms-2 mt-1 top-0" style="padding-top:1px;">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#333333" class="bi bi-geo-alt" viewBox="0 0 16 16">
                 <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A31.493 31.493 0 0 1 8 14.58a31.481 31.481 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94zM8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10z"/>

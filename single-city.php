@@ -1,5 +1,18 @@
-<?php get_header(); ?>
-<?php get_header('green'); ?>
+<?php
+
+/**
+ *
+ * Perform start setup
+ *
+**/
+$postId = get_the_ID();
+$cityPostalcode = get_post_meta($postId, 'postalcode', true);
+$cityName = get_post_meta($postId, 'city', true);
+
+get_header();
+
+
+get_header('green', array('city' => $cityName, 'postalcode' => $cityPostalcode)); ?>
 
 
 <?php
@@ -342,13 +355,6 @@
 
 <main id="main" class="container"<?php if ( isset( $navbar_position ) && 'fixed_top' === $navbar_position ) : echo ' style="padding-top: 100px;"'; elseif ( isset( $navbar_position ) && 'fixed_bottom' === $navbar_position ) : echo ' style="padding-bottom: 100px;"'; endif; ?>>
 <?php
-/**
- *
- * Perform start setup
- *
-**/
-$postId = get_the_ID();
-$cityPostalcode = get_post_meta($postId, 'postalcode', true);
 
 // get user meta query
 $userMetaQuery = $wpdb->get_results( "
@@ -366,7 +372,15 @@ foreach($userMetaQuery as $userMeta){
 
 // pass to backend
 $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
-
+<script type="text/javascript">
+function addToLocalStorage(key, val){
+	window.localStorage.setItem(key, val);
+}
+jQuery(document).ready(function(){
+  addToLocalStorage('city', '<?php echo $cityName; ?>');
+  addToLocalStorage('postalcode', '<?php echo $cityPostalcode; ?>');
+});
+</script>
 <input type="hidden" id="cityDefaultUserIdAsString" value="<?php echo $cityDefaultUserIdAsString;?>">
 <input type="hidden" id="postalCode" value="<?php echo $cityPostalcode; ?>">
 <section id="content" class="row">
