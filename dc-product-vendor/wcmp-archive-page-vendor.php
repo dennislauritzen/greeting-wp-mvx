@@ -64,7 +64,9 @@ $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
 					<h6 class="float-start d-none d-lg-inline d-xl-inline py-2 border-bottom filter-header">Filtrér</h6>
 				</div>
 				<div class="collapse d-lg-block accordion-collapse " id="colFilter">
-
+          <input type="hidden" name="guid" id="guid" value="<?php echo hash('crc32c', $vendor->get_id().'-_-'.$vendor->user_data->user_nicename); ?>">
+          <input type="hidden" name="nn" id="nn" value="<?php echo $vendor->user_data->user_nicename; ?>">
+          <input type="hidden" name="gid" id="gid" value="<?php echo $vendor->get_id(); ?>">
 					<h5 class="text-uppercase">Kategorier</h5>
 					<ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
 					<?php
@@ -83,8 +85,8 @@ $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
 						?>
 						<li class="px-0">
 							<div class="form-check">
-									<input type="checkbox" name="filter_catocca_vendor" class="form-check-input filter-on-vendor-page" id="filter_catocca_<?php echo $category->term_id; ?>" value="<?php echo $category->term_id; ?>">
-									<label class="form-check-label" for="filter_catocca_<?php echo $category->term_id; ?>"><?php echo $category->name; ?></label>
+									<input type="checkbox" name="filter_cat_vendor" class="form-check-input filter-on-vendor-page" id="filter_cat_<?php echo $category->term_id; ?>" value="<?php echo $category->term_id; ?>">
+									<label class="form-check-label" for="filter_cat_<?php echo $category->term_id; ?>"><?php echo $category->name; ?></label>
 							</div>
 						</li>
 					<?php
@@ -111,8 +113,8 @@ $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
 						?>
 						<li class="px-0">
 							<div class="form-check">
-								<input type="checkbox" name="filter_catocca_vendor" class="form-check-input filter-on-vendor-page" id="filter_catocca_<?php echo $occasion->term_id; ?>" value="<?php echo $occasion->term_id; ?>">
-								<label class="form-check-label" for="filter_catocca_<?php echo $occasion->term_id; ?>"><?php echo $occasion->name; ?></label>
+								<input type="checkbox" name="filter_occ_vendor" class="form-check-input filter-on-vendor-page" id="filter_occ_<?php echo $occasion->term_id; ?>" value="<?php echo $occasion->term_id; ?>">
+								<label class="form-check-label" for="filter_occ_<?php echo $occasion->term_id; ?>"><?php echo $occasion->name; ?></label>
 							</div>
 						</li>
 					<?php

@@ -528,15 +528,14 @@ function greeting_custom_post_type() {
             'has_archive' => true,
             'supports' => array('title'),
 						'capabilities' => array(
-								'publish_posts' => 'edit_dashboard',
-				        'edit_posts' => 'edit_dashboard',
-				        'edit_others_posts' => 'edit_dashboard',
-				        'delete_posts' => 'edit_dashboard',
-				        'delete_others_posts' => 'edit_dashboard',
-				        'read_private_posts' => 'edit_dashboard',
-				        'edit_post' => 'edit_dashboard',
-				        'delete_post' => 'edit_dashboard',
-				        'read_post' => 'edit_dashboard' )
+								'publish_posts' => 'publish_wcmppages',
+				        'edit_posts' => 'edit_wcmppages',
+				        'edit_others_posts' => 'edit_other_wcmppages',
+				        'delete_posts' => 'delete_wcmppages',
+				        'delete_others_posts' => 'delete_other_wcmppages',
+				        'read_private_posts' => 'read_private_wcmppages',
+				        'edit_post' => 'edit_wcmppage',
+				        'delete_post' => 'delete_wcmppage' )
         )
 	);
 
@@ -552,18 +551,34 @@ function greeting_custom_post_type() {
             'has_archive' => true,
             'supports' => array('title'),
 						'capabilities' => array(
-								'publish_posts' => 'edit_dashboard',
-				        'edit_posts' => 'edit_dashboard',
-				        'edit_others_posts' => 'edit_dashboard',
-				        'delete_posts' => 'edit_dashboard',
-				        'delete_others_posts' => 'edit_dashboard',
-				        'read_private_posts' => 'edit_dashboard',
-				        'edit_post' => 'edit_dashboard',
-				        'delete_post' => 'edit_dashboard',
-				        'read_post' => 'edit_dashboard' )
+							'publish_posts' => 'publish_wcmppages',
+							'edit_posts' => 'edit_wcmppages',
+							'edit_others_posts' => 'edit_other_wcmppages',
+							'delete_posts' => 'delete_wcmppages',
+							'delete_others_posts' => 'delete_other_wcmppages',
+							'read_private_posts' => 'read_private_wcmppages',
+							'edit_post' => 'edit_wcmppage',
+							'delete_post' => 'delete_wcmppage' )
         )
 	);
 }
+
+function add_theme_caps() {
+    // gets the administrator role
+    $admins = get_role( 'administrator' );
+
+    $admins->add_cap( 'publish_wcmppages' );
+    $admins->add_cap( 'edit_wcmppages' );
+    $admins->add_cap( 'edit_other_wcmppages' );
+    $admins->add_cap( 'delete_wcmppages' );
+    $admins->add_cap( 'delete_other_wcmppages' );
+    $admins->add_cap( 'read_private_wcmppages' );
+    $admins->add_cap( 'edit_wcmppage' );
+    $admins->add_cap( 'delete_wcmppage' );
+}
+add_action( 'admin_init', 'add_theme_caps');
+
+
 
 /**
 *
@@ -629,10 +644,12 @@ function removeAdminVisibilityForSomeUSers(){
 	//remove_submenu_page( 'index.php', 'update-core.php');  // Update
 
 		/* REMOVE DEFAULT MENUS */
-	remove_menu_page('edit.php?post_type=landingpage');
-	remove_menu_page('edit.php?post_type=city');
-	remove_menu_page('acoplw_badges_ui');
-	remove_menu_page('upload.php');
+	if (!in_array( 'administrator', (array) $user->roles )){
+		remove_menu_page('edit.php?post_type=landingpage');
+		remove_menu_page('edit.php?post_type=city');
+		remove_menu_page('acoplw_badges_ui');
+		remove_menu_page('upload.php');
+	}
 }
 add_action( 'admin_head', 'removeAdminVisibilityForSomeUSers' );
 
@@ -875,6 +892,7 @@ function categoryActionJavascript() { ?>
 			var ajaxurl = "<?php echo admin_url('admin-ajax.php');?>";
 			var catOccaDeliveryIdArray = [];
 			var inputPriceRangeArray = [];
+			var deliveryIdArray = [];
 			// $('#cityPageReset').hide();
 
 			jQuery(".filter-on-city-page").click(function(){
@@ -901,8 +919,11 @@ function categoryActionJavascript() { ?>
 
 			function update(){
 				var cityName = $('#cityName').val();
-
+				var postalCode = $('#postalCode').val();
 				catOccaIdArray = [];
+				deliveryIdArray = [];
+				inputPriceRangeArray = [];
+
 				$("input:checkbox[name=filter_catocca_city]:checked").each(function(){
 					catOccaIdArray.push($(this).val());
 				});
@@ -928,19 +949,18 @@ function categoryActionJavascript() { ?>
 					catOccaIdArray: catOccaIdArray,
 					deliveryIdArray: deliveryIdArray,
 					inputPriceRangeArray: inputPriceRangeArray,
-					cityName: cityName
+					cityName: cityName,
+					postalCode: postalCode
 				};
 				jQuery.post(ajaxurl, data, function(response) {
 					jQuery('#defaultStore').hide();
 					jQuery('.filteredStore').show();
 					jQuery('.filteredStore').html(response);
-					
-					if(catOccaIdArray.length == 0 && priceChange == 1){
+
+					if(catOccaIdArray.length == 0 && deliveryIdArray.length == 0 && priceChange == 1){
 						jQuery('#defaultStore').show();
 						jQuery('.filteredStore').hide();
 						jQuery('#noVendorFound').hide();
-					} else {
-
 					}
 				});
 			}
@@ -1018,6 +1038,8 @@ function catOccaDeliveryAction() {
 	// delivery filter data
 	$deliveryIdArray = $_POST['deliveryIdArray'];
 
+	$postal_code = $_POST['postalCode'];
+
 	// declare array for store user ID get from occasion
 	$userIdArrayGetFromCatOcca = array();
 
@@ -1066,10 +1088,22 @@ function catOccaDeliveryAction() {
 	$placeholder_arr = array_fill(0, count($deliveryIdArray), '%s');
 
 	if(!empty($deliveryIdArray)){
-		foreach($deliveryIdArray as $post_id){
-			foreach($post_id as $deliveryType){
-				if($deliveryType == $catOccaDeliveryId){
-					array_push($userIdArrayGetFromDelivery, $defaultUserId);
+		$args = array(
+			'role' => 'dc_vendor',
+			'meta_query' => array(
+					'key' => 'delivery_type',
+					'value' => $deliveryIdArray,
+					'compare' => 'IN'
+				)
+		);
+		$usersByFilter = new WP_User_Query( $args	);
+		$deliveryArr = $usersByFilter->get_results($usersByFilter);
+
+		foreach($deliveryArr as $v){
+			$delivery_type = get_field('delivery_type','user_'.$v->ID);
+			if(!empty($delivery_type)){
+				if(in_array($delivery_type[0]['value'],$deliveryIdArray)){
+					array_push($userIdArrayGetFromDelivery, $v->ID);
 				}
 			}
 		}
@@ -1526,7 +1560,8 @@ function vendStoreActionJavascript() { ?>
 	<script type="text/javascript">
 		jQuery(document).ready(function($) {
 			var ajaxurl = "<?php echo admin_url('admin-ajax.php');?>";
-			var catOccaIdArray = [];
+			var catIdArray = [];
+			var occIdArray = [];
 			var inputPriceRangeArray = [];
 
 			$(".filter-on-vendor-page").click(function(){
@@ -1551,9 +1586,13 @@ function vendStoreActionJavascript() { ?>
 				updateVendor();
 			});
 			function updateVendor(){
-				catOccaIdArray = [];
-				$("input:checkbox[name=filter_catocca_vendor]:checked").each(function(){
-					catOccaIdArray.push($(this).val());
+				catIdArray = [];
+				occIdArray = [];
+				$("input:checkbox[name=filter_cat_vendor]:checked").each(function(){
+					catIdArray.push($(this).val());
+				});
+				$("input:checkbox[name=filter_occ_vendor]:checked").each(function(){
+					occIdArray.push($(this).val());
 				});
 
 				inputPriceRangeArray = [
@@ -1564,7 +1603,11 @@ function vendStoreActionJavascript() { ?>
 				var data = {
 					'action': 'productFilterAction',
 					defaultProductIdAsString: jQuery("#defaultProductIdAsString").val(),
-					productFilterDataArray: catOccaIdArray,
+					nn: $("input[name=nn]").val(),
+					gid: $("input[name=gid]").val(),
+					guid: $("input[name=guid]").val(),
+					catIds: catIdArray,
+					occIds: occIdArray,
 					inputPriceRangeArray: inputPriceRangeArray
 				};
 				jQuery.post(ajaxurl, data, function(response) {
@@ -1644,46 +1687,34 @@ function productFilterAction() {
 	// default product id array come from front end
 	$defaultProductIdAsString = $_POST['defaultProductIdAsString'];
 	$defaultProductIdArray = explode(",", $defaultProductIdAsString);
+	$default_placeholder = array_fill(0, count($defaultProductIdArray), '%d');
 
-	// after click filter data keep on this array
-	$productFilterDataArray = $_POST['productFilterDataArray'];
+	// Get secrets & info
+	$nn = $_POST['nn'];
+	$gid = $_POST['gid'];
+	$guid = $_POST['guid'];
 
-	// declare array for store product ID get from product filter data array
-	$proIdArrGetFromProductFilterDataArray = array();
+	// Check (best we can) if the data has been changed before post.
+	if($guid != hash('crc32c', $gid.'-_-'.$nn)){
+		return;
+	}
+
 
 	global $wpdb;
-
-	$where = array();
-	$placeholder_arr = array_fill(0, count($productFilterDataArray), '%s');
-
-	if(count($productFilterDataArray) > 0){
-		foreach($productFilterDataArray as $productFilterData){
-			if(is_numeric($productFilterData)){
-				$where[] = $productFilterData;
-			}
-		}
-	}
-
-	$query = $wpdb->prepare("
-		SELECT *
-		FROM ".$wpdb->prefix."term_relationships
-		WHERE term_taxonomy_id IN (".implode(', ',$placeholder_arr).")
-	", $where);
-	$productData = $wpdb->get_results($query);
-
-	foreach($productData as $product){
-		$singleProductId = $product->object_id;
-		array_push($proIdArrGetFromProductFilterDataArray, $singleProductId);
-	}
 
 	// input price filter data come from front end
 	$inputPriceRangeArray = $_POST['inputPriceRangeArray'];
 	$inputMinPrice = (int) $inputPriceRangeArray[0];
 	$inputMaxPrice = (int) $inputPriceRangeArray[1];
 
+	// after click filter data keep on this array
+	$catIDs = $_POST['catIds'];
+	$occIDs = $_POST['occIds'];
+
 	$query = array(
 		'post_status' => 'publish',
 		'post_type' => 'product',
+		'author' => $gid,
 		'meta_query' => array(
 			array(
 				'key' => '_price',
@@ -1694,34 +1725,45 @@ function productFilterAction() {
 			)
 		)
 	);
-
-	$productQuery = new WP_Query($query);
-	$storePriceFilterProductArray = wp_list_pluck( $productQuery->posts, 'ID' );
-
-	// check condition
-	$defaultProOccasTagEtcWithPriceFilterIntersect = array();
-
-	if(count($proIdArrGetFromProductFilterDataArray) > 0 && count($storePriceFilterProductArray) > 0){
-		$defaultProOccasTagEtcWithPriceFilterIntersect = array_intersect($defaultProductIdArray, $proIdArrGetFromProductFilterDataArray, $storePriceFilterProductArray);
+	// Loop category IDs for where
+	$cat_arr = array();
+	foreach($catIDs as $k => $v){
+		$cat_arr[] = $v;
 	}
-	elseif(count($proIdArrGetFromProductFilterDataArray) > 0 && count($storePriceFilterProductArray) == 0){
-		$defaultProOccasTagEtcWithPriceFilterIntersect = array_intersect($defaultProductIdArray, $proIdArrGetFromProductFilterDataArray);
-	}
-	elseif(count($proIdArrGetFromProductFilterDataArray) == 0 && count($storePriceFilterProductArray) > 0){
-		$defaultProOccasTagEtcWithPriceFilterIntersect = array_intersect($defaultProductIdArray, $storePriceFilterProductArray);
-	}
-	else {
-		//echo "No filter applicable!";
+	// Loop occassion IDs for where
+	$occ_arr = array();
+	foreach($occIDs as $k => $v){
+		$occ_arr[] = $v;
 	}
 
-	$filteredProductArrayUnique = array_unique($defaultProOccasTagEtcWithPriceFilterIntersect);
+	if(!empty($cat_arr) && !empty($occ_arr)){
+		$query['tax_query']['relation'] = 'AND';
+	}
+	if(!empty($cat_arr)){
+		$query['tax_query'][] = array(
+			'taxonomy' => 'product_cat',
+			'field' => 'term_id',
+			'terms' => $cat_arr
+		);
+	}
 
-	if(count($filteredProductArrayUnique) > 0 ){
-		// call the template with pass $filteredProductArrayUnique variable
-		get_template_part('template-parts/product-loop', null, array('filteredProductArrayUnique' => $filteredProductArrayUnique));
+	if(!empty($occ_arr)){
+		$query['tax_query'][] = array(
+			'taxonomy' => 'occasion',
+			'field' => 'term_id',
+			'terms' => $occ_arr
+		);
+	}
 
-	?>
-	<?php } else { ?>
+	$loop  = new WP_Query($query);
+
+	if ( $loop ->have_posts() ) {
+
+		while ( $loop ->have_posts() ) : $loop ->the_post();
+        wc_get_template_part( 'content', 'product' );
+    endwhile;
+
+	} else { ?>
 
 	<div>
 		<p id="noProductFound" style="margin-top: 50px; margin-bottom: 35px; padding: 15px 10px; background-color: #f8f8f8;">
@@ -2282,10 +2324,9 @@ add_action( 'template_redirect', 'redirect_direct_access' );
  */
 
 //  add_action('init', 'greeting_shop_only_one_store_same_time');
- add_action('wp_loaded', 'greeting_shop_only_one_store_same_time');
+add_action('wp_loaded', 'greeting_shop_only_one_store_same_time');
 
- function greeting_shop_only_one_store_same_time() {
-
+function greeting_shop_only_one_store_same_time() {
 	$single_vendor = 0;
 	$last_inserted_vendor_id = null;
 	$vendor_id_array = array();
@@ -2362,7 +2403,6 @@ add_filter('wcmp_show_report_abuse_link', '__return_false');
  * Trigger Holiday Mode
  */
 // add_action ('init', 'greeting_woocommerce_holiday_mode');
-
 function greeting_woocommerce_holiday_mode() {
 
 	// $get_option = get_option( 'mb-bhi-settings' );
@@ -2899,4 +2939,31 @@ function get_breadcrumb() {
        echo the_search_query();
        echo '</em>"';
    }
+}
+
+/**
+ * Function for handling price ranges.
+ * Added by Dennis Lauritzen
+ *
+ * @source https://stackoverflow.com/questions/66072017/filter-products-by-price-range-using-woocommerce-wc-get-products
+ */
+add_filter( 'woocommerce_product_data_store_cpt_get_products_query', 'handle_price_range_query_var', 10, 2 );
+function handle_price_range_query_var( $query, $query_vars ) {
+    if ( ! empty( $query_vars['price_range'] ) ) {
+        $price_range = explode( '|', esc_attr($query_vars['price_range']) );
+
+        if ( is_array($price_range) && count($price_range) == 2 ) {
+						$query['meta_query'][] = array(
+							'key' => '_price',
+							// 'value' => array(50, 100),
+							'value' => $price_range,
+							'compare' => 'BETWEEN',
+							'type' => 'NUMERIC'
+						);
+
+            $query['orderby'] = 'meta_value_num'; // sort by price
+            $query['order'] = 'ASC'; // In ascending order
+        }
+    }
+    return $query;
 }
