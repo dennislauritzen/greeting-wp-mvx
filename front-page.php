@@ -506,7 +506,7 @@ if(!empty($user_postal)){
       'relation' => 'AND',
       array(
         'key' => 'delivery_zips',
-        'value' => $postal,
+        'value' => $user_postal,
         'compare' => 'LIKE'
       ),
       array(
