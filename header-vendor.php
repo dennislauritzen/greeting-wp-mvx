@@ -420,21 +420,38 @@
     <div class="row">
       <div class="col-12 rounded bg-white py-3 shadow-sm">
         <div class="row align-items-center">
-          <div class="col-lg-3" class="p-0 m-0">
-            <?php
-    					$image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
-    				?>
-            <img class="img-fuid pe-1" style="max-height:75px;"
-              src="<?php echo esc_attr($image); ?>">
-            <?php echo ucfirst(esc_html($vendor->page_title)); ?>
+          <div class="d-flex col-md-12 col-lg-3 align-items-center">
+            <div class="col-9 col-lg-12">
+              <?php
+      					$image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
+      				?>
+              <img class="img-fuid pe-1" style="max-height:75px;"
+                src="<?php echo esc_attr($image); ?>">
+              <?php echo ucfirst(esc_html($vendor->page_title)); ?>
+            </div>
+            <div class="d-lg-none col-3 col-lg-0">
+              <button type="button" id="toggleOpening" class="d-lg-none btn btn-primary bg-teal border-0 py-2 px-1 px-sm-4" style="font-size:12px;">
+                Levering & åbningstid
+              </button>
+              <script type="text/javascript">
+                jQuery(document).ready(function(){
+                  jQuery("#toggleOpening").click(function(){
+                    if(jQuery(".opening-row").css('display') == 'none'){
+                      jQuery(".opening-row").removeClass('d-none', {duration:500});
+                    } else {
+                      jQuery(".opening-row").addClass('d-none', {duration:500});
+                    }
+                  });
+                });
+              </script>
+            </div>
           </div>
-          <div class="col-lg-3">
+          <div class="d-none pt-1 pt-lg-0 d-lg-inline col-lg-3 opening-row">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-door-open" viewBox="0 0 16 16">
               <path d="M8.5 10c-.276 0-.5-.448-.5-1s.224-1 .5-1 .5.448.5 1-.224 1-.5 1z"/>
               <path d="M10.828.122A.5.5 0 0 1 11 .5V1h.5A1.5 1.5 0 0 1 13 2.5V15h1.5a.5.5 0 0 1 0 1h-13a.5.5 0 0 1 0-1H3V1.5a.5.5 0 0 1 .43-.495l7-1a.5.5 0 0 1 .398.117zM11.5 2H11v13h1V2.5a.5.5 0 0 0-.5-.5zM4 1.934V15h6V1.077l-6 .857z"/>
             </svg>
             <?php
-            $day_array = array('mandag','tirsdag','onsdag','torsdag','fredag','lørdag','søndag');
             function build_intervals($items, $is_contiguous, $make_interval) {
                   $intervals = array();
                   $end   = false;
@@ -461,24 +478,32 @@
               }
 
               $opening = get_field('openning', 'user_'.$vendor->id);
+              $open_iso_days = array();
+              $open_label_days = array();
+              foreach($opening as $k => $v){
+                $open_iso_days[] = (int) $v['value'];
+                $open_label_days[$v['value']] = $v['label'];
+              }
+
               $interv = array();
-              if(!empty($opening) && is_array($opening) && count($opening) > 0 && is_numeric($opening)){
-                print 'Butikken leverer ';
-                $interv = build_intervals($opening, function($a, $b) { return ($b - $a) <= 1; }, function($a, $b) { return "{$a}..{$b}"; });
+              if(!empty($open_iso_days) && is_array($open_iso_days)){
+                $interv = build_intervals($open_iso_days, function($a, $b) { return ($b - $a) <= 1; }, function($a, $b) { return $a."..".$b; });
               } else {
                 print 'Butikkens leveringsdage er ukendte';
               }
               $i = 1;
-              if(count($interv) > 0){
+
+              if(!empty($interv)){
+                print 'Butikken leverer ';
                 foreach($interv as $v){
                   $val = explode('..',$v);
-                  $start = $day_array[$val[0]];
-                  $end = $day_array[$val[1]];
+                  $start = $open_label_days[$val[0]];
                   if($val[0] != $val[1])
                   {
-                    print $start."-".$end;
+                    $end = $open_label_days[$val[1]];
+                    print strtolower($start."-".$end);
                   } else {
-                    print $start;
+                    print strtolower($start);
                   }
                   if(count($interv) > 1){
                     if(count($interv)-1 == $i){ print " og "; }
@@ -489,7 +514,7 @@
               }
             ?>
           </div>
-          <div class="col-lg-3">
+          <div class="col-lg-3 d-none d-lg-inline pt-1 pt-lg-0 opening-row">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clock" viewBox="0 0 16 16">
               <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
               <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
@@ -514,7 +539,7 @@
               }
             ?>
           </div>
-          <div class="col-lg-3">
+          <div class="col-lg-3 d-none d-lg-inline pt-1 pt-lg-0 opening-row">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-door-open" viewBox="0 0 16 16">
               <path d="M8.5 10c-.276 0-.5-.448-.5-1s.224-1 .5-1 .5.448.5 1-.224 1-.5 1z"/>
               <path d="M10.828.122A.5.5 0 0 1 11 .5V1h.5A1.5 1.5 0 0 1 13 2.5V15h1.5a.5.5 0 0 1 0 1h-13a.5.5 0 0 1 0-1H3V1.5a.5.5 0 0 1 .43-.495l7-1a.5.5 0 0 1 .398.117zM11.5 2H11v13h1V2.5a.5.5 0 0 0-.5-.5zM4 1.934V15h6V1.077l-6 .857z"/>

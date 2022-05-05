@@ -140,7 +140,7 @@ if(!is_product()){
 				</div>
 				<div class="col-12 pb-3 pb-lg-0 pb-xl-0 col-sm-6 col-lg-3">
 					<div class="card" style="">
-					  <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/pexels-furkanfdemir-6309844-scaled.jpg" class="card-img-top" alt="<?php echo $store_name; ?>">
+					  <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/pexels-furkanfdemir-6309844-scaled.jpg" class="card-img-top" alt="">
 					  <div class="card-body">
 					    <h5 class="card-title">Vin & Vin</h5>
 					    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
@@ -150,7 +150,7 @@ if(!is_product()){
 				</div>
 				<div class="col-12 pb-3 pb-lg-0 pb-xl-0 col-sm-6 col-lg-3">
 					<div class="card" style="">
-					  <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/pexels-secret-garden-931154-scaled.jpg" class="card-img-top" alt="<?php echo $store_name; ?>">
+					  <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/pexels-secret-garden-931154-scaled.jpg" class="card-img-top" alt="">
 					  <div class="card-body">
 					    <h5 class="card-title">Flowers all over</h5>
 					    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
@@ -160,7 +160,7 @@ if(!is_product()){
 				</div>
 				<div class="col-12 pb-3 pb-lg-0 pb-xl-0 col-sm-6 col-lg-3">
 					<div class="card" style="">
-					  <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/pexels-florent-b-2664149-scaled.jpg" class="card-img-top" alt="<?php echo $store_name; ?>">
+					  <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/pexels-florent-b-2664149-scaled.jpg" class="card-img-top" alt="">
 					  <div class="card-body">
 					    <h5 class="card-title">John's Vin</h5>
 					    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
@@ -170,7 +170,7 @@ if(!is_product()){
 				</div>
 				<div class="col-12 pb-3 pb-lg-0 pb-xl-0 col-sm-6 col-lg-3">
 					<div class="card">
-					  <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/pexels-furkanfdemir-6309844-scaled.jpg" class="card-img-top" alt="<?php echo $store_name; ?>">
+					  <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/pexels-furkanfdemir-6309844-scaled.jpg" class="card-img-top" alt="">
 					  <div class="card-body">
 					    <h5 class="card-title">Vin & Vin</h5>
 					    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>

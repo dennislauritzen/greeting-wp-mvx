@@ -8,13 +8,15 @@
 *
 */
 
-global $product;
+global $WCMp, $product;
 
-$product_id = $product->ID;
+$product_id = $product->get_id();
 $product_meta = get_post($product_id);
 $vendor_id = $product_meta->post_author;
 $vendor = get_wcmp_vendor($vendor_id);
-
+if(!is_object($vendor)){
+  return;
+}
 ?>
 
 <section id="vendor" class="bg-light-grey py-5 mb-5">
@@ -22,12 +24,16 @@ $vendor = get_wcmp_vendor($vendor_id);
     <div class="row">
       <div class="col-lg-2">
 				<?php
-					$image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
+          if(!is_object($vendor)){
+            $image = $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
+          } else {
+  					$image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
+          }
 				?>
 				<img class="d-inline-block pb-3" src="<?php echo esc_attr($image); ?>">
       </div>
       <div class="col-lg-6">
-        <h6><?php echo ucfirst(esc_html($vendor->user_data->data->display_name)); ?></h6>
+        <h6><?php echo (is_object($vendor) ? ucfirst(esc_html($vendor->user_data->data->display_name)) : ''); ?></h6>
         <p>
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#446a6b" class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
             <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
@@ -63,21 +69,21 @@ $vendor = get_wcmp_vendor($vendor_id);
         <p>Butikken leverer på flg. dage:
           <?php
           $del_days = get_field('openning', 'user_'.$vendor_id);
-          $day_array = array('mandag','tirsdag','onsdag','torsdag','fredag','lørdag','søndag');
+          $day_array = array(1 => 'mandag', 2 => 'tirsdag', 3 => 'onsdag', 4 => 'torsdag', 5 => 'fredag', 6 => 'lørdag', 7 => 'søndag');
 
           if(is_array($del_days) && count($del_days) > 0){
-  					$i = 0;
+  					$i = 1;
             foreach($del_days as $v){
-              $day = $day_array[$v];
-              if ($i == 0){
+              $day = $day_array[$i];
+              if ($i == 1){
                 $day = ucfirst($day);
               }
 
               if(count($del_days) > 1)
               {
-                if($i < count($del_days)-2){
+                if($i < count($del_days)-1){
                   $day .= ', ';
-                } else if($i == count($del_days)-1) {
+                } else if($i == count($del_days)) {
                   $day = ' og '.$day;
                 }
               }

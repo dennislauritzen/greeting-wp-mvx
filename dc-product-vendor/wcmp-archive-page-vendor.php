@@ -64,8 +64,8 @@ $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
 					<h6 class="float-start d-none d-lg-inline d-xl-inline py-2 border-bottom filter-header">Filtrér</h6>
 				</div>
 				<div class="collapse d-lg-block accordion-collapse " id="colFilter">
-          <input type="hidden" name="guid" id="guid" value="<?php echo hash('crc32c', $vendor->get_id().'-_-'.$vendor->user_data->user_nicename); ?>">
-          <input type="hidden" name="nn" id="nn" value="<?php echo $vendor->user_data->user_nicename; ?>">
+          <input type="hidden" name="guid" id="guid" value="<?php echo hash('crc32c', $vendor->get_id().'-_-'.($vendor->user_data->user_nicename?:'')); ?>">
+          <input type="hidden" name="nn" id="nn" value="<?php echo ($vendor->user_data->user_nicename?:''); ?>">
           <input type="hidden" name="gid" id="gid" value="<?php echo $vendor->get_id(); ?>">
 					<h5 class="text-uppercase">Kategorier</h5>
 					<ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
@@ -224,7 +224,9 @@ $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
 
 			<div class="col-12 col-xs-12 col-sm-12 col-md-12 col-lg-10">
 				<div class="applied-filters row mt-xs-0 mt-sm-0 mt-md-0 mb-3 lh-lg">
-					<div class="col-12 filter-list"><a class="badge rounded-pill border-yellow py-2 px-2 me-1 my-lg-0 my-xl-0 text-dark filter-static">Butik: Den Blå Dør <button type="button" class="btn-close" aria-label="Close"></button>
+					<div class="col-12 filter-list"><a class="badge rounded-pill border-yellow py-2 px-2 me-1 my-lg-0 my-xl-0 text-dark filter-static">
+            Butik: <?php echo ($vendor->user_data->user_nicename?:''); ?>
+            <button type="button" class="btn-close" aria-label="Close"></button>
             </a><a href="#" id="vendorPageReset" onclick="event.preventDefault();" class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 bg-yellow text-white">
               Nulstil alle
               <button type="button" class="btn-close  btn-close-white" aria-label="Close">

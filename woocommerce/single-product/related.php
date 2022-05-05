@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( $related_products ) :
 
 global $product;
-$product_id = $product->ID;
+$product_id = $product->get_id();
 $product_meta = get_post($product_id);
 $vendor_id = $product_meta->post_author;
 $vendor = get_wcmp_vendor($vendor_id);

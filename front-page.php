@@ -1,4 +1,107 @@
 <?php
+
+global $wpdb;
+
+// Get IP Details for page.
+function get_client_ip() {
+    $ipaddress = '';
+    if (getenv('HTTP_CLIENT_IP'))
+        $ipaddress = getenv('HTTP_CLIENT_IP');
+    else if(getenv('REMOTE_ADDR'))
+         $ipaddress = getenv('REMOTE_ADDR');
+    else if(getenv('HTTP_X_FORWARDED_FOR'))
+        $ipaddress = getenv('HTTP_X_FORWARDED_FOR');
+    else if(getenv('HTTP_X_FORWARDED'))
+        $ipaddress = getenv('HTTP_X_FORWARDED');
+    else if(getenv('HTTP_FORWARDED_FOR'))
+        $ipaddress = getenv('HTTP_FORWARDED_FOR');
+    else if(getenv('HTTP_FORWARDED'))
+       $ipaddress = getenv('HTTP_FORWARDED');
+    else
+        $ipaddress = 'UNKNOWN';
+    return $ipaddress;
+}
+
+function call_ip_apis($ip){
+  $urls = array(
+    'http://ipinfo.io/'.$ip.'/json', // return HTTP=429 if usage limit reached
+    'http://ip-api.com/json/'.$ip
+  );
+
+  $curl = curl_init();
+  curl_setopt($curl, CURLOPT_URL, $urls[0]);
+  curl_setopt($curl, CURLOPT_BINARYTRANSFER, true);
+  curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+  $jsonData = json_decode(curl_exec($curl));
+  if(curl_getinfo($curl, CURLINFO_RESPONSE_CODE) != '200'){
+    curl_setopt($curlSession, CURLOPT_URL, $urls[1]);
+  }
+  #curl_setopt($curl, CURLOPT_GET, true);
+
+  $jsonData = json_decode(curl_exec($curl));
+  curl_close($curl);
+
+  return $jsonData;
+}
+$ip_detail_ipinfo = call_ip_apis('86.52.19.58');
+
+
+if(!empty($ip_detail_ipinfo) AND (isset($ip_detail_ipinfo->postal) || isset($ip_detail_ipinfo->zip))){
+  #print $ip_details->postal;
+  $user_postal = (!empty($ip_detail_ipinfo->postal) ? $ip_detail_ipinfo->postal : $ip_detail_ipinfo->zip);
+} else {
+  $user_postal = '';
+}
+
+
+$user_areas = array(
+  'start' => 1000,
+  'end' => 9999
+);
+if(!empty($user_postal)){
+  if($user_postal >= 1000 && $user_postal < 3000){
+    $user_areas['start'] = 1000;
+    $user_areas['end'] = 3000;
+  } else if($user_postal >= 3000 && $user_postal < 3700){
+    $user_areas['start'] = 3000;
+    $user_areas['end'] = 3700;
+  } else if($user_postal >= 3700 && $user_postal < 4000){
+    $user_areas['start'] = 3700;
+    $user_areas['end'] = 4000;
+  } else if($user_postal >= 4000 && $user_postal < 4800){
+    $user_areas['start'] = 4000;
+    $user_areas['end'] = 4800;
+  } else if($user_postal >= 4800 && $user_postal < 5000){
+    $user_areas['start'] = 4800;
+    $user_areas['end'] = 5000;
+  } else if($user_postal >= 5000 && $user_postal < 6000){
+    $user_areas['start'] = 5000;
+    $user_areas['end'] = 6000;
+  } else if($user_postal >= 6000 && $user_postal < 6700){
+    $user_areas['start'] = 6000;
+    $user_areas['end'] = 6700;
+  } else if($user_postal >= 6700 && $user_postal < 7000){
+    $user_areas['start'] = 6700;
+    $user_areas['end'] = 7000;
+  } else if($user_postal >= 7000 && $user_postal < 7500){
+    $user_areas['start'] = 7000;
+    $user_areas['end'] = 7500;
+  } else if($user_postal >= 7500 && $user_postal < 8000){
+    $user_areas['start'] = 7500;
+    $user_areas['end'] = 8000;
+  } else if($user_postal >= 8000 && $user_postal < 9000){
+    $user_areas['start'] = 8000;
+    $user_areas['end'] = 9000;
+  } else if($user_postal >= 9000 && $user_postal < 10000){
+    $user_areas['start'] = 9000;
+    $user_areas['end'] = 9999;
+  }
+}
+
+// =========================
+// =========================
+
+// Start the template
 get_header();
 ?>
 
@@ -324,36 +427,65 @@ ul.recommandations li a:hover {
                 </form>
                 <ul class="list-inline my-2">
                   <?php
-                  global $wpdb;
-
-                  $landing_page_meta = $wpdb->get_results(
-                      "
-                          SELECT *
-                          FROM {$wpdb->prefix}postmeta
-                          WHERE meta_key =  'is_featured_city'
-                          AND meta_value = 1
-                          LIMIT 8
-                      "
-                  );
-
-                  $page_id_array = array();
-
-                  foreach($landing_page_meta as $key => $land_meta){
-                      $page_id_array[] = $land_meta->post_id;
+                  if(!empty($user_postal)){
+                    $postal_args2 = array(
+                      'post_type' => 'city',
+                      'posts_per_page' => '1',
+                      'meta_query' => array(
+                        array(
+                          'key' => 'postalcode',
+                          'value' => $user_postal,
+                          'compare' => '='
+                        )
+                      ),
+                      'no_found_rows' => true
+                    );
+                    $postal_query2 = new WP_Query($postal_args2);
+                    foreach($postal_query2->posts as $k => $post){
+                  ?>
+                  <li class="list-inline-item pb-1">
+                    <a href="<?php echo get_permalink($landing_page_id);?>" class="btn btn-link rounded-pill pb-2 border-1 border-white text-white">
+                      <?php echo get_post_meta($post->ID, 'postalcode', true)." ".get_post_meta($post->ID, 'city', true);?>
+                    </a>
+                  </li>
+                  <?php
+                    }
                   }
-
-                  $page_id_array_length = count($page_id_array);
-                  $page_id_array_midle = $page_id_array_length/2;
-                  $page_id_array_midle_celling = ceil($page_id_array_midle);
-
-                  foreach($page_id_array as $key => $landing_page_id){ ?>
+                  ?>
+                  <?php
+                  $postal_args = array(
+                    'post_type' => 'city',
+                    'posts_per_page' => '7',
+                    'orderby' => 'meta_value',
+                    'meta_key' => 'is_featured_city',
+                    'order' => 'DESC',
+                    'meta_query' => array(
+                      'relation' => 'AND',
+                      array(
+                        'key' => 'postalcode',
+                        'value' => array($user_areas['start'], $user_areas['end']),
+                        'compare' => 'BETWEEN',
+                        'type' => 'numeric'
+                      ),
+                      array(
+                        'key' => 'postalcode',
+                        'value' => (!empty($user_postal) ? $user_postal : (int) '0999'),
+                        'compare' => '!=',
+                        'type' => 'numeric'
+                      )
+                    ),
+                    'no_found_rows' => true
+                  );
+                  $postal_query = new WP_Query($postal_args);
+                  foreach($postal_query->posts as $k => $post){
+                    $postal_query->the_post();?>
                     <li class="list-inline-item pb-1">
                       <a href="<?php echo get_permalink($landing_page_id);?>" class="btn btn-link rounded-pill pb-2 border-1 border-white text-white">
-                        <?php echo get_post_meta($landing_page_id, 'postalcode', true)." ".get_post_meta($landing_page_id, 'city', true);?>
+                        <?php echo get_post_meta($post->ID, 'postalcode', true)." ".get_post_meta($post->ID, 'city', true);?>
                       </a>
                     </li>
                   <?php
-                  }
+                  } // endwhile
                   ?>
                 </ul>
             </div>
@@ -362,55 +494,79 @@ ul.recommandations li a:hover {
     </div>
 </section>
 
+<?php
+if(!empty($user_postal)){
+  $args = array(
+    'role' => 'dc_vendor',
+    'orderby' => 'meta_value',
+    'meta_key' => 'delivery_zips',
+    'order' => 'DESC',
+    'number' => 4,
+    'meta_query' => array(
+      'relation' => 'AND',
+      array(
+        'key' => 'delivery_zips',
+        'value' => $postal,
+        'compare' => 'LIKE'
+      ),
+      array(
+        'key' => 'delivery_type',
+        'value' => array(0,1),
+        'type' => 'numeric',
+        'compare' => 'IN'
+      )
+    )
+  );
+  $query = new WP_User_Query($args);
+  $results = $query->get_results();
+}
+
+
+if(!empty($results)){
+?>
 <section id="inspiration" class="inspirationstores">
   <div class="container">
     <div class="row my-4 py-5">
       <div clsas="col-12">
         <h4 class="h1 pb-5 mb-3 text-center">📍 Bliv inspireret i lækre butikker nær dig</h4>
       </div>
+      <?php
+      foreach($results as $k => $v){
+        $vendor = get_user_meta($v->ID);
+
+        $image = (!empty($vendor['_vendor_profile_image'])? $vendor['_vendor_profile_image'][0] : '');
+        $banner = (!empty($vendor['_vendor_banner'])? $vendor['_vendor_banner'][0] : '');
+
+        $vendor_banner = (!empty(wp_get_attachment_image_src($banner)) ? wp_get_attachment_image_src($banner, 'medium')[0] : '');
+        $vendor_picture = (!empty(wp_get_attachment_image_src($image)) ? wp_get_attachment_image_src($image, 'medium')[0] : '');
+        #$vendor_url = get_permalink();
+        #$vendor_desc = get_user_meta();
+
+        $description2 = (!empty($vendor['_vendor_description'][0]) ? $vendor['_vendor_description'][0] : '');
+
+        if(strlen(wp_strip_all_tags($description2)) >= '98'){
+          $description = substr(wp_strip_all_tags($description2), 0, 95).'...';
+        } else {
+          $description = $description2;
+        }
+      ?>
       <div class="col-12 pb-3 pb-lg-0 pb-xl-0 col-sm-6 col-lg-3">
         <div class="card" style="">
-          <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/pexels-furkanfdemir-6309844-scaled.jpg" class="card-img-top" alt="<?php echo $store_name; ?>">
+          <img src="<?php echo $vendor_banner; ?>" class="card-img-top" alt="<?php echo $vendor['nickname']['0']; ?>">
           <div class="card-body">
-            <h5 class="card-title">Vin & Vin</h5>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-            <a href="#" class="rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link">Se butikkens udvalg</a>
+            <h5 class="card-title"><?php echo $vendor['nickname']['0']; ?></h5>
+            <p class="card-text"><?php echo $description; ?></p>
+            <a href="<?php echo get_permalink($v->ID); ?>" class="rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link">Se butikkens udvalg</a>
           </div>
         </div>
       </div>
-      <div class="col-12 pb-3 pb-lg-0 pb-xl-0 col-sm-6 col-lg-3">
-        <div class="card" style="">
-          <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/pexels-secret-garden-931154-scaled.jpg" class="card-img-top" alt="<?php echo $store_name; ?>">
-          <div class="card-body">
-            <h5 class="card-title">Flowers all over</h5>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-            <a href="#" class="rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link">Se butikkens udvalg</a>
-          </div>
-        </div>
-      </div>
-      <div class="col-12 pb-3 pb-lg-0 pb-xl-0 col-sm-6 col-lg-3">
-        <div class="card" style="">
-          <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/pexels-florent-b-2664149-scaled.jpg" class="card-img-top" alt="<?php echo $store_name; ?>">
-          <div class="card-body">
-            <h5 class="card-title">John's Vin</h5>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-            <a href="#" class="rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link">Se butikkens udvalg</a>
-          </div>
-        </div>
-      </div>
-      <div class="col-12 pb-3 pb-lg-0 pb-xl-0 col-sm-6 col-lg-3">
-        <div class="card">
-          <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/pexels-furkanfdemir-6309844-scaled.jpg" class="card-img-top" alt="<?php echo $store_name; ?>">
-          <div class="card-body">
-            <h5 class="card-title">Vin & Vin</h5>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-            <a href="#" class="rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link">Se butikkens udvalg</a>
-          </div>
-        </div>
-      </div>
+      <?php
+      } // endforeach
+      ?>
     </div>
   </div>
 </section>
+<?php } ?>
 
 <section id="howitworks" class="bg-light-grey py-5">
   <div class="container text-center">
@@ -575,7 +731,7 @@ ul.recommandations li a:hover {
       </div>
       <div class="col-lg-4">
         <div class="card" style="">
-          <img src="<?php echo get_field('howdy_block1_picture'); ?>" class="card-img-top" alt="<?php echo $store_name; ?>">
+          <img src="<?php echo get_field('howdy_block1_picture'); ?>" class="card-img-top" alt="<?php echo get_field('howdy_block1_header'); ?>">
           <div class="card-body">
             <h5 class="card-title"><?php echo get_field('howdy_block1_header'); ?></h5>
             <p class="card-text"><?php echo get_field('howdy_block1_text'); ?></p>
@@ -587,7 +743,7 @@ ul.recommandations li a:hover {
       </div>
       <div class="col-lg-4">
         <div class="card" style="">
-          <img src="<?php echo get_field('howdy_block2_picture'); ?>" class="card-img-top" alt="<?php echo $store_name; ?>">
+          <img src="<?php echo get_field('howdy_block2_picture'); ?>" class="card-img-top" alt="<?php echo get_field('howdy_block2_header'); ?>">
           <div class="card-body">
             <h5 class="card-title"><?php echo get_field('howdy_block2_header'); ?></h5>
             <p class="card-text"><?php echo get_field('howdy_block2_text'); ?></p>
@@ -599,7 +755,7 @@ ul.recommandations li a:hover {
       </div>
       <div class="col-lg-4">
         <div class="card" style="">
-          <img src="<?php echo get_field('howdy_block3_picture'); ?>" class="card-img-top" alt="<?php echo $store_name; ?>">
+          <img src="<?php echo get_field('howdy_block3_picture'); ?>" class="card-img-top" alt="<?php echo get_field('howdy_block3_header'); ?>">
           <div class="card-body">
             <h5 class="card-title"><?php echo get_field('howdy_block3_header'); ?></h5>
             <p class="card-text"><?php echo get_field('howdy_block3_text'); ?></p>
