@@ -531,8 +531,10 @@ if(!empty($results)){
         <h4 class="h1 pb-5 mb-3 text-center">📍 Bliv inspireret i lækre butikker nær dig</h4>
       </div>
       <?php
+      global $WCMp;
       foreach($results as $k => $v){
         $vendor = get_user_meta($v->ID);
+        $vendor_page_slug = get_wcmp_vendor($v->ID);
 
         $image = (!empty($vendor['_vendor_profile_image'])? $vendor['_vendor_profile_image'][0] : '');
         $banner = (!empty($vendor['_vendor_banner'])? $vendor['_vendor_banner'][0] : '');
@@ -549,6 +551,7 @@ if(!empty($results)){
         } else {
           $description = $description2;
         }
+
       ?>
       <div class="col-12 pb-3 pb-lg-0 pb-xl-0 col-sm-6 col-lg-3">
         <div class="card" style="">
@@ -556,7 +559,7 @@ if(!empty($results)){
           <div class="card-body">
             <h5 class="card-title"><?php echo $vendor['nickname']['0']; ?></h5>
             <p class="card-text"><?php echo $description; ?></p>
-            <a href="<?php echo get_permalink($v->ID); ?>" class="rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link">Se butikkens udvalg</a>
+            <a href="<?php echo $vendor_page_slug->get_permalink(); ?>" class="rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link">Se butikkens udvalg</a>
           </div>
         </div>
       </div>
