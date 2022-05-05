@@ -413,7 +413,7 @@ ul.recommandations li a:hover {
                 <h1 class="text-white pb-3">Skal vi levere <span id="spinner"></span> <br>til én du holder af?</h1>
                 <form role="search" method="get" autocomplete="off" id="searchform">
                 <div class="input-group pb-4 w-100 me-0 me-xs-0 me-sm-0 me-md-0 me-lg-5 me-xl-5">
-                  <input type="text" name="keyword" id="front_Search-new_ucsa" class="form-control border-0 ps-5 pe-3 py-3 shadow-sm rounded" placeholder="Indtast by eller postnr. (eks. 8000)">
+                  <input type="text" name="keyword" id="front_Search-new_ucsa" class="form-control border-0 ps-5 pe-3 py-3 shadow-sm rounded" placeholder="Indtast by eller postnr. (eks. <?php echo (!empty($user_postal) ? $user_postal : '8000'); ?>)">
                   <figure class="position-absolute mt-2 mb-3 ps-3" style="padding-top:5px; z-index:1000;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#333333" class="bi bi-geo-alt" viewBox="0 0 16 16">
                       <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A31.493 31.493 0 0 1 8 14.58a31.481 31.481 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94zM8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10z"/>
