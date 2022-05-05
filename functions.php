@@ -565,6 +565,28 @@ function greeting_custom_post_type() {
 	);
 }
 
+/**
+ * Add settings pages to ACF.
+ *
+ */
+if( function_exists('acf_add_options_page') ) {
+	acf_add_options_page(array(
+		'page_title' 	=> 'Theme General Settings',
+		'menu_title'	=> 'Theme Settings',
+		'menu_slug' 	=> 'theme-general-settings',
+		'capability'	=> 'edit_posts',
+		'redirect'		=> false
+	));
+
+	acf_add_options_sub_page(array(
+		'page_title' 	=> 'Theme Landingpage Settings',
+		'menu_title'	=> 'Header',
+		'parent_slug'	=> 'theme-general-settings',
+	));
+}
+
+
+
 function add_theme_caps() {
     // gets the administrator role
     $admins = get_role( 'administrator' );

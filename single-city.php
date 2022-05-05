@@ -705,17 +705,23 @@ jQuery(document).ready(function(){
             <div class="card shadow border-0 mb-3">
               <div class="card-body">
                 <div class="row align-items-center">
-                  <div class="col-3 text-center">
-                    <img class="img-fluid rounded-start" src="<?php echo $image;?>" style="max-width: 100px;">
-                    <?php $button_text = apply_filters('wcmp_vendor_lists_single_button_text', $vendor->page_title); ?>
-                    <h6><?php echo esc_html($button_text); ?></h6>
-                    <a href="<?php echo esc_url($vendor->get_permalink()); ?>" class="cta rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-3 px-md-4">
-                      Gå til butik<span class="d-none d-md-inline"> ></span>
-                    </a>
+                  <div class="col-12 col-md-3 text-start text-md-center">
+                    <div class="row mb-4 mb-md-0 d-flex">
+                      <div class="col-4 col-md-12">
+                        <img class="img-fluid rounded-start" src="<?php echo $image;?>" style="max-width: 100px;">
+                      </div>
+                      <div class="col-8 col-md-12">
+                        <?php $button_text = apply_filters('wcmp_vendor_lists_single_button_text', $vendor->page_title); ?>
+                        <h6><?php echo esc_html($button_text); ?></h6>
+                        <a href="<?php echo esc_url($vendor->get_permalink()); ?>" class="cta rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-3 px-md-4">
+                          Gå til butik<span class="d-none d-md-inline"> ></span>
+                        </a>
+                      </div>
+                    </div>
                   </div>
 
 
-                  <div class="col-9">
+                  <div class="col-12 col-md-9">
                     <div class="row">
                     <?php
                     $vendorProducts = $vendor->get_products(array('fields' => 'all', 'posts_per_page' => 3));
@@ -731,7 +737,7 @@ jQuery(document).ready(function(){
                           $imageUrl = $placeHolderImage;
                         }
                       ?>
-                      <div class="col-6 col-xs-6 col-sm-6 col-md-4">
+                      <div class="col-4 col-xs-4 col-sm-4 col-md-4">
                         <div class="card border-0">
                             <a href="<?php echo get_permalink($product->get_id());?>"><img src="<?php echo $imageUrl;?>" class="card-img-top" alt="<?php echo $product->get_name();?>"></a>
                             <div class="card-body">
@@ -874,38 +880,43 @@ jQuery(document).ready(function(){
 
 <section id="learnmore">
   <div class="container">
-    <div class="row pt-5 pb-0">
+    <div class="row py-5">
       <div clsas="col-12">
         <h4 class="text-center pb-5">👋 Howdy - vil du lære Greeting.dk lidt bedre at kende?</h4>
       </div>
-      <div class="col-12 pb-3 pb-lg-0 pb-xl-0 col-lg-4">
+      <div class="col-lg-4">
         <div class="card" style="">
-          <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/pexels-furkanfdemir-6309844-scaled.jpg" class="card-img-top" alt="<?php echo $store_name; ?>">
+          <img src="<?php echo get_field('howdy_block1_picture'); ?>" class="card-img-top" alt="<?php echo get_field('howdy_block1_header'); ?>">
           <div class="card-body">
-            <h5 class="card-title">Skal din butik være med?</h5>
-            <p class="card-text">Skal din butik også være med på Greeting.dk? Vi arbejder altid for et ligeværdigt samarbejde -
-              og vil til enhver tid arbejde sammen med dig om at sikre den bedste oplevelse for vores fælles kunder. Vil du være med?</p>
-            <a href="#" class="rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link">Du starter lige her</a>
+            <h5 class="card-title"><?php echo get_field('howdy_block1_header'); ?></h5>
+            <p class="card-text"><?php echo get_field('howdy_block1_text'); ?></p>
+            <a href="<?php echo get_field('howdy_block1_link'); ?>" class="rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link">
+              <?php echo get_field('howdy_block1_button_cta'); ?>
+            </a>
           </div>
         </div>
       </div>
-      <div class="col-12 pb-3 pb-lg-0 pb-xl-0 col-lg-4">
+      <div class="col-lg-4">
         <div class="card" style="">
-          <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/pexels-secret-garden-931154-scaled.jpg" class="card-img-top" alt="<?php echo $store_name; ?>">
+          <img src="<?php echo get_field('howdy_block2_picture'); ?>" class="card-img-top" alt="<?php echo get_field('howdy_block2_header'); ?>">
           <div class="card-body">
-            <h5 class="card-title">Fortjener dine medarbejdere en hilsen?</h5>
-            <p class="card-text">Det er vigtigt at huske dem, du sætter pris på - også på jobbet. Derfor tilbyder vi også firmaer at levere større partiere af medarbejder gaver til eks. jul, påske, sommer - eller gaven til den kommende jubilar.</p>
-            <a href="#" class="rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link">Se butikkens udvalg</a>
+            <h5 class="card-title"><?php echo get_field('howdy_block2_header'); ?></h5>
+            <p class="card-text"><?php echo get_field('howdy_block2_text'); ?></p>
+            <a href="<?php echo get_field('howdy_block2_link'); ?>" class="rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link">
+              <?php echo get_field('howdy_block2_button_cta'); ?>
+            </a>
           </div>
         </div>
       </div>
-      <div class="col-12 pb-3 pb-lg-0 pb-xl-0 col-lg-4">
+      <div class="col-lg-4">
         <div class="card" style="">
-          <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/pexels-florent-b-2664149-scaled.jpg" class="card-img-top" alt="<?php echo $store_name; ?>">
+          <img src="<?php echo get_field('howdy_block3_picture'); ?>" class="card-img-top" alt="<?php echo get_field('howdy_block3_header'); ?>">
           <div class="card-body">
-            <h5 class="card-title">Spørgsmål? Så fang os her :)</h5>
-            <p class="card-text">Vil du gerne høre, hvad vi er for nogen - og hvordan det hele fungerer? Eller har du konkrete spørgsmål til udvalget i en af butikkerne? Vi sidder altid klar - så ræk endelig ud.</p>
-            <a href="#" class="rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link">Se butikkens udvalg</a>
+            <h5 class="card-title"><?php echo get_field('howdy_block3_header'); ?></h5>
+            <p class="card-text"><?php echo get_field('howdy_block3_text'); ?></p>
+            <a href="<?php echo get_field('howdy_block3_link'); ?>" class="rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link">
+              <?php echo get_field('howdy_block3_button_cta'); ?>
+            </a>
           </div>
         </div>
       </div>

@@ -444,7 +444,7 @@ ul.recommandations li a:hover {
                     foreach($postal_query2->posts as $k => $post){
                   ?>
                   <li class="list-inline-item pb-1">
-                    <a href="<?php echo get_permalink($landing_page_id);?>" class="btn btn-link rounded-pill pb-2 border-1 border-white text-white">
+                    <a href="<?php echo get_permalink($post->ID);?>" class="btn btn-link rounded-pill pb-2 border-1 border-white text-white">
                       <?php echo get_post_meta($post->ID, 'postalcode', true)." ".get_post_meta($post->ID, 'city', true);?>
                     </a>
                   </li>
@@ -480,7 +480,7 @@ ul.recommandations li a:hover {
                   foreach($postal_query->posts as $k => $post){
                     $postal_query->the_post();?>
                     <li class="list-inline-item pb-1">
-                      <a href="<?php echo get_permalink($landing_page_id);?>" class="btn btn-link rounded-pill pb-2 border-1 border-white text-white">
+                      <a href="<?php echo get_permalink($post->ID);?>" class="btn btn-link rounded-pill pb-2 border-1 border-white text-white">
                         <?php echo get_post_meta($post->ID, 'postalcode', true)." ".get_post_meta($post->ID, 'city', true);?>
                       </a>
                     </li>
