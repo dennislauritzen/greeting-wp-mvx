@@ -284,10 +284,13 @@
  $vendor_id = $product_meta->post_author;
  $vendor = get_wcmp_vendor($vendor_id);
 
+ $vendor2 = get_user_meta($vendor_id);
+ $banner = (!empty($vendor2['_vendor_banner'])? $vendor2['_vendor_banner'][0] : '');
+ $vendor_banner = (!empty(wp_get_attachment_image_src($banner)) ? wp_get_attachment_image_src($banner, 'medium')[0] : '');
  ?>
 
 
- <section id="top" class="pt-1" style="min-height: 350px; background-size: cover; background-position: center center; background-image: linear-gradient(rgba(0, 0, 0, 0.35),rgba(0, 0, 0, 0.35)),url('<?php echo (empty($banner) ? 'https://dev.greeting.dk/wp-content/uploads/2022/04/pexels-furkanfdemir-6309844-1-scaled.jpg' : esc_url($banner)); ?>');">
+ <section id="top" class="pt-1" style="min-height: 350px; background-size: cover; background-position: center center; background-image: linear-gradient(rgba(0, 0, 0, 0.35),rgba(0, 0, 0, 0.35)),url('<?php echo (empty($vendor_banner) ? 'https://dev.greeting.dk/wp-content/uploads/2022/04/pexels-furkanfdemir-6309844-1-scaled.jpg' : esc_url($vendor_banner)); ?>');">
   <div class="container py-4">
     <div class="row">
 			<div class="d-flex pb-3 pb-lg-0 pb-xl-0 position-relative justify-content-center justify-content-lg-start justify-content-xl-start col-md-12 col-lg-3">
@@ -493,21 +496,23 @@
               }
               $i = 1;
 
-              if(!empty($interv)){
+              if(!empty($interv) && count($interv) > 0){
                 print 'Butikken leverer ';
                 foreach($interv as $v){
                   $val = explode('..',$v);
-                  $start = $open_label_days[$val[0]];
-                  if($val[0] != $val[1])
-                  {
-                    $end = $open_label_days[$val[1]];
-                    print strtolower($start."-".$end);
-                  } else {
-                    print strtolower($start);
-                  }
-                  if(count($interv) > 1){
-                    if(count($interv)-1 == $i){ print " og "; }
-                    else if(count($interv) > $i) { print ', ';}
+                  if(!empty($val)){
+                    $start = $open_label_days[$val[0]];
+                    if($val[0] != $val[1])
+                    {
+                      $end = $open_label_days[$val[1]];
+                      print strtolower($start."-".$end);
+                    } else {
+                      print strtolower($start);
+                    }
+                    if(count($interv) > 1){
+                      if(count($interv)-1 == $i){ print " og "; }
+                      else if(count($interv) > $i) { print ', ';}
+                    }
                   }
                   $i++;
                 }

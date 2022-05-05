@@ -54,8 +54,8 @@
 		          </ul>
 		        </div>
 		      </div>
-		      <div class="col-6 col-xs-6 col-sm-6 col-md-6 col-lg-2 col-xl-2">
-		        <h6 class="pb-3 text-uppercase">Jylland</h6>
+		      <div class="col-6 col-xs-6 col-sm-6 col-md-6 col-lg-3 col-xl-3">
+		        <h6 class="pb-3 text-uppercase">Udvalgte postnumre i Jylland</h6>
 		        <ul class="list-unstyled mb-0">
 							<li class="pb-1"><a href="<?php echo site_url(); ?>/c/6000-kolding/" class="text-white">6000 Kolding</a></li>
 							<li class="pb-1"><a href="<?php echo site_url(); ?>/c/6100-haderslev/" class="text-white">6100 Haderslev</a></li>
@@ -77,7 +77,7 @@
 		        </ul>
 		      </div>
 		      <div class="col-6 col-xs-6 col-sm-6 col-md-6 col-lg-3 col-xl-3">
-		        <h6 class="pb-3 text-uppercase">Fyn, Sjælland & øer</h6>
+		        <h6 class="pb-3 text-uppercase">Udvalgte postnumre på Fyn, Sjælland & øer</h6>
 		        <ul class="list-unstyled mb-0">
 							<li class="pb-1"><a href="<?php echo site_url(); ?>/c/2000-frederiksberg/" class="text-white">2000 Frederiksberg C</a></li>
 		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/2200-koebenhavn-n/" class="text-white">2200 København N</a></li>
@@ -106,10 +106,6 @@
 		          <li class="pb-1"><a href="https://dk.trustpilot.com/review/greeting.dk" class="text-white">Trustpilot</a></li>
 		          <li class="pb-1"><a href="<?php echo site_url(); ?>/kontakt" class="text-white">Kontakt</a></li>
 		        </ul>
-		      </div>
-		      <div class="d-none d-lg-inline d-xl-inline col-lg-1">
-		        <p>
-		        </p>
 		      </div>
 		      <div class="col-6 col-xs-6 col-sm-6 col-md-6 col-lg-3 col-xl-3">
 		        <h6 class="light mt-3 mt-lg-0 mt-xl-0">Gavehilsner fra danske specialbutikker</h6>

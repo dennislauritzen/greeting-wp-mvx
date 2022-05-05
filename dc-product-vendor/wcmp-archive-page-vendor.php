@@ -635,36 +635,36 @@ do_action('after_wcmp_vendor_description', $vendorId);
       </div>
       <div class="col-lg-4">
         <div class="card" style="">
-          <img src="<?php echo get_field('howdy_block1_picture'); ?>" class="card-img-top" alt="<?php echo get_field('howdy_block1_header'); ?>">
+          <img src="<?php echo get_field('howdy_block1_picture', 'options'); ?>" class="card-img-top" alt="<?php echo get_field('howdy_block1_header', 'options'); ?>">
           <div class="card-body">
-            <h5 class="card-title"><?php echo get_field('howdy_block1_header'); ?></h5>
-            <p class="card-text"><?php echo get_field('howdy_block1_text'); ?></p>
-            <a href="<?php echo get_field('howdy_block1_link'); ?>" class="rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link">
-              <?php echo get_field('howdy_block1_button_cta'); ?>
+            <h5 class="card-title"><?php echo get_field('howdy_block1_header', 'options'); ?></h5>
+            <p class="card-text"><?php echo get_field('howdy_block1_text', 'options'); ?></p>
+            <a href="<?php echo get_field('howdy_block1_link', 'options'); ?>" class="rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link">
+              <?php echo get_field('howdy_block1_button_cta', 'options'); ?>
             </a>
           </div>
         </div>
       </div>
       <div class="col-lg-4">
         <div class="card" style="">
-          <img src="<?php echo get_field('howdy_block2_picture'); ?>" class="card-img-top" alt="<?php echo get_field('howdy_block2_header'); ?>">
+          <img src="<?php echo get_field('howdy_block2_picture', 'options'); ?>" class="card-img-top" alt="<?php echo get_field('howdy_block2_header', 'options'); ?>">
           <div class="card-body">
-            <h5 class="card-title"><?php echo get_field('howdy_block2_header'); ?></h5>
-            <p class="card-text"><?php echo get_field('howdy_block2_text'); ?></p>
-            <a href="<?php echo get_field('howdy_block2_link'); ?>" class="rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link">
-              <?php echo get_field('howdy_block2_button_cta'); ?>
+            <h5 class="card-title"><?php echo get_field('howdy_block2_header', 'options'); ?></h5>
+            <p class="card-text"><?php echo get_field('howdy_block2_text', 'options'); ?></p>
+            <a href="<?php echo get_field('howdy_block2_link', 'options'); ?>" class="rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link">
+              <?php echo get_field('howdy_block2_button_cta', 'options'); ?>
             </a>
           </div>
         </div>
       </div>
       <div class="col-lg-4">
         <div class="card" style="">
-          <img src="<?php echo get_field('howdy_block3_picture'); ?>" class="card-img-top" alt="<?php echo get_field('howdy_block3_header'); ?>">
+          <img src="<?php echo get_field('howdy_block3_picture', 'options'); ?>" class="card-img-top" alt="<?php echo get_field('howdy_block3_header', 'options'); ?>">
           <div class="card-body">
-            <h5 class="card-title"><?php echo get_field('howdy_block3_header'); ?></h5>
-            <p class="card-text"><?php echo get_field('howdy_block3_text'); ?></p>
-            <a href="<?php echo get_field('howdy_block3_link'); ?>" class="rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link">
-              <?php echo get_field('howdy_block3_button_cta'); ?>
+            <h5 class="card-title"><?php echo get_field('howdy_block3_header', 'options'); ?></h5>
+            <p class="card-text"><?php echo get_field('howdy_block3_text', 'options'); ?></p>
+            <a href="<?php echo get_field('howdy_block3_link', 'options'); ?>" class="rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link">
+              <?php echo get_field('howdy_block3_button_cta', 'options'); ?>
             </a>
           </div>
         </div>

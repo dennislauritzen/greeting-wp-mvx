@@ -706,10 +706,6 @@ function ajax_fetch() { ?>
 			jQuery("#searchform").submit(function(event){
 				event.preventDefault();
 				var val = jQuery("#datafetch_wrapper li.recomms:first-child a").prop('href');
-				var postalcode = '';
-				var city = '';
-
-				window.localStorage.setItem('greeting_postalcode', text);
 
 				if(val.length){
 					window.location.href = val;
