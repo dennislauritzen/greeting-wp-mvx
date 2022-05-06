@@ -1034,7 +1034,7 @@ function categoryActionJavascript() { ?>
 
 				$('div.filter-list div.dynamic-filters').remove();
 
-				jQuery('.store').show();
+				jQuery('#defaultStore').show();
 				jQuery('.filteredStore').hide();
 			});
 		});
@@ -2413,7 +2413,8 @@ function greeting_shop_only_one_store_same_time() {
  */
 // show shop only one store same time notice
 function show_shop_only_one_store_same_time_notice(){
-	wc_print_notice('You can not shopping from different STORE once!, Please go to CART and keep only one STORE item in cart. If you want to shopping from several item please you can place another order.', 'error');
+	$notice = 'Øv - vi kan se, du har produkter fra flere butikker i kurven. Du kan på nuværende tidspunkt kun handle i én butik ad gangen. Gå til kurven og sørg for, der kun er produkter fra én butik i kurven, før du kan gennemføre';
+	wc_print_notice($notice, 'error');
 }
 
 /**
@@ -2777,20 +2778,19 @@ function greeting_echo_date_picker( ) {
 		$closed_days_date[] = $modified_date;
 	}
 
-	$closed_days_date[] = $vendorClosedDayRow->meta_value;
+	$closed_days_date = explode(",",$vendorClosedDayRow->meta_value);
 
-	$date_now = new dateTime();
+	$date_now = new DateTime();
 	$closed_days_date_exist_check = array();
 
 	foreach($closed_days_date as $ok_date){
-		$date_time_object = new dateTime($ok_date);
+		$date_time_object = new DateTime($ok_date);
 		if($date_time_object > $date_now){
 			$closed_days_date_exist_check[] = $ok_date;
 		}
 	}
 
 	rsort($closed_days_date_exist_check); // reverse sort the array
-
 
 	echo '<div id="show-if-shipping">';
 	echo '<span>Butikken kan levere om ';
@@ -2837,10 +2837,20 @@ add_action( 'woocommerce_after_checkout_validation', 'greeting_check_billing_pos
 function argmcAddStepsContent($step) {
 	//First Step Content
   if ($step == 'step_6') {
-		greeting_echo_receiver_info( );
+		greeting_echo_receiver_info();
 	}
 }
 add_action('arg-mc-checkout-step', 'argmcAddStepsContent');
+
+
+
+/**
+ * Make ship to different address checkbox checked by default
+ * @since 1.0.1
+ * @author Dennis Lauritzen
+ */
+add_filter('woocommerce_ship_to_different_address_checked', '__return_true');
+add_filter('woocommerce_order_needs_shipping_address', '__return_true');
 
 /**
  * Disable order shipping options
@@ -2884,6 +2894,18 @@ function greeting_marketplace_checkout_fields($fields) {
   return $fields;
 }
 
+add_action( 'woocommerce_after_shipping_rate', 'blm_action_after_shipping_rate', 20, 2 );
+function blm_action_after_shipping_rate ( $method, $index ) {
+    if( is_cart() ) {
+        return; // Exit on cart page
+    }
+
+    $shipping_country = WC()->customer->get_shipping_country();
+    $shipping_state   = WC()->customer->get_shipping_state();
+
+    // Testing output
+    echo '<br><small>Country code:' . $shipping_country . ' | State code: ' . $shipping_state . '</small>';
+}
 
 /**
  * Add additional terms to checkout if cart contains product that has an age restriction of 18+
@@ -2907,7 +2929,7 @@ function greeting_marketplace_checkout_age_restriction() {
 			'label_class'   => array('woocommerce-form__label woocommerce-form__label-for-checkbox checkbox'),
 			'input_class'   => array('woocommerce-form__input woocommerce-form__input-checkbox input-checkbox'),
 			'required'      => true,
-			'label'         => esc_html__('I confirm that I\'m 18+ years old.', 'woocommerce'),
+			'label'         => esc_html__('I confirm that I\'m 18+ years old.', 'greeting2'),
 		));
 	}
 }
@@ -2990,4 +3012,74 @@ function handle_price_range_query_var( $query, $query_vars ) {
         }
     }
     return $query;
+}
+
+/**
+ * Function for getting IP details
+ * from user.
+ *
+ * @access public
+ * @author Dennis Lauritzen
+ * @return string
+ */
+function get_client_ip() {
+    $ipaddress = '';
+    if (getenv('HTTP_CLIENT_IP'))
+        $ipaddress = getenv('HTTP_CLIENT_IP');
+    else if(getenv('REMOTE_ADDR'))
+         $ipaddress = getenv('REMOTE_ADDR');
+    else if(getenv('HTTP_X_FORWARDED_FOR'))
+        $ipaddress = getenv('HTTP_X_FORWARDED_FOR');
+    else if(getenv('HTTP_X_FORWARDED'))
+        $ipaddress = getenv('HTTP_X_FORWARDED');
+    else if(getenv('HTTP_FORWARDED_FOR'))
+        $ipaddress = getenv('HTTP_FORWARDED_FOR');
+    else if(getenv('HTTP_FORWARDED'))
+       $ipaddress = getenv('HTTP_FORWARDED');
+    else
+        $ipaddress = 'UNKNOWN';
+    return $ipaddress;
+}
+
+/**
+ * Function for getting IP info from
+ * service providers' API.
+ *
+ * @access public
+ * @author Dennis Lauritzen
+ * @return string
+ */
+function call_ip_apis($ip){
+  $urls = array(
+    'http://ipinfo.io/'.$ip.'/json', // return HTTP=429 if usage limit reached
+    'http://ip-api.com/json/'.$ip
+  );
+
+  $curl = curl_init();
+  curl_setopt($curl, CURLOPT_URL, $urls[0]);
+  curl_setopt($curl, CURLOPT_BINARYTRANSFER, true);
+  curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+  $jsonData = json_decode(curl_exec($curl));
+  if(curl_getinfo($curl, CURLINFO_RESPONSE_CODE) != '200'){
+    curl_setopt($curlSession, CURLOPT_URL, $urls[1]);
+  }
+  #curl_setopt($curl, CURLOPT_GET, true);
+
+  $jsonData = json_decode(curl_exec($curl));
+  curl_close($curl);
+
+  return $jsonData;
+}
+
+
+/**
+ * Change the default state and country on the checkout page
+ */
+add_filter( 'default_checkout_billing_country', 'change_default_checkout_country' );
+add_filter( 'default_checkout_billing_state', 'change_default_checkout_state' );
+function change_default_checkout_country() {
+  return 'DK'; // country code
+}
+function change_default_checkout_state() {
+  return 'DK'; // state code
 }

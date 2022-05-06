@@ -44,11 +44,15 @@ $blue: #0d6efd;
 $indigo: #6610f2;
 $purple: #6f42c1;
 $pink: #d63384;
+$pink-greeting: #F8F8F8;
+$rose-greeting: #fecbca;
 $red: #dc3545;
 $orange: #fd7e14;
 $yellow: #ffc107;
+$yellow-greeting: #d6bf75;
 $green: #198754;
 $teal: #20c997;
+$teal-dark: #446a6b;
 $cyan: #0dcaf0;
 
 // Fonts
@@ -350,6 +354,25 @@ body.admin-bar {
 	}
 }
 
+a.greeting-link,
+a {
+	color: $teal-dark;
+
+	&:hover	{
+		color: darken($teal-dark, 10%);
+		text-decoration: underline;
+	}
+}
+a.greeting-link-yellow {
+	color: $yellow-greeting;
+}
+a.greeting-link-rose {
+	color: $rose-greeting;
+}
+a.greeting-link-pink {
+	color: $pink-greeting;
+}
+
 .bg-pink {
 	background:#F8F8F8;
 }
@@ -360,7 +383,10 @@ body.admin-bar {
 	background:#3E246F;
 }
 .bg-teal {
-	background: #446a6b;
+	background: $teal-dark;
+}
+.bg-red {
+	background: #b23849;
 }
 
 .bg-teal-75 {
@@ -381,18 +407,24 @@ body.admin-bar {
 	color:#3E246F;
 }
 .text-teal {
-	color:#4d696b;
+	color:$teal-dark;
 }
 
 /* Borders */
 .border-teal {
-	border-color: #446a6b;
-}
-.border-teal {
-	border: 1px solid #446a6b;
+	border: 1px solid $teal-dark;
 }
 .border-yellow {
 	border: 1px solid #d6bf75;
+}
+.border-color-teal {
+	border-color: $teal-dark;
+}
+.border-color-yellow {
+	border-color: #d6bf75;
+}
+.border-color-red {
+	border-color: #b23849;
 }
 
 /*
@@ -403,6 +435,20 @@ body.admin-bar {
 	border: 1px solid #58a2a2;
 }
 
+/*
+ *
+ * Notices
+ *
+ */
+.greeting-notice {
+
+}
+.woocommerce-message::before,
+.woocommerce-info::before,
+.woocommerce-error::before
+{
+	content: '';
+}
 
 /* Top part */
 #top {

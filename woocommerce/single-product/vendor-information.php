@@ -26,11 +26,15 @@ if(!is_object($vendor)){
 				<?php
           if(!is_object($vendor)){
             $image = $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
+            $link = '#';
           } else {
-  					$image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
+  					$image = $vendor->get_image() ? $vendor->get_image('image', array(175,175)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
+            $link = $vendor->get_permalink();
           }
 				?>
-				<img class="d-inline-block pb-3" src="<?php echo esc_attr($image); ?>">
+        <a href="<?php echo $link; ?>">
+  				<img class="d-inline-block pb-3" src="<?php echo esc_attr($image); ?>">
+        </a>
       </div>
       <div class="col-lg-6">
         <h6><?php echo (is_object($vendor) ? ucfirst(esc_html($vendor->user_data->data->display_name)) : ''); ?></h6>

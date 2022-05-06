@@ -48,7 +48,7 @@
                     <a class="nav-link text-dark" href="<?php echo site_url();?>/firmagaver">Firmagaver</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark" href="<?php echo site_url();?>/om-os">Om Greeting</a>
+                    <a class="nav-link text-dark" href="<?php echo site_url();?>/om-os">Om Greeting.dk</a>
                 </li>
             </ul>
             <ul class="nav d-inline-flex m-0">

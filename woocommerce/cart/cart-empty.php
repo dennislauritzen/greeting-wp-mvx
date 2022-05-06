@@ -24,7 +24,15 @@ do_action( 'woocommerce_cart_is_empty' );
 
 if ( wc_get_page_id( 'shop' ) > 0 ) : ?>
 	<p class="return-to-shop">
-		<a class="button wc-backward" href="<?php echo esc_url( apply_filters( 'woocommerce_return_to_shop_redirect', wc_get_page_permalink( 'shop' ) ) ); ?>">
+		<script type="text/javascript">
+			jQuery(document).ready(function(){
+				var link = window.localStorage.getItem('city_link');
+				if(link && link != ''){
+					document.getElementById('backLinkCart').href = link;
+				}
+			});
+		</script>
+		<a class="button wc-backward" id="backLinkCart" href="<?php echo esc_url( home_url() ); ?>">
 			<?php
 				/**
 				 * Filter "Return To Shop" text.

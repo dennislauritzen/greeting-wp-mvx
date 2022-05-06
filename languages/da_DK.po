@@ -1,0 +1,1247 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: them.es Starter Theme v1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-06 13:13+0200\n"
+"PO-Revision-Date: 2022-05-06 13:43+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: da_DK\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"POT-Revision-Date: Tue Apr 12 2016 16:05:52 GMT+0200 (CEST)\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Generator: Poedit 3.0.1\n"
+"X-Poedit-KeywordsList: _:1;gettext:1;dgettext:2;ngettext:1,2;dngettext:2,3;"
+"__:1;_e:1;_c:1;_n:1,2;_n_noop:1,2;_nc:1,2;__ngettext:1,2;__ngettext_noop:1,2;"
+"_x:1,2c;_ex:1,2c;_nx:1,2,4c;_nx_noop:1,2,3c;_n_js:1,2;_nx_js:1,2,3c;"
+"esc_attr__:1;esc_html__:1;esc_attr_e:1;esc_html_e:1;esc_attr_x:1,2c;"
+"esc_html_x:1,2c;comments_number_link:2,3;t:1;st:1;trans:1;transChoice:1,2\n"
+"X-Poedit-Basepath: ..\n"
+"X-Textdomain-Support: yes\n"
+"X-Loco-Target-Locale: de_DE\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: 404.php:13
+msgid "Not found"
+msgstr "Der blev ikke fundet noget"
+
+#: 404.php:15
+msgid "It looks like nothing was found at this location."
+msgstr "Det ser ikke ud til, at vi kan finde det, du leder efter."
+
+#: archive.php:14
+#, php-format
+msgid "Daily Archives: %s"
+msgstr "Daglige arkiver: %s"
+
+#: archive.php:16
+#, php-format
+msgid "Monthly Archives: %s"
+msgstr "Månedlige arkiver: %s"
+
+#: archive.php:16
+msgctxt "monthly archives date format"
+msgid "F Y"
+msgstr "F Y"
+
+#: archive.php:18
+#, php-format
+msgid "Yearly Archives: %s"
+msgstr "Årsarkiv: %s"
+
+#: archive.php:18
+msgctxt "yearly archives date format"
+msgid "Y"
+msgstr "Y"
+
+#: archive.php:20
+msgid "Blog Archives"
+msgstr "Blog-side"
+
+#: author-bio.php:14
+#, php-format
+msgid "About %s"
+msgstr "Om %s"
+
+#: author-bio.php:23
+msgid "Website"
+msgstr "Besøg website"
+
+#: author.php:21
+#, php-format
+msgid "Author Archives: %s"
+msgstr "Arkiv for forfatter: %s"
+
+#: category.php:11
+#, php-format
+msgid "Category Archives: %s"
+msgstr "Kategori: %s"
+
+#: comments.php:24
+msgid "No Comments yet!"
+msgstr "Der er ingen kommentarer endnu"
+
+#: comments.php:36
+#, php-format
+msgctxt "comments title"
+msgid "One Reply to &ldquo;%s&rdquo;"
+msgstr "Én besvarelse til &ldquo;%s&rdquo;"
+
+#: comments.php:41
+#, php-format
+msgctxt "comments title"
+msgid "%1$s Reply to &ldquo;%2$s&rdquo;"
+msgid_plural "%1$s Replies to &ldquo;%2$s&rdquo;"
+msgstr[0] "%1$s svar til &ldquo;%2$s&rdquo;"
+msgstr[1] "%1$s svar til &ldquo;%2$s&rdquo;"
+
+#: comments.php:57 comments.php:80
+msgid "Comment navigation"
+msgstr "Navigér i kommentarer"
+
+#: comments.php:58 comments.php:81
+msgid "&larr; Older Comments"
+msgstr "&larr; Tidligere kommentarer"
+
+#: comments.php:59 comments.php:82
+msgid "Newer Comments &rarr;"
+msgstr "Nyere kommenterer &rarr;"
+
+#: comments.php:93
+msgid "Comments are closed."
+msgstr "Kommentarer er lukket."
+
+#: content-index.php:12 content.php:15 content.php:23 sidebar.php:46
+#, php-format
+msgid "Permalink to %s"
+msgstr "Link til %s"
+
+#: content-index.php:23
+#, php-format
+msgid "%s Comment"
+msgid_plural "%s Comments"
+msgstr[0] "%s kommentar"
+msgstr[1] "%s kommentarer"
+
+#: content-index.php:44 content-single.php:31 content.php:49 image.php:46
+#: page-full.php:18 page.php:24
+msgid "Pages:"
+msgstr "Sider:"
+
+#: content-index.php:47 content.php:111 sidebar.php:64
+msgid "more"
+msgstr "vis flere"
+
+#: content-none.php:10 search.php:19
+msgid "Nothing Found"
+msgstr "Intet fundet"
+
+#: content-none.php:13
+msgid "Apologies, but no results were found for the requested archive."
+msgstr "Beklager, men der blev desværre ikke fundet noget i arkivet."
+
+#: content-single.php:260 content.php:113 functions.php:327 functions.php:352
+#: image.php:57 index.php:17 page-full.php:21 page.php:28 sidebar.php:18
+msgid "Edit"
+msgstr "Redigér"
+
+#: content-single.php:268 content-single.php:271 content.php:61 content.php:74
+msgid ", "
+msgstr ","
+
+#: content-single.php:273
+#, php-format
+msgid ""
+"This entry was posted in %1$s and tagged %2$s by <a href=\"%6$s\">%5$s</a>. "
+"Bookmark the <a href=\"%3$s\" title=\"Permalink to %4$s\" rel=\"bookmark"
+"\">permalink</a>."
+msgstr ""
+
+#: content-single.php:275
+#, php-format
+msgid ""
+"This entry was posted in %1$s by <a href=\"%6$s\">%5$s</a>. Bookmark the <a "
+"href=\"%3$s\" title=\"Permalink to %4$s\" rel=\"bookmark\">permalink</a>."
+msgstr ""
+
+#: content-single.php:277
+#, php-format
+msgid ""
+"This entry was posted by <a href=\"%6$s\">%5$s</a>. Bookmark the <a href="
+"\"%3$s\" title=\"Permalink to %4$s\" rel=\"bookmark\">permalink</a>."
+msgstr ""
+
+#: content.php:17
+msgid "Featured"
+msgstr "Fremhævet"
+
+#: content.php:48
+msgid "Continue reading <span class=\"meta-nav\">&rarr;</span>"
+msgstr "Fortsæt læsning <span class=\"meta-nav\">&rarr;</span>"
+
+#: content.php:66
+#, php-format
+msgid "<span class=\"%1$s\">Posted in</span> %2$s"
+msgstr "<span class=\"%1$s\">Tagget</span> %2$s"
+
+#: content.php:84
+#, php-format
+msgid "<span class=\"%1$s\">Tagged</span> %2$s"
+msgstr "<span class=\"%1$s\">Tagget</span> %2$s"
+
+#: content.php:102
+msgid "Leave a comment"
+msgstr "Kommentér"
+
+#: dc-product-vendor/archive_vendor_info.php:30
+msgid "Unfollow"
+msgstr "Følg ikke"
+
+#: dc-product-vendor/archive_vendor_info.php:30
+msgid "Follow"
+msgstr "Følg"
+
+#: dc-product-vendor/emails/vendor-new-order.php:19
+#, php-format
+msgid ""
+"A new order was received and marked as %s from %s. Their order is as follows:"
+msgstr ""
+"En ny bestilling er modtaget og markeret som %s fra %s. Bestillingen ser ud "
+"som følger:"
+
+#: dc-product-vendor/emails/vendor-new-order.php:26
+#: woocommerce/cart/cart.php:28 woocommerce/cart/cart.php:57
+#: woocommerce/checkout/form-pay.php:27
+#: woocommerce/checkout/review-order.php:23
+msgid "Product"
+msgstr "Produkt"
+
+#: dc-product-vendor/emails/vendor-new-order.php:27
+#: woocommerce/cart/cart.php:30 woocommerce/cart/cart.php:81
+#: woocommerce/global/quantity-input.php:28
+msgid "Quantity"
+msgstr "Antal"
+
+#: dc-product-vendor/emails/vendor-new-order.php:28
+msgid "Commission"
+msgstr "Kommission"
+
+#: dc-product-vendor/emails/vendor-new-order.php:56
+msgid "Note:"
+msgstr "Note:"
+
+#: dc-product-vendor/emails/vendor-new-order.php:67
+msgid "Customer Details"
+msgstr "Kundeoplysninger"
+
+#: dc-product-vendor/emails/vendor-new-order.php:69
+msgid "Customer Name:"
+msgstr "Kundens navn:"
+
+#: dc-product-vendor/emails/vendor-new-order.php:70
+#: woocommerce/checkout/thankyou.php:58
+msgid "Email:"
+msgstr "E-mail:"
+
+#: dc-product-vendor/emails/vendor-new-order.php:73
+msgid "Telephone:"
+msgstr "Telefon:"
+
+#: dc-product-vendor/emails/vendor-new-order.php:82
+msgid "Billing Address"
+msgstr "Faktureringsadresse"
+
+#: dc-product-vendor/emails/vendor-new-order.php:84
+#: woocommerce/single-product/meta.php:47
+msgid "N/A"
+msgstr "Ikke tilgængelig"
+
+#: dc-product-vendor/emails/vendor-new-order.php:90
+msgid "Shipping Address"
+msgstr "Forsendelsesadresse"
+
+#: dc-product-vendor/review/rating-vendor-tab.php:31
+#: dc-product-vendor/review/rating_vendor_lists.php:31
+#, php-format
+msgid "Rated %s out of 5"
+msgstr "Vurderet %s ud af 5"
+
+#: dc-product-vendor/review/rating-vendor-tab.php:32
+#: dc-product-vendor/review/rating_vendor_lists.php:32
+#: dc-product-vendor/review/review-link.php:32
+#: dc-product-vendor/review/review.php:46
+#: dc-product-vendor/review/review.php:79
+#: dc-product-vendor/review/review.php:99
+msgid "out of 5"
+msgstr "ud af 5"
+
+#: dc-product-vendor/review/rating-vendor-tab.php:38
+#, php-format
+msgid " %s Stars out of 5 based on %s Reviews"
+msgstr " %s stjerner ud af 5 baseret på %s bedømmelser"
+
+#: dc-product-vendor/review/rating-vendor-tab.php:43
+msgid " No Reviews Yet"
+msgstr "Endnu ingen bedømmelser / anmeldelser"
+
+#: dc-product-vendor/review/rating.php:29
+msgid "Products reviews"
+msgstr "Produktbedømmelser"
+
+#: dc-product-vendor/review/rating.php:29
+msgid "Product review"
+msgstr "Produktbedømmelse"
+
+#: dc-product-vendor/review/rating.php:31
+msgid "Reviews"
+msgstr "Bedømmelser"
+
+#: dc-product-vendor/review/rating.php:31
+msgid "Review"
+msgstr "Bedømmelse"
+
+#: dc-product-vendor/review/rating.php:75
+#: dc-product-vendor/review/rating.php:95
+msgid " No Review Yet "
+msgstr "Der er ingen bedømmelser endnu"
+
+#: dc-product-vendor/review/rating_vendor_lists.php:35
+msgid "No Rating Yet"
+msgstr "Der er ingen rating endnu."
+
+#: dc-product-vendor/review/review-link.php:30
+#: dc-product-vendor/review/review-link.php:31
+msgid "Leave Vendor feedback"
+msgstr "Giv butikspartner feedback"
+
+#: dc-product-vendor/review/review.php:45
+#: dc-product-vendor/review/review.php:78
+#: dc-product-vendor/review/review.php:98
+#, php-format
+msgid "Rated %d out of 5"
+msgstr "Vurderet %d ud af 5"
+
+#: dc-product-vendor/review/review.php:51
+#: dc-product-vendor/review/review.php:104
+msgid "Your comment is awaiting approval"
+msgstr "Din kommentar afventer godkendelse"
+
+#: dc-product-vendor/review/review.php:58
+#: dc-product-vendor/review/review.php:111
+msgid "verified buyer"
+msgstr "verificeret køber"
+
+#: dc-product-vendor/shortcode/vendor_lists.php:30
+msgid "Enter Address"
+msgstr "Indtast adresse"
+
+#: dc-product-vendor/shortcode/vendor_lists.php:35
+msgid "Within"
+msgstr "Inden for"
+
+#: dc-product-vendor/shortcode/vendor_lists.php:48
+msgid "Miles"
+msgstr "Mil"
+
+#: dc-product-vendor/shortcode/vendor_lists.php:49
+msgid "Kilometers"
+msgstr "Kilometer"
+
+#: dc-product-vendor/shortcode/vendor_lists.php:50
+msgid "Nautical miles"
+msgstr "Nautiske mil"
+
+#: dc-product-vendor/shortcode/vendor_lists.php:55 functions.php:293
+msgid "Submit"
+msgstr "Send / Gem"
+
+#: dc-product-vendor/shortcode/vendor_lists.php:64
+#, php-format
+msgid "Viewing the single vendor"
+msgid_plural "Viewing all %d vendors"
+msgstr[0] "Viser enkelt butikspartner"
+msgstr[1] "Viser alle %d butikspartnere"
+
+#: dc-product-vendor/shortcode/vendor_lists.php:73
+#, php-format
+msgctxt "with first and last result"
+msgid "Viewing the single vendor"
+msgid_plural "Viewing %1$d&ndash;%2$d of %3$d vendors"
+msgstr[0] "Viser enkelt butikspartner"
+msgstr[1] "Viser %1$d&ndash;%2$d af %3$d butikspartnere"
+
+#: dc-product-vendor/shortcode/vendor_lists.php:83
+msgid "By date"
+msgstr "Efter dato"
+
+#: dc-product-vendor/shortcode/vendor_lists.php:84
+msgid "By Alphabetically"
+msgstr "Alfabetisk"
+
+#: dc-product-vendor/shortcode/vendor_lists.php:85
+msgid "By Category"
+msgstr "Efter kategori"
+
+#: dc-product-vendor/shortcode/vendor_lists.php:86
+msgid "By Shipping"
+msgstr "Efter forsendelse"
+
+#: dc-product-vendor/shortcode/vendor_lists.php:113
+#: dc-product-vendor/vendor_registration_form.php:234
+msgid "Select a country&hellip;"
+msgstr "Vælg et land&hellip;"
+
+#: dc-product-vendor/shortcode/vendor_lists.php:122
+msgid "Select a state&hellip;"
+msgstr "Vælg en stat&hellip;"
+
+#: dc-product-vendor/shortcode/vendor_lists.php:124
+msgid "ZIP code"
+msgstr "Postnummer"
+
+#: dc-product-vendor/shortcode/vendor_lists.php:128
+msgid "Sort"
+msgstr "Sortér efter"
+
+#: dc-product-vendor/shortcode/vendor_lists.php:186
+msgid "No vendor found!"
+msgstr ""
+"Der blev desværre ikke fundet nogle butikker, der opfylder de valgte "
+"kriterier."
+
+#: dc-product-vendor/shortcode/vendor_registration.php:4
+msgid "Vendor Registration Form"
+msgstr "Registrér som butikspartner"
+
+#: dc-product-vendor/shortcode/vendor_registration.php:9
+msgid "Account Details"
+msgstr "Kontodetaljer"
+
+#: dc-product-vendor/shortcode/vendor_registration.php:12
+#: woocommerce/myaccount/form-login.php:80
+msgid "Username"
+msgstr "Brugernavn"
+
+#: dc-product-vendor/shortcode/vendor_registration.php:17
+#: dc-product-vendor/vendor-dashboard/vendor-orders/views/html-order-info.php:145
+#: woocommerce/myaccount/form-login.php:87
+msgid "Email address"
+msgstr "E-mail adresse"
+
+#: dc-product-vendor/shortcode/vendor_registration.php:22 functions.php:292
+#: woocommerce/myaccount/form-login.php:43
+#: woocommerce/myaccount/form-login.php:94
+msgid "Password"
+msgstr "Kodeord"
+
+#: dc-product-vendor/shortcode/vendor_registration.php:26
+msgid "Anti-spam"
+msgstr "Anti-spam"
+
+#: dc-product-vendor/shortcode/vendor_registration.php:38
+#: woocommerce/myaccount/form-login.php:71
+#: woocommerce/myaccount/form-login.php:108
+msgid "Register"
+msgstr "Registrer"
+
+#: dc-product-vendor/taxonomy-dc_vendor_shop.php:55
+msgid "Site Administrator has blocked this vendor"
+msgstr "Greeting.dk har valgt at udelukke denne vendor"
+
+#: dc-product-vendor/vendor-dashboard/product-manager/views/html-product-attribute.php:23
+msgid "Remove"
+msgstr "Fjern"
+
+#: dc-product-vendor/vendor-dashboard/product-manager/views/html-product-attribute.php:32
+#: functions.php:407 functions.php:408
+msgid "Name"
+msgstr "Navn"
+
+#: dc-product-vendor/vendor-dashboard/product-manager/views/html-product-attribute.php:45
+msgid "Value(s)"
+msgstr "Værdi(er)"
+
+#: dc-product-vendor/vendor-dashboard/product-manager/views/html-product-attribute.php:59
+msgid "Select terms"
+msgstr "Vælg vilkår"
+
+#: dc-product-vendor/vendor-dashboard/product-manager/views/html-product-attribute.php:76
+msgid "Select all"
+msgstr "Vælg alle"
+
+#: dc-product-vendor/vendor-dashboard/product-manager/views/html-product-attribute.php:77
+msgid "Select none"
+msgstr "Vælg ingen"
+
+#: dc-product-vendor/vendor-dashboard/product-manager/views/html-product-attribute.php:85
+#, php-format
+msgid "Enter some text, or some attributes by \"%s\" separating values."
+msgstr "Indtast en tekst eller en attribut med \"%s\" som separator."
+
+#: dc-product-vendor/vendor-dashboard/product-manager/views/html-product-attribute.php:92
+msgid "Visible on the product page"
+msgstr "Synlig på produktside"
+
+#: dc-product-vendor/vendor-dashboard/product-manager/views/html-product-attribute.php:103
+msgid "Used for variations"
+msgstr "Bruges ved variationer"
+
+#: dc-product-vendor/vendor-dashboard/product-manager/views/html-product-data-attributes.php:29
+msgid "Custom product attribute"
+msgstr "Tilpasset produktattribut"
+
+#: dc-product-vendor/vendor-dashboard/product-manager/views/html-product-data-attributes.php:44
+msgid "Add"
+msgstr "Tilføj"
+
+#: dc-product-vendor/vendor-dashboard/product-manager/views/html-product-data-attributes.php:50
+#: dc-product-vendor/vendor-dashboard/product-manager/views/html-product-data-attributes.php:82
+msgid "Expand"
+msgstr "Udvid"
+
+#: dc-product-vendor/vendor-dashboard/product-manager/views/html-product-data-attributes.php:50
+#: dc-product-vendor/vendor-dashboard/product-manager/views/html-product-data-attributes.php:82
+msgid "Close"
+msgstr "Luk"
+
+#: dc-product-vendor/vendor-dashboard/product-manager/views/html-product-data-attributes.php:79
+msgid "Save attributes"
+msgstr "Gem attributter"
+
+#: dc-product-vendor/vendor-dashboard/vendor-orders/views/html-order-info.php:32
+msgid "Order date"
+msgstr "Bestillingsdato"
+
+#: dc-product-vendor/vendor-dashboard/vendor-orders/views/html-order-info.php:38
+msgid "Payment method"
+msgstr "Betalingsmetode"
+
+#: dc-product-vendor/vendor-dashboard/vendor-orders/views/html-order-info.php:43
+#, php-format
+msgid "Payment via <u><strong>%s</strong></u>"
+msgstr "Betaling via <u><strong>%s</strong></u>"
+
+#: dc-product-vendor/vendor-dashboard/vendor-orders/views/html-order-info.php:52
+msgid "Delivery location from map"
+msgstr "Leveringslokation fra kort"
+
+#: dc-product-vendor/vendor-dashboard/vendor-orders/views/html-order-info.php:72
+msgid "Delivery Date"
+msgstr "Leveringsdato"
+
+#: dc-product-vendor/vendor-dashboard/vendor-orders/views/html-order-info.php:78
+msgid "Receiver Info"
+msgstr "Modtagerdetaljer"
+
+#: dc-product-vendor/vendor-dashboard/vendor-orders/views/html-order-info.php:98
+msgid "Billing address"
+msgstr "Faktureringsadresse"
+
+#: dc-product-vendor/vendor-dashboard/vendor-orders/views/html-order-info.php:104
+#: dc-product-vendor/vendor-dashboard/vendor-orders/views/html-order-info.php:119
+msgid "Address:"
+msgstr "Adresse:"
+
+#: dc-product-vendor/vendor-dashboard/vendor-orders/views/html-order-info.php:104
+msgid "No billing address set."
+msgstr "Ingen faktureringsadresse indtastet."
+
+#: dc-product-vendor/vendor-dashboard/vendor-orders/views/html-order-info.php:113
+msgid "Shipping address"
+msgstr "Leveringsadresse"
+
+#: dc-product-vendor/vendor-dashboard/vendor-orders/views/html-order-info.php:119
+msgid "No shipping address set."
+msgstr "Ingen leveringsadresse indtastet."
+
+#: dc-product-vendor/vendor-dashboard/vendor-orders/views/html-order-info.php:128
+msgid "Customer detail"
+msgstr "Kundedetaljer"
+
+#: dc-product-vendor/vendor-dashboard/vendor-orders/views/html-order-info.php:146
+msgid "Phone"
+msgstr "Telefon"
+
+#: dc-product-vendor/vendor-dashboard/vendor-orders/views/html-order-info.php:181
+msgid "Customer provided note:"
+msgstr "Kundens note:"
+
+#: functions.php:194
+msgid "Older posts"
+msgstr "Ældre indlæg"
+
+#: functions.php:195
+msgid "Newer posts"
+msgstr "Nyere indlæg"
+
+#: functions.php:265
+#, php-format
+msgid ""
+"<span class=\"sep\">Posted on </span><a href=\"%1$s\" title=\"%2$s\" rel="
+"\"bookmark\"><time class=\"entry-date\" datetime=\"%3$s\">%4$s</time></"
+"a><span class=\"by-author\"> <span class=\"sep\"> by </span> <span class="
+"\"author-meta vcard\"><a class=\"url fn n\" href=\"%5$s\" title=\"%6$s\" rel="
+"\"author\">%7$s</a></span></span>"
+msgstr ""
+
+#: functions.php:271
+#, php-format
+msgid "View all posts by %s"
+msgstr "Vis alle posts af %s"
+
+#: functions.php:289
+msgid ""
+"This content is password protected. To view it please enter your password "
+"below."
+msgstr ""
+"Dette indhold er beskyttet af kodeord - for at se det bedes du venligst "
+"indtaste koden nedenfor."
+
+#: functions.php:327
+msgid "Pingback:"
+msgstr "Pingback:"
+
+#: functions.php:342
+#, php-format
+msgid "%1$s, %2$s"
+msgstr "%1$s, %2$s"
+
+#: functions.php:348
+#, php-format
+msgid "%1$s ago"
+msgstr "%1$s siden"
+
+#: functions.php:357
+msgid "Your comment is awaiting moderation."
+msgstr "Din kommentar afventer moderering."
+
+#: functions.php:370
+msgid "Reply"
+msgstr "Svar"
+
+#: functions.php:411 functions.php:412
+msgid "Email"
+msgstr "E-mail"
+
+#: functions.php:417
+msgid ""
+"Save my name, email, and website in this browser for the next time I comment."
+msgstr "Gem mit navn, e-mail og website i denne browser til næste gang."
+
+#: functions.php:424 functions.php:425
+msgid "Comment"
+msgstr "Kommentar"
+
+#: functions.php:428
+#, php-format
+msgid "You must be <a href=\"%s\">logged in</a> to post a comment."
+msgstr ""
+
+#: functions.php:430
+#, php-format
+msgid ""
+"Logged in as <a href=\"%1$s\">%2$s</a>. <a href=\"%3$s\" title=\"Log out of "
+"this account\">Log out?</a>"
+msgstr ""
+
+#: functions.php:431
+msgid "Your Email address will not be published."
+msgstr "Din e-mail adresse vil ikke blive publiceret."
+
+#: functions.php:438
+#, php-format
+msgid "Leave a Reply to %s"
+msgstr "Svar på %s"
+
+#: functions.php:439
+msgid "Cancel reply"
+msgstr "Afbryd svar"
+
+#: functions.php:440
+msgid "Post Comment"
+msgstr "Send kommentar"
+
+#: functions.php:523
+msgid "Landing Pages"
+msgstr "Landingssider"
+
+#: functions.php:524
+msgid "Landing Page"
+msgstr "Landingsside"
+
+#: functions.php:547 woocommerce/cart/shipping-calculator.php:76
+msgid "City"
+msgstr "By"
+
+#: functions.php:548
+msgid "Cities"
+msgstr "Byer"
+
+#: functions.php:1818
+#, php-format
+msgid "Delivered <span class=\"count\">(%s)</span>"
+msgid_plural "Delivered <span class=\"count\">(%s)</span>"
+msgstr[0] "Leveret <span class=\"count\">(%s)</span>"
+msgstr[1] "Leveret <span class=\"count\">(%s)</span>"
+
+#: functions.php:2120
+msgid "Please select the Delivery Date"
+msgstr "Vælg venligst leveringsdato"
+
+#: functions.php:2236
+msgid "Please enter receiver info"
+msgstr "Venligst indtast modtagerinfo"
+
+#: functions.php:2237
+msgid "Please enter greeting message"
+msgstr "Venligst indtast din hilsen til modtager"
+
+#: functions.php:2239
+msgid ""
+"Standard package accept only 150 Character, Please choose premium package"
+msgstr ""
+"Standardhilsenen indeholder desværre kun 150 tegn - vælg venligst den større "
+"hilsen (der inkluderer et større kort) for at skrive en længere tekst (op "
+"til 400 tegn)."
+
+#: functions.php:2298
+msgid "Packaging Options"
+msgstr "Sorteringsindstillinger"
+
+#: functions.php:2490
+msgid "Fra "
+msgstr "Fra "
+
+#: functions.php:2657
+msgid "Hilsen & leveringsdato"
+msgstr "Hilsen & leveringsdato"
+
+#: functions.php:2701
+msgid "Din hilsen til modtager"
+msgstr "Din hilsen til modtager"
+
+#: functions.php:2702
+msgid "Skriv din hilsen til din modtager her :)"
+msgstr "Skriv din hilsen til din modtager her :)"
+
+#: functions.php:2709
+msgid "Receiver info"
+msgstr "Modtagerinfo"
+
+#: functions.php:2710
+msgid "Enter receiver info"
+msgstr "Indtast modtagerens informationer"
+
+#: functions.php:2809
+msgid "Hvornår skal gaven leveres?"
+msgstr "Hvornår skal gaven leveres?"
+
+#: functions.php:2810
+msgid "Hurtigst muligt"
+msgstr "Hurtigst muligt"
+
+#: functions.php:2911
+msgid "I confirm that I'm 18+ years old."
+msgstr ""
+"Jeg bekræfter hermed, at jeg er over 18 år (og dermed må købe produkter, der "
+"indeholder alkohol)."
+
+#: header.php:37
+msgid "Skip to main content"
+msgstr "Gå til primært indhold"
+
+#: header.php:90
+msgid "Toggle navigation"
+msgstr "Vis/skjul navigation"
+
+#: header.php:111 header.php:112 searchform.php:8 searchform.php:9
+msgid "Search"
+msgstr "Søg"
+
+#: image.php:19
+msgid "Previous image"
+msgstr "Forrige billede"
+
+#: image.php:20
+msgid "Next image"
+msgstr "Næste billede"
+
+#: image.php:50
+msgid "Page"
+msgstr "Side"
+
+#: image.php:70
+msgctxt "Parent post link"
+msgid "Published in %title"
+msgstr "Publiceret i %title"
+
+#: image.php:71
+msgid "Parent post"
+msgstr "Forældre-post"
+
+#: inc/customizer.php:22
+msgid "Header"
+msgstr "Header"
+
+#: inc/customizer.php:43
+msgid "Upload Header Logo"
+msgstr "Upload header-logo"
+
+#: inc/customizer.php:44
+msgid "Height: &gt;80px"
+msgstr "Højde: &gt;80px"
+
+#: inc/customizer.php:64
+msgid "Navbar Scheme"
+msgstr "Navbar farveskema"
+
+#: inc/customizer.php:67
+msgid "Default"
+msgstr "Standard"
+
+#: inc/customizer.php:68
+msgid "Dark"
+msgstr "Mørk"
+
+#: inc/customizer.php:69
+msgid "Primary"
+msgstr "Primær"
+
+#: inc/customizer.php:88
+msgid "Navbar"
+msgstr "Navbar"
+
+#: inc/customizer.php:91
+msgid "Static"
+msgstr "Statisk"
+
+#: inc/customizer.php:92
+msgid "Fixed to top"
+msgstr "Fastgjort til top"
+
+#: inc/customizer.php:93
+msgid "Fixed to bottom"
+msgstr "Fastgjort til bund"
+
+#: inc/customizer.php:112
+msgid "Show Searchfield?"
+msgstr "Vis søgefelt?"
+
+#: inc/wp_bootstrap_navwalker.php:208
+msgid "Add a menu"
+msgstr "Tilføj menu"
+
+#: search.php:11
+#, php-format
+msgid "Search Results for: %s"
+msgstr "Søgeresultater for: %s"
+
+#: search.php:21
+msgid ""
+"Sorry, but nothing matched your search criteria. Please try again with some "
+"different keywords."
+msgstr ""
+
+#: sidebar.php:35
+msgid "Recent Posts"
+msgstr "Seneste indlæg"
+
+#: sidebar.php:57
+msgid "Categories"
+msgstr "Kategorier"
+
+#: tag.php:11
+#, php-format
+msgid "Tag: %s"
+msgstr "Tag: %s"
+
+#: woocommerce/archive-product-to-vendorstore.php:344
+msgid "No verified vendor found!"
+msgstr "Ingen godkendt butikspartner fundet"
+
+#: woocommerce/cart/cart-empty.php:43
+msgid "Return to shop"
+msgstr "Gå tilbage til shop"
+
+#: woocommerce/cart/cart-shipping.php:81
+msgid "Shipping costs are calculated during checkout."
+msgstr ""
+
+#: woocommerce/cart/cart-shipping.php:83
+msgid "Enter your address to view shipping options."
+msgstr ""
+
+#: woocommerce/cart/cart-shipping.php:86
+msgid ""
+"There are no shipping options available. Please ensure that your address has "
+"been entered correctly, or contact us if you need any help."
+msgstr ""
+
+#: woocommerce/cart/cart-shipping.php:89
+#, php-format
+msgid "No shipping options were found for %s."
+msgstr ""
+
+#: woocommerce/cart/cart-shipping.php:90
+msgid "Enter a different address"
+msgstr "Indtast en anden adresse"
+
+#: woocommerce/cart/cart-totals.php:23
+msgid "Cart totals"
+msgstr "Total"
+
+#: woocommerce/cart/cart-totals.php:27 woocommerce/cart/cart-totals.php:28
+#: woocommerce/cart/cart.php:31 woocommerce/cart/cart.php:103
+#: woocommerce/checkout/review-order.php:24
+#: woocommerce/checkout/review-order.php:56
+msgid "Subtotal"
+msgstr "Subtotal"
+
+#: woocommerce/cart/cart-totals.php:59 woocommerce/cart/cart-totals.php:60
+msgid "Shipping"
+msgstr "Forsendelse"
+
+#: woocommerce/cart/cart-totals.php:89
+#, php-format
+msgid "(estimated for %s)"
+msgstr "(estimat for %s)"
+
+#: woocommerce/cart/cart-totals.php:122 woocommerce/cart/cart-totals.php:124
+#: woocommerce/checkout/review-order.php:103
+msgid "Total"
+msgstr ""
+
+#: woocommerce/cart/cart.php:29 woocommerce/cart/cart.php:76
+msgid "Price"
+msgstr "Pris"
+
+#: woocommerce/cart/cart.php:72
+msgid "Available on backorder"
+msgstr "Tilgængelig for restordre-bestilling"
+
+#: woocommerce/cart/cart.php:116 woocommerce/cart/mini-cart.php:47
+msgid "Remove this item"
+msgstr "Fjern denne vare"
+
+#: woocommerce/cart/cart.php:140
+msgid "Update cart"
+msgstr "Opdatér kurv"
+
+#: woocommerce/cart/cart.php:151
+msgid "Coupon:"
+msgstr "Rabatkode:"
+
+#: woocommerce/cart/cart.php:152 woocommerce/checkout/form-coupon.php:34
+msgid "Coupon code"
+msgstr "Rabatkode"
+
+#: woocommerce/cart/cart.php:153 woocommerce/checkout/form-coupon.php:38
+msgid "Apply coupon"
+msgstr "Tilføj rabatkode"
+
+#: woocommerce/cart/cross-sells.php:24
+msgid "You may be interested in&hellip;"
+msgstr "Måske du kunne være interesseret i&hellip;"
+
+#: woocommerce/cart/mini-cart.php:92
+msgid "No products in the cart."
+msgstr "Ingen produkter i kurven."
+
+#: woocommerce/cart/proceed-to-checkout-button.php:26
+msgid "Proceed to checkout"
+msgstr "Gå til bestilling"
+
+#: woocommerce/cart/shipping-calculator.php:24
+msgid "Calculate shipping"
+msgstr "Beregn forsendelse"
+
+#: woocommerce/cart/shipping-calculator.php:31
+msgid "Select a country / region&hellip;"
+msgstr "Vælg land / region&hellip;"
+
+#: woocommerce/cart/shipping-calculator.php:50
+#: woocommerce/cart/shipping-calculator.php:55
+#: woocommerce/cart/shipping-calculator.php:67
+msgid "State / County"
+msgstr "Region"
+
+#: woocommerce/cart/shipping-calculator.php:56
+msgid "Select an option&hellip;"
+msgstr "Vælg &hellip;"
+
+#: woocommerce/cart/shipping-calculator.php:82
+msgid "Postcode / ZIP"
+msgstr "Postnr"
+
+#: woocommerce/cart/shipping-calculator.php:86
+msgid "Update"
+msgstr "Opdatér"
+
+#: woocommerce/checkout/cart-errors.php:21
+msgid ""
+"There are some issues with the items in your cart. Please go back to the "
+"cart page and resolve these issues before checking out."
+msgstr ""
+
+#: woocommerce/checkout/cart-errors.php:25
+msgid "Return to cart"
+msgstr "Gå tilbage til kurv"
+
+#: woocommerce/checkout/form-billing.php:24
+msgid "Billing &amp; Shipping"
+msgstr "Fakturering & forsendelse"
+
+#: woocommerce/checkout/form-billing.php:28
+msgid "Billing details"
+msgstr "Faktureringsinformation"
+
+#: woocommerce/checkout/form-billing.php:53
+msgid "Create an account?"
+msgstr "Opret konto?"
+
+#: woocommerce/checkout/form-checkout.php:26
+msgid "You must be logged in to checkout."
+msgstr "Du skal være logget ind for at bestille."
+
+#: woocommerce/checkout/form-checkout.php:54
+msgid "Your order"
+msgstr "Din ordre"
+
+#: woocommerce/checkout/form-coupon.php:26
+msgid "Have a coupon?"
+msgstr "Har du en rabatkode?"
+
+#: woocommerce/checkout/form-coupon.php:26
+msgid "Click here to enter your code"
+msgstr "Klik her for at indtaste din kode"
+
+#: woocommerce/checkout/form-coupon.php:31
+msgid "If you have a coupon code, please apply it below."
+msgstr "Har du en rabatkode? Så indtast den umiddelbart nedenfor."
+
+#: woocommerce/checkout/form-login.php:26
+msgid "Returning customer?"
+msgstr "Er du allerede kunde?"
+
+#: woocommerce/checkout/form-login.php:26
+msgid "Click here to login"
+msgstr "Klik her for at logge ind"
+
+#: woocommerce/checkout/form-login.php:32
+msgid ""
+"If you have shopped with us before, please enter your details below. If you "
+"are a new customer, please proceed to the Billing section."
+msgstr ""
+
+#: woocommerce/checkout/form-pay.php:28
+msgid "Qty"
+msgstr "Antal"
+
+#: woocommerce/checkout/form-pay.php:29
+msgid "Totals"
+msgstr "Total"
+
+#: woocommerce/checkout/form-pay.php:79
+msgid ""
+"Sorry, it seems that there are no available payment methods for your "
+"location. Please contact us if you require assistance or wish to make "
+"alternate arrangements."
+msgstr ""
+
+#: woocommerce/checkout/form-shipping.php:26
+msgid "Ship to a different address?"
+msgstr "Send til en anden adresse?"
+
+#: woocommerce/checkout/form-shipping.php:57
+#: woocommerce/single-product/tabs/additional-information.php:22
+msgid "Additional information"
+msgstr "Ekstra information"
+
+#: woocommerce/checkout/order-receipt.php:25
+#: woocommerce/checkout/thankyou.php:47
+msgid "Order number:"
+msgstr "Ordrenr.:"
+
+#: woocommerce/checkout/order-receipt.php:29
+#: woocommerce/checkout/thankyou.php:52
+msgid "Date:"
+msgstr "Dato:"
+
+#: woocommerce/checkout/order-receipt.php:33
+#: woocommerce/checkout/thankyou.php:64
+msgid "Total:"
+msgstr "Total:"
+
+#: woocommerce/checkout/order-receipt.php:38
+#: woocommerce/checkout/thankyou.php:70
+msgid "Payment method:"
+msgstr "Betalingsmetode:"
+
+#: woocommerce/checkout/payment.php:33
+msgid ""
+"Sorry, it seems that there are no available payment methods for your state. "
+"Please contact us if you require assistance or wish to make alternate "
+"arrangements."
+msgstr ""
+
+#: woocommerce/checkout/payment.php:33
+msgid "Please fill in your details above to see available payment methods."
+msgstr ""
+
+#: woocommerce/checkout/payment.php:42
+#, php-format
+msgid ""
+"Since your browser does not support JavaScript, or it is disabled, please "
+"ensure you click the %1$sUpdate Totals%2$s button before placing your order. "
+"You may be charged more than the amount stated above if you fail to do so."
+msgstr ""
+
+#: woocommerce/checkout/payment.php:44
+msgid "Update totals"
+msgstr "Opdatér total"
+
+#: woocommerce/checkout/terms.php:31
+msgid "required"
+msgstr "påkrævet"
+
+#: woocommerce/checkout/thankyou.php:31
+msgid ""
+"Unfortunately your order cannot be processed as the originating bank/"
+"merchant has declined your transaction. Please attempt your purchase again."
+msgstr ""
+
+#: woocommerce/checkout/thankyou.php:34
+msgid "Pay"
+msgstr "Betal"
+
+#: woocommerce/checkout/thankyou.php:36
+msgid "My account"
+msgstr "Min konto"
+
+#: woocommerce/checkout/thankyou.php:42 woocommerce/checkout/thankyou.php:84
+msgid "Thank you. Your order has been received."
+msgstr "Tak for det - din bestilling er modtaget."
+
+#: woocommerce/content-single-product-rigid-quickview.php:59
+msgid "Placeholder"
+msgstr "Placeholder"
+
+#: woocommerce/content-widget-reviews.php:31
+#, php-format
+msgid "by %s"
+msgstr "af %s"
+
+#: woocommerce/global/quantity-input.php:28
+#, php-format
+msgid "%s quantity"
+msgstr "%s antal"
+
+#: woocommerce/global/quantity-input.php:43
+msgctxt "Product quantity input tooltip"
+msgid "Qty"
+msgstr "Antal"
+
+#: woocommerce/loop/orderby.php:34
+msgid "Show"
+msgstr "Vis"
+
+#: woocommerce/loop/orderby.php:45
+msgid "Show All"
+msgstr "Vis alle"
+
+#: woocommerce/loop/orderby.php:55
+msgid "Sort By"
+msgstr "Sortér efter"
+
+#: woocommerce/loop/orderby.php:56
+msgid "Shop order"
+msgstr "Butiksbestilling"
+
+#: woocommerce/loop/pagination.php:37
+msgid "Loading"
+msgstr "Indlæser"
+
+#: woocommerce/loop/pagination.php:38
+msgid "No more items available"
+msgstr "Ikke yderligere varer tilgængelige"
+
+#: woocommerce/loop/pagination.php:43
+msgid "Load More"
+msgstr "Indlæs flere"
+
+#: woocommerce/myaccount/form-login.php:32
+msgid "Login"
+msgstr "Log ind"
+
+#: woocommerce/myaccount/form-login.php:39
+msgid "Username or email address"
+msgstr "Brugernavn eller e-mail adresse"
+
+#: woocommerce/myaccount/form-login.php:52
+msgid "Remember me"
+msgstr "Husk mig"
+
+#: woocommerce/myaccount/form-login.php:56
+msgid "Log in"
+msgstr "Log ind"
+
+#: woocommerce/myaccount/form-login.php:58
+msgid "Lost your password?"
+msgstr "Glemt kodeord?"
+
+#: woocommerce/myaccount/form-login.php:100
+msgid "A link to set a new password will be sent to your email address."
+msgstr ""
+"Et link til at vælge dit nye kodeord bliver sendt til din e-mail adresse."
+
+#: woocommerce/product-searchform.php:27 woocommerce/product-searchform.php:41
+msgid "Search Products"
+msgstr "Søg produkter"
+
+#: woocommerce/product-searchform.php:35
+msgid "All Categories"
+msgstr "Alle kategorier"
+
+#: woocommerce/single-product/add-to-cart/variable.php:32
+msgid "This product is currently out of stock and unavailable."
+msgstr ""
+"Dette produkt er desværre ikke på lager netop nu, og derfor kan det ikke "
+"bestilles."
+
+#: woocommerce/single-product/add-to-cart/variation.php:22
+msgid ""
+"Sorry, this product is unavailable. Please choose a different combination."
+msgstr ""
+"Beklager, dette produkt er ikke tilgængeligt. Vælg venligst en anden "
+"kombination."
+
+#: woocommerce/single-product/meta.php:41
+msgid "Category:"
+msgid_plural "Categories:"
+msgstr[0] "Kategori:"
+msgstr[1] "Kategorier:"
+
+#: woocommerce/single-product/meta.php:43
+msgid "Tag:"
+msgid_plural "Tags:"
+msgstr[0] "Tag:"
+msgstr[1] "Tags:"
+
+#: woocommerce/single-product/meta.php:47
+msgid "SKU:"
+msgstr "SKU:"
+
+#: woocommerce/single-product/product-image.php:44
+msgid "Awaiting product image"
+msgstr "Afventer produktbillede"
+
+#: woocommerce/single-product/product-image.php:55
+msgid "Play Product Video"
+msgstr "Afspil Produktvidea"
+
+#: woocommerce/single-product/tabs/description.php:22
+msgid "Description"
+msgstr "Beskrivelse"

@@ -26,9 +26,9 @@ if($args['cityName']){
           <div class="col-9">
             <div class="row">
             <?php
-            $vendorProducts = $vendor->get_products(array('fields' => 'all'));
+            $vendorProducts = $vendor->get_products(array('fields' => 'all', 'posts_per_page' => '3'));
             foreach ($vendorProducts as $prod) {
-              $product = wc_get_product($prod);
+              $product = wc_get_product($prod->ID);
               $imageId = $product->get_image_id();
               $uploadedImage = wp_get_attachment_image_url($imageId);
               $placeHolderImage = $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
@@ -39,17 +39,19 @@ if($args['cityName']){
               } else {
                 $imageUrl = $placeHolderImage;
               }
-            }
             ?>
               <div class="col-6 col-xs-6 col-sm-6 col-md-4">
                 <div class="card border-0">
-                    <a href="<?php echo get_permalink($product->get_id());?>"><img src="<?php echo $imageUrl;?>" class="card-img-top" alt="REPLACEME"></a>
+                    <a href="<?php echo get_permalink($product->get_id());?>"><img src="<?php echo $imageUrl;?>" class="card-img-top" alt="<?php echo $product->get_name();?>"></a>
                     <div class="card-body">
                         <h6 class="card-title" style="font-size: 14px;"><?php echo $product->get_name();?></a></h6>
                         <p class="price">Fra <?php echo $product->get_price();?> kr.</p>
                     </div>
                 </div>
               </div>
+              <?php
+              }
+              ?>
             </div>
           </div>
         </div>

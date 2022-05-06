@@ -286,7 +286,7 @@
 
  $vendor2 = get_user_meta($vendor_id);
  $banner = (!empty($vendor2['_vendor_banner'])? $vendor2['_vendor_banner'][0] : '');
- $vendor_banner = (!empty(wp_get_attachment_image_src($banner)) ? wp_get_attachment_image_src($banner, 'medium')[0] : '');
+ $vendor_banner = (!empty(wp_get_attachment_image_src($banner)) ? wp_get_attachment_image_src($banner, 'full')[0] : '');
  ?>
 
 
@@ -352,7 +352,7 @@
 					$cart_count = WC()->cart->cart_contents_count; // Set variable for cart item count
         	$cart_url = wc_get_cart_url();  // Set Cart URL
 					?>
-					<a href="<?php echo$cart_url; ?>">
+					<a href="<?php echo $cart_url; ?>">
 	          <span class="position-relative" aria-label="Se kurv">
 	            <svg width="21" height="23" viewBox="0 0 21 23" xmlns="http://www.w3.org/2000/svg">
 	              <path d="M6.434 6.967H3.306l-1.418 14.47h17.346L17.82 6.967h-3.124c.065.828.097 1.737.097 2.729h-1.5c0-1.02-.031-1.927-.093-2.729H7.93a35.797 35.797 0 00-.093 2.729h-1.5c0-.992.032-1.9.097-2.729zm.166-1.5C7.126 1.895 8.443.25 10.565.25s3.44 1.645 3.965 5.217h4.65l1.708 17.47H.234l1.712-17.47H6.6zm6.432 0c-.407-2.65-1.27-3.717-2.467-3.717-1.196 0-2.06 1.066-2.467 3.717h4.934z" fill="#ffffff">
@@ -428,9 +428,11 @@
               <?php
       					$image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
       				?>
-              <img class="img-fuid pe-1" style="max-height:75px;"
-                src="<?php echo esc_attr($image); ?>">
-              <?php echo ucfirst(esc_html($vendor->page_title)); ?>
+              <a href="<?php echo $vendor->get_permalink(); ?>" class="text-dark">
+                <img class="img-fuid pe-1" style="max-height:75px;"
+                  src="<?php echo esc_attr($image); ?>">
+                <?php echo ucfirst(esc_html($vendor->page_title)); ?>
+              </a>
             </div>
             <div class="d-lg-none col-3 col-lg-0">
               <button type="button" id="toggleOpening" class="d-lg-none btn btn-primary bg-teal border-0 py-2 px-1 px-sm-4" style="font-size:12px;">
@@ -496,16 +498,18 @@
               }
               $i = 1;
 
-              if(!empty($interv) && count($interv) > 0){
+              if(!empty($opening) && !empty($interv) && count($interv) > 0){
                 print 'Butikken leverer ';
                 foreach($interv as $v){
                   $val = explode('..',$v);
                   if(!empty($val)){
-                    $start = $open_label_days[$val[0]];
+                    $start = $open_label_days[$val[0]]?: '';
                     if($val[0] != $val[1])
                     {
-                      $end = $open_label_days[$val[1]];
-                      print strtolower($start."-".$end);
+                      $end = $open_label_days[$val[1]]?: '';
+                      if(!empty($start) && !empty($end)){
+                        print strtolower($start."-".$end);
+                      }
                     } else {
                       print strtolower($start);
                     }

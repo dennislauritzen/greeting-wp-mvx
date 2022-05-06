@@ -2,49 +2,7 @@
 
 global $wpdb;
 
-// Get IP Details for page.
-function get_client_ip() {
-    $ipaddress = '';
-    if (getenv('HTTP_CLIENT_IP'))
-        $ipaddress = getenv('HTTP_CLIENT_IP');
-    else if(getenv('REMOTE_ADDR'))
-         $ipaddress = getenv('REMOTE_ADDR');
-    else if(getenv('HTTP_X_FORWARDED_FOR'))
-        $ipaddress = getenv('HTTP_X_FORWARDED_FOR');
-    else if(getenv('HTTP_X_FORWARDED'))
-        $ipaddress = getenv('HTTP_X_FORWARDED');
-    else if(getenv('HTTP_FORWARDED_FOR'))
-        $ipaddress = getenv('HTTP_FORWARDED_FOR');
-    else if(getenv('HTTP_FORWARDED'))
-       $ipaddress = getenv('HTTP_FORWARDED');
-    else
-        $ipaddress = 'UNKNOWN';
-    return $ipaddress;
-}
-
-function call_ip_apis($ip){
-  $urls = array(
-    'http://ipinfo.io/'.$ip.'/json', // return HTTP=429 if usage limit reached
-    'http://ip-api.com/json/'.$ip
-  );
-
-  $curl = curl_init();
-  curl_setopt($curl, CURLOPT_URL, $urls[0]);
-  curl_setopt($curl, CURLOPT_BINARYTRANSFER, true);
-  curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-  $jsonData = json_decode(curl_exec($curl));
-  if(curl_getinfo($curl, CURLINFO_RESPONSE_CODE) != '200'){
-    curl_setopt($curlSession, CURLOPT_URL, $urls[1]);
-  }
-  #curl_setopt($curl, CURLOPT_GET, true);
-
-  $jsonData = json_decode(curl_exec($curl));
-  curl_close($curl);
-
-  return $jsonData;
-}
-$ip_detail_ipinfo = call_ip_apis('86.52.19.58');
-
+$ip_detail_ipinfo = call_ip_apis(get_client_ip());
 
 if(!empty($ip_detail_ipinfo) AND (isset($ip_detail_ipinfo->postal) || isset($ip_detail_ipinfo->zip))){
   #print $ip_details->postal;
@@ -572,10 +530,10 @@ if(!empty($results)){
 <?php } ?>
 
 <section id="howitworks" class="bg-light-grey py-5">
-  <div class="container text-center">
+  <div class="container text-center py-5 my-4">
     <div class="row">
       <div class="col-12">
-        <h2 class="py-2">🎁 Sådan fungerer det</h2>
+        <h2 class="pt-2 pb-4">🎁 Sådan fungerer det</h2>
         <p class="text-md py-4 lh-base">
           Indtast din modtagers adresse og se udvalg af gaver. Vælg en gave.<br>
           Butikken pakker gaven flot ind, håndskriver en hilsen fra dig og sørger for, at din gave leveres til modtageren.

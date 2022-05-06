@@ -74,7 +74,11 @@ $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
 					// $vendor previously declared and get value from there
 					$vendorProducts = $vendor->get_products(array('fields' => 'ids'));
 					foreach ($vendorProducts as $productId) {
-						$categoryTermList = wp_get_post_terms($productId, 'product_cat', array('fields' => 'all'));
+						$categoryTermList = wp_get_post_terms(
+              $productId,
+              'product_cat',
+              array('fields' => 'all', 'exclude' => array(15,16))
+            );
 						foreach($categoryTermList as $catTerm){
 							// unique item insert to array
 							$uniqueTermId = $catTerm->term_id;

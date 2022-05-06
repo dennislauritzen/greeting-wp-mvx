@@ -377,6 +377,7 @@ function addToLocalStorage(key, val){
 	window.localStorage.setItem(key, val);
 }
 jQuery(document).ready(function(){
+  addToLocalStorage('city_link', window.location.href);
   addToLocalStorage('city', '<?php echo $cityName; ?>');
   addToLocalStorage('postalcode', '<?php echo $cityPostalcode; ?>');
 });
@@ -520,7 +521,7 @@ jQuery(document).ready(function(){
           // product category
           $categoryArgs = array(
              'taxonomy'   => "product_cat",
-             'exclude' => 15,
+             'exclude' => array(15,16),
              // 'pad_counts' => true,
              // 'hide_empty' => 1,
           );
@@ -759,8 +760,8 @@ jQuery(document).ready(function(){
                 <small class="text-muted">
                   <div>
                     <?php
-                    $delivery_type = get_field('_delivery_type','user_'.$vendor->id);
-
+                    $delivery_type = get_field('delivery_type','user_'.$vendor->id);
+                    $delivery_type = (!empty($delivery_type['0']['value']) ? $delivery_type['0']['value'] : '');
                     if($delivery_type == 1){
                     ?>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bicycle" viewBox="0 0 16 16">
