@@ -2045,10 +2045,10 @@ function attach_pdf_to_email ( $attachments, $email_id , $order ) {
 }
 // vendor attachment end
 
-
+add_action( 'woocommerce_after_checkout_validation', 'greeting_check_billing_postcode', 10, 2);
 function greeting_check_billing_postcode( $fields, $errors ){
 
-	$storeProductId = '';
+	$storeProductId = 0;
 	// Get $product object from Cart object
 	$cart = WC()->cart->get_cart();
 
@@ -2114,8 +2114,7 @@ function greeting_show_hide_calendar( $available_gateways ) {?>
 <?php
 }
 
-add_action( 'woocommerce_checkout_process', 'greeting_validate_new_checkout_fields' );
-
+#add_action( 'woocommerce_checkout_process', 'greeting_validate_new_checkout_fields' );
 function greeting_validate_new_checkout_fields() {
    if ( isset( $_POST['delivery_date'] ) && empty( $_POST['delivery_date'] ) ) wc_add_notice( __( 'Please select the Delivery Date' ), 'error' );
 }
@@ -2135,7 +2134,18 @@ function greeting_enable_datepicker() { ?>
 add_action( 'woocommerce_after_checkout_form', 'greeting_load_calendar_dates', 20 );
 
 function greeting_load_calendar_dates( $available_gateways ) {
-	global $closed_days_date;?>
+	// Get $product object from Cart object
+	$cart = WC()->cart->get_cart();
+
+	foreach( $cart as $cart_item_key => $cart_item ){
+		$product = $cart_item['data'];
+		$storeProductId = $product->get_id();
+	}
+
+	$vendor_id = get_post_field( 'post_author', $storeProductId );
+	$dates = get_vendor_dates($vendor_id);
+	$dates_json = json_encode($dates);
+?>
 
    <script type="text/javascript">
       jQuery(document).ready(function($) {
@@ -2151,18 +2161,18 @@ function greeting_load_calendar_dates( $available_gateways ) {
 				customMinDateVal = $('#vendorDeliverDay').val();
 			}
 			// var vendorClosedDayArray = $('#vendorClosedDayId').val();
-			var vendorClosedDayArray = <?php echo json_encode($closed_days_date); ?>;
+			var vendorClosedDayArray = <?php echo $dates_json; ?>;
 
 			$('#datepicker').datepicker({
 				dateFormat: 'dd-mm-yy',
 				// minDate: -1,
 				minDate: customMinDateVal,
 				// maxDate: "+1M +10D"
-				maxDate: "+10D",
+				maxDate: "+58D",
 				// closed on specific date
 				beforeShowDay: function(date){
 					var string = jQuery.datepicker.formatDate('dd-mm-yy', date);
-					return [ vendorClosedDayArray.indexOf(string) == -1 ]
+					return [ vendorClosedDayArray.indexOf(string) == -1 ];
 				}
 			}).datepicker( "show" );
          });
@@ -2171,18 +2181,16 @@ function greeting_load_calendar_dates( $available_gateways ) {
    <?php
 }
 
+
 // Save & show date as order meta
-
 add_action( 'woocommerce_checkout_update_order_meta', 'greeting_save_delivery_date_with_order' );
-
 function greeting_save_delivery_date_with_order( $order_id ) {
-
     global $woocommerce;
     if ( $_POST['delivery_date'] ) update_post_meta( $order_id, '_delivery_date', esc_attr( $_POST['delivery_date'] ) );
 }
 
-add_action( 'woocommerce_admin_order_data_after_billing_address', 'greeting_delivery_date_display_admin_order_meta' );
 
+add_action( 'woocommerce_admin_order_data_after_billing_address', 'greeting_delivery_date_display_admin_order_meta' );
 function greeting_delivery_date_display_admin_order_meta( $order ) {
 
    echo '<p><strong>Delivery Date:</strong> ' . get_post_meta( $order->get_id(), '_delivery_date', true ) . '</p>';
@@ -2233,10 +2241,10 @@ add_action( 'woocommerce_checkout_process', 'greeting_validate_new_receiver_info
 
 function greeting_validate_new_receiver_info_fields() {
 
-   if ( isset( $_POST['receiver_info'] ) && empty( $_POST['receiver_info'] ) ) wc_add_notice( __( 'Please enter receiver info' ), 'error' );
-   if ( isset( $_POST['greeting_message'] ) && empty( $_POST['greeting_message'] ) ) wc_add_notice( __( 'Please enter greeting message' ), 'error' );
+   if ( isset( $_POST['receiver_phone'] ) && empty( $_POST['receiver_phone'] ) ) wc_add_notice( __( 'Please enter receiver_phone' ), 'greeting2' );
+   if ( isset( $_POST['greeting_message'] ) && empty( $_POST['greeting_message'] ) ) wc_add_notice( __( 'Please enter greeting message' ), 'greeting2' );
 
-   if ( $_POST['message-pro'] == 0 && (strlen( $_POST['greeting_message'] ) > 150))  wc_add_notice( __( 'Standard package accept only 150 Character, Please choose premium package' ), 'error' );
+   if ( $_POST['message-pro'] == 0 && (strlen( $_POST['greeting_message'] ) > 150))  wc_add_notice( __( 'Standard package accept only 150 Character, Please choose premium package' ), 'greeting2' );
 
 }
 
@@ -2246,14 +2254,14 @@ add_action( 'woocommerce_checkout_update_order_meta', 'greeting_save_receiver_in
 function greeting_save_receiver_info_with_order( $order_id ) {
     global $woocommerce;
 
-    if ( $_POST['receiver_info'] ) update_post_meta( $order_id, 'receiver_info', esc_attr( $_POST['receiver_info'] ) );
+    if ( $_POST['receiver_phone'] ) update_post_meta( $order_id, 'receiver_phone', esc_attr( $_POST['receiver_phone'] ) );
 }
 
 add_action( 'woocommerce_admin_order_data_after_billing_address', 'greeting_receiver_info_display_admin_order_meta' );
 
 function greeting_receiver_info_display_admin_order_meta( $order ) {
 
-   echo '<p><strong>Receiver Info:</strong> ' . get_post_meta( $order->get_id(), 'receiver_info', true ) . '</p>';
+   echo '<p><strong>Receiver Phone:</strong> ' . get_post_meta( $order->get_id(), 'receiver_phone', true ) . '</p>';
 
 }
 
@@ -2261,14 +2269,14 @@ function greeting_receiver_info_display_admin_order_meta( $order ) {
 add_action( 'woocommerce_thankyou', 'greeting_view_order_and_receiver_info_thankyou_page', 20 );
 
 function greeting_view_order_and_receiver_info_thankyou_page( $order_id ){  ?>
-    <?php echo '<p><strong>Receiver Info:</strong> ' . get_post_meta( $order_id, 'receiver_info', true ) . '</p>';
+    <?php echo '<p><strong>'.__('Receiver phone','greeting2').':</strong> ' . get_post_meta( $order_id, 'receiver_phone', true ) . '</p>';
 }
 
 // Add custom order meta data to make it accessible in Order preview template
 add_filter( 'woocommerce_admin_order_preview_get_order_details', 'admin_order_preview_add_receiver_info_custom_meta_data', 10, 2 );
 
 function admin_order_preview_add_receiver_info_custom_meta_data( $data, $order ) {
-    if( $receiver_info_value = $order->get_meta('receiver_info') )
+    if( $receiver_info_value = $order->get_meta('receiver_phone') )
         $data['receiver_info_key'] = $receiver_info_value; // <= Store the value in the data array.
     	return $data;
 }
@@ -2290,12 +2298,12 @@ function custom_display_order_receiver_info_data_in_admin(){
 
 /** packaging fee begin */
 
-add_action( 'woocommerce_review_order_before_order_total', 'checkout_packaging_radio_buttons' );
+#add_action( 'woocommerce_review_order_before_order_total', 'checkout_packaging_radio_buttons' );
 
 function checkout_packaging_radio_buttons() {
 
-    echo '<tr class="packaging-radio">
-        <th>'.__("Packaging Options").'</th><td>';
+    echo '<div class="packaging-radio">
+        <div>'.__("Packaging Options").'</div><div>';
 
 	$chosen = WC()->session->get( 'packaging' );
     $chosen = empty( $chosen ) ? WC()->checkout->get_value( 'packaging' ) : $chosen;
@@ -2310,19 +2318,18 @@ function checkout_packaging_radio_buttons() {
         ),
     ), $chosen );
 
-    echo '</td></tr>';
+    echo '</div></div>';
 }
 
-add_action( 'woocommerce_cart_calculate_fees', 'checkout_packaging_fee', 20, 1 );
-
+#add_action( 'woocommerce_cart_calculate_fees', 'checkout_packaging_fee', 20, 1 );
 function checkout_packaging_fee( $cart ) {
     if ( $radio = WC()->session->get( 'packaging' ) ) {
         $cart->add_fee( 'Packaging Fee', $radio );
     }
 }
 
-add_action( 'woocommerce_checkout_update_order_review', 'checkout_packaging_choice_to_session' );
 
+#add_action( 'woocommerce_checkout_update_order_review', 'checkout_packaging_choice_to_session' );
 function checkout_packaging_choice_to_session( $posted_data ) {
     parse_str( $posted_data, $output );
     if ( isset( $output['packaging'] ) ){
@@ -2548,11 +2555,10 @@ function display_price_in_variation_option_name( $term ) {
  *
  * @author Dennis Lauritzen
  */
-add_action( 'wp_footer', 'add_javascript_on_cart_page', 9999 );
 
+add_action( 'wp_footer', 'add_javascript_on_cart_page', 9999 );
 function add_javascript_on_cart_page() {
-  if ( is_cart() ) {
-     ?>
+?>
 		 <style type="text/css">
 		 .woocommerce button[name="update_cart"],
 		 .woocommerce input[name="update_cart"] {
@@ -2591,8 +2597,7 @@ function add_javascript_on_cart_page() {
 				 }, 1000 ); // 1 second delay, half a second (500) seems comfortable too
 		 });
 		 </script>
-		 <?php
-  }
+<?php
 }
 
 /**
@@ -2700,15 +2705,15 @@ function greeting_echo_receiver_info( ) {
 			'required'		=> true,
 			'label'				=> __('Din hilsen til modtager'),
 			'placeholder'	=> __('Skriv din hilsen til din modtager her :)'),
-			));
+		), WC()->checkout->get_value( 'greeting_message' ) );
 
-		woocommerce_form_field( 'receiver_info', array(
+		woocommerce_form_field( 'receiver_phone', array(
 			'type'          => 'text',
 			'class'         => array('form-row-wide', 'greeting-custom-input'),
 			'required'      => true,
-			'label'         => __('Receiver info'),
-			'placeholder'       => __('Enter receiver info'),
-			));
+			'label'         => __('Receiver phone'),
+			'placeholder'       => __('Enter phone number of the receiver'),
+			), WC()->checkout->get_value( 'receiver_phone' ));
 		#echo '<tr class="message-pro-radio"><td>';
 
 	echo '<h3 class="pt-4">Leveringsdato</h3>';
@@ -2716,6 +2721,113 @@ function greeting_echo_receiver_info( ) {
 	greeting_echo_date_picker();
 
 	echo '</div>';
+}
+
+function get_vendor_delivery_days_required($vendor_id){
+	global $wpdb;
+
+	// get vendor delivery day
+	$vendorDeliveryDay = $wpdb->get_row( "
+		SELECT * FROM {$wpdb->prefix}usermeta
+		WHERE user_id = $vendor_id
+		AND meta_key = 'vendor_require_delivery_day'
+	" );
+	return $vendorDeliveryDay->meta_value;
+}
+
+function get_vendor_closed_dates($vendor_id){
+	global $wpdb;
+	// get vendor closed day
+	$vendorClosedDayRow = $wpdb->get_row( "
+		SELECT * FROM {$wpdb->prefix}usermeta
+		WHERE user_id = $vendor_id
+		AND meta_key = 'vendor_closed_day'
+	" );
+
+	return $vendorClosedDayRow->meta_value;
+}
+
+function get_vendor_dropoff_time($vendor_id){
+	global $wpdb;
+	// get vendor drop off time
+	$vendorDropOffTimeRow = $wpdb->get_row( "
+		SELECT * FROM {$wpdb->prefix}usermeta
+		WHERE user_id = $vendor_id
+		AND meta_key = 'vendor_drop_off_time'
+	" );
+
+	return $vendorDropOffTimeRow->meta_value;
+}
+
+
+/**
+ * Function to get all closed dates calculated
+ * from opening days, closed dates etc.
+ *
+ * @author Dennis
+ */
+function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'close'){
+	global $wpdb;
+
+	$closed_days_date = array();
+
+	$vendorDropOffTime = get_vendor_dropoff_time($vendor_id);
+	$vendorDeliverDayReq = get_vendor_delivery_days_required($vendor_id);
+
+	// @todo - Dennis update according to latest updates in closing day-field.
+	// open close days begin
+	$default_days = ['1','2','3','4','5','6','7'];
+	$openning_days = get_user_meta($vendor_id, 'openning', true); // true for not array return
+	$closed_days = array_diff($default_days, $openning_days);
+
+	$open_days = array();
+	$dates = array();
+	$today = new DateTime('now');
+
+	// Loop through the closed dates from admin.
+	$meta_closed_days = get_vendor_closed_dates($vendor_id);
+	$closed_days_date = (!empty($meta_closed_days[0]) ? explode(",",$meta_closed_days) : array());
+	$closed_dates_arr = array();
+	if(!empty($closed_days_date)){
+		foreach($closed_days_date as $ok_date){
+			$date_time_object = new DateTime($ok_date);
+			if($date_time_object > $today){
+				$closed_dates_arr[] = $date_time_object->format($date_format);
+			}
+		}
+	}
+
+	// Generate array of all open days next 60 days.
+	$open_num = 0;
+	$closed_num = 0;
+	for($i=0;$i<60;$i++){
+		$now = new DateTime('now');
+		$now->modify('+'.$vendorDeliverDayReq.' days');
+		if(!in_array($today->format('N'), $closed_days) && !in_array($today->format($date_format),$closed_dates_arr)){
+
+			if($now->format('H') > $vendorDropOffTime && $i == 0){
+				$open_num--;
+			} else {
+				$open_num++;
+			}
+
+			if($open_num >= $vendorDeliverDayReq){
+				$dates[] = $today->format($date_format);
+			} else {
+				$closed_days_date[] = $today->format($date_format);
+			}
+		} else {
+			$closed_num++;
+			$closed_days_date[] = $today->format($date_format);
+		}
+		$today->modify('+1 day');
+	}
+
+	if($open_close == 'close'){
+		return $closed_days_date;
+	} else {
+		return $dates;
+	}
 }
 
 /**
@@ -2726,8 +2838,7 @@ function greeting_echo_receiver_info( ) {
  * order date begin
  */
 # add_action( 'woocommerce_review_order_before_payment', 'greeting_echo_date_picker' );
-$closed_days_date = array();
-function greeting_echo_date_picker( ) {
+function greeting_echo_date_picker(  ) {
 	$storeProductId = '';
 	// Get $product object from Cart object
 	$cart = WC()->cart->get_cart();
@@ -2738,66 +2849,9 @@ function greeting_echo_date_picker( ) {
 	}
 
 	$vendor_id = get_post_field( 'post_author', $storeProductId );
-
-	global $wpdb;
-
-	// get vendor drop off time
-	$vendorDropOffTimeRow = $wpdb->get_row( "
-		SELECT * FROM {$wpdb->prefix}usermeta
-		WHERE user_id = $vendor_id
-		AND meta_key = 'vendor_drop_off_time'
-	" );
-	$vendorDropOffTime = $vendorDropOffTimeRow->meta_value;
-
-	// get vendor closed day
-	$vendorClosedDayRow = $wpdb->get_row( "
-		SELECT * FROM {$wpdb->prefix}usermeta
-		WHERE user_id = $vendor_id
-		AND meta_key = 'vendor_closed_day'
-	" );
-
-	// get vendor delivery day
-	$vendorDeliverDay = $wpdb->get_row( "
-		SELECT * FROM {$wpdb->prefix}usermeta
-		WHERE user_id = $vendor_id
-		AND meta_key = 'vendor_require_delivery_day'
-	" );
-	$vendorDeliverDayReq = $vendorDeliverDay->meta_value;
-
-	// open close days begin
-	$default_days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-	$openning_days = get_user_meta($vendor_id, 'openning', true); // true for not array return
-	$closed_days = array_diff($default_days, $openning_days);
-
-	global $closed_days_date;
-	foreach($closed_days as $closed){
-		$today_day = date("l");
-		$today_date = date_create($today_day);
-		date_modify($today_date, $closed);
-		$modified_date = date_format($today_date, "d-m-Y");
-		$closed_days_date[] = $modified_date;
-	}
-
-	$closed_days_date = explode(",",$vendorClosedDayRow->meta_value);
-
-	$date_now = new DateTime();
-	$closed_days_date_exist_check = array();
-
-	foreach($closed_days_date as $ok_date){
-		$date_time_object = new DateTime($ok_date);
-		if($date_time_object > $date_now){
-			$closed_days_date_exist_check[] = $ok_date;
-		}
-	}
-
-	rsort($closed_days_date_exist_check); // reverse sort the array
-
-	echo '<div id="show-if-shipping">';
-	echo '<span>Butikken kan levere om ';
-	echo $vendorDeliverDayReq. ' leveringsdage, hvis du ';
-	echo 'bestiller inden kl.';
-	echo $vendorDropOffTime;
-	echo ':00</span>';
+	$vendorDeliverDayReq = get_vendor_delivery_days_required($vendor_id);
+	$vendorDropOffTime = get_vendor_dropoff_time($vendor_id);
+	$closed_dates_arr = explode(",",get_vendor_closed_dates($vendor_id));
 
 
 	woocommerce_form_field( 'delivery_date', array(
@@ -2806,13 +2860,21 @@ function greeting_echo_date_picker( ) {
 		'id'            => 'datepicker',
 		'required'      => false,
 		'label'         => __('Hvornår skal gaven leveres?'),
-		'placeholder'   => __('Hurtigst muligt'),
-	));
+		'placeholder'   => __('Hurtigst muligt')
+	), WC()->checkout->get_value( 'delivery_date' ) );
 
 
-	$closed_days_date_iteration = count($closed_days_date_exist_check);
+	echo '<div id="show-if-shipping">';
+	echo '<span>Butikken kan levere om ';
+	echo $vendorDeliverDayReq. ' leveringsdage, hvis du ';
+	echo 'bestiller inden kl. ';
+	echo $vendorDropOffTime;
+	echo ':00</span>';
+
+
+	$closed_days_date_iteration = count($closed_dates_arr);
 	$cdi = 0;
-	foreach($closed_days_date_exist_check as $closed_date){
+	foreach($closed_dates_arr as $closed_date){
 		if(++$cdi == $closed_days_date_iteration){
 			echo $closed_date;
 		} else {
@@ -2827,7 +2889,6 @@ function greeting_echo_date_picker( ) {
 	<input type="hidden" id="vendorDropOffTimeId" value="<?php echo $vendorDropOffTime;?>"/>
 	<?php
 }
-add_action( 'woocommerce_after_checkout_validation', 'greeting_check_billing_postcode', 10, 2);
 
 /**
  * Add Content to the Related Steps Created Above
@@ -2894,17 +2955,16 @@ function greeting_marketplace_checkout_fields($fields) {
   return $fields;
 }
 
-add_action( 'woocommerce_after_shipping_rate', 'blm_action_after_shipping_rate', 20, 2 );
-function blm_action_after_shipping_rate ( $method, $index ) {
-    if( is_cart() ) {
-        return; // Exit on cart page
-    }
-
-    $shipping_country = WC()->customer->get_shipping_country();
-    $shipping_state   = WC()->customer->get_shipping_state();
-
-    // Testing output
-    echo '<br><small>Country code:' . $shipping_country . ' | State code: ' . $shipping_state . '</small>';
+/**
+ * Change the default state and country on the checkout page
+ */
+add_filter( 'default_checkout_billing_country', 'change_default_checkout_country' );
+add_filter( 'default_checkout_shipping_country', 'change_default_checkout_country' );
+function change_default_checkout_country() {
+  return 'DK'; // country code
+}
+function change_default_checkout_state() {
+  return ''; // state code
 }
 
 /**
@@ -3051,8 +3111,8 @@ function get_client_ip() {
  */
 function call_ip_apis($ip){
   $urls = array(
-    'http://ipinfo.io/'.$ip.'/json', // return HTTP=429 if usage limit reached
-    'http://ip-api.com/json/'.$ip
+		0 => 'http://ip-api.com/json/'.$ip,
+    1 => 'http://ipinfo.io/'.$ip.'/json' // return HTTP=429 if usage limit reached
   );
 
   $curl = curl_init();
@@ -3069,17 +3129,4 @@ function call_ip_apis($ip){
   curl_close($curl);
 
   return $jsonData;
-}
-
-
-/**
- * Change the default state and country on the checkout page
- */
-add_filter( 'default_checkout_billing_country', 'change_default_checkout_country' );
-add_filter( 'default_checkout_billing_state', 'change_default_checkout_state' );
-function change_default_checkout_country() {
-  return 'DK'; // country code
-}
-function change_default_checkout_state() {
-  return 'DK'; // state code
 }

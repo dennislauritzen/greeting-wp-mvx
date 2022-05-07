@@ -15,6 +15,7 @@ the_post();
   		<div id="post-<?php the_ID(); ?>" <?php post_class( 'content' ); ?>>
   			<!--<h1 class="entry-title"><?php the_title(); ?></h1>-->
   			<?php
+          #var_dump(WC()->checkout);
   				the_content();
   			?>
   		</div><!-- /#post-<?php the_ID(); ?> -->

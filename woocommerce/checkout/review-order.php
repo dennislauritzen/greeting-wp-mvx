@@ -26,7 +26,7 @@ defined( 'ABSPATH' ) || exit;
 	</thead>
 	<tbody>
 		<?php
-		do_action( 'woocommerce_review_order_before_cart_contents' );
+		#do_action( 'woocommerce_review_order_before_cart_contents' );
 
 		foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
 			$_product = apply_filters( 'woocommerce_cart_item_product', $cart_item['data'], $cart_item, $cart_item_key );
