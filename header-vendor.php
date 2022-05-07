@@ -436,7 +436,7 @@
             </div>
             <div class="d-lg-none col-3 col-lg-0">
               <button type="button" id="toggleOpening" class="d-lg-none btn btn-primary bg-teal border-0 py-2 px-1 px-sm-4" style="font-size:12px;">
-                Levering & åbningstid
+                Se leveringstid & øvrig info
               </button>
               <script type="text/javascript">
                 jQuery(document).ready(function(){
