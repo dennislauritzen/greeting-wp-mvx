@@ -3184,3 +3184,22 @@ function call_ip_apis($ip){
 
   return $jsonData;
 }
+
+/**
+ * Removing vendors ability to set some of the
+ * order statuses on orders.
+ *
+ * @author Dennis Lauritzen
+ * @since v0.1
+ *
+ */
+
+add_filter( 'wcmp_vendor_order_statuses', 'wcmp_change_default_status', 10, 2);
+function wcmp_change_default_status( $order_status, $order ){
+	unset($order_status['wc-pending']);
+	unset($order_status['wc-on-hold']);
+	unset($order_status['wc-cancelled']);
+	unset($order_status['wc-refunded']);
+	unset($order_status['wc-failed']);
+	return $order_status;
+}
