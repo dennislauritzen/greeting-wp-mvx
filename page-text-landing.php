@@ -9,26 +9,6 @@ get_header();
 get_header('green');
 ?>
 
-<style type="text/css">
-  .bg-pink {
-    background: #F8F8F8;
-  }
-  .bg-rose {
-    background: #fecbca;
-  }
-  .bg-teal {
-    background: #446a6b;
-  }
-  .border-teal {
-    border-color: #446a6b;
-  }
-  .bg-light-grey {
-    background: #F8F8F8;
-  }
-  .bg-yellow {
-    background: #d6bf75;
-  }
-</style>
 <?php
 the_post();
 ?>
@@ -51,5 +31,6 @@ the_post();
     </div>
   </div>
 </section>
+
 <?php
 get_footer();

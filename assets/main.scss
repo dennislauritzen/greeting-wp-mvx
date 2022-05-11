@@ -464,17 +464,21 @@ a.greeting-link-pink {
 
 	.top-search-btn {
 		width: 40px;
-		height: 35px;
-		margin-top: 2px;
-		z-index: 1000;
-		background-image: url('https://greeting.dk/wp-content/plugins/greeting-marketplace/assets/img/search-icon.svg');
-		background-repeat: no-repeat;
-		background-position: center center;
+    height: 35px;
+    margin-top: 2px;
+    z-index: 1000;
+    background-image: url('https://greeting.dk/wp-content/plugins/greeting-marketplace/assets/img/search-icon.svg');
+    background-repeat: no-repeat;
+    background-position: center center;
 	}
 
 	.top-search-input {
 		padding-left: 30px;
 	}
+
+  .btn-create {
+    border: 1px solid #58a2a2;
+  }
 
 	.store-loc {
 		font-family: 'Inter',sans-serif;
