@@ -16,14 +16,25 @@ if($args['cityName']){
     <div class="card shadow border-0 mb-3">
       <div class="card-body">
         <div class="row align-items-center">
-          <div class="col-3 text-center">
-            <img class="img-fluid rounded-start" src="<?php echo $image;?>" style="max-width: 100px;">
-            <h6><?php echo esc_html($vendor->page_title); ?></h6>
-            <a href="<?php echo $vendor->get_permalink(); ?>" class="cta rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-3 px-md-4">
-              Gå til butik<span class="d-none d-md-inline"></span>
-            </a>
+          <div class="col-12 col-md-3 text-start text-md-center">
+            <div class="row mb-4 mb-md-0 d-flex">
+              <div class="col-4 col-md-12">
+                <a href="<?php echo esc_url($vendor->get_permalink()); ?>">
+                  <img class="img-fluid rounded-start" src="<?php echo $image;?>" style="max-width: 100px;">
+                </a>
+              </div>
+              <div class="col-8 col-md-12">
+                <?php $button_text = apply_filters('wcmp_vendor_lists_single_button_text', $vendor->page_title); ?>
+                <a href="<?php echo esc_url($vendor->get_permalink()); ?>" class="text-dark">
+                  <h6><?php echo esc_html($button_text); ?></h6>
+                </a>
+                <a href="<?php echo $vendor->get_permalink(); ?>" class="cta rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-3 px-md-4">
+                  Gå til butik<span class="d-none d-md-inline"></span>
+                </a>
+              </div>
+            </div>
           </div>
-          <div class="col-9">
+          <div class="col-12 col-md-9">
             <div class="row">
             <?php
             $vendorProducts = $vendor->get_products(array('fields' => 'all', 'posts_per_page' => '3'));
@@ -40,7 +51,7 @@ if($args['cityName']){
                 $imageUrl = $placeHolderImage;
               }
             ?>
-              <div class="col-6 col-xs-6 col-sm-6 col-md-4">
+              <div class="col-4 col-xs-4 col-sm-4 col-md-4">
                 <div class="card border-0">
                     <a href="<?php echo get_permalink($product->get_id());?>"><img src="<?php echo $imageUrl;?>" class="card-img-top" alt="<?php echo $product->get_name();?>"></a>
                     <div class="card-body">

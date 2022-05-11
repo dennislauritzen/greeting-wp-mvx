@@ -2,21 +2,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Rubik:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
+<?php
+$cart_count = WC()->cart->cart_contents_count; // Set variable for cart item count
+$cart_url = wc_get_cart_url();  // Set Cart URL
+?>
 
-<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasMenu" aria-labelledby="offcanvasMenu">
-  <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="offcanvasMenuLabel">Menu</h5>
-    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
-  <div class="offcanvas-body">
-    <div class="">
-      <p>Bliv Butikspartner</p>
-      <p>Cases</p>
-      <p>Om Greeting.dk</p>
-      <p>Kontakt</p>
-    </div>
-  </div>
-</div>
 <section id="top" class="bg-teal pt-1">
     <div class="container py-4">
       <div class="row">
@@ -36,10 +26,20 @@
               <path d="m474.15 87.426c0.753-1.5772 1.356-3.4925 1.808-5.7457 0.452-2.2533 0.679-5.4829 0.679-9.689v-51.261c0-3.6803-0.528-6.647-1.583-8.9003-0.98-2.2532-2.148-4.1309-3.504-5.6331v-0.22532l16.39-5.9711v71.878c0 4.206 0.227 7.4732 0.679 9.8016 0.527 2.3283 1.205 4.2436 2.034 5.7457v0.2253h-16.503v-0.2253zm34.138 0.2253-19.443-27.94 12.999-14.083c1.809-1.9528 3.015-3.9807 3.618-6.0837 0.602-2.1782 0.452-3.9808-0.453-5.4078v-0.2253h14.695v0.2253c-3.391 1.5022-6.367 3.4174-8.93 5.7458-2.562 2.2532-5.011 4.6191-7.347 7.0977l-5.878 6.4217 16.617 23.884c1.733 2.4035 3.315 4.4314 4.747 6.0838s3.128 3.0043 5.087 4.0558v0.2253h-15.712z"/>
               </svg>
           </a>
-          <a class="position-absolute top-0 end-0 me-4 d-inline d-lg-none d-xl-none" data-bs-toggle="offcanvas" href="#offcanvasMenu" role="button" aria-controls="offcanvasExample">
+          <a class="position-absolute top-0 start-0 me-4 ms-1 d-inline d-lg-none d-xl-none" data-bs-toggle="offcanvas" href="#offcanvasMenu" role="button" aria-controls="offcanvasExample">
             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#ffffff" class="bi bi-list" viewBox="0 0 16 16">
               <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
             </svg>
+          </a>
+          <a class="position-absolute top-0 end-0 me-4 d-inline d-lg-none d-xl-none  right-col text-end" href="<?php echo$cart_url; ?>">
+            <span class="position-relative" aria-label="Se kurv">
+              <svg width="21" height="23" viewBox="0 0 21 23" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6.434 6.967H3.306l-1.418 14.47h17.346L17.82 6.967h-3.124c.065.828.097 1.737.097 2.729h-1.5c0-1.02-.031-1.927-.093-2.729H7.93a35.797 35.797 0 00-.093 2.729h-1.5c0-.992.032-1.9.097-2.729zm.166-1.5C7.126 1.895 8.443.25 10.565.25s3.44 1.645 3.965 5.217h4.65l1.708 17.47H.234l1.712-17.47H6.6zm6.432 0c-.407-2.65-1.27-3.717-2.467-3.717-1.196 0-2.06 1.066-2.467 3.717h4.934z" fill="#ffffff">
+                </path>
+              </svg>
+              <span class="position-absolute start-50 top-0 badge rounded-circle text-white" style="background: #cea09f;"><?php echo $cart_count; ?></span>
+            </span>
+            <span class="d-inline px-lg-2 px-xl-3 hide-lg text-white">&nbsp;&nbsp;&nbsp;Kurv</span>
           </a>
         </div>
         <div class="col-md-12 col-lg-5 col-xl-6">
@@ -74,11 +74,7 @@
           <a href="#" class="btn text-white">Log ind</a>
           <a href="#" class="btn btn-create rounded text-white">Opret</a>
           <div class="btn position-relative ms-lg-0 ms-xl-1">
-            <?php
-  					$cart_count = WC()->cart->cart_contents_count; // Set variable for cart item count
-          	$cart_url = wc_get_cart_url();  // Set Cart URL
-  					?>
-            <a href="<?php echo$cart_url; ?>">
+            <a href="<?php echo $cart_url; ?>">
               <span class="position-relative" aria-label="Se kurv">
                 <svg width="21" height="23" viewBox="0 0 21 23" xmlns="http://www.w3.org/2000/svg">
                   <path d="M6.434 6.967H3.306l-1.418 14.47h17.346L17.82 6.967h-3.124c.065.828.097 1.737.097 2.729h-1.5c0-1.02-.031-1.927-.093-2.729H7.93a35.797 35.797 0 00-.093 2.729h-1.5c0-.992.032-1.9.097-2.729zm.166-1.5C7.126 1.895 8.443.25 10.565.25s3.44 1.645 3.965 5.217h4.65l1.708 17.47H.234l1.712-17.47H6.6zm6.432 0c-.407-2.65-1.27-3.717-2.467-3.717-1.196 0-2.06 1.066-2.467 3.717h4.934z" fill="#ffffff">

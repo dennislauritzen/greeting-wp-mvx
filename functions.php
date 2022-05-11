@@ -458,11 +458,44 @@ endif;
 if ( function_exists( 'register_nav_menus' ) ) {
 	register_nav_menus(
 		array(
-			'main-menu'   => 'Main Navigation Menu',
+			'main-menu-mobile'   => 'Main Menu Mobile - Hamburger menu',
+			'main-menu-desktop'   => 'Main Navigation Menu (Top)',
 			'footer-menu' => 'Footer Menu',
 		)
 	);
 }
+
+/**
+ * Function to add custom classes to li's in
+ * nav_menus
+ *
+ * @since v1.0
+ *
+ */
+function add_additional_class_on_li($classes, $item, $args) {
+    if(isset($args->add_li_class)) {
+        $classes[] = $args->add_li_class;
+    }
+    return $classes;
+}
+add_filter('nav_menu_css_class', 'add_additional_class_on_li', 1, 3);
+
+/**
+ * Function to add custom classes to a's in
+ * nav_menus
+ *
+ * @since v1.0
+ *
+ */
+function add_additional_class_on_a($atts, $item, $args) {
+	$classes = '';
+	 if(isset($args->add_a_class)) {
+       $classes = $args->add_a_class;
+   }
+	 $atts['class'] = $classes;
+   return $atts;
+}
+add_filter( 'nav_menu_link_attributes', 'add_additional_class_on_a', 10, 3 );
 
 // Custom Nav Walker: wp_bootstrap_navwalker().
 $custom_walker = get_template_directory() . '/inc/wp_bootstrap_navwalker.php';
@@ -579,8 +612,18 @@ if( function_exists('acf_add_options_page') ) {
 	));
 
 	acf_add_options_sub_page(array(
-		'page_title' 	=> 'Theme Landingpage Settings',
+		'page_title' 	=> 'Theme Header Settings',
 		'menu_title'	=> 'Header',
+		'parent_slug'	=> 'theme-general-settings',
+	));
+	acf_add_options_sub_page(array(
+		'page_title' 	=> 'Theme Footer Settings',
+		'menu_title'	=> 'Footer',
+		'parent_slug'	=> 'theme-general-settings',
+	));
+	acf_add_options_sub_page(array(
+		'page_title' 	=> 'Theme Block: Howdy Settings',
+		'menu_title'	=> 'Howdy-block',
 		'parent_slug'	=> 'theme-general-settings',
 	));
 }
@@ -2044,7 +2087,14 @@ function attach_pdf_to_email ( $attachments, $email_id , $order ) {
 
 }
 // vendor attachment end
-
+/**
+ * Check if store delivers in the postal code
+ *
+ *
+ *
+ *
+ *
+ */
 add_action( 'woocommerce_after_checkout_validation', 'greeting_check_billing_postcode', 10, 2);
 function greeting_check_billing_postcode( $fields, $errors ){
 
@@ -2778,7 +2828,11 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 	// open close days begin
 	$default_days = ['1','2','3','4','5','6','7'];
 	$openning_days = get_user_meta($vendor_id, 'openning', true); // true for not array return
-	$closed_days = array_diff($default_days, $openning_days);
+	if(is_array($openning_days)){
+		$closed_days = array_diff($default_days, $openning_days);
+	} else {
+		$closed_days = $default_days;
+	}
 
 	$open_days = array();
 	$dates = array();

@@ -357,17 +357,37 @@ get_header('green', array('city' => $cityName, 'postalcode' => $cityPostalcode))
 <?php
 
 // get user meta query
-$userMetaQuery = $wpdb->get_results( "
-    SELECT * FROM {$wpdb->prefix}usermeta
-    WHERE meta_key = 'delivery_zips'
-" );
+#$args = array(
+#  'role' => 'dc_vendor',
+#  'meta_query' => array(
+#      'key' => 'delivery_zips',
+#      'value' => $cityPostalcode,
+#      'compare' => 'CONTAINS'
+#    )
+#);
+#$vendors = new WP_User_Query( $args	);
+#$vendor_arr = $vendors->get_results();
+
+$query = $wpdb->prepare("
+  SELECT
+    u.id
+  FROM
+    wp_users u
+  RIGHT JOIN
+    wp_usermeta um ON um.user_id = u.ID
+  RIGHT JOIN
+    wp_usermeta um2 ON um2.user_id = u.ID
+  WHERE
+	(um.meta_key = 'wp_capabilities' AND um.meta_value LIKE %s)
+    AND
+	(um2.meta_key = 'delivery_zips' AND um2.meta_value LIKE %s)
+  AND
+    NOT EXISTS (SELECT NULL FROM wp_usermeta um3 WHERE um3.meta_key = '_vendor_turn_off' AND um3.user_id = u.id)", '%dc_vendor%', '%'.$cityPostalcode.'%');
+$results = $wpdb->get_results($query);
 
 $UserIdArrayForCityPostalcode = array();
-
-foreach($userMetaQuery as $userMeta){
-    if (str_contains($userMeta->meta_value, $cityPostalcode)) {
-        array_push($UserIdArrayForCityPostalcode, $userMeta->user_id);
-    }
+foreach($results as $v){
+  $UserIdArrayForCityPostalcode[] = $v->id;
 }
 
 // pass to backend
@@ -478,6 +498,30 @@ jQuery(document).ready(function(){
           <h6 class="float-start d-none d-lg-inline d-xl-inline py-2 border-bottom filter-header">Filtrér</h6>
         </div>
         <div class="collapse d-lg-block accordion-collapse " id="colFilter">
+
+
+          <?php
+          /**
+           * ---------------------
+           * Delivery type filter
+           * ---------------------
+          **/
+          ?>
+          <h5 class="text-uppercase">Levering</h5>
+          <ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
+
+          <div class="form-check">
+              <input type="checkbox" name="filter_del_city" class="form-check-input filter-on-city-page" id="filter_delivery_1" value="1">
+              <label class="form-check-label" for="filter_delivery_1">Personlig levering</label>
+          </div>
+          <div class="form-check">
+              <input type="checkbox" name="filter_del_city" class="form-check-input filter-on-city-page" id="filter_delivery_0" value="0">
+              <label class="form-check-label" for="filter_delivery_0">Forsendelse med fragtfirma</label>
+          </div>
+
+          </ul>
+
+
           <?php
           /**
            * ---------------------
@@ -490,19 +534,6 @@ jQuery(document).ready(function(){
 
           <?php
           // search users for get filtered category
-          $cityPostalcode = get_post_meta($postId, 'postalcode', true);
-             $userMetaQuery = $wpdb->get_results( "
-             SELECT * FROM {$wpdb->prefix}usermeta
-             WHERE meta_key = 'delivery_zips'
-          " );
-
-          $UserIdArrayForCityPostalcode = array();
-          foreach($userMetaQuery as $userMeta){
-             if (str_contains($userMeta->meta_value, $cityPostalcode)) {
-                 array_push($UserIdArrayForCityPostalcode, $userMeta->user_id);
-             }
-          }
-
           // for category
           $categoryTermListArray = array();
 
@@ -529,14 +560,6 @@ jQuery(document).ready(function(){
           foreach($productCategories as $category){
              foreach($categoryTermListArrayUnique as $catTerm){
                  if($catTerm == $category->term_id){ ?>
-                    <!-- <li>
-                     <a class="city-page-item dropdown-item d-flex align-items-center gap-2 py-2" href="#">
-                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-square" viewBox="0 0 16 16">
-                         <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-                       </svg>
-                       <?php //echo $category->name; ?>
-                     </a>
-                    </li> -->
                     <div class="form-check">
                         <input type="checkbox" name="filter_catocca_city" class="form-check-input filter-on-city-page" id="filter_cat<?php echo $category->term_id; ?>" value="<?php echo $category->term_id; ?>">
                         <label for="filter_cat<?php echo $category->term_id; ?>" class="form-check-label">
@@ -595,26 +618,6 @@ jQuery(document).ready(function(){
           ?>
           </ul>
 
-          <?php
-          /**
-           * ---------------------
-           * Delivery type filter
-           * ---------------------
-          **/
-          ?>
-          <h5 class="text-uppercase">Levering</h5>
-          <ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
-
-          <div class="form-check">
-              <input type="checkbox" name="filter_del_city" class="form-check-input filter-on-city-page" id="filter_delivery_1" value="1">
-              <label class="form-check-label" for="filter_delivery_1">Personlig levering</label>
-          </div>
-          <div class="form-check">
-              <input type="checkbox" name="filter_del_city" class="form-check-input filter-on-city-page" id="filter_delivery_0" value="0">
-              <label class="form-check-label" for="filter_delivery_0">Forsendelse med fragtfirma</label>
-          </div>
-
-          </ul>
 
           <!-- price filter filter-->
           <?php

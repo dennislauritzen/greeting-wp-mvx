@@ -191,7 +191,7 @@ get_header('checkout');
 		</div>
 	</div>
 	<div class="row my-5 pb-5">
-		<div class="col-4 p-5">
+		<div class="col-12 col-lg-4 p-5">
 			<h1 class="mt-5">Følg os</h1>
 			<p>
 				Kunne du tænke dig at følge med i, hvad vi går og laver - og blive inspireret til din næste gavehilsen?
@@ -214,7 +214,7 @@ get_header('checkout');
 				</a>
 			</p>
 		</div><!-- /.col -->
-		<div class="col-4 bg-light p-5">
+		<div class="col-12 col-lg-4 bg-light p-5">
 			<?php
 			$vendor = get_wcmp_vendor($vendor_id);
 			if($vendor){
@@ -254,7 +254,7 @@ get_header('checkout');
 			}
 			?>
 		</div><!-- /.col -->
-		<div class="col-4 p-5">
+		<div class="col-12 col-lg-4 p-5">
 			<h3 class="mt-5">Brug for hjælp?</h3>
 			<p>
 				Er du i tvivl om noget vedrørende din ordre, eller har du rettelser? Så

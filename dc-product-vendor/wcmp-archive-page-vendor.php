@@ -372,7 +372,7 @@ do_action('after_wcmp_vendor_description', $vendorId);
             <?php echo wp_kses_post(htmlspecialchars_decode( wpautop( $description ), ENT_QUOTES )); ?>
         </div>
         <?php } ?>
-        <p><a href="<?php echo esc_url($vendor->get_permalink()); ?>">Se butikkens øvrige gaveprodukter</a><p>
+        <p><a href="<?php echo esc_url($vendor->get_permalink()); ?>">Se hele butikkns gaveudvalg</a><p>
       </div>
       <div class="col-lg-4">
         <b>Leveringsinformationer</b>
