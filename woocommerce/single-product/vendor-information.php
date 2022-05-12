@@ -70,155 +70,166 @@ if(!is_object($vendor)){
       </div>
       <div class="col-lg-4">
         <b>Leveringsinformationer</b>
-        <p>Butikken leverer på flg. dage:
-          <?php
-          $del_days = get_field('openning', 'user_'.$vendor_id);
-          $day_array = array(1 => 'mandag', 2 => 'tirsdag', 3 => 'onsdag', 4 => 'torsdag', 5 => 'fredag', 6 => 'lørdag', 7 => 'søndag');
+        <?php
+        $del_type = get_field('delivery_type', 'user_'.$vendor_id);
+        if(!empty($del_type) && $del_type[0]['value'] == "0")
+        {
+          echo '<p>'.get_field('freight_company_delivery_text', 'options').'</p>';
+        } else {
+        ?>
+          <p>Butikken leverer på flg. dage:
+            <?php
+            $del_days = get_field('openning', 'user_'.$vendor_id);
+            $day_array = array(1 => 'mandag', 2 => 'tirsdag', 3 => 'onsdag', 4 => 'torsdag', 5 => 'fredag', 6 => 'lørdag', 7 => 'søndag');
 
-          if(is_array($del_days) && count($del_days) > 0){
-  					$i = 1;
-            foreach($del_days as $v){
-              $day = $day_array[$i];
-              if ($i == 1){
-                $day = ucfirst($day);
-              }
-
-              if(count($del_days) > 1)
-              {
-                if($i < count($del_days)-1){
-                  $day .= ', ';
-                } else if($i == count($del_days)) {
-                  $day = ' og '.$day;
+            if(is_array($del_days) && count($del_days) > 0){
+    					$i = 1;
+              foreach($del_days as $v){
+                $day = $day_array[$i];
+                if ($i == 1){
+                  $day = ucfirst($day);
                 }
+
+                if(count($del_days) > 1)
+                {
+                  if($i < count($del_days)-1){
+                    $day .= ', ';
+                  } else if($i == count($del_days)) {
+                    $day = ' og '.$day;
+                  }
+                }
+
+                print $day;
+                $i++;
+              } // endforeach
+            } // endif
+            ?>.
+          </p>
+          <p>
+            Butikken leverer
+            <?php
+              if(get_field('vendor_require_delivery_day', 'user_'.$vendor_id) == 0)
+              {
+                echo ' i dag';
               }
+                else if(get_field('vendor_require_delivery_day', 'user_'.$vendor_id) == 1)
+              {
+                echo ' i morgen';
+              } else {
+                echo 'om '.get_field('vendor_require_delivery_day', 'user_'.$vendor_id)." hverdage";
+              }
+            ?>, hvis du bestiller inden kl.
+            <?php echo (!empty(get_field('vendor_drop_off_time', 'user_'.$vendor_id)) ? get_field('vendor_drop_off_time', 'user_'.$vendor_id) : '11'); ?>.
+          </p>
+  				<?php
+  				// --- CLOSED DATES --- Dennis.
+  				$closed_dates = get_field('vendor_closed_day', 'user_'.$vendor_id);
+  				$dates = explode(",",$closed_dates);
+  				$viable_dates = array();
 
-              print $day;
-              $i++;
-            } // endforeach
-          } // endif
-          ?>.
-        </p>
-        <p>
-          Butikken leverer
-          <?php
-            if(get_field('vendor_require_delivery_day', 'user_'.$vendor_id) == 0)
-            {
-              echo ' i dag';
-            }
-              else if(get_field('vendor_require_delivery_day', 'user_'.$vendor_id) == 1)
-            {
-              echo ' i morgen';
-            } else {
-              echo 'om '.get_field('vendor_require_delivery_day', 'user_'.$vendor_id)." hverdage";
-            }
-          ?>, hvis du bestiller inden kl.
-          <?php echo (!empty(get_field('vendor_drop_off_time', 'user_'.$vendor_id)) ? get_field('vendor_drop_off_time', 'user_'.$vendor_id) : '11'); ?>.
-        </p>
-				<?php
-				// --- CLOSED DATES --- Dennis.
-				$closed_dates = get_field('vendor_closed_day', 'user_'.$vendor_id);
-				$dates = explode(",",$closed_dates);
-				$viable_dates = array();
+  				foreach($dates as $val){
+  					$date_u = strtotime($val);
+  					$date = date("d-m-Y", $date_u);
+  					$today = date("U");
 
-				foreach($dates as $val){
-					$date_u = strtotime($val);
-					$date = date("d-m-Y", $date_u);
-					$today = date("U");
+  					if($date_u >= ($today-(60*60*24)) && $date_u <= ($today+(60*60*24*30))){
+  						$weekday = date('N',$date_u);
+  						$weekday_str = '';
+  						$date = date('j',$date_u);
+  						$month = date('m',$date_u);
+  						$month_str = '';
 
-					if($date_u >= ($today-(60*60*24)) && $date_u <= ($today+(60*60*24*30))){
-						$weekday = date('N',$date_u);
-						$weekday_str = '';
-						$date = date('j',$date_u);
-						$month = date('m',$date_u);
-						$month_str = '';
+  						switch($weekday){
+  							case 1:
+  								$weekday_str = 'mandag';
+  								break;
+  							case 2:
+  								$weekday_str = 'tirsdag';
+  								break;
+  							case 3:
+  								$weekday_str = 'onsdag';
+  								break;
+  							case 4:
+  								$weekday_str = 'torsdag';
+  								break;
+  							case 5:
+  								$weekday_str = 'fredag';
+  								break;
+  							case 6:
+  								$weekday_str = 'lørdag';
+  								break;
+  							case 7:
+  								$weekday_str = 'søndag';
+  								break;
+  						}
 
-						switch($weekday){
-							case 1:
-								$weekday_str = 'mandag';
-								break;
-							case 2:
-								$weekday_str = 'tirsdag';
-								break;
-							case 3:
-								$weekday_str = 'onsdag';
-								break;
-							case 4:
-								$weekday_str = 'torsdag';
-								break;
-							case 5:
-								$weekday_str = 'fredag';
-								break;
-							case 6:
-								$weekday_str = 'lørdag';
-								break;
-							case 7:
-								$weekday_str = 'søndag';
-								break;
-						}
+  						switch($month){
+  							case 1:
+  								$month_str = 'januar';
+  								break;
+  							case 2:
+  								$month_str = 'februar';
+  								break;
+  							case 3:
+  								$month_str = 'marts';
+  								break;
+  							case 4:
+  								$month_str = 'april';
+  								break;
+  							case 5:
+  								$month_str = 'maj';
+  								break;
+  							case 6:
+  								$month_str = 'juni';
+  								break;
+  							case 7:
+  								$month_str = 'juli';
+  								break;
+  							case 8:
+  								$month_str = 'august';
+  								break;
+  							case 9:
+  								$month_str = 'september';
+  								break;
+  							case 10:
+  								$month_str = 'oktober';
+  								break;
+  							case 11:
+  								$month_str = 'november';
+  								break;
+  							case 12:
+  								$month_str = 'december';
+  								break;
+  						}
+  						$viable_dates[] = $weekday_str." d. ".$date.". ".$month_str;
+  					}
+  				}
 
-						switch($month){
-							case 1:
-								$month_str = 'januar';
-								break;
-							case 2:
-								$month_str = 'februar';
-								break;
-							case 3:
-								$month_str = 'marts';
-								break;
-							case 4:
-								$month_str = 'april';
-								break;
-							case 5:
-								$month_str = 'maj';
-								break;
-							case 6:
-								$month_str = 'juni';
-								break;
-							case 7:
-								$month_str = 'juli';
-								break;
-							case 8:
-								$month_str = 'august';
-								break;
-							case 9:
-								$month_str = 'september';
-								break;
-							case 10:
-								$month_str = 'oktober';
-								break;
-							case 11:
-								$month_str = 'november';
-								break;
-							case 12:
-								$month_str = 'december';
-								break;
-						}
-						$viable_dates[] = $weekday_str." d. ".$date.". ".$month_str;
-					}
-				}
+  				$dates_for_str = '';
+  				$i = 0;
+  				foreach($viable_dates as $v){
+  					$i++;
+  					$dates_for_str .= $v;
+  					if(count($viable_dates) > 1){
+  						if($i == count($viable_dates)-1){
+  							$dates_for_str .= ' og ';
+  						} else if($i < count($viable_dates)){
+  							$dates_for_str .= ', ';
+  						}
+  					}
+  				}
 
-				$dates_for_str = '';
-				$i = 0;
-				foreach($viable_dates as $v){
-					$i++;
-					$dates_for_str .= $v;
-					if(count($viable_dates) > 1){
-						if($i == count($viable_dates)-1){
-							$dates_for_str .= ' og ';
-						} else if($i < count($viable_dates)){
-							$dates_for_str .= ', ';
-						}
-					}
-				}
+  				if(count($viable_dates) > 0){
+  				?>
+  			 		<p>Bemærk dog at butikken ikke leverer <?php print $dates_for_str; ?>.</p>
+  				<?php
+  				}
+  				// --- END of CLOSED DATES --- Dennis.
+  				?>
 
-				if(count($viable_dates) > 0){
-				?>
-			 		<p>Bemærk dog at butikken ikke leverer <?php print $dates_for_str; ?>.</p>
-				<?php
-				}
-				// --- END of CLOSED DATES --- Dennis.
-				?>
+        <?php
+        } // end if
+        ?>
       </div>
     </div>
   </div>

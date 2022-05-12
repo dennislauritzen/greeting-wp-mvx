@@ -994,7 +994,6 @@ function categoryActionJavascript() { ?>
 				$("input:checkbox[name=filter_catocca_city]:checked").each(function(){
 					catOccaIdArray.push($(this).val());
 				});
-				deliveryIdArray = [];
 				$("input:checkbox[name=filter_del_city]:checked").each(function(){
 					deliveryIdArray.push($(this).val());
 				});
@@ -1160,7 +1159,8 @@ function catOccaDeliveryAction() {
 			'meta_query' => array(
 					'key' => 'delivery_type',
 					'value' => $deliveryIdArray,
-					'compare' => 'IN'
+					'compare' => 'IN',
+					'type' => 'NUMERIC'
 				)
 		);
 		$usersByFilter = new WP_User_Query( $args	);
@@ -1170,7 +1170,7 @@ function catOccaDeliveryAction() {
 			$delivery_type = get_field('delivery_type','user_'.$v->ID);
 			if(!empty($delivery_type)){
 				if(in_array($delivery_type[0]['value'],$deliveryIdArray)){
-					array_push($userIdArrayGetFromDelivery, $v->ID);
+					array_push($userIdArrayGetFromDelivery, (string) $v->ID);
 				}
 			}
 		}
@@ -1210,11 +1210,14 @@ function catOccaDeliveryAction() {
 	// check condition
 	$userIdArrayGetFromCatOccaDelivery = array();
 
-	$full_arr = array_merge($userIdArrayGetFromCatOcca, $userIdArrayGetFromDelivery);
-	$full_arr2 = array_merge($full_arr, $userIdArrayGetFromPriceFilter);
+	$full_arr = array_merge($userIdArrayGetFromCatOcca, $userIdArrayGetFromPriceFilter);
+	$full_arr = array_unique($full_arr);
 
-	$return_arr = array_unique($full_arr2);
-	$return_arr = array_intersect($defaultUserArray, $return_arr);
+	if(!empty($deliveryIdArray)){
+		$full_arr = array_intersect($userIdArrayGetFromDelivery, $full_arr);
+	}
+
+	$return_arr = array_intersect($defaultUserArray, $full_arr);
 
 	if(!empty($return_arr)){
 		foreach ($return_arr as $filteredUser) {

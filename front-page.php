@@ -1,6 +1,7 @@
 <?php
 
-global $wpdb;
+global $wpdb, $post;
+$this_post_id = $post->ID;
 
 $ip_detail_ipinfo = call_ip_apis(get_client_ip());
 
@@ -404,11 +405,11 @@ ul.recommandations li a:hover {
                       'no_found_rows' => true
                     );
                     $postal_query2 = new WP_Query($postal_args2);
-                    foreach($postal_query2->posts as $k => $post){
+                    foreach($postal_query2->posts as $k => $postal){
                   ?>
                   <li class="list-inline-item pb-1">
-                    <a href="<?php echo get_permalink($post->ID);?>" class="btn btn-link rounded-pill pb-2 border-1 border-white text-white">
-                      <?php echo get_post_meta($post->ID, 'postalcode', true)." ".get_post_meta($post->ID, 'city', true);?>
+                    <a href="<?php echo get_permalink($postal->ID);?>" class="btn btn-link rounded-pill pb-2 border-1 border-white text-white">
+                      <?php echo get_post_meta($postal->ID, 'postalcode', true)." ".get_post_meta($postal->ID, 'city', true);?>
                     </a>
                   </li>
                   <?php
@@ -440,11 +441,11 @@ ul.recommandations li a:hover {
                     'no_found_rows' => true
                   );
                   $postal_query = new WP_Query($postal_args);
-                  foreach($postal_query->posts as $k => $post){
+                  foreach($postal_query->posts as $k => $postal){
                     $postal_query->the_post();?>
                     <li class="list-inline-item pb-1">
-                      <a href="<?php echo get_permalink($post->ID);?>" class="btn btn-link rounded-pill pb-2 border-1 border-white text-white">
-                        <?php echo get_post_meta($post->ID, 'postalcode', true)." ".get_post_meta($post->ID, 'city', true);?>
+                      <a href="<?php echo get_permalink($postal->ID);?>" class="btn btn-link rounded-pill pb-2 border-1 border-white text-white">
+                        <?php echo get_post_meta($postal->ID, 'postalcode', true)." ".get_post_meta($postal->ID, 'city', true);?>
                       </a>
                     </li>
                   <?php
@@ -619,6 +620,102 @@ if(!empty($results)){
   </div>
 </section>
 
+
+<?php
+var_dump($this_post_id);
+var_dump(get_field('frontpage_full_width_boxes', $this_post_id));
+if (have_rows('frontpage_full_width_boxes', $this_post_id) ){
+  while (have_posts()) : the_post();
+
+
+  endwhile;
+
+
+  while( have_rows('frontpage_full_width_boxes', $post_id)) : the_row();
+    $image = get_sub_field('image');
+    $heading = get_sub_field('heading');
+    $text = get_sub_field('text');
+    $icon = get_sub_field('icon');
+    $icon = (str_contains($icon, '<svg') ? $icon : '<span class="small">'.wp_strip_all_tags($icon).'</span>');
+    $cta_text = get_sub_field('cta_text');
+    $cta_link = get_sub_field('cta_link');
+    $left_or_right = get_sub_field('left_or_right');
+    $color = get_sub_field('color');
+    $bg_class = 'bg-teal';
+    $text_class = 'text-white';
+    $heading_text = 'text-rose';
+    $cta_bg = 'bg-white';
+    $cta_text_color = 'text-teal';
+
+    if($color == '0'){
+      // green with white text
+      $bg_class = 'bg-teal';
+      $text_class = 'text-white';
+      $heading_text = 'text-white';
+    } else if($color == '1'){
+      // green with white text and pink heading
+      $bg_class = 'bg-teal';
+      $text_class = 'text-white';
+      $heading_text = 'text-pink';
+    } else if($color == '2'){
+      // light grey bg
+      $bg_class = 'bg-light-grey';
+      $text_class = 'text-teal';
+      $heading_text = 'text-teal';
+      $cta_bg = 'bg-teal';
+      $cta_text_color = 'text-white';
+    } else if($color == '3'){
+      // bg rose
+      $bg_class = 'bg-rose';
+      $text_class = 'text-dark';
+      $heading_text = 'text-dark';
+    } else if($color == '4'){
+      // bg rose with green heading
+      $bg_class = 'bg-rose';
+      $text_class = 'text-teal';
+      $heading_text = 'text-teal';
+    } else if($color == '5'){
+      // bg yellow green text
+      $bg_class = 'bg-yellow';
+      $text_class = 'text-teal';
+      $heading_text = 'text-teal';
+    } else if($color == '6'){
+      // bg white green text
+      $bg_class = 'bg-white';
+      $text_class = 'text-teal';
+      $heading_text = 'text-teal';
+      $cta_bg = 'bg-teal';
+      $cta_text_color = 'text-white';
+    }
+    ?>
+
+    <section id="<?php echo strtolower(str_replace(array(' ','&nbsp;','.'), array('','',''), wp_strip_all_tags($heading))); ?>">
+      <div class="container-fluid">
+        <div class="row">
+          <?php if($left_or_right == "1"){ ?>
+          <div class="col-12 col-md-6" style="background-image:url('<?php echo $image; ?>');background-size:cover;"></div>
+          <?php } ?>
+          <div class="col-12 col-md-6 text-center d-flex align-items-center <?php echo $bg_class; ?> <?php echo $text_class; ?>" style="height: 35vw; min-height: 500px;">
+            <div class="p-2 p-lg-5 p-xl-5 d-inline-block w-100">
+              <div class="text-center px-lg-4 px-xl-4 w-100 <?php echo $text_class; ?>">
+                <?php echo $icon; ?>
+                <h3 class="py-2 <?php echo $heading_text; ?>"><?php echo $heading; ?></h3>
+                <?php echo str_replace('<p>','<p class="px-lg-5 px-xl-5">',$text); ?>
+                <a class="btn <?php echo $cta_bg; ?> <?php echo $cta_text_color; ?> rounded-pill mt-2 py-3 px-4" href="<?php echo $cta_link; ?>" title="<?php echo $heading; ?>"><?php echo $cta_text; ?></a>
+              </div>
+            </div>
+          </div>
+          <?php if($left_or_right == "0"){ ?>
+          <div class="col-12 col-md-6" style="background-image:url('<?php echo $image; ?>');background-size:cover;"></div>
+          <?php } ?>
+        </div>
+      </div>
+    </section>
+
+    <?php
+  endwhile;
+}
+?>
 <section id="about">
   <div class="container-fluid">
     <div class="row">
@@ -641,7 +738,7 @@ if(!empty($results)){
         <div class="col-12 col-md-6" style="background-image:url('https://greeting.dk/wp-content/uploads/2021/11/265A7587-aspect-ratio-800-700.jpg');background-size:cover;"></div>
     </div>
   </div>
-</div>
+</section>
 
 <section class="businessgifts">
   <div class="container-fluid">

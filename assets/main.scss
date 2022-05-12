@@ -398,10 +398,16 @@ a.greeting-link-pink {
 .bg-light-grey {
 	background: #F8F8F8;
 }
+.bg-white {
+	background: #ffffff;
+}
 
 /* Text colors */
 .text-pink {
 	color:#F0D0DB;
+}
+.text-rose {
+	color:#fecbca;
 }
 .text-purple {
 	color:#3E246F;
@@ -443,11 +449,14 @@ a.greeting-link-pink {
 .greeting-notice {
 
 }
-.woocommerce-message::before,
-.woocommerce-info::before,
-.woocommerce-error::before
-{
-	content: '';
+.woocommerce-message {
+	li {
+		padding-left: 35px !important;
+	}
+}
+
+.woocommerce-privacy-policy-text {
+	padding-topp: 35px;
 }
 
 /* Top part */
