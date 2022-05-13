@@ -49,6 +49,52 @@
 		.form-row-label {
 			width: 95%;
 		}
+
+		  #greeting-footer h6 {
+		    font-family: 'Rubik', 'Inter', 'Comic Sans', sans-serif;
+		    font-size: 20px;
+		    color: #1b4949;
+		  }
+		  #greeting-footer h6.light {
+		    font-family: 'Rubik', 'Inter', 'Comic Sans', sans-serif;
+		    font-size: 18px;
+		    text-transform: uppercase;
+		    color: #ffffff;
+		  }
+		  #greeting-footer ul {
+		    font-family: 'Inter', 'Comic Sans', sans-serif;
+		    font-weight: 300;
+		    font-size: 13px;
+		  }
+		  #greeting-footer ul.social {
+		    width: 150px;
+		    list-style: none;
+		    margin: -30px 0 0 -100px;
+		    padding: 0 5px 0 0;
+		  }
+		  #greeting-footer ul.social li {
+		    float: left;
+		    width: 45px;
+		    margin: 0;
+		    padding: 0;
+		  }
+
+		  #formal-footer {
+		    border-top: 3px solid #fecbca;
+		    font-family: 'Inter',sans-serif;
+		    font-size: 12px;
+		    color: #555555;
+		  }
+		  #formal-footer ul {
+		    list-style: none;
+		    margin: 0;
+		    padding: 0;
+		  }
+		  #formal-footer ul li {
+		    float: left;
+		    margin: 0;
+		    padding: 0 10px 0 0;
+		  }
 		</style>
 </head>
 
@@ -89,14 +135,37 @@
               <path d="m474.15 87.426c0.753-1.5772 1.356-3.4925 1.808-5.7457 0.452-2.2533 0.679-5.4829 0.679-9.689v-51.261c0-3.6803-0.528-6.647-1.583-8.9003-0.98-2.2532-2.148-4.1309-3.504-5.6331v-0.22532l16.39-5.9711v71.878c0 4.206 0.227 7.4732 0.679 9.8016 0.527 2.3283 1.205 4.2436 2.034 5.7457v0.2253h-16.503v-0.2253zm34.138 0.2253-19.443-27.94 12.999-14.083c1.809-1.9528 3.015-3.9807 3.618-6.0837 0.602-2.1782 0.452-3.9808-0.453-5.4078v-0.2253h14.695v0.2253c-3.391 1.5022-6.367 3.4174-8.93 5.7458-2.562 2.2532-5.011 4.6191-7.347 7.0977l-5.878 6.4217 16.617 23.884c1.733 2.4035 3.315 4.4314 4.747 6.0838s3.128 3.0043 5.087 4.0558v0.2253h-15.712z"/>
               </svg>
           </a>
-          <a class="position-absolute top-0 end-0 me-4 d-inline d-lg-none d-xl-none" data-bs-toggle="offcanvas" href="#offcanvasMenu" role="button" aria-controls="offcanvasExample">
+          <!--<a class="position-absolute top-0 end-0 me-4 d-inline d-lg-none d-xl-none" data-bs-toggle="offcanvas" href="#offcanvasMenu" role="button" aria-controls="offcanvasExample">
             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#ffffff" class="bi bi-list" viewBox="0 0 16 16">
               <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
             </svg>
-          </a>
+          </a>-->
         </div>
         <div class="d-flex col-lg-3 justify-content-center justify-content-lg-end order-3 pt-3 pt-lg-0">
-          Telefon - Mail - Chat
+					<a href="tel:+4571901834" title="Ring til os her, hvis du oplever problemer eller har spørgsmål.">
+						<svg version="1.2" width="45" height="45" xmlns="http://www.w3.org/2000/svg" fill="#ffffff" xmlns:xlink="http://www.w3.org/1999/xlink">
+							 <g>
+								<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="#ffffff" class="bi bi-circle" viewBox="0 0 16 16">
+								  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+								</svg>
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#ffffff" class="bi bi-circle" viewBox="0 0 16 16" x="10" y="10">
+									<path fill-rule="evenodd" d="M1.885.511a1.745 1.745 0 0 1 2.61.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.678.678 0 0 0 .178.643l2.457 2.457a.678.678 0 0 0 .644.178l2.189-.547a1.745 1.745 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.634 18.634 0 0 1-7.01-4.42 18.634 18.634 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877L1.885.511z"/>
+								</svg>
+							</g>
+						</svg>
+					</a>
+					<a href="mailto:kontakt@greeting.dk" alt="E-mail" title="Skriv til os her, hvis du oplever problemer eller har spørgsmål.">
+						<svg version="1.2" width="45" height="45" xmlns="http://www.w3.org/2000/svg" fill="#ffffff" xmlns:xlink="http://www.w3.org/1999/xlink">
+							 <g>
+								<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="#ffffff" class="bi bi-circle" viewBox="0 0 16 16">
+								  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+								</svg>
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#ffffff" class="bi bi-circle" viewBox="0 0 16 16" x="10" y="10">
+									<path fill-rule="evenodd" d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l3.235 1.94a2.76 2.76 0 0 0-.233 1.027L1 5.384v5.721l3.453-2.124c.146.277.329.556.55.835l-3.97 2.443A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741l-3.968-2.442c.22-.28.403-.56.55-.836L15 11.105V5.383l-3.002 1.801a2.76 2.76 0 0 0-.233-1.026L15 4.217V4a1 1 0 0 0-1-1H2Zm6 2.993c1.664-1.711 5.825 1.283 0 5.132-5.825-3.85-1.664-6.843 0-5.132Z"/>
+								</svg>
+							</g>
+						</svg>
+					</a>
         </div>
       </div>
     </div>

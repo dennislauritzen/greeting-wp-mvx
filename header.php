@@ -270,7 +270,7 @@
     font-size: 13px;
   }
   #greeting-footer ul.social {
-    width: 100px;
+    width: 150px;
     list-style: none;
     margin: -30px 0 0 -100px;
     padding: 0 5px 0 0;
