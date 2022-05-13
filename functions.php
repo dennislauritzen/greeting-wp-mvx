@@ -1853,7 +1853,6 @@ add_action( 'wp_ajax_nopriv_productFilterAction', 'productFilterAction' );
  * Custom order status
  */
 add_action( 'init', 'register_delivered_order_status' );
-
 function register_delivered_order_status() {
     register_post_status( 'wc-delivered', array(
         'label'                     => 'Delivered',
@@ -1904,7 +1903,6 @@ function getLastOrderId(){
 
 // Action based on last order
 use Dompdf\Dompdf; // reference the Dompdf namespace
-
 // add the action
 add_action( 'woocommerce_thankyou', 'call_order_status_completed', 10, 1);
 // define woocommerce_order_status_completed callback function
@@ -2090,9 +2088,12 @@ function attach_pdf_to_email ( $attachments, $email_id , $order ) {
 
 }
 // vendor attachment end
+
+
+
+
 /**
  * Check if store delivers in the postal code
- *
  *
  *
  *
@@ -2100,6 +2101,7 @@ function attach_pdf_to_email ( $attachments, $email_id , $order ) {
  */
 add_action( 'woocommerce_after_checkout_validation', 'greeting_check_billing_postcode', 10, 2);
 function greeting_check_billing_postcode( $fields, $errors ){
+	global $wpdb, $wcmp;
 
 	$storeProductId = 0;
 	// Get $product object from Cart object
@@ -2111,8 +2113,8 @@ function greeting_check_billing_postcode( $fields, $errors ){
 	}
 
 	$vendor_id = get_post_field( 'post_author', $storeProductId );
+	$vendor = get_wcmp_vendor($vendor_id);
 
-	global $wpdb;
 
 	// get vendor postal code
 	// $vendorPostalCodeRow = $wpdb->get_row( "
@@ -2130,23 +2132,47 @@ function greeting_check_billing_postcode( $fields, $errors ){
 	" );
 	$vendorDeliveryZipsBilling = $vendorDeliveryZipsRow->meta_value;
 
-	$vendorRelatedPCBillingWithoutComma = str_replace(","," ",$vendorDeliveryZipsBilling);
-	$vendorRelatedPCBillingWCArray = explode(" ", $vendorRelatedPCBillingWithoutComma);
+	$vendorRelatedPCBillingWithoutComma = str_replace(" ","",$vendorDeliveryZipsBilling);
+	$vendorRelatedPCBillingWCArray = explode(",", $vendorRelatedPCBillingWithoutComma);
 	// push vendor postal code
 	// $vendorRelatedPCBillingWCArray[] = $vendorPostalCodeBilling;
-	$findPostCodeFromArray = in_array($fields[ 'billing_postcode' ], $vendorRelatedPCBillingWCArray);
 
-		if ($findPostCodeFromArray){
+	$ship_postcode = $fields['shipping_postcode'];
+	$findPostCodeFromArray = in_array($ship_postcode, $vendorRelatedPCBillingWCArray);
+
+	if (!in_array($ship_postcode, $vendorRelatedPCBillingWCArray)){
+
+		$args = array(
+			'post_type' => 'city',
+			'meta_query'=> array(
+				array(
+						'key' => 'postalcode',
+						'compare' => '=',
+						'value' => '8000',
+						'type' => 'numeric'
+				 )
+			),
+			'post_status' => 'publish',
+			'posts_per_page' => '1'
+		);
+		$city = new WP_Query( $args );
+		var_dump($city->posts[0]->post_title);
+
+		if($city && $city->posts && count($city->posts) > 0){
+			$errors->add( 'validation', var_dump($city).'<p style="line-height:150%;">Beklager - den valgte butik kan ikke levere til '.$city->posts[0]->post_title.'. Du kan: <br>- <a href="'.$vendor->get_permalink().'">gå til butikkens side</a> og se hvilke postnumre de leverer til<br>eller<br>- <a href="'.get_permalink($city->posts[0]->ID).'">klikke her og se butikker der leverer i postnummer '.$city->posts[0]->post_title.'</a></p>' );
 		} else {
-			$errors->add( 'validation', 'This store not deliver to postcode '.$fields[ 'billing_postcode' ].', Store only deliver to '.$vendorDeliveryZipsBilling.' these postcode.' );
+			$errors->add( 'validation', var_dump($city).'Beklager - butikken kan desværre ikke levere til det postnummer, du har indtastet under levering. Du bedes enten ændre leveringens postnummer eller gå til <a href="'.home_url().'">forsiden</a> for at finde en butik i det ønskede postnummer.' );
 		}
+	}
 }
 
 
+
+
+
+
 add_action( 'woocommerce_after_checkout_form', 'greeting_show_hide_calendar' );
-
 function greeting_show_hide_calendar( $available_gateways ) {?>
-
 <script type="text/javascript">
 
    function show_calendar( val ) {
@@ -2236,46 +2262,101 @@ function greeting_load_calendar_dates( $available_gateways ) {
 
 
 // Save & show date as order meta
-add_action( 'woocommerce_checkout_update_order_meta', 'greeting_save_delivery_date_with_order' );
-function greeting_save_delivery_date_with_order( $order_id ) {
+/**
+ * function to add order meta in admin
+ * #add delivery_date
+ *
+ *
+ */
+add_action( 'woocommerce_checkout_update_order_meta', 'greeting_save_custom_fields_with_order' );
+function greeting_save_custom_fields_with_order( $order_id ) {
     global $woocommerce;
     if ( $_POST['delivery_date'] ) update_post_meta( $order_id, '_delivery_date', esc_attr( $_POST['delivery_date'] ) );
+		if ( $_POST['greeting_message'] ) update_post_meta( $order_id, '_greeting_message', esc_attr( $_POST['greeting_message'] ) );
+		if ( $_POST['delivery_instructions'] ) update_post_meta( $order_id, '_delivery_instructions', esc_attr( $_POST['delivery_instructions'] ) );
 }
 
 
 add_action( 'woocommerce_admin_order_data_after_billing_address', 'greeting_delivery_date_display_admin_order_meta' );
 function greeting_delivery_date_display_admin_order_meta( $order ) {
+   $str = '<p><strong>Leveringsdato:</strong> ' . get_post_meta( $order->get_id(), '_delivery_date', true ) . '</p>';
+	 $str .= '<p><strong>Besked til modtager:</strong> ' . get_post_meta( $order->get_id(), '_greeting_message', true ) . '</p>';
+	 $str .= '<p><strong>Leveringsinstruktioner:</strong> ' . get_post_meta( $order->get_id(), '_delivery_instructions', true ) . '</p>';
 
-   echo '<p><strong>Delivery Date:</strong> ' . get_post_meta( $order->get_id(), '_delivery_date', true ) . '</p>';
-
+	 echo $str;
 }
 
 // show order date in thank you page
 add_action( 'woocommerce_thankyou', 'greeting_view_order_and_thankyou_page', 20 );
+function greeting_view_order_and_thankyou_page( $order_id ){
+	$str = '<p><strong>Leveringsdato:</strong> ' . get_post_meta( $order->get_id(), '_delivery_date', true ) . '</p>';
+	$str .= '<p><strong>Besked til modtager:</strong> ' . get_post_meta( $order->get_id(), '_greeting_message', true ) . '</p>';
+	$str .= '<p><strong>Leveringsinstruktioner:</strong> ' . get_post_meta( $order->get_id(), '_delivery_instructions', true ) . '</p>';
 
-function greeting_view_order_and_thankyou_page( $order_id ){  ?>
-    <?php echo '<p><strong>Delivery Date:</strong> ' . get_post_meta( $order_id, '_delivery_date', true ) . '</p>';
+	echo $str;
 }
 
 // Add custom order meta data to make it accessible in Order preview template
 add_filter( 'woocommerce_admin_order_preview_get_order_details', 'admin_order_preview_add_custom_meta_data', 10, 2 );
-
 function admin_order_preview_add_custom_meta_data( $data, $order ) {
-    if( $delivery_date_value = $order->get_meta('_delivery_date') )
+    if( $delivery_date_value = $order->get_meta('_delivery_date') ){
         $data['delivery_date_key'] = $delivery_date_value; // <= Store the value in the data array.
+		}
+		if( $greeting_message = $order->get_meta('_greeting_message') ){
+        $data['greeting_message_key'] = $greeting_message; // <= Store the value in the data array.
+		}
+		if( $delivery_instructions = $order->get_meta('_delivery_instructions') ){
+        $data['delivery_instructions_key'] = $delivery_instructions; // <= Store the value in the data array.
+		}
     return $data;
 }
 
 // Display order date in admin order preview
 add_action( 'woocommerce_admin_order_preview_start', 'custom_display_order_data_in_admin' );
-
 function custom_display_order_data_in_admin(){
     // Call the stored value and display it
-    echo '<div style="margin:15px 0px 0px 15px;"><strong>Delivery Date:</strong> {{data.delivery_date_key}}</div>';
+    $str = '<div style="margin:15px 0px 0px 15px;"><strong>Leveringsdato:</strong> {{data.delivery_date_key}}</div>';
+		$str .= '<div style="margin:15px 0px 0px 15px;"><strong>Besked til modtager:</strong> {{data.greeting_message_key}}</div>';
+		$str .= '<div style="margin:15px 0px 0px 15px;"><strong>Leveringsinstruktioner:</strong> {{data.delivery_instructions_key}}</div>';
 }
 
 
-add_action( 'woocommerce_cart_calculate_fees', 'checkout_message_fee', 20, 1 );
+/**
+ * Add a custom field (in an order) to the emails
+ *
+ * @since v1.0
+ * @author Dennis
+ */
+add_filter( 'woocommerce_email_order_meta_fields', 'custom_woocommerce_email_order_meta_fields', 10, 3 );
+
+function custom_woocommerce_email_order_meta_fields( $fields, $sent_to_admin, $order ) {
+    $fields['delivery_date'] = array(
+        'label' => __( 'Leveringsdato' ),
+        'value' => get_post_meta( $order->id, '_delivery_date', true ),
+    );
+		$fields['greeting_message'] = array(
+        'label' => __( 'Besked til modtager' ),
+        'value' => get_post_meta( $order->id, '_greeting_message', true ),
+    );
+		$fields['delivery_instructions'] = array(
+        'label' => __( 'Leveringsinstruktioner' ),
+        'value' => get_post_meta( $order->id, '_delivery_instructions', true ),
+    );
+    return $fields;
+}
+
+
+
+
+
+/**
+ * Function for adding extra fee in checkout.
+ * if e.g. there is a larger message available.
+ *
+ * @author Dennis
+ * @since v1.0
+ */
+#add_action( 'woocommerce_cart_calculate_fees', 'checkout_message_fee', 20, 1 );
 function checkout_message_fee( $cart ) {
     if ( $radio2 = WC()->session->get( 'message-pro' ) ) {
         $cart->add_fee( 'Message Fee', $radio2 );
@@ -2290,16 +2371,48 @@ function checkout_message_choice_to_session( $posted_data ) {
     }
 }
 
-add_action( 'woocommerce_checkout_process', 'greeting_validate_new_receiver_info_fields' );
 
-function greeting_validate_new_receiver_info_fields() {
 
-   if ( isset( $_POST['receiver_phone'] ) && empty( $_POST['receiver_phone'] ) ) wc_add_notice( __( 'Please enter receiver_phone' ), 'greeting2' );
-   if ( isset( $_POST['greeting_message'] ) && empty( $_POST['greeting_message'] ) ) wc_add_notice( __( 'Please enter greeting message' ), 'greeting2' );
+/**
+*
+* Function for the greeting text / greeting message
+* #greeting_text #greeting_meesage
+*
+*
+*/
+add_action( 'woocommerce_after_checkout_validation', 'greeting_validate_new_receiver_info_fields', 10, 2 );
+function greeting_validate_new_receiver_info_fields($fields, $errors) {
+	global $woocommerce;
 
-   if ( $_POST['message-pro'] == 0 && (strlen( $_POST['greeting_message'] ) > 150))  wc_add_notice( __( 'Standard package accept only 150 Character, Please choose premium package' ), 'greeting2' );
+	if ( isset($_POST['receiver_phone']) && empty($_POST['receiver_phone']) ){
+		$errors->add(
+			'validation',
+			__( 'Please enter receiver phone', 'greeting2')
+		);
+	}
+	if ( isset($_POST['greeting_message']) && empty($_POST['greeting_message']) ){
+		$errors->add(
+			'validation',
+			__( 'Please enter greeting message', 'greeting2')
+		);
+	}
+	//if ($_POST['message-pro'] == "0" && (strlen($_POST['greeting_message']) > 165)){
+	if(strlen($_POST['greeting_message']) > 165){
+		$errors->add(
+			'validation',
+			__( 'Standard package accept only 165 Character', 'greeting2')
+		);
+	}
 
+  // Check if set, if its not set add an error. This one is only requite for companies
+  if ( !(preg_match('/^[0-9]{8,12}$/D', $_POST['receiver_phone'] ))){
+		$errors->add(
+			'validation',
+			__('Indtast et gyldigt telefonnummer til modtager, så vi kan kontakte vedkommende ved eventuelle spørgsmål om levering eller lignende.','greeting2')
+		);
+  }
 }
+
 
 //  Save & show date as order meta
 add_action( 'woocommerce_checkout_update_order_meta', 'greeting_save_receiver_info_with_order' );
@@ -2419,7 +2532,6 @@ function greeting_shop_only_one_store_same_time() {
 	if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
 		// Yes, WooCommerce is enabled
 		if(!empty(WC()->cart) && !is_admin()){
-			$i = 0;
 			$cart_data = WC()->cart->get_cart();
 			$length = count($cart_data);
 			foreach ($cart_data as $cart_item_key => $cart_item) {
@@ -2428,24 +2540,16 @@ function greeting_shop_only_one_store_same_time() {
 				if(is_object($vendor_data)){
 					$vendor_id = $vendor_data->user_data->ID;
 					$vendor_id_array[] = $vendor_id;
-					if ($i == $length - 1) {
-						$last_inserted_vendor_id = $vendor_id;
-					}
 				}
-				$i++;
 			}
 		}
 	} else {
 		// WooCommerce is NOT enabled!
+		return;
 	}
 
 	// check array is unique or not
-	if(count($vendor_id_array) === 1 && end($vendor_id_array) === $last_inserted_vendor_id) {
-	} else {
-		$single_vendor = 1;
-	}
-
-	if(!empty($vendor_id_array) && $single_vendor === 1){
+	if(!empty($vendor_id_array) && count(array_unique($vendor_id_array)) > 1) {
 		// remove actions
 		remove_action( 'woocommerce_after_shop_loop_item', 'woocommerce_template_loop_add_to_cart', 10 );
 		remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_add_to_cart', 30 );
@@ -2735,20 +2839,20 @@ function greeting_echo_receiver_info( ) {
 
 		echo '<h3>Din hilsen til modtager</h3>';
 
-		$chosenMessage = WC()->session->get( 'message-pro' );
-		$chosenMessage = empty( $chosenMessage ) ? WC()->checkout->get_value( 'message-pro' ) : $chosenMessage;
-		$chosenMessage = empty( $chosenMessage ) ? '0' : $chosenMessage;
+		#$chosenMessage = WC()->session->get( 'message-pro' );
+		#$chosenMessage = empty( $chosenMessage ) ? WC()->checkout->get_value( 'message-pro' ) : $chosenMessage;
+		#$chosenMessage = empty( $chosenMessage ) ? '0' : $chosenMessage;
 
-		woocommerce_form_field( 'message-pro',  array(
-			'type'      => 'radio',
-			'label'			=> 'Hvor lang er din hilsen?',
-			'class'     => array( 'form-row-wide', 'update_totals_on_change' ),
-			'label_class' =>	array('form-row-label'),
-			'options'   => array(
-				'0'				=> 'Standardhilsen, håndskrevet (op til 165 tegn)',
-				'4'				=> 'Lang hilsen, håndkrevet (op til 400 tegn), +10 kr.'
-			),
-		), $chosenMessage );
+		#woocommerce_form_field( 'message-pro',  array(
+		#	'type'      => 'radio',
+		#	'label'			=> 'Hvor lang er din hilsen?',
+		#	'class'     => array( 'form-row-wide', 'update_totals_on_change' ),
+		#	'label_class' =>	array('form-row-label'),
+		#	'options'   => array(
+		#		'0'				=> 'Standardhilsen, håndskrevet (op til 165 tegn)',
+		#		'4'				=> 'Lang hilsen, håndkrevet (op til 400 tegn), +10 kr.'
+		#	),
+		#), $chosenMessage );
 
 		// @todo - If message-pro == 4, then this should be allowed to be 400 characters.
 		woocommerce_form_field( 'greeting_message', array(
@@ -2756,8 +2860,9 @@ function greeting_echo_receiver_info( ) {
 			'id'					=> 'greetingMessage',
 			'class'				=> array('form-row-wide'),
 			'required'		=> true,
-			'label'				=> __('Din hilsen til modtager'),
+			'label'				=> __('Din hilsen til modtager (max 165 tegn)'),
 			'placeholder'	=> __('Skriv din hilsen til din modtager her :)'),
+			'maxlength' 	=> 165
 		), WC()->checkout->get_value( 'greeting_message' ) );
 
 		woocommerce_form_field( 'receiver_phone', array(
@@ -2768,6 +2873,14 @@ function greeting_echo_receiver_info( ) {
 			'placeholder'       => __('Enter phone number of the receiver'),
 			), WC()->checkout->get_value( 'receiver_phone' ));
 		#echo '<tr class="message-pro-radio"><td>';
+
+		woocommerce_form_field( 'delivery_instructions', array(
+			'type'				=> 'textarea',
+			'id'					=> 'deliveryInstructions',
+			'class'				=> array('form-row-wide'),
+			'label'				=> __('Leveringsinstruktioner'),
+			'placeholder'	=> __('Har du særlige instruktioner til leveringen? Eks. en dørkode, særlige forhold på leveringsadressen eller lignende? Notér dem her :)')
+		), WC()->checkout->get_value( 'delivery_instructions' ) );
 
 	echo '<h3 class="pt-4">Leveringsdato</h3>';
 
@@ -2985,7 +3098,7 @@ function greeting_marketplace_checkout_fields($fields) {
   unset($fields['billing']['billing_address_2']);
   // unset($fields['billing']['billing_city']);
   // unset($fields['billing']['billing_postcode']);
-  unset($fields['billing']['billing_country']);
+  # unset($fields['billing']['billing_country']);
   unset($fields['billing']['billing_state']);
   //unset($fields['billing']['billing_phone']);
   //unset($fields['billing']['billing_email']);
@@ -2998,7 +3111,7 @@ function greeting_marketplace_checkout_fields($fields) {
   unset($fields['shipping']['shipping_address_2']);
   //unset($fields['shipping']['shipping_city']);
   //unset($fields['shipping']['shipping_postcode']);
-	unset($fields['shipping']['shipping_country']);
+	# unset($fields['shipping']['shipping_country']);
 	unset($fields['shipping']['shipping_state']);
 
     // Remove order comment fields
@@ -3206,3 +3319,40 @@ function wcmp_change_default_status( $order_status, $order ){
 	unset($order_status['wc-failed']);
 	return $order_status;
 }
+
+
+/**
+ *
+ * Add photos to order e-mails
+ *
+ * @author Dennis Lauritzen
+ * @since v1.0
+ */
+function greeting_add_photos_to_wc_emails( $args ) {
+
+    $args['show_sku'] = false;
+    $args['show_image'] = true;
+    return $args;
+}
+add_filter( 'woocommerce_email_order_items_args', 'greeting_add_photos_to_wc_emails' );
+
+/**
+ *
+ * Add photos to order e-mails
+ *
+ * @author Dennis Lauritzen
+ * @since v1.0
+ */
+function greeting_modify_wc_order_emails( $args ) {
+
+    // bail if this is sent to the admin
+    #if ( $args['sent_to_admin'] ) {
+    #    return $args;
+    #}
+    $args['show_sku'] = false;
+    $args['show_image'] = true;
+    $args['image_size'] = array( 100, 100 );
+
+    return $args;
+}
+add_filter( 'woocommerce_email_order_items_args', 'greeting_modify_wc_order_emails' );

@@ -7,9 +7,9 @@
 
 get_header();
 get_header('green');
-?>
 
-<?php
+
+
 the_post();
 ?>
 <section id="landingpage">

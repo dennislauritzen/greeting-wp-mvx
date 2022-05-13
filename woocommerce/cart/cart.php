@@ -23,14 +23,14 @@ do_action( 'woocommerce_before_cart' ); ?>
 
 <form class="woocommerce-cart-form" action="<?php echo esc_url( wc_get_cart_url() ); ?>" method="post">
 	<?php do_action( 'woocommerce_before_cart_table' ); ?>
-	<div class="row py-3 shop_table shop_table_responsive cart woocommerce-cart-form__contents">
+	<!--<div class="row py-3 shop_table shop_table_responsive cart woocommerce-cart-form__contents">
 		<div class="col-1 product-thumbnail">&nbsp;</div>
-		<div class="col-5 product-name"><?php esc_html_e( 'Product', 'woocommerce' ); ?></div>
+		<div class="col-10 col-md-5 product-name"><?php esc_html_e( 'Product', 'woocommerce' ); ?></div>
 		<div class="col-2 product-price"><?php esc_html_e( 'Price', 'woocommerce' ); ?></div>
 		<div class="col-2 product-quantity"><?php esc_html_e( 'Quantity', 'woocommerce' ); ?></div>
 		<div class="col-1 product-subtotal"><?php esc_html_e( 'Subtotal', 'woocommerce' ); ?></div>
 		<div class="col-1 product-remove"></div>
-	</div>
+	</div>-->
 
 			<?php do_action( 'woocommerce_before_cart_contents' ); ?>
 
@@ -43,7 +43,7 @@ do_action( 'woocommerce_before_cart' ); ?>
 					$product_permalink = apply_filters( 'woocommerce_cart_item_permalink', $_product->is_visible() ? $_product->get_permalink( $cart_item ) : '', $cart_item, $cart_item_key );
 					?>
 					<div class="row cart-row align-items-center pb-3">
-						<div class="col-1 product-thumbnail">
+						<div class="col-2 col-md-1 col-lg-1 mt-3 mb-1 product-thumbnail">
 						<?php
 						$thumbnail = apply_filters( 'woocommerce_cart_item_thumbnail', $_product->get_image(), $cart_item, $cart_item_key );
 
@@ -54,7 +54,7 @@ do_action( 'woocommerce_before_cart' ); ?>
 						}
 						?>
 						</div>
-						<div class="product-name col-5 " data-title="<?php esc_attr_e( 'Product', 'woocommerce' ); ?>">
+						<div class="product-name col-10 col-md-3 col-lg-4 col-xl-5 mt-3 mb-1" data-title="<?php esc_attr_e( 'Product', 'woocommerce' ); ?>">
 						<?php
 						if ( ! $product_permalink ) {
 							echo wp_kses_post( apply_filters( 'woocommerce_cart_item_name', $_product->get_name(), $cart_item, $cart_item_key ) . '&nbsp;' );
@@ -73,12 +73,12 @@ do_action( 'woocommerce_before_cart' ); ?>
 						}
 						?>
 						</div>
-						<div class="col-2 product-price woocommerce-Price-amount amount" data-title="<?php esc_attr_e( 'Price', 'woocommerce' ); ?>">
+						<div class="col-2 col-md-2 col-lg-1 product-price woocommerce-Price-amount amount" data-title="<?php esc_attr_e( 'Price', 'woocommerce' ); ?>">
 							<?php
 								echo apply_filters( 'woocommerce_cart_item_price', WC()->cart->get_product_price( $_product ), $cart_item, $cart_item_key ); // PHPCS: XSS ok.
 							?>
 						</div>
-						<div class="col-2 product-quantity" data-title="<?php esc_attr_e( 'Quantity', 'woocommerce' ); ?>">
+						<div class="col-5 col-md-3 col-lg-3 col-xl-2 product-quantity" data-title="<?php esc_attr_e( 'Quantity', 'woocommerce' ); ?>">
 						<?php
 						if ( $_product->is_sold_individually() ) {
 							$product_quantity = sprintf( '1 <input type="hidden" name="cart[%s][qty]" value="1" />', $cart_item_key );
@@ -100,7 +100,7 @@ do_action( 'woocommerce_before_cart' ); ?>
 						?>
 						</div>
 
-						<div class="col-1 product-subtotal" data-title="<?php esc_attr_e( 'Subtotal', 'woocommerce' ); ?>">
+						<div class="col-3 col-md-1 me-2 product-subtotal" data-title="<?php esc_attr_e( 'Subtotal', 'woocommerce' ); ?>">
 							<?php
 								echo apply_filters( 'woocommerce_cart_item_subtotal', WC()->cart->get_product_subtotal( $_product, $cart_item['quantity'] ), $cart_item, $cart_item_key ); // PHPCS: XSS ok.
 							?>
@@ -145,7 +145,7 @@ do_action( 'woocommerce_before_cart' ); ?>
 	</div>
 	</form>
 	<div class="row">
-		<div class="col-6">
+		<div class="col-12 col-lg-6 mb-5">
 			<?php if ( wc_coupons_enabled() ) { ?>
 				<div class="coupon input-group w-75">
 					<label for="coupon_code" class="input-group-text"><?php esc_html_e( 'Coupon:', 'woocommerce' ); ?></label>

@@ -15,7 +15,437 @@
     background-color: #446a6b;
     background-image: none;
   }
-  </style>
+
+
+  .bg-pink {
+    background: #F8F8F8;
+  }
+  .bg-rose {
+    background: #fecbca;
+  }
+  .bg-teal {
+    background: #446a6b;
+  }
+  .bg-teal-75 {
+    background: rgba(68, 106, 107,0.75);
+  }
+  .border-teal {
+    border-color: #446a6b;
+  }
+  .bg-light-grey {
+    background: #F8F8F8;
+  }
+  .bg-yellow {
+    background: #d6bf75;
+  }
+  .border-teal {
+    border: 1px solid #446a6b;
+  }
+  .border-yellow {
+    border: 1px solid #d6bf75;
+  }
+  .text-teal {
+    color: #1b4949;
+  }
+
+  #top {
+    border-top: 3px solid #fecbca;
+  }
+
+  .top-text-content {
+    opacity: 1.0 !important;
+  }
+
+	/*
+	*	Frontpage video
+	*/
+	#maintop {
+	}
+	#maintop .video-wrapper {
+	  /* Telling our absolute positioned video to
+	  be relative to this element */
+	  width: 100vw;
+	  height: 700px;
+	  /* Will not allow the video to overflow the
+	  container */
+	  overflow: hidden;
+	}
+	video {
+	  /** Simulationg background-size: cover */
+	  object-fit: cover;
+	  height: 100%;
+	  width: 100%;
+	}
+
+	#spinner {
+	  color:#fecbca;
+	}
+	#spinner:after {
+	  content:"";
+	  animation: spin 20s linear infinite;
+	}
+	@keyframes spin {
+	  0% { content:"en gavekurv"; }
+	  10% { content:"en vingave"; }
+	  20% { content:"et strikkesæt"; }
+	  30% { content:"en overraskelse"; }
+	  40% { content:"en buket blomster"; }
+	  50% { content: "en lækker gin"; }
+	  60% { content: "smukke roser"; }
+	  70% { content: "tak for besøg-gaven"; }
+	  80% { content: "bare fordi-gaven"; }
+	  90% { content: "en gavehilsen"; }
+	  100% { content:"en gavekurv"; }
+	}
+
+
+	ul.recommandations {
+
+	}
+	ul.recommandations li.active {
+		background-color: #d6bf75;
+		border: 0;
+	}
+	ul.recommandations li.active a {
+		color: #ffffff;
+	}
+	ul.recommandations li:hover {
+		background-color: #d6bf75;
+	}
+	ul.recommandations li:last-child:hover {
+		border-bottom-left-radius: 3px !important;
+		border-bottom-right-radius: 3px !important;
+	}
+	ul.recommandations li:hover a,
+	ul.recommandations li a:hover {
+		color: #ffffff;
+	}
+
+
+  /*
+  * section#hotitworks
+  * How it works section
+  * --
+  */
+  #howitworks h1,
+  #howitworks h2,
+  #howitworks h3 {
+    font-family: "Dela Gothic One", cursive, serif;
+    font-weight: 300;
+  }
+	ul.timeline {
+		width: 100%;
+		position: relative;
+		list-style: none;
+		line-height: 1.8em;
+		min-height: 50px;
+		float: left;
+		text-align: center;
+	}
+	ul.timeline::before {
+		content: "";
+		display: block;
+		background-color: #446a6b;
+		height: 0.5px;
+		margin: 0 ;
+		position:relative;
+		top:23px;
+	}
+  ul.timeline li {
+    float: left;
+    width: 20%;
+    min-width: 125px;
+    padding: 0 10px;
+  }
+  ul.timeline li figure {
+    position: relative;
+    z-index: 2;
+    background: #F8F8F8;
+    height: 50px;
+    width: 80px;
+    border-radius: 50%;
+    margin: 0 auto 10px auto;
+    box-sizing: inherit;
+  }
+  @media (min-width: 769px){
+    ul.timeline::before {
+      margin: 0 100px;
+    }
+  }
+  @media (max-width: 768px){
+    ul.timeline {
+      text-align: left;
+    }
+    ul.timeline::before {
+      content: "";
+      position: absolute;
+      width: 1px;
+      top: 10px;
+      left: 59px;
+      margin-top: 25px;
+      height: calc(100% - 75px);
+    }
+    ul.timeline li {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      min-width: 200px;
+      padding: 5px 10px 10px 10px;
+    }
+    ul.timeline li figure {
+      width: 34px;
+      text-align: left;
+      margin: 0 15px 0 0;
+    }
+    ul.timeline li svg {
+      width: 34px;
+    }
+  }
+
+  /*
+  * #inspiration .inspirationstores
+  * The "get inspired by other stores sections"
+  * also used on product pages.
+  */
+  .inspirationstores h1,
+  .inspirationstores h2,
+  .inspirationstores h3,
+  .inspirationstores h4 {
+    font-family: "Dela Gothic One", cursive, serif;
+  }
+  .inspirationstores .card .card-img-top {
+    width: 100%;
+    height: 10vw;
+    min-height: 200px;
+    object-fit: cover;
+  }
+  .inspirationstores .card .card-title {
+    font-family: 'Rubik',sans-serif;
+  }
+  .inspirationstores .card .card-text {
+    font-family: 'Inter',sans-serif;
+    font-size: 14px;
+    line-height: 23px;
+  }
+
+	/*
+	* #learnmore
+	* Learn more section
+	*/
+	#learnmore h1,
+	#learnmore h2,
+	#learnmore h3,
+	#learnmore h4 {
+		font-family: "Dela Gothic One", cursive, serif;
+	}
+	#learnmore .card .card-img-top {
+		width: 100%;
+		height: 10vw;
+		min-height: 200px;
+		object-fit: cover;
+	}
+	#learnmore .card .card-title {
+		font-family: 'Rubik',sans-serif;
+	}
+	#learnmore .card .card-text {
+		font-family: 'Inter',sans-serif;
+		font-size: 14px;
+		line-height: 23px;
+	}
+
+  #greeting-footer h6 {
+    font-family: 'Rubik', 'Inter', 'Comic Sans', sans-serif;
+    font-size: 20px;
+    color: #1b4949;
+  }
+  #greeting-footer h6.light {
+    font-family: 'Rubik', 'Inter', 'Comic Sans', sans-serif;
+    font-size: 18px;
+    text-transform: uppercase;
+    color: #ffffff;
+  }
+  #greeting-footer ul {
+    font-family: 'Inter', 'Comic Sans', sans-serif;
+    font-weight: 300;
+    font-size: 13px;
+  }
+  #greeting-footer ul.social {
+    width: 100px;
+    list-style: none;
+    margin: -30px 0 0 -100px;
+    padding: 0 5px 0 0;
+  }
+  #greeting-footer ul.social li {
+    float: left;
+    width: 45px;
+    margin: 0;
+    padding: 0;
+  }
+
+  #formal-footer {
+    border-top: 3px solid #fecbca;
+    font-family: 'Inter',sans-serif;
+    font-size: 12px;
+    color: #555555;
+  }
+  #formal-footer ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  #formal-footer ul li {
+    float: left;
+    margin: 0;
+    padding: 0 10px 0 0;
+  }
+
+
+	#top {
+		border-top: 3px solid #fecbca;
+	}
+	#top div.right-col {
+		font-family: 'Inter', sans-serif;
+	}
+	#top div.right-col .btn {
+		font-size: 13px;
+	}
+	#top .top-search-btn {
+		width: 40px;
+		height: 35px;
+		margin-top: 2px;
+		z-index: 1000;
+		background-image: url('https://greeting.dk/wp-content/plugins/greeting-marketplace/assets/img/search-icon.svg');
+		background-repeat: no-repeat;
+		background-position: center center;
+	}
+	#top .top-search-input {
+		padding-left: 30px;
+	}
+	.btn-create {
+		border: 1px solid #58a2a2;
+	}
+
+	#citycontent h1 {
+		padding-bottom: 15px;
+		position: relative;
+	}
+	#citycontent h1::before {
+		position: absolute;
+		background: linear-gradient(to right, #555555 75px, #ffffff 75px);
+		height: 3px;
+		content: '';
+		bottom: 0;
+		right: 0;
+		left: 0;
+	}
+	#citycontent h1,
+	#citycontent h2 {
+		font-family: 'Rubik','Inter', sans-serif;
+		font-weight: 600;
+	}
+
+	#citycontent #topoccassions .card .card-img-top {
+		width: 100%;
+		height: 10vw;
+		object-fit: cover;
+	}
+	#citycontent #topoccassions .card h5.card-title {
+		font-family: 'Inter',sans-serif;
+		font-size: 14px;
+	}
+
+	.filter a[aria-expanded='true'] {
+		background: #d6bf75;
+	}
+	.accordion-button:not(.collapsed)::after {
+		background-image: url('data:image/svg+xml, %3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%23222222%22%20class%3D%22bi%20bi-chevron-down%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M1.646%204.646a.5.5%200%200%201%20.708%200L8%2010.293l5.646-5.647a.5.5%200%200%201%20.708.708l-6%206a.5.5%200%200%201-.708%200l-6-6a.5.5%200%200%201%200-.708z%22%2F%3E%3C%2Fsvg%3E');
+		transform: rotate(180deg);
+	}
+
+	.filter h5 {
+		font-family: 'Rubik','Inter', serif;
+		font-weight: 500;
+		font-size: 12px;
+	}
+	.filter h6 {
+		font-family: 'Inter','Rubik',serif;
+		font-weight: 800;
+		font-size: 13px;
+	}
+	.filter ul {
+		font-family: 'Inter', sans-serif;
+		font-size: 12px;
+	}
+	.filter span.price-filter-text {
+		font-size: 11px;
+	}
+	.filter input[type="range"]::-webkit-slider-thumb {
+		background: #446a6b;
+		border: 1px solid #446a6b;
+	}
+	.filter input[type="range"]::-ms-thumb {
+		background: #446a6b;
+		border: 1px solid #446a6b;
+	}
+	.filter input[type="range"]::-moz-range-thumb {
+		background: #446a6b;
+		border: 1px solid #446a6b;
+	}
+
+	div.applied-filters {
+		font-family: 'Inter', sans-serif;
+		font-size: 15px;
+		font-weight: 200;
+	}
+
+	div.store h6.card-title {
+		font-family: 'Rubik','Inter', sans-serif;
+		font-size: 14px;
+		font-weight: 600;
+	}
+	div.store small {
+		font-family: 'Inter', sans-serif;
+		font-size: 10px;
+		font-weight: 400;
+	}
+	div.store div.card p.price,
+	div.store div.card bdi,
+	div.store div.card div.price_hold {
+		font-size: 13px;
+	}
+	.store {
+		transition: all .15s ease-in-out;
+	}
+	.store:hover {
+		transform: scale(1.015);
+	}
+	@media (max-width: 768px){
+		.store a.cta {
+			font-size: 0.725rem;
+		}
+	}
+
+	/** loading begin */
+		.overlay {
+		display: none;
+		position: fixed;
+		width: 100%;
+		height: 100%;
+		top: 0;
+		left: 0;
+		z-index: 999;
+		background: rgba(255,255,255,0.8) url("<?php echo get_stylesheet_directory_uri() . '/image/loading3.gif';?>") center no-repeat;
+	}
+	/* Turn off scrollbar when body element has the loading class */
+	div.loading {
+		overflow: hidden;
+	}
+	/* Make spinner image visible when body element has the loading class */
+	div.loading .overlay {
+		display: block;
+	}
+	/** loading end */
+	</style>
 
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
