@@ -351,7 +351,7 @@ jQuery(document).ready(function(){
                       class="form-range py-3"
                       value="array"
                       data-slider-min="0"
-                      data-slider-max="<?php echo ceil($maxProductPrice+1); ?>"
+                      data-slider-max="<?php echo ceil($maxProductPrice); ?>"
                       data-slider-step="1"
                       data-slider-tooltip="hide"
                       data-slider-value="[<?php echo $start_val; ?>,<?php echo ceil($end_val); ?>]"/>

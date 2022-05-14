@@ -960,11 +960,12 @@ function categoryActionJavascript() { ?>
 			var catOccaDeliveryIdArray = [];
 			var inputPriceRangeArray = [];
 			var deliveryIdArray = [];
+ 			var priceSliderMin = jQuery("#sliderPrice").data("slider-min");
+			var priceSliderMax = jQuery("#sliderPrice").data("slider-max");
 			// $('#cityPageReset').hide();
 
 			var url_string = window.location.href; //window.location.href
 			var url = new URL(url_string);
-			console.log(url);
 
 			var del_url_val = url.searchParams.get("d");
 			var cat_url_val = url.searchParams.get("c");
@@ -993,9 +994,6 @@ function categoryActionJavascript() { ?>
 			if(price_url_val){
 				inputPriceRangeArray = price_url_val.split(",");
 
-				var priceSliderMin = jQuery("#sliderPrice").data("slider-min");
-				var priceSliderMax = jQuery("#sliderPrice").data("slider-max");
-
 				var priceRangeMinVal = 0;
 				var priceRangeMaxVal = priceSliderMax;
 				if(inputPriceRangeArray[0] >= priceSliderMin &&  !isNaN(parseFloat(inputPriceRangeArray[0])) && isFinite(inputPriceRangeArray[0])){
@@ -1009,7 +1007,8 @@ function categoryActionJavascript() { ?>
 				document.getElementById("slideStartPoint").value = priceRangeMinVal;
 				document.getElementById("slideEndPoint").value =  priceRangeMaxVal;
 			}
-			if(deliveryIdArray || catOccaDeliveryIdArray || inputPriceRangeArray){
+
+			if(deliveryIdArray.length > 0 && catOccaDeliveryIdArray.length > 0 && inputPriceRangeArray.length > 0){
 				update();
 			}
 
@@ -1078,6 +1077,10 @@ function categoryActionJavascript() { ?>
 						jQuery('#defaultStore').show();
 						jQuery('.filteredStore').hide();
 						jQuery('#noVendorFound').hide();
+					} else if(catOccaIdArray.length == 0 && deliveryIdArray.length == 0 && priceChange == 0){
+						jQuery('#defaultStore').show();
+						jQuery('.filteredStore').hide();
+						jQuery('#noVendorFound').hide();
 					}
 
 					var state = { 'd': deliveryIdArray, 'c': catOccaIdArray, 'p': inputPriceRangeArray }
@@ -1090,12 +1093,20 @@ function categoryActionJavascript() { ?>
 						if(url){ 	url += '&'; }
 						url += 'c='+catOccaIdArray;
 					}
-					if(inputPriceRangeArray.length > 0){
+
+					if(inputPriceRangeArray.length > 0 && (inputPriceRangeArray[0] > sliderValMin || inputPriceRangeArray[1] < sliderValMax)){
 						if(url){ 	url += '&'; }
 						url += 'price='+inputPriceRangeArray;
 					}
+					if(url.length > 0){
+						url = '?'+url;
+					}
 
-					history.pushState(state, '', '?'+url);
+					if(url){
+						history.pushState(state, '', url);
+					} else {
+						window.history.replaceState({}, '', location.pathname);
+					}
 				});
 			}
 
@@ -1236,13 +1247,16 @@ function catOccaDeliveryAction() {
 
 		foreach($deliveryArr as $v){
 			$delivery_type = get_field('delivery_type','user_'.$v->ID);
+
 			if(!empty($delivery_type)){
-				if(in_array($delivery_type[0]['value'],$deliveryIdArray)){
+				if(in_array($delivery_type[0]['value'],$deliveryIdArray) || (isset($delivery_type[1]['value']) && in_array($delivery_type[1]['value'],$deliveryIdArray) )  ){
 					array_push($userIdArrayGetFromDelivery, (string) $v->ID);
 				}
 			}
 		}
 	}
+	$userIdArrayGetFromDelivery = array_intersect($defaultUserArray, $userIdArrayGetFromDelivery);
+
 
 	////////////////
 	// Filter: Price
@@ -1276,14 +1290,11 @@ function catOccaDeliveryAction() {
 	// $userIdArrayGetFromPriceFilter
 
 	// check condition
-	$userIdArrayGetFromCatOccaDelivery = array();
-
 	$full_arr = array_merge($userIdArrayGetFromCatOcca, $userIdArrayGetFromPriceFilter);
-	$full_arr = array_unique($full_arr);
-
 	if(!empty($deliveryIdArray)){
-		$full_arr = array_intersect($userIdArrayGetFromDelivery, $full_arr);
+		$full_arr = array_merge($userIdArrayGetFromDelivery, $full_arr);
 	}
+	$full_arr = array_unique($full_arr);
 
 	$return_arr = array_intersect($defaultUserArray, $full_arr);
 
@@ -1413,9 +1424,7 @@ function landpageAction() {
 				array_push($userIdArrayGetFromOcca, $postAuthorId);
 			}
 		} else {
-
 			foreach($defaultUserArray as $defaultUserId){
-
 				$userMetas = get_user_meta($defaultUserId, 'delivery_type', true);
 
 				foreach($userMetas as $deliveryType){
