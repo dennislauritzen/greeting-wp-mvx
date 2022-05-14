@@ -335,7 +335,7 @@ $cart_url = wc_get_cart_url();  // Set Cart URL
         </a>
       </div>
       <div class="col-md-12 col-lg-5 col-xl-6">
-        <form action="" method="" class="position-relative mx-5">
+        <form role="search" method="get" autocomplete="off" id="searchform" class="position-relative mx-5">
           <label for="" class="screen-reader-text">Indtast det postnummer, du ønsker at sende en gave til - og se udvalget af butikker</label>
           <button type="submit" name="submit" class="top-search-btn rounded-pill position-absolute border-0 end-0 bg-teal p-3 me-1"></button>
           <?php
@@ -346,13 +346,20 @@ $cart_url = wc_get_cart_url();  // Set Cart URL
           ?>
           <script type="text/javascript">
             jQuery(document).ready(function(){
-              document.getElementById('topGreenSearch').value = window.localStorage.getItem('postalcode')+' '+window.localStorage.getItem('city');
+              var postalcode = window.localStorage.getItem('postalcode');
+              var city = window.localStorage.getItem('city');
+
+              if(postalcode && city){
+                document.getElementById('front_Search-new_ucsa').value = postalcode+' '+city;
+              }
             });
           </script>
           <?php
           }
           ?>
-          <input type="text" class="top-search-input form-control rounded-pill border-0 py-2" id="topGreenSearch" value="<?php echo $val; ?>" placeholder="Indtast by eller postnr.">
+          <input type="text" class="top-search-input form-control rounded-pill border-0 py-2" id="front_Search-new_ucsa" name="keyword" value="<?php echo $val; ?>" placeholder="Indtast by eller postnr.">
+          <ul id="datafetch_wrapper" class="d-none list-group position-relative recommandations position-absolute list-unstyled rounded w-100 bg-light bg-white" style="top: 42px; z-index: 100000;">
+          </ul>
           <figure class="location-pin position-absolute ms-2 mt-1 top-0" style="padding-top:1px;">
             <svg width="14" height="18" viewBox="0 0 13 17" xmlns="http://www.w3.org/2000/svg">
               <path fill="#4d696b" d="M6.5 0C3.115 0 .361 2.7.361 6.02c0 5.822 5.662 10.69 5.903 10.894a.366.366 0 00.472 0c.241-.205 5.903-5.073 5.903-10.893C12.639 2.7 9.885 0 6.5 0zm0 9.208c-1.795 0-3.25-1.427-3.25-3.187 0-1.76 1.455-3.188 3.25-3.188s3.25 1.428 3.25 3.188c0 1.76-1.455 3.187-3.25 3.187z">

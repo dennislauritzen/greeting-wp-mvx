@@ -934,6 +934,7 @@ function greeting_save_product_cat_meta( $post_id ) {
 
 /**
  * Vendor filter on City Page
+ * city filter
  */
 add_action( 'wp_footer', 'categoryActionJavascript' );
 
@@ -955,12 +956,62 @@ function categoryActionJavascript() { ?>
 	<script type="text/javascript">
 		// Start the jQuery
 		jQuery(document).ready(function($) {
-
 			var ajaxurl = "<?php echo admin_url('admin-ajax.php');?>";
 			var catOccaDeliveryIdArray = [];
 			var inputPriceRangeArray = [];
 			var deliveryIdArray = [];
 			// $('#cityPageReset').hide();
+
+			var url_string = window.location.href; //window.location.href
+			var url = new URL(url_string);
+			console.log(url);
+
+			var del_url_val = url.searchParams.get("d");
+			var cat_url_val = url.searchParams.get("c");
+			var price_url_val = url.searchParams.get("price");
+
+			if(del_url_val){
+				deliveryIdArray = del_url_val.split(",");
+
+				jQuery.each( deliveryIdArray, function(i,v){
+					if(	$("input#filter_delivery_"+v).length){
+						$("input#filter_delivery_"+v).prop('checked',true);
+					}
+				});
+			}
+			if(cat_url_val){
+				catOccaDeliveryIdArray = cat_url_val.split(",");
+
+				jQuery.each( catOccaDeliveryIdArray, function(i,v){
+					if(	$("input#filter_cat"+v).length){
+						$("input#filter_cat"+v).prop('checked',true);
+					} else if($("input#filter_occ_"+v).length) {
+						$("input#filter_occ_"+v).prop('checked',true);
+					}
+				});
+			}
+			if(price_url_val){
+				inputPriceRangeArray = price_url_val.split(",");
+
+				var priceSliderMin = jQuery("#sliderPrice").data("slider-min");
+				var priceSliderMax = jQuery("#sliderPrice").data("slider-max");
+
+				var priceRangeMinVal = 0;
+				var priceRangeMaxVal = priceSliderMax;
+				if(inputPriceRangeArray[0] >= priceSliderMin &&  !isNaN(parseFloat(inputPriceRangeArray[0])) && isFinite(inputPriceRangeArray[0])){
+					priceRangeMinVal = inputPriceRangeArray[0];
+				}
+				if(inputPriceRangeArray[1] <= priceSliderMax &&  !isNaN(parseFloat(inputPriceRangeArray[1])) && isFinite(inputPriceRangeArray[1])){
+					priceRangeMaxVal = inputPriceRangeArray[1];
+				}
+
+				jQuery("#sliderPrice").data('data-slider-value','['+priceRangeMinVal+','+priceRangeMaxVal+']');
+				document.getElementById("slideStartPoint").value = priceRangeMinVal;
+				document.getElementById("slideEndPoint").value =  priceRangeMaxVal;
+			}
+			if(deliveryIdArray || catOccaDeliveryIdArray || inputPriceRangeArray){
+				update();
+			}
 
 			jQuery(".filter-on-city-page").click(function(){
 				update();
@@ -1028,6 +1079,23 @@ function categoryActionJavascript() { ?>
 						jQuery('.filteredStore').hide();
 						jQuery('#noVendorFound').hide();
 					}
+
+					var state = { 'd': deliveryIdArray, 'c': catOccaIdArray, 'p': inputPriceRangeArray }
+					var url = '';
+					if(deliveryIdArray.length > 0){
+						if(url){ 	url += '&'; }
+						url += 'd='+deliveryIdArray;
+					}
+					if(catOccaIdArray.length > 0){
+						if(url){ 	url += '&'; }
+						url += 'c='+catOccaIdArray;
+					}
+					if(inputPriceRangeArray.length > 0){
+						if(url){ 	url += '&'; }
+						url += 'price='+inputPriceRangeArray;
+					}
+
+					history.pushState(state, '', '?'+url);
 				});
 			}
 

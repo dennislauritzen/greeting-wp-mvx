@@ -307,6 +307,18 @@ jQuery(document).ready(function(){
             $minProductPrice = 0;
             $maxProductPrice = max($productPriceArray);
           }
+
+          $start_val = $minProductPrice;
+          $end_val = $maxProductPrice;
+          if(isset($_GET['price'])){
+            $price_arr = explode(',',$_GET['price']);
+            if(is_numeric($price_arr['0']) && $price_arr['0'] >= $minProductPrice){
+              $start_val = $price_arr['0'];
+            }
+            if(is_numeric($price_arr['1']) && $price_arr['1'] <= $maxProductPrice){
+              $end_val = $price_arr['1'];
+            }
+          }
           ?>
 
           <h5 class="text-uppercase">Pris</h5>
@@ -314,10 +326,10 @@ jQuery(document).ready(function(){
             <div id="slideInput" class="my-3">
               <div class="row">
                 <div class="col-2 col-xs-2 col-sm-2 col-md-2 col-lg-4 col-xl-3">
-                  <input type="text" id="slideStartPoint" class="form-control price-field" data-index="0" value="<?php echo $minProductPrice;?>" readonly/>
+                  <input type="text" id="slideStartPoint" class="form-control price-field" data-index="0" value="<?php echo $start_val;?>" readonly/>
                 </div>
                 <div class="col-2 offset-8 col-xs-2 col-sm-2 offset-xs-8 offset-sm-8 col-md-2 offset-md-8 col-lg-4 offset-lg-4 col-xl-3 offset-xl-6">
-                  <input type="text" id="slideEndPoint" class="form-control price-field" data-index="1" value="<?php echo ceil($maxProductPrice);?>" readonly/>
+                  <input type="text" id="slideEndPoint" class="form-control price-field" data-index="1" value="<?php echo ceil($end_val);?>" readonly/>
                 </div>
               </div>
               <div class="row">
@@ -342,7 +354,7 @@ jQuery(document).ready(function(){
                       data-slider-max="<?php echo ceil($maxProductPrice+1); ?>"
                       data-slider-step="1"
                       data-slider-tooltip="hide"
-                      data-slider-value="[0,<?php echo ceil($maxProductPrice); ?>]"/>
+                      data-slider-value="[<?php echo $start_val; ?>,<?php echo ceil($end_val); ?>]"/>
                   </div>
                 </div>
               </div>
