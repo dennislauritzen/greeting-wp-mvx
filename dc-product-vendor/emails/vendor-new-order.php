@@ -9,12 +9,20 @@
  * @version   0.0.1
  */
 if (!defined('ABSPATH'))
-    exit; // Exit if accessed directly 
+    exit; // Exit if accessed directly
 global $WCMp;
 $vendor = get_wcmp_vendor(absint($vendor_id));
 do_action( 'woocommerce_email_header', $email_heading, $email );
 $text_align = is_rtl() ? 'right' : 'left';
 ?>
+
+<div style="margin-top: 20px;">
+  <a href="<?php echo site_url().'/index.php/shop-order-status/?order_id='. $order->get_id();?>">
+    <img src="<?php echo site_url().'/wp-content/uploads/qr-codes/'.$order->get_id().'.png' ;?>" alt="qr code"/>
+    Update Order Status
+  </a>
+</div>
+
 
 <p><?php printf(esc_html__('A new order was received and marked as %s from %s. Their order is as follows:', 'dc-woocommerce-multi-vendor'), $order->get_status( 'edit' ), $order->get_billing_first_name() . ' ' . $order->get_billing_last_name()); ?></p>
 
@@ -93,9 +101,6 @@ if (apply_filters('show_cust_order_calulations_field', true, $vendor->id)) {
             <?php endif; ?>
     </tr>
     </table>
-    <div style="margin-top: 20px;">
-		<img src="<?php echo site_url().'/wp-content/uploads/qr-codes/'.$order->get_id().'.png' ;?>" alt="qr code"/>
-    </div>
-    <a href="<?php echo site_url().'/index.php/shop-order-status/?order_id='. $order->get_id();?>">Update Order Status</a>
+
 
 <?php do_action('wcmp_email_footer'); ?>

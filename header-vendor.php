@@ -295,6 +295,20 @@ $cart_url = wc_get_cart_url();  // Set Cart URL
  $cart_count = WC()->cart->cart_contents_count; // Set variable for cart item count
  $cart_url = wc_get_cart_url();  // Set Cart URL
 
+ $del_type = '';
+ $del_value = '';
+ if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
+   $delivery_type = get_field('delivery_type', 'user_'.$vendor->id)[0];
+
+   if(empty($delivery_type['label'])){
+     $del_value = $delivery_type;
+     $del_type = $delivery_type;
+   } else {
+     $del_value = $delivery_type['value'];
+     $del_type = $delivery_type['label'];
+   }
+ }
+
  ?>
 
 
@@ -509,7 +523,13 @@ $cart_url = wc_get_cart_url();  // Set Cart URL
               $i = 1;
 
               if(!empty($opening) && !empty($interv) && count($interv) > 0){
-                print 'Butikken leverer ';
+
+                if($del_value == "1"){
+                  echo 'Butikken leverer ';
+                } else if($del_value == "0"){
+                  echo 'Butikken afsender ';
+                }
+
                 foreach($interv as $v){
                   $val = explode('..',$v);
                   if(!empty($val)){
@@ -540,7 +560,16 @@ $cart_url = wc_get_cart_url();  // Set Cart URL
             </svg>
             Bestil inden kl.
               <?php echo (!empty(get_field('vendor_drop_off_time', 'user_'.$vendor->id)) ? get_field('vendor_drop_off_time', 'user_'.$vendor->id) : '11'); ?>
-            for levering
+            for
+
+            <?php
+            if($del_value == "1"){
+              echo ' levering ';
+            } else if($del_value == "0"){
+              echo ' forsendelse ';
+            }
+            ?>
+
             <?php
               if(get_field('vendor_require_delivery_day', 'user_'.$vendor->id) == 0)
               {
@@ -565,16 +594,6 @@ $cart_url = wc_get_cart_url();  // Set Cart URL
             </svg>
             <?php
             if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
-              $delivery_type = get_field('delivery_type', 'user_'.$vendor->id)[0];
-              $del_type = '';
-              if(empty($delivery_type['label'])){
-                $del_value = $delivery_type;
-                $del_type = $delivery_type;
-              } else {
-                $del_value = $delivery_type['value'];
-                $del_type = $delivery_type['label'];
-              }
-
               if($del_value == "1"){
                 echo 'Personlig levering til døren';
               } else if($del_value == "0"){

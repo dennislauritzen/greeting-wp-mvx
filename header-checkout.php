@@ -4,7 +4,12 @@
 	<meta charset="<?php bloginfo( 'charset' ); ?>">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<?php wp_head(); ?>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+		<link rel='stylesheet' id='style-css' href='https://dev.greeting.dk/wp-content/themes/greeting2/style.css?ver=3.0.4' media='all' />
+		<link rel='stylesheet' id='main-css' href='https://dev.greeting.dk/wp-content/themes/greeting2/assets/css/main.css?ver=3.0.4' media='all' />
+
+
+		<link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Merriweather:wght@300;400;700;900&family=Roboto+Slab:wght@100;200;300;400;500;600;700;800;900&family=Rubik:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 

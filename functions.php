@@ -519,7 +519,7 @@ function greeting2_scripts_loader() {
 
 	// 1. Styles.
 	wp_enqueue_style( 'style', get_template_directory_uri() . '/style.css', array(), $theme_version, 'all' );
-	wp_enqueue_style( 'main', get_template_directory_uri() . '/assets/css/main.css', array(), $theme_version, 'all' ); // main.scss: Compiled Framework source + custom styles.
+	//wp_enqueue_style( 'main', get_template_directory_uri() . '/assets/css/main.css', array(), $theme_version, 'all' ); // main.scss: Compiled Framework source + custom styles.
 
 	if ( is_rtl() ) {
 		wp_enqueue_style( 'rtl', get_template_directory_uri() . '/assets/css/rtl.css', array(), $theme_version, 'all' );
@@ -2218,14 +2218,13 @@ function greeting_check_billing_postcode( $fields, $errors ){
 	$findPostCodeFromArray = in_array($ship_postcode, $vendorRelatedPCBillingWCArray);
 
 	if (!in_array($ship_postcode, $vendorRelatedPCBillingWCArray)){
-
 		$args = array(
 			'post_type' => 'city',
 			'meta_query'=> array(
 				array(
 						'key' => 'postalcode',
 						'compare' => '=',
-						'value' => '8000',
+						'value' => $ship_postcode,
 						'type' => 'numeric'
 				 )
 			),
@@ -2236,7 +2235,7 @@ function greeting_check_billing_postcode( $fields, $errors ){
 		var_dump($city->posts[0]->post_title);
 
 		if($city && $city->posts && count($city->posts) > 0){
-			$errors->add( 'validation', var_dump($city).'<p style="line-height:150%;">Beklager - den valgte butik kan ikke levere til '.$city->posts[0]->post_title.'. Du kan: <br>- <a href="'.$vendor->get_permalink().'">gå til butikkens side</a> og se hvilke postnumre de leverer til<br>eller<br>- <a href="'.get_permalink($city->posts[0]->ID).'">klikke her og se butikker der leverer i postnummer '.$city->posts[0]->post_title.'</a></p>' );
+			$errors->add( 'validation', var_dump($city).'<p style="line-height:150%;">Beklager - den valgte butik kan ikke levere til '.$city->posts[0]->post_title.'. Du kan <a href="'.$vendor->get_permalink().'">gå til butikkens side</a> og se hvilke postnumre de leverer til eller <a href="'.get_permalink($city->posts[0]->ID).'">klikke her og se butikker der leverer i postnummer '.$city->posts[0]->post_title.'</a></p>' );
 		} else {
 			$errors->add( 'validation', var_dump($city).'Beklager - butikken kan desværre ikke levere til det postnummer, du har indtastet under levering. Du bedes enten ændre leveringens postnummer eller gå til <a href="'.home_url().'">forsiden</a> for at finde en butik i det ønskede postnummer.' );
 		}
@@ -2350,15 +2349,26 @@ function greeting_save_custom_fields_with_order( $order_id ) {
     global $woocommerce;
     if ( $_POST['delivery_date'] ) update_post_meta( $order_id, '_delivery_date', esc_attr( $_POST['delivery_date'] ) );
 		if ( $_POST['greeting_message'] ) update_post_meta( $order_id, '_greeting_message', esc_attr( $_POST['greeting_message'] ) );
+		if ( $_POST['receiver_phone'] ) update_post_meta( $order_id, '_receiver_phone', esc_attr( $_POST['receiver_phone'] ) );
+
 		if ( $_POST['delivery_instructions'] ) update_post_meta( $order_id, '_delivery_instructions', esc_attr( $_POST['delivery_instructions'] ) );
+
+		if ( $_POST['leave_gift_address'] ) update_post_meta( $order_id, '_leave_gift_address', esc_attr( $_POST['leave_gift_address'] ) );
+		if ( $_POST['leave_gift_neighbour'] ) update_post_meta( $order_id, '_leave_gift_neighbour', esc_attr( $_POST['leave_gift_neighbour'] ) );
 }
 
 
 add_action( 'woocommerce_admin_order_data_after_billing_address', 'greeting_delivery_date_display_admin_order_meta' );
 function greeting_delivery_date_display_admin_order_meta( $order ) {
    $str = '<p><strong>Leveringsdato:</strong> ' . get_post_meta( $order->get_id(), '_delivery_date', true ) . '</p>';
+	 $str .= '<p><strong>Modtagers telefonnr.:</strong> ' . get_post_meta( $order->get_id(), '_receiver_phone', true ) . '</p>';
 	 $str .= '<p><strong>Besked til modtager:</strong> ' . get_post_meta( $order->get_id(), '_greeting_message', true ) . '</p>';
 	 $str .= '<p><strong>Leveringsinstruktioner:</strong> ' . get_post_meta( $order->get_id(), '_delivery_instructions', true ) . '</p>';
+
+	 $leave_gift_at_address = (get_post_meta( $order->get_id(), '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej');
+	 $str .= '<p><strong>Leveringsinstruktioner:</strong> ' . $leave_gift_at_address . '</p>';
+	 $leave_gift_at_neighbour = (get_post_meta( $order->get_id(), '_leave_gift_neighbour', true ) == "1" ? 'Ja' : 'Nej');
+	 $str .= '<p><strong>Leveringsinstruktioner:</strong> ' . $leave_gift_at_neighbour . '</p>';
 
 	 echo $str;
 }
@@ -2367,8 +2377,14 @@ function greeting_delivery_date_display_admin_order_meta( $order ) {
 add_action( 'woocommerce_thankyou', 'greeting_view_order_and_thankyou_page', 20 );
 function greeting_view_order_and_thankyou_page( $order_id ){
 	$str = '<p><strong>Leveringsdato:</strong> ' . get_post_meta( $order->get_id(), '_delivery_date', true ) . '</p>';
+	$str .= '<p><strong>Modtagers telefonnr.:</strong> ' . get_post_meta( $order->get_id(), '_receiver_phone', true ) . '</p>';
 	$str .= '<p><strong>Besked til modtager:</strong> ' . get_post_meta( $order->get_id(), '_greeting_message', true ) . '</p>';
 	$str .= '<p><strong>Leveringsinstruktioner:</strong> ' . get_post_meta( $order->get_id(), '_delivery_instructions', true ) . '</p>';
+
+	$leave_gift_at_address = (get_post_meta( $order->get_id(), '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej');
+	$str .= '<p><strong>Leveringsinstruktioner:</strong> ' . $leave_gift_at_address . '</p>';
+	$leave_gift_at_neighbour = (get_post_meta( $order->get_id(), '_leave_gift_neighbour', true ) == "1" ? 'Ja' : 'Nej');
+	$str .= '<p><strong>Leveringsinstruktioner:</strong> ' . $leave_gift_at_neighbour . '</p>';
 
 	echo $str;
 }
@@ -2379,9 +2395,23 @@ function admin_order_preview_add_custom_meta_data( $data, $order ) {
     if( $delivery_date_value = $order->get_meta('_delivery_date') ){
         $data['delivery_date_key'] = $delivery_date_value; // <= Store the value in the data array.
 		}
+		if( $receiver_phone = $order->get_meta('_receiver_phone') ){
+        $data['receiver_phone_key'] = $receiver_phone; // <= Store the value in the data array.
+		}
+
 		if( $greeting_message = $order->get_meta('_greeting_message') ){
         $data['greeting_message_key'] = $greeting_message; // <= Store the value in the data array.
 		}
+
+		if( $leave_gift_address = $order->get_meta('_leave_gift_address') ){
+				$leave_gift_address = ($leave_gift_address == "1" ? 'Ja' : 'Nej');
+        $data['leave_gift_address_key'] = $leave_gift_address; // <= Store the value in the data array.
+		}
+		if( $leave_gift_neighbour = $order->get_meta('_leave_gift_neighbour') ){
+				$leave_gift_neighbour = ($leave_gift_neighbour == "1" ? 'Ja' : 'Nej');
+        $data['leave_gift_neighbour_key'] = $leave_gift_neighbour; // <= Store the value in the data array.
+		}
+
 		if( $delivery_instructions = $order->get_meta('_delivery_instructions') ){
         $data['delivery_instructions_key'] = $delivery_instructions; // <= Store the value in the data array.
 		}
@@ -2393,7 +2423,14 @@ add_action( 'woocommerce_admin_order_preview_start', 'custom_display_order_data_
 function custom_display_order_data_in_admin(){
     // Call the stored value and display it
     $str = '<div style="margin:15px 0px 0px 15px;"><strong>Leveringsdato:</strong> {{data.delivery_date_key}}</div>';
+		$str .= '<div style="margin:15px 0px 0px 15px;"><strong>Modtagers telefonnr.:</strong> {{data.receiver_phone_key}}</div>';
+
 		$str .= '<div style="margin:15px 0px 0px 15px;"><strong>Besked til modtager:</strong> {{data.greeting_message_key}}</div>';
+		$str .= '<div style="margin:15px 0px 0px 15px;"><strong>Leveringsinstruktioner:</strong> {{data.delivery_instructions_key}}</div>';
+
+
+		$str .= '<div style="margin:15px 0px 0px 15px;"><strong>Leveringsinstruktioner:</strong> {{data.delivery_instructions_key}}</div>';
+
 		$str .= '<div style="margin:15px 0px 0px 15px;"><strong>Leveringsinstruktioner:</strong> {{data.delivery_instructions_key}}</div>';
 }
 
@@ -2411,14 +2448,37 @@ function custom_woocommerce_email_order_meta_fields( $fields, $sent_to_admin, $o
         'label' => __( 'Leveringsdato' ),
         'value' => get_post_meta( $order->id, '_delivery_date', true ),
     );
+		$fields['billing_phone'] = array(
+        'label' => __( 'Afsenders telefonnr.' ),
+        'value' => get_post_meta( $order->id, '_billing_phone', true ),
+    );
+
+
 		$fields['greeting_message'] = array(
         'label' => __( 'Besked til modtager' ),
         'value' => get_post_meta( $order->id, '_greeting_message', true ),
+    );
+
+
+		$leave_gift_at_address = (get_post_meta( $order->get_id(), '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej');
+		$fields['leave_gift_address'] = array(
+        'label' => __( 'Leveringsinstruktioner' ),
+        'value' => $leave_gift_at_address
+    );
+		$leave_gift_at_neighbour = (get_post_meta( $order->get_id(), '_leave_gift_neighbour', true ) == "1" ? 'Ja' : 'Nej');
+		$fields['leave_gift_neighbour'] = array(
+        'label' => __( 'Leveringsinstruktioner' ),
+        'value' => $leave_gift_at_neighbour
     );
 		$fields['delivery_instructions'] = array(
         'label' => __( 'Leveringsinstruktioner' ),
         'value' => get_post_meta( $order->id, '_delivery_instructions', true ),
     );
+		$fields['receiver_phone'] = array(
+        'label' => __( 'Modtagers telefonnr.' ),
+        'value' => get_post_meta( $order->id, '_receiver_phone', true ),
+    );
+
     return $fields;
 }
 
@@ -2461,10 +2521,10 @@ add_action( 'woocommerce_after_checkout_validation', 'greeting_validate_new_rece
 function greeting_validate_new_receiver_info_fields($fields, $errors) {
 	global $woocommerce;
 
-	if ( isset($_POST['receiver_phone']) && empty($_POST['receiver_phone']) ){
+	if ( isset($_POST['receiver_phone']) && (empty($_POST['receiver_phone']) || !preg_match('/^[0-9]{8,12}$/D', $_POST['receiver_phone'])) ){
 		$errors->add(
 			'validation',
-			__( 'Please enter receiver phone', 'greeting2')
+			__('Indtast et gyldigt telefonnummer til modtager, så vi kan kontakte vedkommende ved eventuelle spørgsmål om levering eller lignende.','greeting2')
 		);
 	}
 	if ( isset($_POST['greeting_message']) && empty($_POST['greeting_message']) ){
@@ -2480,14 +2540,6 @@ function greeting_validate_new_receiver_info_fields($fields, $errors) {
 			__( 'Standard package accept only 165 Character', 'greeting2')
 		);
 	}
-
-  // Check if set, if its not set add an error. This one is only requite for companies
-  if ( !(preg_match('/^[0-9]{8,12}$/D', $_POST['receiver_phone'] ))){
-		$errors->add(
-			'validation',
-			__('Indtast et gyldigt telefonnummer til modtager, så vi kan kontakte vedkommende ved eventuelle spørgsmål om levering eller lignende.','greeting2')
-		);
-  }
 }
 
 
@@ -2950,6 +3002,26 @@ function greeting_echo_receiver_info( ) {
 			'placeholder'       => __('Enter phone number of the receiver'),
 			), WC()->checkout->get_value( 'receiver_phone' ));
 		#echo '<tr class="message-pro-radio"><td>';
+
+		echo '<h3>Leveringsinstruktioner</h3>';
+
+
+		woocommerce_form_field( 'leave_gift_address', array(
+			'type'				=> 'checkbox',
+			'id'					=> 'deliveryLeaveGiftAddress',
+			'class'				=> array('form-row-wide'),
+			'label'				=> __('Ja, gaven må efterlades på adressen'),
+			'placeholder'	=> ''
+		),  1 );
+
+
+		woocommerce_form_field( 'leave_gift_neighbour', array(
+			'type'				=> 'checkbox',
+			'id'					=> 'deliveryLeaveGiftNeighbour',
+			'class'				=> array('form-row-wide'),
+			'label'				=> __('Ja, gaven må afleveres til/hos naboen'),
+			'placeholder'	=> ''
+		), 0 );
 
 		woocommerce_form_field( 'delivery_instructions', array(
 			'type'				=> 'textarea',
@@ -3433,3 +3505,12 @@ function greeting_modify_wc_order_emails( $args ) {
     return $args;
 }
 add_filter( 'woocommerce_email_order_items_args', 'greeting_modify_wc_order_emails' );
+
+/**
+ * Function for removing visitor stats in wcmp.
+ * for performance reasons.
+ *
+ * @since v1.0
+ * @author Dennis Lauritzen
+ */
+apply_filters('wcmp_is_disable_store_visitors_stats', '__return_false');

@@ -47,6 +47,20 @@ if(!empty($vendor_city)){
 
 $cart_count = WC()->cart->cart_contents_count; // Set variable for cart item count
 $cart_url = wc_get_cart_url();  // Set Cart URL
+
+$del_type = '';
+$del_value = '';
+if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
+  $delivery_type = get_field('delivery_type', 'user_'.$vendor->id)[0];
+
+  if(empty($delivery_type['label'])){
+    $del_value = $delivery_type;
+    $del_type = $delivery_type;
+  } else {
+    $del_value = $delivery_type['value'];
+    $del_type = $delivery_type['label'];
+  }
+}
 ?>
 
 
@@ -500,9 +514,7 @@ $cart_url = wc_get_cart_url();  // Set Cart URL
               <path d="M8.5 10c-.276 0-.5-.448-.5-1s.224-1 .5-1 .5.448.5 1-.224 1-.5 1z"/>
               <path d="M10.828.122A.5.5 0 0 1 11 .5V1h.5A1.5 1.5 0 0 1 13 2.5V15h1.5a.5.5 0 0 1 0 1h-13a.5.5 0 0 1 0-1H3V1.5a.5.5 0 0 1 .43-.495l7-1a.5.5 0 0 1 .398.117zM11.5 2H11v13h1V2.5a.5.5 0 0 0-.5-.5zM4 1.934V15h6V1.077l-6 .857z"/>
             </svg>
-            Butikken leverer
             <?php
-            $day_array = array('mandag','tirsdag','onsdag','torsdag','fredag','lørdag','søndag');
             function build_intervals($items, $is_contiguous, $make_interval) {
                   $intervals = array();
                   $end   = false;
@@ -529,25 +541,46 @@ $cart_url = wc_get_cart_url();  // Set Cart URL
               }
 
               $opening = get_field('openning', 'user_'.$vendor->id);
+              $open_iso_days = array();
+              $open_label_days = array();
+              foreach($opening as $k => $v){
+                $open_iso_days[] = (int) $v['value'];
+                $open_label_days[$v['value']] = $v['label'];
+              }
+
               $interv = array();
-              if(!empty($opening) && is_array($opening) && count($opening) > 0){
-                //$interv = build_intervals($opening,  function($a, $b) { return ($b - $a) <= 1; }, function($a, $b) { return "{$a}..{$b}"; });
+              if(!empty($open_iso_days) && is_array($open_iso_days)){
+                $interv = build_intervals($open_iso_days, function($a, $b) { return ($b - $a) <= 1; }, function($a, $b) { return $a."..".$b; });
+              } else {
+                print 'Butikkens leveringsdage er ukendte';
               }
               $i = 1;
-              if(count($interv) > 0){
+
+              if(!empty($opening) && !empty($interv) && count($interv) > 0){
+
+                if($del_value == "1"){
+                  echo 'Butikken leverer ';
+                } else if($del_value == "0"){
+                  echo 'Butikken afsender ';
+                }
+
                 foreach($interv as $v){
                   $val = explode('..',$v);
-                  $start = $day_array[$val[0]];
-                  $end = $day_array[$val[1]];
-                  if($val[0] != $val[1])
-                  {
-                    print $start."-".$end;
-                  } else {
-                    print $start;
-                  }
-                  if(count($interv) > 1){
-                    if(count($interv)-1 == $i){ print " og "; }
-                    else if(count($interv) > $i) { print ', ';}
+                  if(!empty($val)){
+                    $start = isset($open_label_days[$val[0]])? $open_label_days[$val[0]] : '';
+                    if($val[0] != $val[1])
+                    {
+                      $end = isset($open_label_days[$val[1]]) ? $open_label_days[$val[1]] : '';
+                      if(!empty($start) && !empty($end)){
+                        print strtolower($start."-".$end);
+                      }
+                    } else {
+                      print strtolower($start);
+                    }
+                    if(count($interv) > 1){
+                      if(count($interv)-1 == $i){ print " og "; }
+                      else if(count($interv) > $i) { print ', ';}
+                    }
                   }
                   $i++;
                 }
@@ -561,7 +594,16 @@ $cart_url = wc_get_cart_url();  // Set Cart URL
             </svg>
             Bestil inden kl.
               <?php echo (!empty(get_field('vendor_drop_off_time', 'user_'.$vendor->id)) ? get_field('vendor_drop_off_time', 'user_'.$vendor->id) : '11'); ?>
-            for levering
+            for
+
+            <?php
+            if($del_value == "1"){
+              echo ' levering ';
+            } else if($del_value == "0"){
+              echo ' forsendelse ';
+            }
+            ?>
+
             <?php
               if(get_field('vendor_require_delivery_day', 'user_'.$vendor->id) == 0)
               {
@@ -585,20 +627,14 @@ $cart_url = wc_get_cart_url();  // Set Cart URL
               <path d="M10.828.122A.5.5 0 0 1 11 .5V1h.5A1.5 1.5 0 0 1 13 2.5V15h1.5a.5.5 0 0 1 0 1h-13a.5.5 0 0 1 0-1H3V1.5a.5.5 0 0 1 .43-.495l7-1a.5.5 0 0 1 .398.117zM11.5 2H11v13h1V2.5a.5.5 0 0 0-.5-.5zM4 1.934V15h6V1.077l-6 .857z"/>
             </svg>
             <?php
-            $delivery_type = (isset(get_field('delivery_type', 'user_'.$vendor->id)[0]) ? get_field('delivery_type', 'user_'.$vendor->id)[0] : get_field('delivery_type', 'user_'.$vendor->id));
-            $del_type = '';
-            if(empty($delivery_type['label'])){
-              $del_value = $delivery_type;
-              $del_type = $delivery_type;
+            if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
+              if($del_value == "1"){
+                echo 'Personlig levering til døren';
+              } else if($del_value == "0"){
+                echo 'Forsendelse med fragtfirma (2-3 hverdages transporttid)';
+              }
             } else {
-              $del_value = $delivery_type['value'];
-              $del_type = $delivery_type['label'];
-            }
-
-            if($del_value == "1"){
-              echo 'Personlig levering til døren';
-            } else if($del_value == "0"){
-              echo 'Forsendelse med fragtfirma (2-3 hverdages transporttid)';
+              echo 'Butikkens leveringstype er ukendt.';
             }
             ?>
           </div>

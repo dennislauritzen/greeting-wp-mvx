@@ -38,7 +38,7 @@ get_header('checkout');
 			<div class="row border mb-3">
 				<div class="col-6 pt-2">
 					<p>
-						<strong class="text-uppercase">Bestillingsdato & status</strong>
+						<strong class="text-uppercase">Bestillingsdato</strong>
 						<br>
 						<?php echo esc_html( wc_format_datetime( $order->get_date_created() ) ); ?><!--(Status: <?php echo $order->get_status(); ?>)-->
 					</p>

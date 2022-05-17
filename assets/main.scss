@@ -392,6 +392,9 @@ a.greeting-link-pink {
 .bg-teal-75 {
 	background: rgba(68, 106, 107,0.75);
 }
+.bg-teal-front {
+	background: rgba(68, 106, 107,0.75);
+}
 .bg-yellow {
 	background: #d6bf75;
 }
@@ -834,6 +837,7 @@ h1, h2 {
  * The footer with formal info.
  *
 */
+
 #formal-footer {
 	border-top: 3px solid #fecbca;
 	font-family: 'Inter',sans-serif;
@@ -858,26 +862,26 @@ h1, h2 {
  *
  */
  #spinner {
-   color:#fecbca;
-
-	 &:after {
-	   content:"";
-	   animation: spin 20s linear infinite;
-	 }
+	 color:#fecbca;
+ }
+ #spinner:after {
+	 content:"";
+	 animation: spin 20s linear infinite;
  }
  @keyframes spin {
-   0% { content:"en gavekurv"; }
-   10% { content:"en vingave"; }
-   20% { content:"et strikkesæt"; }
-   30% { content:"en overraskelse"; }
-   40% { content:"en buket blomster"; }
-   50% { content: "en lækker gin"; }
-   60% { content: "smukke roser"; }
-   70% { content: "tak for besøg-gaven"; }
-   80% { content: "bare fordi-gaven"; }
-   90% { content: "en gavehilsen"; }
-   100% { content:"en gavekurv"; }
+	 0% { content:"en gavekurv"; }
+	 10% { content:"en vingave"; }
+	 20% { content:"et strikkesæt"; }
+	 30% { content:"en overraskelse"; }
+	 40% { content:"en buket blomster"; }
+	 50% { content: "en lækker gin"; }
+	 60% { content: "smukke roser"; }
+	 70% { content: "tak for besøg-gaven"; }
+	 80% { content: "bare fordi-gaven"; }
+	 90% { content: "en gavehilsen"; }
+	 100% { content:"en gavekurv"; }
  }
+
 
 
 /*

@@ -17,6 +17,21 @@ $vendor = get_wcmp_vendor($vendor_id);
 if(!is_object($vendor)){
   return;
 }
+
+$del_type = '';
+$del_value = '';
+if(!empty(get_field('delivery_type', 'user_'.$vendor_id))){
+  $delivery_type = get_field('delivery_type', 'user_'.$vendor_id)[0];
+
+  if(empty($delivery_type['label'])){
+    $del_value = $delivery_type;
+    $del_type = $delivery_type;
+  } else {
+    $del_value = $delivery_type['value'];
+    $del_type = $delivery_type['label'];
+  }
+}
+
 ?>
 
 <section id="vendor" class="bg-light-grey py-5 mb-5">
@@ -69,14 +84,15 @@ if(!is_object($vendor)){
         <p><a href="<?php echo esc_url($vendor->get_permalink()); ?>">Se butikkens øvrige gaveprodukter</a><p>
       </div>
       <div class="col-lg-4">
-        <b>Leveringsinformationer</b>
+
         <?php
-        $del_type = get_field('delivery_type', 'user_'.$vendor_id);
-        if(!empty($del_type) && $del_type[0]['value'] == "0")
-        {
+
+        if($del_value == '0'){
+          echo "<b>Information om forsendelse</b>";
           echo '<p>'.get_field('freight_company_delivery_text', 'options').'</p>';
         } else {
         ?>
+          <b>Leveringsinformation</b>
           <p>Butikken leverer på flg. dage:
             <?php
             $del_days = get_field('openning', 'user_'.$vendor_id);

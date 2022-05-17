@@ -5,9 +5,18 @@
  * Perform start setup
  *
 **/
+global $woocommerce;
+
 $postId = get_the_ID();
 $cityPostalcode = get_post_meta($postId, 'postalcode', true);
 $cityName = get_post_meta($postId, 'city', true);
+
+$checkout_postalcode = WC()->customer->get_shipping_postcode();
+if($cityPostalcode != $checkout_postalcode){
+  print 'postnumre afviger';
+  #var_dump($woocommerce);
+  $woocommerce->cart->empty_cart();
+}
 
 get_header();
 

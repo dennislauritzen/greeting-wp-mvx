@@ -72,7 +72,7 @@ get_header();
           <source src="https://dev.greeting.dk/wp-content/uploads/2022/04/greeting_top_q23.mp4" type="video/mp4">
           <source src="https://dev.greeting.dk/wp-content/uploads/2022/04/Greeting_webm_q33.webm" type="video/webm">
         </video>
-        <div class="col-12 col-md-10 col-lg-7 col-xl-6 bg-teal-75 position-relative start-0 top-0">
+        <div class="col-12 col-md-10 col-lg-7 col-xl-6 bg-teal-front position-relative start-0 top-0">
             <div class="py-5 px-1 px-xs-1 px-sm-1 px-md-2 px-lg-5 px-xl-5 m-5 top-text-content">
                 <div class="pb-4">
                     <svg viewBox="0 0 524 113" width="150" fill="#ffffff"  xmlns="http://www.w3.org/2000/svg">
