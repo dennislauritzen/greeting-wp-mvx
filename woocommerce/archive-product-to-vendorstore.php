@@ -1,16 +1,16 @@
 <?php
 get_header();
-?>        
+?>
 <div id="content" class="has-sidebar rigid-right-sidebar" >
 	<div id="rigid_page_title" class="rigid_title_holder" >
 		<div class="inner fixed">
 
-        <?php 
+        <?php
         global $wp_query;
         $cat = $wp_query->get_queried_object();
         $categoryId = $cat->term_id;
-        $categoryName = $cat->name;        
-            
+        $categoryName = $cat->name;
+
         ?>
             <!-- BREADCRUMB -->
             <div class="breadcrumb"><a href="<?php echo site_url();?>">Home</a> <span class="rigid-breadcrumb-delimiter">/</span> Product Category <span class="rigid-breadcrumb-delimiter">/</span> <?php echo $categoryName;?></div>
@@ -42,7 +42,7 @@ get_header();
             <!-- END OF TITLE -->
 		</div>
     </div>
-        
+
     <div class="inner">
 		<!-- CONTENT WRAPPER -->
 		<div id="main" class="fixed box box-common">
@@ -51,28 +51,28 @@ get_header();
             if (function_exists('dynamic_sidebar')) : ?>
             <div class="sidebar">
                 <?php if (is_active_sidebar('right_sidebar')): ?>
-                    <?php 
+                    <?php
                         dynamic_sidebar('right_sidebar'); ?>
                 <?php endif; ?>
 
                 <!--Filter begin-->
                 <span type="button" id="changeZip" style="border:1px solid green; border-radius: 12px; padding:4px 10px;cursor:pointer;">Change ZIP</span>
 
-                <div style="float: left;">  
+                <div style="float: left;">
                     <span id="resetAllCategoryPage" style="border:1px solid salmon; border-radius: 12px; padding:4px 10px; margin-right:10px; cursor:pointer;">Reset All</span>
                 </div>
                 <div class="clear">
                 </div>
-                
+
                 <!-- occasion filter-->
                 <div class="vendor_sort_categorypage" style="margin:20px 0px !important;">
                     <p style="font-weight:500">Occasion</p>
                     <?php
-                    
+
                     // if delivery zip empty
                     if($withDeliveryZip == 0){
 
-                        // for used on occasion prepare here 
+                        // for used on occasion prepare here
                         $occasionTermListArray = array();
 
                             // $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
@@ -90,7 +90,7 @@ get_header();
                                       )
                                    ),
                                 ));
-                                                
+
                             foreach ($categoryProducts as $productId) {
                                 $occasionTermList = wp_get_post_terms($productId, 'occasion', array('fields' => 'ids'));
                                 foreach($occasionTermList as $occasionTerm){
@@ -133,7 +133,7 @@ get_header();
                             }
                         }
 
-                        // for used on occasion prepare here 
+                        // for used on occasion prepare here
                         $occasionTermListArray = array();
 
                         foreach ($UserIdArrayForDeliveryZip as $vendorId) {
@@ -173,10 +173,10 @@ get_header();
                     $args = array (
                         'role' => 'dc_vendor'
                     );
-                    
+
                     // Create the WP_User_Query object
                     $userQuery = new WP_User_Query($args);
-                    
+
                     // Get the results
                     $vendors = $userQuery->get_results();
 
@@ -190,7 +190,7 @@ get_header();
                         } else {
                             $userMetas = [];
                         }
-                        
+
                         foreach($userMetas as $deliveryType){
                             array_push($deliveryTypeArray, $deliveryType);
                         }
@@ -206,7 +206,7 @@ get_header();
                     <?php }
                     ?>
                 </div>
-                
+
                 <!--Filter end-->
             </div>
             <?php endif;?>
@@ -263,7 +263,7 @@ get_header();
                             WHERE ID = $singleProductId
                         "
                     );
-                
+
                     $postAuthorId = $postAuthor->post_author;
 
                     array_push($userByCategoryId, $postAuthorId);
@@ -283,12 +283,12 @@ get_header();
                 } else {
                     $userserIdArray = $filteredUserIdArrayUnique;
                 }
-                
+
                     // pass to backend
                     $categoryPageDefaultUserIdAsString = implode(",", $userserIdArray); ?>
-    
+
                     <input type="hidden" id="categoryPageDefaultUserIdAsString" value="<?php echo $categoryPageDefaultUserIdAsString;?>">
-                        
+
                     <div id="vendorByDeliveryZipCategory" class="wcmp-store-list-wrap">
                         <?php
                         if ($userserIdArray) {
@@ -338,7 +338,7 @@ get_header();
                                 </div>
 
                                 <?php
-                            } 
+                            }
 
                         } else {
                             _e('No verified vendor found!', 'dc-woocommerce-multi-vendor');
@@ -351,37 +351,6 @@ get_header();
                     </div>
                 </div>
             </div>
-
-            <div style="text-align: center;">
-                <div class="overlay"></div>
-            </div>
-
-            <style>
-                .overlay {
-                    display: none;
-                    position: fixed;
-                    width: 100%;
-                    height: 100%;
-                    top: 0;
-                    left: 0;
-                    z-index: 999;
-                    background: rgba(255,255,255,0.8) url("<?php echo get_stylesheet_directory_uri() . '/image/loading3.gif';?>") center no-repeat;
-                }
-                /* Turn off scrollbar when body element has the loading class */
-                div.loading-custom {
-                    overflow: hidden;   
-                }
-                /* Make spinner image visible when body element has the loading class */
-                div.loading-custom .overlay {
-                    display: block;
-                }
-
-                /** Modal redesign */
-                .modal-content {
-                    border-radius: 0px !important;
-                }
-            </style>
-
         </div>
     </div>
 </div><!-- END OF MAIN CONTENT -->
@@ -407,7 +376,7 @@ get_header();
         </div>
     </div>
 </div>
-    
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
@@ -432,8 +401,8 @@ get_header();
             }
         });
 
-        
-        $('#sendButton').on('click', function(){	
+
+        $('#sendButton').on('click', function(){
             var deliveryZip = $('#deliveryZip').val();
 		    window.history.replaceState(null, null, "?zip="+deliveryZip);
 		    // window.history.pushState("string", "Title", deliveryZip);

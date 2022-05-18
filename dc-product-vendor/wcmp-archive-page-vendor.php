@@ -314,32 +314,6 @@ $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
 <input type="hidden" id="defaultProductIdAsString" value="<?php echo $defaultProductIdAsString;?>">
 
 
-<div style="text-align: center;">
-  	<div class="overlay"></div>
-</div>
-
-<style>
-    .overlay {
-        display: none;
-        position: fixed;
-        width: 100%;
-        height: 100%;
-        top: 0;
-        left: 0;
-        z-index: 999;
-        background: rgba(255,255,255,0.8) url("<?php echo get_stylesheet_directory_uri() . '/image/loading3.gif';?>") center no-repeat;
-    }
-    /* Turn off scrollbar when body element has the loading class */
-    div.loading-custom3 {
-        overflow: hidden;
-    }
-    /* Make spinner image visible when body element has the loading class */
-    div.loading-custom3 .overlay {
-        display: block;
-    }
-</style>
-
-
 <?php
 // Additional hook after archive description ended
 do_action('after_wcmp_vendor_description', $vendorId);

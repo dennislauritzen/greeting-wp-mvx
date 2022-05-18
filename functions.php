@@ -1986,6 +1986,9 @@ add_action( 'woocommerce_thankyou', 'call_order_status_completed', 10, 1);
 function call_order_status_completed( $array ) {
 
 	$latestOrderId = getLastOrderId(); // Last order ID
+	$order_hash = hash('md4','gree_ting_dk#!4r1242142fgriejgfto'.$latestOrderId.$latestOrderId);
+	$order_hash2 = hash('md4', 'vvkrne12onrtnFG_:____'.$latestOrderId);
+
 	$order = wc_get_order( $latestOrderId ); // Get an instance of the WC_Order oject
 
 	$orderCreatedDate =  $order->get_date_created();
@@ -2006,32 +2009,24 @@ function call_order_status_completed( $array ) {
 	$billingCountry = $order->get_billing_country();
 	$billingEmail = $order->get_billing_email();
 	$billingPhone = $order->get_billing_phone();
+	// shipping details
+	$shippingFirstName = $order->get_shipping_first_name();
+	$shippingLastName = $order->get_shipping_last_name();
+	$shippingCompany = $order->get_shipping_company();
+	$shippingAddress1 = $order->get_shipping_address_1();
+	$shippingAddress2 = $order->get_shipping_address_2();
+	$shippingCity = $order->get_shipping_city();
+	$shippingState = $order->get_shipping_state();
+	$shippingPostCode = $order->get_shipping_postcode();
+	$shippingCountry = $order->get_shipping_country();
+	$shippingEmail = $order->get_shipping_email();
+	$shippingPhone = $order->get_shipping_phone();
 
 	//$orderData = $order->get_data(); // Get the order data in an array
 
-    // qr code begin
-	include (get_template_directory() . '/phpqrcode/qrlib.php');
-    // Save PNG codes to server
-    $upload = wp_upload_dir();
-    $upload_dir = $upload['basedir'] .'/qr-codes/';
-    $permissions = 0755;
-    $oldmask = umask(0);
-    if (!is_dir($upload_dir)) mkdir($upload_dir, $permissions);
-    $umask = umask($oldmask);
-    $chmod = chmod($upload_dir, $permissions);
-    $codeContents = site_url().'/index.php/shop-order-status/?order_id='.$latestOrderId;
-
-    // we need to generate filename
-    $fileName = $latestOrderId.'.png';
-    $pngAbsoluteFilePath = $upload_dir.$fileName;
-
-    // generating
-    if (!file_exists($pngAbsoluteFilePath)) {
-    	QRcode::png($codeContents, $pngAbsoluteFilePath);
-    	//echo 'File generated!';
-    } else {
-    	echo 'File already generated! We can use this cached file to speed up site on common codes!';
-    }
+  // qr code begin
+  $codeContents = site_url().'/shop-order-status/?order_id='.$latestOrderId.'&oh='.$order_hash.'&sshh='.$order_hash2;
+	$qrcode = 'https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl='.$codeContents;
 	// qr code end
 
     // $orderedStoreName = '';
@@ -2046,109 +2041,117 @@ function call_order_status_completed( $array ) {
 		$productId = $product->get_id();
 
 		$orderProductVendor = get_wcmp_product_vendors($productId);
-        if( $orderProductVendor ) {
-            $term_vendor = wp_get_post_terms($productId, 'dc_vendor_shop');
+    if( $orderProductVendor ) {
+      $term_vendor = wp_get_post_terms($productId, 'dc_vendor_shop');
 			foreach($term_vendor as $ven){
 				$orderedVendorStoreName = $ven->name;
 			}
-        }
-
+  	}
 	} // end foreach
 
 		// send email
-		$body = '<div id="main-wrapper" style="max-width: 600px;margin-left:auto;margin-right:auto;border:1px solid #ddd;color: #333;">
-            <div id="top-header" style="background-color: purple;">
-                <h2 style="color: white; margin: 0px 30px; padding: 20px 0px;">Thanks for shopping with us</h2>
-            </div>
-            <div id="body" style="background-color: white; padding: 30px;">
-                <p>Hi, '.$orderedVendorStoreName.'</p>
-                <p>We have finished your order</p>
-                <p style="color: purple; font-size: 20px;">[Order #'.$latestOrderId.'] ('.$orderCreateDateFormat.')</p>
-                <table id="table" style="width:100%;color:#333;">
-                    <thead>
-                      <tr>
-                        <th style="border: 1px solid #ddd;text-align: center;">Product</th>
-                        <th style="border: 1px solid #ddd;text-align: center;">Quantity</th>
-                        <th style="border: 1px solid #ddd;text-align: center;">Price ('.$orderCurrency.')</th>
-                      </tr>
-                    </thead>
-                    <tbody>';
-                    foreach ( $order->get_items() as $item_id => $item ){
-                      $body.='<tr>
-                        <td style="border: 1px solid #ddd;text-align: center;">'.$item->get_name().'</td>
-                        <td style="border: 1px solid #ddd;text-align: center;">'.$item->get_quantity().'</td>
-                        <td style="border: 1px solid #ddd;text-align: center;">'.$item->get_subtotal().'</td>
-                      </tr>';
-                    }
-                     $body.='<tr>
-                        <td colspan="2" style="border: 1px solid #ddd;text-align: center;"><b>Subtotal</b></td>
-                        <td style="border: 1px solid #ddd;text-align: center;">'.$orderSubTotal.'</td>
-                      </tr>
-                      <tr>
-                        <td colspan="2" style="border: 1px solid #ddd;text-align: center;"><b>Total</b></td>
-                        <td style="border: 1px solid #ddd;text-align: center;">'.$orderTotal.'</td>
-                      </tr>
-                    </tbody>
-                </table>
-                <p style="color: purple; font-size: 20px;">Billing Address</p>
-                <div style="border: 1px solid #ddd; padding: 15px;">
-                    <address>'
-                        .$billingFirstName.' '.$billingLastName.'<br>'
-                        .$billingCompany.'<br>'
-                        .$billingAddress1.'<br>'
-                        .$billingAddress2.'<br>'
-                        .$billingState.'<br>'
-                        .$billingCity.'<br>'
-                        .$billingCountry.'<br>'
-                        .$billingPhone.'<br>'
-                        .$billingEmail.'
-                    </address>
-                </div>
-                <div style="margin-top: 20px;">
-				<img src="'.site_url().'/wp-content/uploads/qr-codes/'.$latestOrderId.'.png " alt="qr code"/>
-                </div>
-                <a href="'.site_url().'/index.php/shop-order-status/?order_id='. $latestOrderId .'">Update Order Status</a>
-                <div style="margin-top: 20px;">
-                    <p>Thanks for shopping with us</p>
-                </div>
-            </div>;
-        </div>';
+	$body = '<div id="main-wrapper" style="max-width: 600px;margin-left:auto;margin-right:auto;border:1px solid #ddd;color: #333;">
+      <div id="top-header" style="background-color: purple;">
+          <h2 style="color: white; margin: 0px 30px; padding: 20px 0px;">Ny ordre fra Greeting.dk :)</h2>
+      </div>
+      <div id="body" style="background-color: white; padding: 30px;">
+					<a href="'.$codeContents.'">
+						<img src="'.$qrcode.'" alt=""/>
+						Markér ordre som leveret
+					</a>
+					<div style="margin-top: 20px;">
 
-    // dompdf begin
-    require_once 'dompdf/autoload.inc.php'; // include autoloader
-    $dompdf = new Dompdf(); // instantiate and use the dompdf class
-    $dompdf->loadHtml($body);
+					</div>
+          <p>Hej, '.$orderedVendorStoreName.'</p>
+          <p>Der er gået en ordre i gennem</p>
+          <p style="color: purple; font-size: 20px;">[Order #'.$latestOrderId.'] ('.$orderCreateDateFormat.')</p>
+          <table id="table" style="width:100%;color:#333;">
+              <thead>
+                <tr>
+                  <th style="border: 1px solid #ddd;text-align: center;">Produkt</th>
+                  <th style="border: 1px solid #ddd;text-align: center;">Antal</th>
+                  <th style="border: 1px solid #ddd;text-align: center;">Pris ('.$orderCurrency.')</th>
+                </tr>
+              </thead>
+              <tbody>';
+              foreach ( $order->get_items() as $item_id => $item ){
+                $body.='<tr>
+                  <td style="border: 1px solid #ddd;text-align: center;">'.$item->get_name().'</td>
+                  <td style="border: 1px solid #ddd;text-align: center;">'.$item->get_quantity().'</td>
+                  <td style="border: 1px solid #ddd;text-align: center;">'.$item->get_subtotal().'</td>
+                </tr>';
+              }
+               $body.='<tr>
+                  <td colspan="2" style="border: 1px solid #ddd;text-align: center;"><b>Subtotal</b></td>
+                  <td style="border: 1px solid #ddd;text-align: center;">'.$orderSubTotal.'</td>
+                </tr>
+                <tr>
+                  <td colspan="2" style="border: 1px solid #ddd;text-align: center;"><b>Total</b></td>
+                  <td style="border: 1px solid #ddd;text-align: center;">'.$orderTotal.'</td>
+                </tr>
+              </tbody>
+          </table>
+          <p style="color: purple; font-size: 20px;">Faktureringsadresse</p>
+          <div style="border: 1px solid #ddd; padding: 15px;">
+              <address>'
+                  .$billingFirstName.' '.$billingLastName.'<br>'
+                  .$billingCompany.'<br>'
+                  .$billingAddress1.'<br>'
+                  .$billingAddress2.'<br>'
+                  .$billingState.'<br>'
+                  .$billingCity.'<br>'
+                  .$billingCountry.'<br>'
+                  .$billingPhone.'<br>'
+                  .$billingEmail.'
+              </address>
+          </div>
+					<p style="color: purple; font-size: 20px;">Leveringsadresse</p>
+					<div style="border: 1px solid #ddd; padding: 15px;">
+							<address>'
+									.$shippingFirstName.' '.$shippingLastName.'<br>'
+									.$shippingCompany.'<br>'
+									.$shippingAddress1.'<br>'
+									.$shippingAddress2.'<br>'
+									.$shippingState.'<br>'
+									.$shippingCity.'<br>'
+									.$shippingCountry.'<br>'
+									.$shippingPhone.'<br>'
+									.$shippingEmail.'
+							</address>
+					</div>
+      </div>;
+  </div>';
+
+  // dompdf begin
+  require_once 'dompdf/autoload.inc.php'; // include autoloader
+  $dompdf = new Dompdf(); // instantiate and use the dompdf class
+  $dompdf->loadHtml($body);
 	$dompdf->setPaper('A4', 'landscape'); // (Optional) Setup the paper size and orientation
 	// Render the HTML as PDF
-    $dompdf->render();
-    // $dompdf->stream(); // Output the generated PDF to Browser
-    //save the pdf file on the server
-    $uploadpdf = wp_upload_dir();
-    $uploadpdf_dir = $uploadpdf['basedir'] .'/pdf-files/';
-    $permissions = 0755;
-    $oldmask = umask(0);
-    if (!is_dir($uploadpdf_dir)) mkdir($uploadpdf_dir, $permissions);
-    $umask = umask($oldmask);
-    $chmod = chmod($uploadpdf_dir, $permissions);
-    file_put_contents($uploadpdf_dir.'/'.$latestOrderId.'.pdf', $dompdf->output());
+  $dompdf->render();
+  // $dompdf->stream(); // Output the generated PDF to Browser
+  //save the pdf file on the server
+  $uploadpdf = wp_upload_dir();
+  $uploadpdf_dir = $uploadpdf['basedir'] .'/pdf-files/';
+  $permissions = 0755;
+  $oldmask = umask(0);
+  if (!is_dir($uploadpdf_dir)) mkdir($uploadpdf_dir, $permissions);
+  $umask = umask($oldmask);
+  $chmod = chmod($uploadpdf_dir, $permissions);
+  file_put_contents($uploadpdf_dir.'/'.$latestOrderId.'.pdf', $dompdf->output());
 	// dompdf end
 
 	// attached pdf file begin
 	// $filename = $latestOrderId.'.pdf';
-    // $attachments = array( WP_CONTENT_DIR . '/uploads/pdf-files/'.$filename );
-    // attach pdf file end
-
+  // $attachments = array( WP_CONTENT_DIR . '/uploads/pdf-files/'.$filename );
+  // attach pdf file end
 	// $headers = array('Content-Type: text/html; charset=UTF-8'); // To send HTML formatted mail, you also can specify the Content-Type HTTP header in the $headers parameter:
-
 	// wp_mail( $to, $subject, $body, $headers, $attachments );
-
 };
 
 
 // vendor attachment begin
-
 add_filter( 'woocommerce_email_attachments', 'attach_pdf_to_email', 10, 3);
-
 function attach_pdf_to_email ( $attachments, $email_id , $order ) {
 
     // Avoiding errors and problems
@@ -2176,8 +2179,8 @@ function attach_pdf_to_email ( $attachments, $email_id , $order ) {
  *
  *
  */
-add_action( 'woocommerce_after_checkout_validation', 'greeting_check_billing_postcode', 10, 2);
-function greeting_check_billing_postcode( $fields, $errors ){
+add_action( 'woocommerce_after_checkout_validation', 'greeting_check_delivery_postcode', 10, 2);
+function greeting_check_delivery_postcode( $fields, $errors ){
 	global $wpdb, $wcmp;
 
 	$storeProductId = 0;
@@ -2191,7 +2194,6 @@ function greeting_check_billing_postcode( $fields, $errors ){
 
 	$vendor_id = get_post_field( 'post_author', $storeProductId );
 	$vendor = get_wcmp_vendor($vendor_id);
-
 
 	// get vendor postal code
 	// $vendorPostalCodeRow = $wpdb->get_row( "
@@ -2241,9 +2243,6 @@ function greeting_check_billing_postcode( $fields, $errors ){
 		}
 	}
 }
-
-
-
 
 
 
@@ -2540,6 +2539,29 @@ function greeting_validate_new_receiver_info_fields($fields, $errors) {
 			__( 'Standard package accept only 165 Character', 'greeting2')
 		);
 	}
+
+	$cart = WC()->cart->get_cart();
+
+	$age_restricted_items_in_cart = false;
+	foreach( $cart as $cart_item_key => $cart_item ){
+		$product = $cart_item['data'];
+		$storeProductId = $product->get_id();
+
+		$product_id = $cart_item['product_id'];
+		$shop_id = get_post_meta($product_id, 'shop', true);
+
+		$product_alchohol = get_post_meta($product_id, 'alcohol', true);
+		if($product_alchohol){
+			$age_restricted_items_in_cart = true;
+		}
+	}
+
+	if($age_restricted_items_in_cart){
+		if(!isset($_POST['age_restriction'])) {
+			$errors->add('age-restriction', esc_html__('Please confirm that you\'re 18+ years old.', 'greeting-marketplace'));
+		}
+	}
+
 }
 
 

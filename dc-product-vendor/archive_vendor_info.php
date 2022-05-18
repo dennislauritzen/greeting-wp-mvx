@@ -540,7 +540,7 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
                   return $intervals;
               }
 
-              $opening = get_field('openning', 'user_'.$vendor->id);
+              $opening = get_field('openning', 'user_'.$vendor_id);
               $open_iso_days = array();
               $open_label_days = array();
               foreach($opening as $k => $v){
