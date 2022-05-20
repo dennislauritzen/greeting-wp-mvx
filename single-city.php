@@ -13,7 +13,7 @@ $cityName = get_post_meta($postId, 'city', true);
 
 $checkout_postalcode = WC()->customer->get_shipping_postcode();
 if($cityPostalcode != $checkout_postalcode){
-  print 'postnumre afviger';
+  //print 'postnumre afviger';
   #var_dump($woocommerce);
   $woocommerce->cart->empty_cart();
 }
