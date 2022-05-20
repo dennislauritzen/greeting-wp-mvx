@@ -866,7 +866,7 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
       </div>
       <div class="col-12 pb-3 pb-lg-0 pb-xl-0 col-lg-4">
         <div class="card" style="">
-          <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/pexels-furkanfdemir-6309844-scaled.jpg" class="card-img-top" alt="<?php echo $store_name; ?>">
+          <img src="https://www.greeting.dk/wp-content/uploads/2022/04/pexels-furkanfdemir-6309844-scaled.jpg" class="card-img-top" alt="<?php echo $store_name; ?>">
           <div class="card-body">
             <h5 class="card-title">Skal din butik være med?</h5>
             <p class="card-text">Skal din butik også være med på Greeting.dk? Vi arbejder altid for et ligeværdigt samarbejde -
@@ -877,7 +877,7 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
       </div>
       <div class="col-12 pb-3 pb-lg-0 pb-xl-0 col-lg-4">
         <div class="card" style="">
-          <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/pexels-secret-garden-931154-scaled.jpg" class="card-img-top" alt="<?php echo $store_name; ?>">
+          <img src="https://www.greeting.dk/wp-content/uploads/2022/04/pexels-secret-garden-931154-scaled.jpg" class="card-img-top" alt="<?php echo $store_name; ?>">
           <div class="card-body">
             <h5 class="card-title">Fortjener dine medarbejdere en hilsen?</h5>
             <p class="card-text">Det er vigtigt at huske dem, du sætter pris på - også på jobbet. Derfor tilbyder vi også firmaer at levere større partiere af medarbejder gaver til eks. jul, påske, sommer - eller gaven til den kommende jubilar.</p>
@@ -887,7 +887,7 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
       </div>
       <div class="col-12 pb-3 pb-lg-0 pb-xl-0 col-lg-4">
         <div class="card" style="">
-          <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/pexels-florent-b-2664149-scaled.jpg" class="card-img-top" alt="<?php echo $store_name; ?>">
+          <img src="https://www.greeting.dk/wp-content/uploads/2022/04/pexels-florent-b-2664149-scaled.jpg" class="card-img-top" alt="<?php echo $store_name; ?>">
           <div class="card-body">
             <h5 class="card-title">Spørgsmål? Så fang os her :)</h5>
             <p class="card-text">Vil du gerne høre, hvad vi er for nogen - og hvordan det hele fungerer? Eller har du konkrete spørgsmål til udvalget i en af butikkerne? Vi sidder altid klar - så ræk endelig ud.</p>
@@ -904,7 +904,7 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
     <div class="row">
       <div class="col-12 text-center pt-4 pb-5 mb-3 position-relative">
         <div class="">
-          <img src="https://dev.greeting.dk/wp-content/uploads/2022/04/greeting-pink.png" style="width: 150px;">
+          <img src="https://www.greeting.dk/wp-content/uploads/2022/04/greeting-pink.png" style="width: 150px;">
         </div>
         <div class="position-absolute top-50 start-100">
           <ul class="social">

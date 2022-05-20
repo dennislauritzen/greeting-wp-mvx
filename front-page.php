@@ -69,8 +69,8 @@ get_header();
     <div class="row g-0">
       <div class="col-12 d-flex  align-items-bottom align-items-md-center align-items-lg-center align-items-xl-center video-wrapper">
         <video class="position-absolute top-0 start-0" playsinline autoplay muted loop poster="">
-          <source src="https://dev.greeting.dk/wp-content/uploads/2022/04/greeting_top_q23.mp4" type="video/mp4">
-          <source src="https://dev.greeting.dk/wp-content/uploads/2022/04/Greeting_webm_q33.webm" type="video/webm">
+          <source src="https://www.greeting.dk/wp-content/uploads/2022/04/greeting_top_q23.mp4" type="video/mp4">
+          <source src="https://www.greeting.dk/wp-content/uploads/2022/04/Greeting_webm_q33.webm" type="video/webm">
         </video>
         <div class="col-12 col-md-10 col-lg-7 col-xl-6 bg-teal-front position-relative start-0 top-0">
             <div class="py-5 px-1 px-xs-1 px-sm-1 px-md-2 px-lg-5 px-xl-5 m-5 top-text-content">
