@@ -3536,3 +3536,49 @@ add_filter( 'woocommerce_email_order_items_args', 'greeting_modify_wc_order_emai
  * @author Dennis Lauritzen
  */
 apply_filters('wcmp_is_disable_store_visitors_stats', '__return_false');
+
+
+add_action( 'init', 'register_order_seen_order_status' );
+function register_order_seen_order_status() {
+    register_post_status( 'wc-order-seen', array(
+        'label'                     => 'Order Seen by Vendor',
+        'public'                    => true,
+        'show_in_admin_status_list' => true,
+        'show_in_admin_all_list'    => true,
+        'exclude_from_search'       => false,
+        'label_count'               => _n_noop( 'Order Seen by Vendor <span class="count">(%s)</span>', 'Shipment Arrival <span class="count">(%s)</span>' )
+    ) );
+}
+
+
+add_filter( 'wc_order_statuses', 'add_order_seen_to_order_statuses' );
+function add_order_seen_to_order_statuses( $order_statuses ) {
+    $new_order_statuses = array();
+    foreach ( $order_statuses as $key => $status ) {
+        $new_order_statuses[ $key ] = $status;
+        if ( 'wc-processing' === $key ) {
+            $new_order_statuses['wc-order-seen'] = 'Order Seen by Vendor';
+        }
+    }
+    return $new_order_statuses;
+}
+
+
+add_action('admin_head', 'styling_admin_order_list' );
+function styling_admin_order_list() {
+    global $pagenow, $post;
+
+    if( $pagenow != 'edit.php') return; // Exit
+    if( get_post_type($post->ID) != 'shop_order' ) return; // Exit
+
+    // HERE we set your custom status
+    $order_status = 'Order Seen'; // <==== HERE
+    ?>
+    <style>
+        .order-status.status-<?php echo sanitize_title( $order_status ); ?> {
+            background: #d7f8a7;
+            color: #0c942b;
+        }
+    </style>
+    <?php
+}

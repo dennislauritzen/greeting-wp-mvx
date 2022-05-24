@@ -13,7 +13,11 @@ $cityName = get_post_meta($postId, 'city', true);
 
 $checkout_postalcode = WC()->customer->get_shipping_postcode();
 if($cityPostalcode != $checkout_postalcode){
+<<<<<<< Updated upstream
   //print 'postnumre afviger';
+=======
+  #print 'postnumre afviger';
+>>>>>>> Stashed changes
   #var_dump($woocommerce);
   $woocommerce->cart->empty_cart();
 }
@@ -135,8 +139,8 @@ jQuery(document).ready(function(){
 		  tt.count DESC
     LIMIT 6
     ");
+    $placeHolderImage = wc_placeholder_img_src();
     foreach($occasion_featured_list as $occasion){
-      $placeHolderImage = wc_placeholder_img_src();
       $occasionImageUrl = '';
       if(!empty($occasion->image_src)){
         $occasionImageUrl = wp_get_attachment_image($occasion->image_src, 'thumbnail', false, array('class' => 'card-img-top', 'alt' => $occasion->name));
