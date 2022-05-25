@@ -2697,7 +2697,7 @@ function greeting_echo_receiver_info( ) {
 			'id'					=> 'deliveryInstructions',
 			'class'				=> array('form-row-wide'),
 			'label'				=> __('Leveringsinstruktioner'),
-			'placeholder'	=> __('Har du særlige instruktioner til leveringen? Eks. en dørkode, særlige forhold på leveringsadressen eller lignende? Notér dem her :)')
+			'placeholder'	=> __('Har du særlige instruktioner til leveringen? Eks. en dørkode, særlige forhold på leveringsadressen, en dato hvor gaven må åbnes eller lignende? Notér dem her :)')
 		), WC()->checkout->get_value( 'delivery_instructions' ) );
 
 	// Insert the delivery date area
@@ -2874,7 +2874,7 @@ function greeting_echo_date_picker(  ) {
 			'id'            => 'datepicker',
 			'required'      => false,
 			'label'         => __('Hvornår skal gaven leveres?'),
-			'placeholder'   => __('Hurtigst muligt')
+			'placeholder'   => __('Vælg dato hvor gaven skal leveres')
 		), WC()->checkout->get_value( 'delivery_date' ) );
 
 
