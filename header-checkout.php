@@ -55,6 +55,11 @@
 			width: 95%;
 		}
 
+		.woocommerce-remove-coupon {
+			width: 100%;
+			display: block;
+		}
+
 		  #greeting-footer h6 {
 		    font-family: 'Rubik', 'Inter', 'Comic Sans', sans-serif;
 		    font-size: 20px;

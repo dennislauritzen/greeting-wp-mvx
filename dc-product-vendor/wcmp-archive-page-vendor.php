@@ -41,8 +41,21 @@ do_action( 'wcmp_archive_description' );
 $vendorId = wcmp_find_shop_page_vendor();
 $vendor = get_wcmp_vendor($vendorId);
 
-$productIdArray = array();
+$del_type = '';
+$del_value = '';
+if(!empty(get_field('delivery_type', 'user_'.$vendorId))){
+  $delivery_type = get_field('delivery_type', 'user_'.$vendorId)[0];
 
+  if(empty($delivery_type['label'])){
+    $del_value = $delivery_type;
+    $del_type = $delivery_type;
+  } else {
+    $del_value = $delivery_type['value'];
+    $del_type = $delivery_type['label'];
+  }
+}
+
+$productIdArray = array();
 $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
 ?>
 
@@ -346,157 +359,168 @@ do_action('after_wcmp_vendor_description', $vendorId);
             <?php echo wp_kses_post(htmlspecialchars_decode( wpautop( $description ), ENT_QUOTES )); ?>
         </div>
         <?php } ?>
-        <p><a href="<?php echo esc_url($vendor->get_permalink()); ?>">Se hele butikkns gaveudvalg</a><p>
+        <p><a href="<?php echo esc_url($vendor->get_permalink()); ?>">Se hele butikkens gaveudvalg</a><p>
       </div>
       <div class="col-lg-4">
-        <b>Leveringsinformationer</b>
-        <p>Butikken leverer på flg. dage:
-          <?php
-          $del_days = get_field('openning', 'user_'.$vendorId);
-					$day_array = array('mandag','tirsdag','onsdag','torsdag','fredag','lørdag','søndag');
+        <?php
 
-					$i = 0;
-          foreach($del_days as $v){
-            //$day = $day_array[$v];
-            if ($i == 0){
-              //$day = ucfirst($day);
-            }
+        if($del_value == '0'){
+          echo "<b>Information om forsendelse</b>";
+          echo '<p>'.get_field('freight_company_delivery_text', 'options').'</p>';
+        } else {
+        ?>
+          <b>Leveringsinformationer</b>
+          <p>Butikken leverer på flg. dage:
+            <?php
+            $del_days = get_field('openning', 'user_'.$vendorId);
+  					$day_array = array('mandag','tirsdag','onsdag','torsdag','fredag','lørdag','søndag');
 
-            if(count($del_days) > 1)
-            {
-              if($i < count($del_days)-2){
-               // $day .= ', ';
-              } else if($i == count($del_days)-1) {
-                // $day = ' og '.$day;
+  					$i = 0;
+            foreach($del_days as $v){
+              //$day = $day_array[$v];
+              if ($i == 0){
+                //$day = ucfirst($day);
               }
+
+              if(count($del_days) > 1)
+              {
+                if($i < count($del_days)-2){
+                 // $day .= ', ';
+                } else if($i == count($del_days)-1) {
+                  // $day = ' og '.$day;
+                }
+              }
+
+              // print $day;
+              $i++;
             }
+            ?>.
+          </p>
+          <p>
+            Butikken leverer
+            <?php
+              if(get_field('vendor_require_delivery_day', 'user_'.$vendorId) == 0)
+              {
+                echo ' i dag';
+              }
+                else if(get_field('vendor_require_delivery_day', 'user_'.$vendorId) == 1)
+              {
+                echo ' i morgen';
+              } else {
+                echo 'om '.get_field('vendor_require_delivery_day', 'user_'.$vendorId)." hverdage";
+              }
+            ?>, hvis du bestiller inden kl.
+            <?php echo (!empty(get_field('vendor_drop_off_time', 'user_'.$vendor->id)) ? get_field('vendor_drop_off_time', 'user_'.$vendor->id) : '11'); ?>.
+          </p>
+  				<?php
+  				// --- CLOSED DATES --- Dennis.
+  				$closed_dates = get_field('vendor_closed_day', 'user_'.$vendorId);
+  				$dates = explode(",",$closed_dates);
+  				$viable_dates = array();
 
-            // print $day;
-            $i++;
-          }
-          ?>.
-        </p>
-        <p>
-          Butikken leverer
-          <?php
-            if(get_field('vendor_require_delivery_day', 'user_'.$vendorId) == 0)
-            {
-              echo ' i dag';
-            }
-              else if(get_field('vendor_require_delivery_day', 'user_'.$vendorId) == 1)
-            {
-              echo ' i morgen';
-            } else {
-              echo 'om '.get_field('vendor_require_delivery_day', 'user_'.$vendorId)." hverdage";
-            }
-          ?>, hvis du bestiller inden kl.
-          <?php echo (!empty(get_field('vendor_drop_off_time', 'user_'.$vendor->id)) ? get_field('vendor_drop_off_time', 'user_'.$vendor->id) : '11'); ?>.
-        </p>
-				<?php
-				// --- CLOSED DATES --- Dennis.
-				$closed_dates = get_field('vendor_closed_day', 'user_'.$vendorId);
-				$dates = explode(",",$closed_dates);
-				$viable_dates = array();
+  				foreach($dates as $val){
+  					$date_u = strtotime($val);
+  					$date = date("d-m-Y", $date_u);
+  					$today = date("U");
 
-				foreach($dates as $val){
-					$date_u = strtotime($val);
-					$date = date("d-m-Y", $date_u);
-					$today = date("U");
+  					if($date_u >= ($today-(60*60*24)) && $date_u <= ($today+(60*60*24*30))){
+  						$weekday = date('N',$date_u);
+  						$weekday_str = '';
+  						$date = date('j',$date_u);
+  						$month = date('m',$date_u);
+  						$month_str = '';
 
-					if($date_u >= ($today-(60*60*24)) && $date_u <= ($today+(60*60*24*30))){
-						$weekday = date('N',$date_u);
-						$weekday_str = '';
-						$date = date('j',$date_u);
-						$month = date('m',$date_u);
-						$month_str = '';
+  						switch($weekday){
+  							case 1:
+  								$weekday_str = 'mandag';
+  								break;
+  							case 2:
+  								$weekday_str = 'tirsdag';
+  								break;
+  							case 3:
+  								$weekday_str = 'onsdag';
+  								break;
+  							case 4:
+  								$weekday_str = 'torsdag';
+  								break;
+  							case 5:
+  								$weekday_str = 'fredag';
+  								break;
+  							case 6:
+  								$weekday_str = 'lørdag';
+  								break;
+  							case 7:
+  								$weekday_str = 'søndag';
+  								break;
+  						}
 
-						switch($weekday){
-							case 1:
-								$weekday_str = 'mandag';
-								break;
-							case 2:
-								$weekday_str = 'tirsdag';
-								break;
-							case 3:
-								$weekday_str = 'onsdag';
-								break;
-							case 4:
-								$weekday_str = 'torsdag';
-								break;
-							case 5:
-								$weekday_str = 'fredag';
-								break;
-							case 6:
-								$weekday_str = 'lørdag';
-								break;
-							case 7:
-								$weekday_str = 'søndag';
-								break;
-						}
+  						switch($month){
+  							case 1:
+  								$month_str = 'januar';
+  								break;
+  							case 2:
+  								$month_str = 'februar';
+  								break;
+  							case 3:
+  								$month_str = 'marts';
+  								break;
+  							case 4:
+  								$month_str = 'april';
+  								break;
+  							case 5:
+  								$month_str = 'maj';
+  								break;
+  							case 6:
+  								$month_str = 'juni';
+  								break;
+  							case 7:
+  								$month_str = 'juli';
+  								break;
+  							case 8:
+  								$month_str = 'august';
+  								break;
+  							case 9:
+  								$month_str = 'september';
+  								break;
+  							case 10:
+  								$month_str = 'oktober';
+  								break;
+  							case 11:
+  								$month_str = 'november';
+  								break;
+  							case 12:
+  								$month_str = 'december';
+  								break;
+  						}
+  						$viable_dates[] = $weekday_str." d. ".$date.". ".$month_str;
+  					}
+  				}
 
-						switch($month){
-							case 1:
-								$month_str = 'januar';
-								break;
-							case 2:
-								$month_str = 'februar';
-								break;
-							case 3:
-								$month_str = 'marts';
-								break;
-							case 4:
-								$month_str = 'april';
-								break;
-							case 5:
-								$month_str = 'maj';
-								break;
-							case 6:
-								$month_str = 'juni';
-								break;
-							case 7:
-								$month_str = 'juli';
-								break;
-							case 8:
-								$month_str = 'august';
-								break;
-							case 9:
-								$month_str = 'september';
-								break;
-							case 10:
-								$month_str = 'oktober';
-								break;
-							case 11:
-								$month_str = 'november';
-								break;
-							case 12:
-								$month_str = 'december';
-								break;
-						}
-						$viable_dates[] = $weekday_str." d. ".$date.". ".$month_str;
-					}
-				}
+  				$dates_for_str = '';
+  				$i = 0;
+  				foreach($viable_dates as $v){
+  					$i++;
+  					$dates_for_str .= $v;
+  					if(count($viable_dates) > 1){
+  						if($i == count($viable_dates)-1){
+  							$dates_for_str .= ' og ';
+  						} else if($i < count($viable_dates)){
+  							$dates_for_str .= ', ';
+  						}
+  					}
+  				}
 
-				$dates_for_str = '';
-				$i = 0;
-				foreach($viable_dates as $v){
-					$i++;
-					$dates_for_str .= $v;
-					if(count($viable_dates) > 1){
-						if($i == count($viable_dates)-1){
-							$dates_for_str .= ' og ';
-						} else if($i < count($viable_dates)){
-							$dates_for_str .= ', ';
-						}
-					}
-				}
+  				if(count($viable_dates) > 0){
+  				?>
+  			 		<p>Bemærk dog at butikken ikke leverer <?php print $dates_for_str; ?>.</p>
+  				<?php
+  				}
+  				// --- END of CLOSED DATES --- Dennis.
+  				?>
 
-				if(count($viable_dates) > 0){
-				?>
-			 		<p>Bemærk dog at butikken ikke leverer <?php print $dates_for_str; ?>.</p>
-				<?php
-				}
-				// --- END of CLOSED DATES --- Dennis.
-				?>
+        <?php
+        } // end if
+        ?>
       </div>
     </div>
   </div>
@@ -666,3 +690,145 @@ do_action( 'wcmp_after_main_content' );
 // do_action( 'wcmp_sidebar' );
 
 get_footer( 'shop' );
+?>
+
+<script src="//code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+<link rel="stylesheet" type="text/css" href="//code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css">
+
+<script type="text/javascript">
+  // Set the slider.
+  var slider = new Slider('#sliderPrice', {
+    'tooltip_split': true
+  });
+  slider.on("slideStop", function(sliderValue){
+    var val = slider.getValue();
+    var min_val = val[0];
+    var max_val = val[1];
+    document.getElementById("slideStartPoint").value = min_val;
+    document.getElementById("slideEndPoint").value = max_val;
+  });
+</script>
+
+<script type="text/javascript">
+  jQuery(document).ready(function($) {
+    var ajaxurl = "<?php echo admin_url('admin-ajax.php');?>";
+    var catIdArray = [];
+    var occIdArray = [];
+    var inputPriceRangeArray = [];
+
+    $(".filter-on-vendor-page").click(function(){
+      updateVendor();
+
+      if(this.checked){
+        setFilterBadge(
+          $('label[for='+this.id+']').text(),
+          this.value,
+          'filter_catocca_'+this.value
+        );
+      } else {
+        removeFilterBadge(
+          $('label[for='+this.id+']').text(),
+          this.value,
+          'filter_catocca_'+this.value,
+          false
+        );
+      }
+    });
+    slider.on("slideStop", function(sliderValue){
+      updateVendor();
+    });
+    function updateVendor(){
+      catIdArray = [];
+      occIdArray = [];
+      $("input:checkbox[name=filter_cat_vendor]:checked").each(function(){
+        catIdArray.push($(this).val());
+      });
+      $("input:checkbox[name=filter_occ_vendor]:checked").each(function(){
+        occIdArray.push($(this).val());
+      });
+
+      inputPriceRangeArray = [
+        document.getElementById("slideStartPoint").value,
+        document.getElementById("slideEndPoint").value
+      ];
+
+      var data = {
+        'action': 'productFilterAction',
+        defaultProductIdAsString: jQuery("#defaultProductIdAsString").val(),
+        nn: $("input[name=nn]").val(),
+        gid: $("input[name=gid]").val(),
+        guid: $("input[name=guid]").val(),
+        catIds: catIdArray,
+        occIds: occIdArray,
+        inputPriceRangeArray: inputPriceRangeArray
+      };
+      jQuery.post(ajaxurl, data, function(response) {
+        jQuery('#products').hide();
+        jQuery('#filteredProduct').show();
+        jQuery('#filteredProduct').html(response);
+      });
+    }
+
+
+    // Filter badges on the vendor page.
+    function setFilterBadge(label, id, dataRemove){
+      var elm = document.createElement('div');
+      elm.id = 'filter'+dataRemove;
+      elm.classList.add('badge', 'rounded-pill', 'border-yellow', 'py-2', 'px-2', 'me-1', 'my-1', 'my-lg-0', 'my-xl-0', 'text-dark', 'dynamic-filters');
+      elm.href = '#';
+      elm.innerHTML = label;
+
+      elmbtn = document.createElement('button');
+      elmbtn.type = 'button';
+      elmbtn.classList.add('btn-close', 'filter-btn-delete');
+      elmbtn.dataset.filterId = id;
+      elmbtn.dataset.label = label;
+      elmbtn.onclick = function(){removeFilterBadge('"'+label+'"', id, dataRemove, true);};
+      elmbtn.dataset.filterRemove = dataRemove;
+      elm.appendChild(elmbtn);
+
+      jQuery('div.filter-list').prepend(elm);
+    }
+    function removeFilterBadge(label, id, dataRemove, updateVendors){
+      if(updateVendors === true){
+        var elmId = dataRemove;
+        console.log(elmId+' '+dataRemove);
+        document.getElementById(elmId).checked = false;
+        updateVendor();
+      }
+      jQuery('#filter'+dataRemove).remove();
+    }
+
+
+    // reset filter
+    $('#vendorPageReset').click(function(){
+      $("input:checkbox[name=filter_catocca_vendor]").removeAttr("checked");
+      var val_max = $("input#sliderPrice").data('slider-max');
+
+      slider.setValue([0,val_max]);
+      $("input#sliderVendorPage").data('slider-value', '[0,'+val_max+']');
+      $("input#sliderVendorPage").data('slider-max', val_max);
+
+      $("input#slideEndPoint").val(val_max);
+      $("input#slideStartPoint").val(0);
+
+      $('div.filter-list div.dynamic-filters').remove();
+
+      //catOccaDeliveryIdArray.length = 0;
+
+      jQuery('#products').show();
+      jQuery('#filteredProduct').hide();
+    });
+  });
+
+  // Add remove loading class on body element based on Ajax request status
+  jQuery(document).on({
+    ajaxStart: function(){
+      jQuery("div").addClass("loading");
+    },
+    ajaxStop: function(){
+      jQuery("div").removeClass("loading");
+    }
+  });
+
+</script>

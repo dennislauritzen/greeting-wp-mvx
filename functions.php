@@ -936,242 +936,6 @@ function greeting_save_product_cat_meta( $post_id ) {
  * Vendor filter on City Page
  * city filter
  */
-add_action( 'wp_footer', 'categoryActionJavascript' );
-
-function categoryActionJavascript() { ?>
-
-	<script type="text/javascript">
-		// Set the slider.
-		var slider = new Slider('#sliderPrice', {
-			'tooltip_split': true
-		});
-		slider.on("slideStop", function(sliderValue){
-			var val = slider.getValue();
-			var min_val = val[0];
-			var max_val = val[1];
-			document.getElementById("slideStartPoint").value = min_val;
-			document.getElementById("slideEndPoint").value = max_val;
-		});
-	</script>
-	<script type="text/javascript">
-		// Start the jQuery
-		jQuery(document).ready(function($) {
-			var ajaxurl = "<?php echo admin_url('admin-ajax.php');?>";
-			var catOccaDeliveryIdArray = [];
-			var inputPriceRangeArray = [];
-			var deliveryIdArray = [];
- 			var priceSliderMin = jQuery("#sliderPrice").data("slider-min");
-			var priceSliderMax = jQuery("#sliderPrice").data("slider-max");
-			// $('#cityPageReset').hide();
-
-			var url_string = window.location.href; //window.location.href
-			var url = new URL(url_string);
-
-			var del_url_val = url.searchParams.get("d");
-			var cat_url_val = url.searchParams.get("c");
-			var price_url_val = url.searchParams.get("price");
-
-			if(del_url_val){
-				deliveryIdArray = del_url_val.split(",");
-
-				jQuery.each( deliveryIdArray, function(i,v){
-					if(	$("input#filter_delivery_"+v).length){
-						$("input#filter_delivery_"+v).prop('checked',true);
-					}
-				});
-			}
-			if(cat_url_val){
-				catOccaDeliveryIdArray = cat_url_val.split(",");
-
-				jQuery.each( catOccaDeliveryIdArray, function(i,v){
-					if(	$("input#filter_cat"+v).length){
-						$("input#filter_cat"+v).prop('checked',true);
-					} else if($("input#filter_occ_"+v).length) {
-						$("input#filter_occ_"+v).prop('checked',true);
-					}
-				});
-			}
-			if(price_url_val){
-				inputPriceRangeArray = price_url_val.split(",");
-
-				var priceRangeMinVal = 0;
-				var priceRangeMaxVal = priceSliderMax;
-				if(inputPriceRangeArray[0] >= priceSliderMin &&  !isNaN(parseFloat(inputPriceRangeArray[0])) && isFinite(inputPriceRangeArray[0])){
-					priceRangeMinVal = inputPriceRangeArray[0];
-				}
-				if(inputPriceRangeArray[1] <= priceSliderMax &&  !isNaN(parseFloat(inputPriceRangeArray[1])) && isFinite(inputPriceRangeArray[1])){
-					priceRangeMaxVal = inputPriceRangeArray[1];
-				}
-
-				jQuery("#sliderPrice").data('data-slider-value','['+priceRangeMinVal+','+priceRangeMaxVal+']');
-				document.getElementById("slideStartPoint").value = priceRangeMinVal;
-				document.getElementById("slideEndPoint").value =  priceRangeMaxVal;
-			}
-
-			if(deliveryIdArray.length > 0 && catOccaDeliveryIdArray.length > 0 && inputPriceRangeArray.length > 0){
-				update();
-			}
-
-			jQuery(".filter-on-city-page").click(function(){
-				update();
-
-				if(this.checked){
-					setFilterBadgeCity(
-						$('label[for='+this.id+']').text(),
-						this.value,
-						'filter_cat'+this.value
-					);
-				} else {
-					removeFilterBadgeCity(
-						$('label[for='+this.id+']').text(),
-						this.value,
-						'filter_cat'+this.value,
-						false
-					);
-				}
-			});
-			slider.on("slideStop", function(sliderValue){
-				update();
-			});
-
-			function update(){
-				var cityName = $('#cityName').val();
-				var postalCode = $('#postalCode').val();
-				catOccaIdArray = [];
-				deliveryIdArray = [];
-				inputPriceRangeArray = [];
-
-				$("input:checkbox[name=filter_catocca_city]:checked").each(function(){
-					catOccaIdArray.push($(this).val());
-				});
-				$("input:checkbox[name=filter_del_city]:checked").each(function(){
-					deliveryIdArray.push($(this).val());
-				});
-
-				var sliderValMin = jQuery("#sliderPrice").data("slider-min");
-				var sliderValMax = jQuery("#sliderPrice").data("slider-max");
-				inputPriceRangeArray = [
-					document.getElementById("slideStartPoint").value,
-					document.getElementById("slideEndPoint").value
-				];
-				var priceChange = 0;
-				if(sliderValMin < document.getElementById("slideStartPoint").value || sliderValMax > document.getElementById("slideEndPoint").value){
-					priceChange = 1;
-				}
-
-				var data = {
-					'action': 'catOccaDeliveryAction',
-					cityDefaultUserIdAsString: jQuery("#cityDefaultUserIdAsString").val(),
-					catOccaIdArray: catOccaIdArray,
-					deliveryIdArray: deliveryIdArray,
-					inputPriceRangeArray: inputPriceRangeArray,
-					cityName: cityName,
-					postalCode: postalCode
-				};
-				jQuery.post(ajaxurl, data, function(response) {
-					jQuery('#defaultStore').hide();
-					jQuery('.filteredStore').show();
-					jQuery('.filteredStore').html(response);
-
-					if(catOccaIdArray.length == 0 && deliveryIdArray.length == 0 && priceChange == 1){
-						jQuery('#defaultStore').show();
-						jQuery('.filteredStore').hide();
-						jQuery('#noVendorFound').hide();
-					} else if(catOccaIdArray.length == 0 && deliveryIdArray.length == 0 && priceChange == 0){
-						jQuery('#defaultStore').show();
-						jQuery('.filteredStore').hide();
-						jQuery('#noVendorFound').hide();
-					}
-
-					var state = { 'd': deliveryIdArray, 'c': catOccaIdArray, 'p': inputPriceRangeArray }
-					var url = '';
-					if(deliveryIdArray.length > 0){
-						if(url){ 	url += '&'; }
-						url += 'd='+deliveryIdArray;
-					}
-					if(catOccaIdArray.length > 0){
-						if(url){ 	url += '&'; }
-						url += 'c='+catOccaIdArray;
-					}
-
-					if(inputPriceRangeArray.length > 0 && (inputPriceRangeArray[0] > sliderValMin || inputPriceRangeArray[1] < sliderValMax)){
-						if(url){ 	url += '&'; }
-						url += 'price='+inputPriceRangeArray;
-					}
-					if(url.length > 0){
-						url = '?'+url;
-					}
-
-					if(url){
-						history.pushState(state, '', url);
-					} else {
-						window.history.replaceState({}, '', location.pathname);
-					}
-				});
-			}
-
-			// Filter badges on the vendor page.
-			function setFilterBadgeCity(label, id, dataRemove){
-				var elm = document.createElement('div');
-				elm.id = 'filter'+dataRemove;
-				elm.classList.add('badge', 'rounded-pill', 'border-yellow', 'py-2', 'px-2', 'me-1', 'my-1', 'my-lg-0', 'my-xl-0', 'text-dark', 'dynamic-filters');
-				elm.href = '#';
-				elm.innerHTML = label;
-
-				elmbtn = document.createElement('button');
-				elmbtn.type = 'button';
-				elmbtn.classList.add('btn-close', 'filter-btn-delete');
-				elmbtn.dataset.filterId = id;
-				elmbtn.dataset.label = label.replace(/ /g,'');
-				elmbtn.onclick = function(){removeFilterBadgeCity('"'+label.replace(/ /g,'')+'"', id, dataRemove, true);};
-				elmbtn.dataset.filterRemove = dataRemove;
-				elm.appendChild(elmbtn);
-
-				jQuery('div.filter-list').prepend(elm);
-			}
-			function removeFilterBadgeCity(label, id, dataRemove, updateVendors){
-				if(updateVendors === true){
-					var elmId = dataRemove;
-					console.log(elmId+' '+dataRemove);
-					document.getElementById(elmId).checked = false;
-					update();
-				}
-				jQuery('#filter'+dataRemove).remove();
-			}
-
-			// reset filter
-			$('#cityPageReset').click(function(){
-				$("input:checkbox[name=filter_catocca_city], input:checkbox[name=filter_del_city]").removeAttr("checked");
-				var val_max = $("input#sliderPrice").data('slider-max');
-
-				slider.setValue([0,val_max]);
-				$("input#sliderPrice").data('slider-value', '[0,'+val_max+']');
-				$("input#sliderPrice").data('slider-max', val_max);
-
-				$("input#slideEndPoint").val(val_max);
-				$("input#slideStartPoint").val(0);
-
-				catOccaDeliveryIdArray.length = 0;
-
-				$('div.filter-list div.dynamic-filters').remove();
-
-				jQuery('#defaultStore').show();
-				jQuery('.filteredStore').hide();
-			});
-		});
-
-		// Add remove loading class on body element based on Ajax request status
-		jQuery(document).on({
-			ajaxStart: function(){
-				jQuery("div").addClass("loading");
-			},
-			ajaxStop: function(){
-				jQuery("div").removeClass("loading");
-			}
-		});
-
-	</script><?php
-}
 
 function catOccaDeliveryAction() {
 	// default user array come from front end
@@ -1318,7 +1082,6 @@ function catOccaDeliveryAction() {
 	}
 	wp_die();
 }
-
 add_action( 'wp_ajax_catOccaDeliveryAction', 'catOccaDeliveryAction' );
 add_action( 'wp_ajax_nopriv_catOccaDeliveryAction', 'catOccaDeliveryAction' );
 
@@ -1692,141 +1455,21 @@ function categoryPageFilterAction() {
 
 	wp_die();
 }
-
-add_action( 'wp_ajax_categoryPageFilterAction', 'categoryPageFilterAction' );
-add_action( 'wp_ajax_nopriv_categoryPageFilterAction', 'categoryPageFilterAction' );
-
+if(!is_cart() && !is_checkout()){
+	add_action( 'wp_ajax_categoryPageFilterAction', 'categoryPageFilterAction' );
+	add_action( 'wp_ajax_nopriv_categoryPageFilterAction', 'categoryPageFilterAction' );
+}
 
 /**
  * Filter on vendor store page
  * @usedon /vendor/*
  * Updated 30/4 by Dennis Lauritzen
  */
-add_action( 'wp_footer', 'vendStoreActionJavascript' );
+if(!is_cart() && !is_checkout()){
+	add_action( 'wp_footer', 'vendStoreActionJavascript' );
+}
 function vendStoreActionJavascript() { ?>
-	<script type="text/javascript">
-		jQuery(document).ready(function($) {
-			var ajaxurl = "<?php echo admin_url('admin-ajax.php');?>";
-			var catIdArray = [];
-			var occIdArray = [];
-			var inputPriceRangeArray = [];
-
-			$(".filter-on-vendor-page").click(function(){
-				updateVendor();
-
-				if(this.checked){
-					setFilterBadge(
-						$('label[for='+this.id+']').text(),
-						this.value,
-						'filter_catocca_'+this.value
-					);
-				} else {
-					removeFilterBadge(
-						$('label[for='+this.id+']').text(),
-						this.value,
-						'filter_catocca_'+this.value,
-						false
-					);
-				}
-			});
-			slider.on("slideStop", function(sliderValue){
-				updateVendor();
-			});
-			function updateVendor(){
-				catIdArray = [];
-				occIdArray = [];
-				$("input:checkbox[name=filter_cat_vendor]:checked").each(function(){
-					catIdArray.push($(this).val());
-				});
-				$("input:checkbox[name=filter_occ_vendor]:checked").each(function(){
-					occIdArray.push($(this).val());
-				});
-
-				inputPriceRangeArray = [
-					document.getElementById("slideStartPoint").value,
-					document.getElementById("slideEndPoint").value
-				];
-
-				var data = {
-					'action': 'productFilterAction',
-					defaultProductIdAsString: jQuery("#defaultProductIdAsString").val(),
-					nn: $("input[name=nn]").val(),
-					gid: $("input[name=gid]").val(),
-					guid: $("input[name=guid]").val(),
-					catIds: catIdArray,
-					occIds: occIdArray,
-					inputPriceRangeArray: inputPriceRangeArray
-				};
-				jQuery.post(ajaxurl, data, function(response) {
-					jQuery('#products').hide();
-					jQuery('#filteredProduct').show();
-					jQuery('#filteredProduct').html(response);
-				});
-			}
-
-
-			// Filter badges on the vendor page.
-			function setFilterBadge(label, id, dataRemove){
-				var elm = document.createElement('div');
-				elm.id = 'filter'+dataRemove;
-				elm.classList.add('badge', 'rounded-pill', 'border-yellow', 'py-2', 'px-2', 'me-1', 'my-1', 'my-lg-0', 'my-xl-0', 'text-dark', 'dynamic-filters');
-				elm.href = '#';
-				elm.innerHTML = label;
-
-				elmbtn = document.createElement('button');
-				elmbtn.type = 'button';
-				elmbtn.classList.add('btn-close', 'filter-btn-delete');
-				elmbtn.dataset.filterId = id;
-				elmbtn.dataset.label = label;
-				elmbtn.onclick = function(){removeFilterBadge('"'+label+'"', id, dataRemove, true);};
-				elmbtn.dataset.filterRemove = dataRemove;
-				elm.appendChild(elmbtn);
-
-				jQuery('div.filter-list').prepend(elm);
-			}
-			function removeFilterBadge(label, id, dataRemove, updateVendors){
-				if(updateVendors === true){
-					var elmId = dataRemove;
-					console.log(elmId+' '+dataRemove);
-					document.getElementById(elmId).checked = false;
-					updateVendor();
-				}
-				jQuery('#filter'+dataRemove).remove();
-			}
-
-
-			// reset filter
-			$('#vendorPageReset').click(function(){
-				$("input:checkbox[name=filter_catocca_vendor]").removeAttr("checked");
-				var val_max = $("input#sliderPrice").data('slider-max');
-
-				slider.setValue([0,val_max]);
-				$("input#sliderVendorPage").data('slider-value', '[0,'+val_max+']');
-				$("input#sliderVendorPage").data('slider-max', val_max);
-
-				$("input#slideEndPoint").val(val_max);
-				$("input#slideStartPoint").val(0);
-
-				$('div.filter-list div.dynamic-filters').remove();
-
-				//catOccaDeliveryIdArray.length = 0;
-
-				jQuery('#products').show();
-				jQuery('#filteredProduct').hide();
-			});
-		});
-
-		// Add remove loading class on body element based on Ajax request status
-		jQuery(document).on({
-			ajaxStart: function(){
-				jQuery("div").addClass("loading");
-			},
-			ajaxStop: function(){
-				jQuery("div").removeClass("loading");
-			}
-		});
-
-	</script><?php
+	<?php
 }
 
 function productFilterAction() {
@@ -2359,7 +2002,9 @@ function greeting_save_custom_fields_with_order( $order_id ) {
 
 add_action( 'woocommerce_admin_order_data_after_billing_address', 'greeting_delivery_date_display_admin_order_meta' );
 function greeting_delivery_date_display_admin_order_meta( $order ) {
-   $str = '<p><strong>Leveringsdato:</strong> ' . get_post_meta( $order->get_id(), '_delivery_date', true ) . '</p>';
+   $str = '<p><strong>Leveringsdato:</strong> ';
+	 if ( $_POST['delivery_date'] ) { $str .= get_post_meta( $order->get_id(), '_delivery_date', true ); } else { $str .= 'Hurtigst muligt'; }
+	 $str .= '</p>';
 	 $str .= '<p><strong>Modtagers telefonnr.:</strong> ' . get_post_meta( $order->get_id(), '_receiver_phone', true ) . '</p>';
 	 $str .= '<p><strong>Besked til modtager:</strong> ' . get_post_meta( $order->get_id(), '_greeting_message', true ) . '</p>';
 	 $str .= '<p><strong>Leveringsinstruktioner:</strong> ' . get_post_meta( $order->get_id(), '_delivery_instructions', true ) . '</p>';
@@ -2375,7 +2020,9 @@ function greeting_delivery_date_display_admin_order_meta( $order ) {
 // show order date in thank you page
 add_action( 'woocommerce_thankyou', 'greeting_view_order_and_thankyou_page', 20 );
 function greeting_view_order_and_thankyou_page( $order_id ){
-	$str = '<p><strong>Leveringsdato:</strong> ' . get_post_meta( $order->get_id(), '_delivery_date', true ) . '</p>';
+	$str = '<p><strong>Leveringsdato:</strong> ';
+	if ( $_POST['delivery_date'] ) { $str .= get_post_meta( $order->get_id(), '_delivery_date', true ); } else { $str .= 'Hurtigst muligt'; }
+	$str .= '</p>';
 	$str .= '<p><strong>Modtagers telefonnr.:</strong> ' . get_post_meta( $order->get_id(), '_receiver_phone', true ) . '</p>';
 	$str .= '<p><strong>Besked til modtager:</strong> ' . get_post_meta( $order->get_id(), '_greeting_message', true ) . '</p>';
 	$str .= '<p><strong>Leveringsinstruktioner:</strong> ' . get_post_meta( $order->get_id(), '_delivery_instructions', true ) . '</p>';
@@ -3053,8 +2700,7 @@ function greeting_echo_receiver_info( ) {
 			'placeholder'	=> __('Har du særlige instruktioner til leveringen? Eks. en dørkode, særlige forhold på leveringsadressen eller lignende? Notér dem her :)')
 		), WC()->checkout->get_value( 'delivery_instructions' ) );
 
-	echo '<h3 class="pt-4">Leveringsdato</h3>';
-
+	// Insert the delivery date area
 	greeting_echo_date_picker();
 
 	echo '</div>';
@@ -3189,42 +2835,76 @@ function greeting_echo_date_picker(  ) {
 		$storeProductId = $product->get_id();
 	}
 
+	// Get vendor ID.
 	$vendor_id = get_post_field( 'post_author', $storeProductId );
+
+	// Get delivery type.
+	$del_type = '';
+	$del_value = '';
+	if(!empty(get_field('delivery_type', 'user_'.$vendor_id))){
+	  $delivery_type = get_field('delivery_type', 'user_'.$vendor_id)[0];
+
+	  if(empty($delivery_type['label'])){
+	    $del_value = $delivery_type;
+	    $del_type = $delivery_type;
+	  } else {
+	    $del_value = $delivery_type['value'];
+	    $del_type = $delivery_type['label'];
+	  }
+	}
+
+	// Get delivery day requirement, cut-off-time for orders and the closed dates.
 	$vendorDeliverDayReq = get_vendor_delivery_days_required($vendor_id);
 	$vendorDropOffTime = get_vendor_dropoff_time($vendor_id);
 	$closed_dates_arr = explode(",",get_vendor_closed_dates($vendor_id));
 
 
-	woocommerce_form_field( 'delivery_date', array(
-		'type'          => 'text',
-		'class'         => array('form-row-wide'),
-		'id'            => 'datepicker',
-		'required'      => false,
-		'label'         => __('Hvornår skal gaven leveres?'),
-		'placeholder'   => __('Hurtigst muligt')
-	), WC()->checkout->get_value( 'delivery_date' ) );
+	if($del_value == '0'){
+		echo '<h3 class="pt-4">Leveringsdato</h3>';
+		echo '<p>';
+		echo 'Da du bestiller fra en butik, der sender varerne med fragtfirma, kan du ikke vælge en leveringsdato. ';
+		echo 'Varen sendes hurtigst muligt - og hvis gaven først må åbnes på en bestemt dag, så kan du notere det oven for i leveringsintruktionerne';
+		echo '</p>';
+	} else {
+		echo '<h3 class="pt-4">Leveringsdato</h3>';
+
+		woocommerce_form_field( 'delivery_date', array(
+			'type'          => 'text',
+			'class'         => array('form-row-wide'),
+			'id'            => 'datepicker',
+			'required'      => false,
+			'label'         => __('Hvornår skal gaven leveres?'),
+			'placeholder'   => __('Hurtigst muligt')
+		), WC()->checkout->get_value( 'delivery_date' ) );
 
 
-	echo '<div id="show-if-shipping">';
-	echo '<span>Butikken kan levere om ';
-	echo $vendorDeliverDayReq. ' leveringsdage, hvis du ';
-	echo 'bestiller inden kl. ';
-	echo $vendorDropOffTime;
-	echo ':00</span>';
+		echo '<div id="show-if-shipping">';
+		echo '<span>Butikken kan levere om ';
+		echo $vendorDeliverDayReq. ' leveringsdag(e), hvis du ';
+		echo 'bestiller inden kl. ';
+		echo $vendorDropOffTime;
+		echo ':00</span>';
 
+		#$closed_days_date_iteration = count($closed_dates_arr);
+		#$cdi = 0;
+		#if(!empty($closed_dates_arr)){
+		#	echo '<p>Butikken holder lukket på flg. datoer: ';
+		#	foreach($closed_dates_arr as $closed_date){
+		#		if(++$cdi == $closed_days_date_iteration){
+		#			echo $closed_date;
+		#		} else {
+		#			echo $closed_date.", ";
+		#		}
+		#	}
+		#	echo '</p>';
+		#	// open close days end
+		#}
 
-	$closed_days_date_iteration = count($closed_dates_arr);
-	$cdi = 0;
-	foreach($closed_dates_arr as $closed_date){
-		if(++$cdi == $closed_days_date_iteration){
-			echo $closed_date;
-		} else {
-			echo $closed_date.", ";
-		}
+		echo '</div>';
 	}
-	// open close days end
 
-	echo '</div>';?>
+
+	?>
 
 	<input type="hidden" id="vendorDeliverDay" value="<?php echo $vendorDeliverDayReq;?>"/>
 	<input type="hidden" id="vendorDropOffTimeId" value="<?php echo $vendorDropOffTime;?>"/>

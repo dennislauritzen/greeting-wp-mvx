@@ -13,11 +13,8 @@ $cityName = get_post_meta($postId, 'city', true);
 
 $checkout_postalcode = WC()->customer->get_shipping_postcode();
 if($cityPostalcode != $checkout_postalcode){
-<<<<<<< Updated upstream
   //print 'postnumre afviger';
-=======
-  #print 'postnumre afviger';
->>>>>>> Stashed changes
+
   #var_dump($woocommerce);
   $woocommerce->cart->empty_cart();
 }
@@ -633,3 +630,234 @@ jQuery(document).ready(function(){
 
 <script src="//code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
 <link rel="stylesheet" type="text/css" href="//code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css">
+
+<script type="text/javascript">
+  // Set the slider.
+  var slider = new Slider('#sliderPrice', {
+    'tooltip_split': true
+  });
+  slider.on("slideStop", function(sliderValue){
+    var val = slider.getValue();
+    var min_val = val[0];
+    var max_val = val[1];
+    document.getElementById("slideStartPoint").value = min_val;
+    document.getElementById("slideEndPoint").value = max_val;
+  });
+</script>
+<script type="text/javascript">
+  // Start the jQuery
+  jQuery(document).ready(function($) {
+    var ajaxurl = "<?php echo admin_url('admin-ajax.php');?>";
+    var catOccaDeliveryIdArray = [];
+    var inputPriceRangeArray = [];
+    var deliveryIdArray = [];
+    var priceSliderMin = jQuery("#sliderPrice").data("slider-min");
+    var priceSliderMax = jQuery("#sliderPrice").data("slider-max");
+    // $('#cityPageReset').hide();
+
+    var url_string = window.location.href; //window.location.href
+    var url = new URL(url_string);
+
+    var del_url_val = url.searchParams.get("d");
+    var cat_url_val = url.searchParams.get("c");
+    var price_url_val = url.searchParams.get("price");
+
+    if(del_url_val){
+      deliveryIdArray = del_url_val.split(",");
+
+      jQuery.each( deliveryIdArray, function(i,v){
+        if(	$("input#filter_delivery_"+v).length){
+          $("input#filter_delivery_"+v).prop('checked',true);
+        }
+      });
+    }
+    if(cat_url_val){
+      catOccaDeliveryIdArray = cat_url_val.split(",");
+
+      jQuery.each( catOccaDeliveryIdArray, function(i,v){
+        if(	$("input#filter_cat"+v).length){
+          $("input#filter_cat"+v).prop('checked',true);
+        } else if($("input#filter_occ_"+v).length) {
+          $("input#filter_occ_"+v).prop('checked',true);
+        }
+      });
+    }
+    if(price_url_val){
+      inputPriceRangeArray = price_url_val.split(",");
+
+      var priceRangeMinVal = 0;
+      var priceRangeMaxVal = priceSliderMax;
+      if(inputPriceRangeArray[0] >= priceSliderMin &&  !isNaN(parseFloat(inputPriceRangeArray[0])) && isFinite(inputPriceRangeArray[0])){
+        priceRangeMinVal = inputPriceRangeArray[0];
+      }
+      if(inputPriceRangeArray[1] <= priceSliderMax &&  !isNaN(parseFloat(inputPriceRangeArray[1])) && isFinite(inputPriceRangeArray[1])){
+        priceRangeMaxVal = inputPriceRangeArray[1];
+      }
+
+      jQuery("#sliderPrice").data('data-slider-value','['+priceRangeMinVal+','+priceRangeMaxVal+']');
+      document.getElementById("slideStartPoint").value = priceRangeMinVal;
+      document.getElementById("slideEndPoint").value =  priceRangeMaxVal;
+    }
+
+    if(deliveryIdArray.length > 0 && catOccaDeliveryIdArray.length > 0 && inputPriceRangeArray.length > 0){
+      update();
+    }
+
+    jQuery(".filter-on-city-page").click(function(){
+      update();
+
+      if(this.checked){
+        setFilterBadgeCity(
+          $('label[for='+this.id+']').text(),
+          this.value,
+          'filter_cat'+this.value
+        );
+      } else {
+        removeFilterBadgeCity(
+          $('label[for='+this.id+']').text(),
+          this.value,
+          'filter_cat'+this.value,
+          false
+        );
+      }
+    });
+    slider.on("slideStop", function(sliderValue){
+      update();
+    });
+
+    function update(){
+      var cityName = $('#cityName').val();
+      var postalCode = $('#postalCode').val();
+      catOccaIdArray = [];
+      deliveryIdArray = [];
+      inputPriceRangeArray = [];
+
+      $("input:checkbox[name=filter_catocca_city]:checked").each(function(){
+        catOccaIdArray.push($(this).val());
+      });
+      $("input:checkbox[name=filter_del_city]:checked").each(function(){
+        deliveryIdArray.push($(this).val());
+      });
+
+      var sliderValMin = jQuery("#sliderPrice").data("slider-min");
+      var sliderValMax = jQuery("#sliderPrice").data("slider-max");
+      inputPriceRangeArray = [
+        document.getElementById("slideStartPoint").value,
+        document.getElementById("slideEndPoint").value
+      ];
+      var priceChange = 0;
+      if(sliderValMin < document.getElementById("slideStartPoint").value || sliderValMax > document.getElementById("slideEndPoint").value){
+        priceChange = 1;
+      }
+
+      var data = {
+        'action': 'catOccaDeliveryAction',
+        cityDefaultUserIdAsString: jQuery("#cityDefaultUserIdAsString").val(),
+        catOccaIdArray: catOccaIdArray,
+        deliveryIdArray: deliveryIdArray,
+        inputPriceRangeArray: inputPriceRangeArray,
+        cityName: cityName,
+        postalCode: postalCode
+      };
+      jQuery.post(ajaxurl, data, function(response) {
+        jQuery('#defaultStore').hide();
+        jQuery('.filteredStore').show();
+        jQuery('.filteredStore').html(response);
+
+        if(catOccaIdArray.length == 0 && deliveryIdArray.length == 0 && priceChange == 1){
+          jQuery('#defaultStore').show();
+          jQuery('.filteredStore').hide();
+          jQuery('#noVendorFound').hide();
+        } else if(catOccaIdArray.length == 0 && deliveryIdArray.length == 0 && priceChange == 0){
+          jQuery('#defaultStore').show();
+          jQuery('.filteredStore').hide();
+          jQuery('#noVendorFound').hide();
+        }
+
+        var state = { 'd': deliveryIdArray, 'c': catOccaIdArray, 'p': inputPriceRangeArray }
+        var url = '';
+        if(deliveryIdArray.length > 0){
+          if(url){ 	url += '&'; }
+          url += 'd='+deliveryIdArray;
+        }
+        if(catOccaIdArray.length > 0){
+          if(url){ 	url += '&'; }
+          url += 'c='+catOccaIdArray;
+        }
+
+        if(inputPriceRangeArray.length > 0 && (inputPriceRangeArray[0] > sliderValMin || inputPriceRangeArray[1] < sliderValMax)){
+          if(url){ 	url += '&'; }
+          url += 'price='+inputPriceRangeArray;
+        }
+        if(url.length > 0){
+          url = '?'+url;
+        }
+
+        if(url){
+          history.pushState(state, '', url);
+        } else {
+          window.history.replaceState({}, '', location.pathname);
+        }
+      });
+    }
+
+    // Filter badges on the vendor page.
+    function setFilterBadgeCity(label, id, dataRemove){
+      var elm = document.createElement('div');
+      elm.id = 'filter'+dataRemove;
+      elm.classList.add('badge', 'rounded-pill', 'border-yellow', 'py-2', 'px-2', 'me-1', 'my-1', 'my-lg-0', 'my-xl-0', 'text-dark', 'dynamic-filters');
+      elm.href = '#';
+      elm.innerHTML = label;
+
+      elmbtn = document.createElement('button');
+      elmbtn.type = 'button';
+      elmbtn.classList.add('btn-close', 'filter-btn-delete');
+      elmbtn.dataset.filterId = id;
+      elmbtn.dataset.label = label.replace(/ /g,'');
+      elmbtn.onclick = function(){removeFilterBadgeCity('"'+label.replace(/ /g,'')+'"', id, dataRemove, true);};
+      elmbtn.dataset.filterRemove = dataRemove;
+      elm.appendChild(elmbtn);
+
+      jQuery('div.filter-list').prepend(elm);
+    }
+    function removeFilterBadgeCity(label, id, dataRemove, updateVendors){
+      if(updateVendors === true){
+        var elmId = dataRemove;
+        console.log(elmId+' '+dataRemove);
+        document.getElementById(elmId).checked = false;
+        update();
+      }
+      jQuery('#filter'+dataRemove).remove();
+    }
+
+    // reset filter
+    $('#cityPageReset').click(function(){
+      $("input:checkbox[name=filter_catocca_city], input:checkbox[name=filter_del_city]").removeAttr("checked");
+      var val_max = $("input#sliderPrice").data('slider-max');
+
+      slider.setValue([0,val_max]);
+      $("input#sliderPrice").data('slider-value', '[0,'+val_max+']');
+      $("input#sliderPrice").data('slider-max', val_max);
+
+      $("input#slideEndPoint").val(val_max);
+      $("input#slideStartPoint").val(0);
+
+      catOccaDeliveryIdArray.length = 0;
+
+      $('div.filter-list div.dynamic-filters').remove();
+
+      jQuery('#defaultStore').show();
+      jQuery('.filteredStore').hide();
+    });
+  });
+
+  // Add remove loading class on body element based on Ajax request status
+  jQuery(document).on({
+    ajaxStart: function(){
+      jQuery("div").addClass("loading");
+    },
+    ajaxStop: function(){
+      jQuery("div").removeClass("loading");
+    }
+  });
+</script>
