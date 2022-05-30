@@ -802,20 +802,20 @@ function data_fetch(){
 	$landing_page_query = $wpdb->get_results($prepared_statement, OBJECT);
 
 	if (!empty($landing_page_query)) {?>
-			<?php
-			$array_count = count($landing_page_query);
-			$i = 0;
+        <?php
+        $array_count = count($landing_page_query);
+        $i = 0;
 
-			foreach ($landing_page_query as $key => $landing_page) {
-				?>
-				<li class="recomms list-group-item py-2 px-4 <?php echo ($key==0) ? 'active' : '';?>" aria-current="true">
-					<a href="<?php print get_permalink( $landing_page->ID ) ;?>" class="recomms-link text-teal stretched-link"><?php echo ucfirst($landing_page->post_title);?></a>
-				</li>
-			<?php } ?>
+        foreach ($landing_page_query as $key => $landing_page) {
+            ?>
+            <li class="recomms list-group-item py-2 px-4 <?php echo ($key==0) ? 'active' : '';?>" aria-current="true">
+                <a href="<?php print get_permalink( $landing_page->ID ) ;?>" class="recomms-link text-teal stretched-link"><?php echo ucfirst($landing_page->post_title);?></a>
+            </li>
+        <?php } ?>
 	<?php
 	// If there is no match for the city, then do this...
 	} else {?>
-		<li class="list-group-item py-2 px-4 <?php echo ($key==0) ? 'active' : '';?>" aria-current="true">
+		<li class="list-group-item py-2 px-4" aria-current="true">
 			Der blev desværre ikke fundet nogle byer, der matcher søgekriterierne
 		</li>
 	<?php }
@@ -1163,7 +1163,7 @@ function landpageAction() {
 	$userIdArrayGetFromDelivery = array();
 
 	foreach($occaDeliveryIdArray as $occaDeliveryId){
-
+        # @todo make sure there is no chance of injection.
 		if(is_numeric($occaDeliveryId)){
 			$productData = $wpdb->get_results(
 				"
@@ -1612,6 +1612,7 @@ function getLastOrderId(){
     $statuses = array_keys(wc_get_order_statuses());
     $statuses = implode( "','", $statuses );
 
+    // @todo make sure no chanc of injection
     // Getting last Order ID (max value)
     $results = $wpdb->get_col( "
         SELECT MAX(ID) FROM {$wpdb->prefix}posts
@@ -1748,20 +1749,20 @@ function call_order_status_completed( $array ) {
                   .$billingEmail.'
               </address>
           </div>
-					<p style="color: purple; font-size: 20px;">Leveringsadresse</p>
-					<div style="border: 1px solid #ddd; padding: 15px;">
-							<address>'
-									.$shippingFirstName.' '.$shippingLastName.'<br>'
-									.$shippingCompany.'<br>'
-									.$shippingAddress1.'<br>'
-									.$shippingAddress2.'<br>'
-									.$shippingState.'<br>'
-									.$shippingCity.'<br>'
-									.$shippingCountry.'<br>'
-									.$shippingPhone.'<br>'
-									.$shippingEmail.'
-							</address>
-					</div>
+        <p style="color: purple; font-size: 20px;">Leveringsadresse</p>
+        <div style="border: 1px solid #ddd; padding: 15px;">
+            <address>'
+                .$shippingFirstName.' '.$shippingLastName.'<br>'
+                .$shippingCompany.'<br>'
+                .$shippingAddress1.'<br>'
+                .$shippingAddress2.'<br>'
+                .$shippingState.'<br>'
+                .$shippingCity.'<br>'
+                .$shippingCountry.'<br>'
+                .$shippingPhone.'<br>'
+                .$shippingEmail.'
+            </address>
+        </div>
       </div>;
   </div>';
 
@@ -2010,27 +2011,34 @@ function greeting_delivery_date_display_admin_order_meta( $order ) {
 	 $str .= '<p><strong>Leveringsinstruktioner:</strong> ' . get_post_meta( $order->get_id(), '_delivery_instructions', true ) . '</p>';
 
 	 $leave_gift_at_address = (get_post_meta( $order->get_id(), '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej');
-	 $str .= '<p><strong>Leveringsinstruktioner:</strong> ' . $leave_gift_at_address . '</p>';
+	 $str .= '<p><strong>Må gaven stilles på adressen:</strong> ' . $leave_gift_at_address . '</p>';
 	 $leave_gift_at_neighbour = (get_post_meta( $order->get_id(), '_leave_gift_neighbour', true ) == "1" ? 'Ja' : 'Nej');
-	 $str .= '<p><strong>Leveringsinstruktioner:</strong> ' . $leave_gift_at_neighbour . '</p>';
+	 $str .= '<p><strong>Må gaven afleveres hos naboen:</strong> ' . $leave_gift_at_neighbour . '</p>';
 
 	 echo $str;
 }
 
 // show order date in thank you page
+// @todo - $order is not defined. Therefore we should not try to access object, just use function variable.
 add_action( 'woocommerce_thankyou', 'greeting_view_order_and_thankyou_page', 20 );
 function greeting_view_order_and_thankyou_page( $order_id ){
-	$str = '<p><strong>Leveringsdato:</strong> ';
-	if ( $_POST['delivery_date'] ) { $str .= get_post_meta( $order->get_id(), '_delivery_date', true ); } else { $str .= 'Hurtigst muligt'; }
-	$str .= '</p>';
-	$str .= '<p><strong>Modtagers telefonnr.:</strong> ' . get_post_meta( $order->get_id(), '_receiver_phone', true ) . '</p>';
-	$str .= '<p><strong>Besked til modtager:</strong> ' . get_post_meta( $order->get_id(), '_greeting_message', true ) . '</p>';
-	$str .= '<p><strong>Leveringsinstruktioner:</strong> ' . get_post_meta( $order->get_id(), '_delivery_instructions', true ) . '</p>';
+    # global $order;
 
-	$leave_gift_at_address = (get_post_meta( $order->get_id(), '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej');
-	$str .= '<p><strong>Leveringsinstruktioner:</strong> ' . $leave_gift_at_address . '</p>';
-	$leave_gift_at_neighbour = (get_post_meta( $order->get_id(), '_leave_gift_neighbour', true ) == "1" ? 'Ja' : 'Nej');
-	$str .= '<p><strong>Leveringsinstruktioner:</strong> ' . $leave_gift_at_neighbour . '</p>';
+    if( empty($order_id) || !is_numeric($order_id)){
+        $order_id = $order->get_id();
+    }
+
+	$str = '<p><strong>Leveringsdato:</strong> ';
+	if ( $_POST['delivery_date'] ) { $str .= get_post_meta( $order_id, '_delivery_date', true ); } else { $str .= 'Hurtigst muligt'; }
+	$str .= '</p>';
+	$str .= '<p><strong>Modtagers telefonnr.:</strong> ' . get_post_meta( $order_id, '_receiver_phone', true ) . '</p>';
+	$str .= '<p><strong>Besked til modtager:</strong> ' . get_post_meta( $order_id, '_greeting_message', true ) . '</p>';
+	$str .= '<p><strong>Leveringsinstruktioner:</strong> ' . get_post_meta( $order_id, '_delivery_instructions', true ) . '</p>';
+
+	$leave_gift_at_address = (get_post_meta( $order_id, '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej');
+	$str .= '<p><strong>Må gaven stilles på adressen:</strong> ' . $leave_gift_at_address . '</p>';
+	$leave_gift_at_neighbour = (get_post_meta( $order_id, '_leave_gift_neighbour', true ) == "1" ? 'Ja' : 'Nej');
+	$str .= '<p><strong>Må gaven afleveres hos naboen:</strong> ' . $leave_gift_at_neighbour . '</p>';
 
 	echo $str;
 }
@@ -2090,9 +2098,10 @@ function custom_display_order_data_in_admin(){
 add_filter( 'woocommerce_email_order_meta_fields', 'custom_woocommerce_email_order_meta_fields', 10, 3 );
 
 function custom_woocommerce_email_order_meta_fields( $fields, $sent_to_admin, $order ) {
+    $delivery_date = (empty(get_post_meta( $order->get_id(), '_delivery_date', true ))?: 'Hurtigst muligt');
     $fields['delivery_date'] = array(
         'label' => __( 'Leveringsdato' ),
-        'value' => get_post_meta( $order->id, '_delivery_date', true ),
+        'value' => $delivery_date,
     );
 		$fields['billing_phone'] = array(
         'label' => __( 'Afsenders telefonnr.' ),
@@ -2100,14 +2109,14 @@ function custom_woocommerce_email_order_meta_fields( $fields, $sent_to_admin, $o
     );
 
 
-		$fields['greeting_message'] = array(
+    $fields['greeting_message'] = array(
         'label' => __( 'Besked til modtager' ),
         'value' => get_post_meta( $order->id, '_greeting_message', true ),
     );
 
 
-		$leave_gift_at_address = (get_post_meta( $order->get_id(), '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej');
-		$fields['leave_gift_address'] = array(
+    $leave_gift_at_address = (get_post_meta( $order->get_id(), '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej');
+    $fields['leave_gift_address'] = array(
         'label' => __( 'Leveringsinstruktioner' ),
         'value' => $leave_gift_at_address
     );
@@ -2478,6 +2487,7 @@ function display_price_in_variation_option_name( $term ) {
     if ( empty( $term ) ) {
         return $term;
     }
+    // @todo - Check if this shouldn't be get_id() function instead of trying to access object directly.
     if ( empty( $product->id ) ) {
         return $term;
     }
@@ -3132,7 +3142,7 @@ function get_client_ip() {
  */
 function call_ip_apis($ip){
   $urls = array(
-		0 => 'http://ip-api.com/json/'.$ip,
+    0 => 'http://ip-api.com/json/'.$ip,
     1 => 'http://ipinfo.io/'.$ip.'/json' // return HTTP=429 if usage limit reached
   );
 
@@ -3142,7 +3152,7 @@ function call_ip_apis($ip){
   curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
   $jsonData = json_decode(curl_exec($curl));
   if(curl_getinfo($curl, CURLINFO_RESPONSE_CODE) != '200'){
-    curl_setopt($curlSession, CURLOPT_URL, $urls[1]);
+    curl_setopt($curl, CURLOPT_URL, $urls[1]);
   }
   #curl_setopt($curl, CURLOPT_GET, true);
 

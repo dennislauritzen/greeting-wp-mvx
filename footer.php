@@ -37,23 +37,23 @@
 		      <div class="col-6 col-xs-6 col-sm-6 col-md-6 col-lg-3 col-xl-3">
 		        <h6 class="pb-3 text-uppercase">Udvalgte postnumre i Jylland</h6>
 		        <ul class="list-unstyled mb-0">
-							<li class="pb-1"><a href="<?php echo site_url(); ?>/c/6000-kolding/" class="text-white">6000 Kolding</a></li>
-							<li class="pb-1"><a href="<?php echo site_url(); ?>/c/6100-haderslev/" class="text-white">6100 Haderslev</a></li>
-							<li class="pb-1"><a href="<?php echo site_url(); ?>/c/6700-esbjerg/" class="text-white">6700 Esbjerg</a></li>
-							<li class="pb-1"><a href="<?php echo site_url(); ?>/c/6710-esbjerg-v/" class="text-white">6710 Esbjerg V</a></li>
-		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/7000-fredericia/" class="text-white">7000 Fredericia</a></li>
-		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/7100-vejle/" class="text-white">7100 Vejle</a></li>
-		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/7400-herning/" class="text-white">7400 Herning</a></li>
-		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/7500-holstebro/" class="text-white">7500 Holstebro</a></li>
-		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/8000-aarhus-c/" class="text-white">8000 Aarhus C</a></li>
-		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/8200-aarhus-n/" class="text-white">8200 Aarhus N</a></li>
-		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/8240-risskov/" class="text-white">8240 Risskov</a></li>
-		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/8600-silkeborg/" class="text-white">8600 Silkeborg</a></li>
-		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/8800-viborg/" class="text-white">8800 Viborg</a></li>
-		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/8900-randers-c/" class="text-white">8900 Randers C</a></li>
-		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/8920-randers-nv/" class="text-white">8920 Randers NV</a></li>
-		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/9000-aalborg-c/" class="text-white">9000 Aalborg C</a></li>
-		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/9800-hjoerring/" class="text-white">9800 Hjørring</a></li>
+                    <li class="pb-1"><a href="<?php echo site_url(); ?>/c/6000-kolding/" class="text-white">6000 Kolding</a></li>
+                    <li class="pb-1"><a href="<?php echo site_url(); ?>/c/6100-haderslev/" class="text-white">6100 Haderslev</a></li>
+                    <li class="pb-1"><a href="<?php echo site_url(); ?>/c/6700-esbjerg/" class="text-white">6700 Esbjerg</a></li>
+                    <li class="pb-1"><a href="<?php echo site_url(); ?>/c/6710-esbjerg-v/" class="text-white">6710 Esbjerg V</a></li>
+                    <li class="pb-1"><a href="<?php echo site_url(); ?>/c/7000-fredericia/" class="text-white">7000 Fredericia</a></li>
+                    <li class="pb-1"><a href="<?php echo site_url(); ?>/c/7100-vejle/" class="text-white">7100 Vejle</a></li>
+                    <li class="pb-1"><a href="<?php echo site_url(); ?>/c/7400-herning/" class="text-white">7400 Herning</a></li>
+                    <li class="pb-1"><a href="<?php echo site_url(); ?>/c/7500-holstebro/" class="text-white">7500 Holstebro</a></li>
+                    <li class="pb-1"><a href="<?php echo site_url(); ?>/c/8000-aarhus-c/" class="text-white">8000 Aarhus C</a></li>
+                    <li class="pb-1"><a href="<?php echo site_url(); ?>/c/8200-aarhus-n/" class="text-white">8200 Aarhus N</a></li>
+                    <li class="pb-1"><a href="<?php echo site_url(); ?>/c/8240-risskov/" class="text-white">8240 Risskov</a></li>
+                    <li class="pb-1"><a href="<?php echo site_url(); ?>/c/8600-silkeborg/" class="text-white">8600 Silkeborg</a></li>
+                    <li class="pb-1"><a href="<?php echo site_url(); ?>/c/8800-viborg/" class="text-white">8800 Viborg</a></li>
+                    <li class="pb-1"><a href="<?php echo site_url(); ?>/c/8900-randers-c/" class="text-white">8900 Randers C</a></li>
+                    <li class="pb-1"><a href="<?php echo site_url(); ?>/c/8920-randers-nv/" class="text-white">8920 Randers NV</a></li>
+                    <li class="pb-1"><a href="<?php echo site_url(); ?>/c/9000-aalborg-c/" class="text-white">9000 Aalborg C</a></li>
+                    <li class="pb-1"><a href="<?php echo site_url(); ?>/c/9800-hjoerring/" class="text-white">9800 Hjørring</a></li>
 		        </ul>
 		      </div>
 		      <div class="col-6 col-xs-6 col-sm-6 col-md-6 col-lg-3 col-xl-3">
@@ -63,9 +63,11 @@
 		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/2200-koebenhavn-n/" class="text-white">2200 København N</a></li>
 		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/2300-koebenhavn-s/" class="text-white">2300 København S</a></li>
 		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/2400-koebenhavn-nv/" class="text-white">2400 København NV</a></li>
-							<li class="pb-1"><a href="<?php echo site_url(); ?>/c/2700-broenshoej/" class="text-white">2700 Brønshøj</a></li>
-							<li class="pb-1"><a href="<?php echo site_url(); ?>/c/3400-hilleroed" class="text-white">3400 Hillerød</a></li>
-							<li class="pb-1"><a href="<?php echo site_url(); ?>/c/3500-vaerloese" class="text-white">3500 Værløse</a></li>
+
+                    <li class="pb-1"><a href="<?php echo site_url(); ?>/c/2700-broenshoej/" class="text-white">2700 Brønshøj</a></li>
+                    <li class="pb-1"><a href="<?php echo site_url(); ?>/c/2800-kongens-lyngby/" class="text-white">2800 Kgs. Lyngby</a></li>
+                    <li class="pb-1"><a href="<?php echo site_url(); ?>/c/3400-hilleroed" class="text-white">3400 Hillerød</a></li>
+                    <li class="pb-1"><a href="<?php echo site_url(); ?>/c/3500-vaerloese" class="text-white">3500 Værløse</a></li>
 		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/4000-roskilde" class="text-white">4000 Roskilde</a></li>
 		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/4600-koege" class="text-white">4600 Køge</a></li>
 		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/4700-naestved" class="text-white">4700 Næstved</a></li>
@@ -112,7 +114,7 @@
 							<ul class="social m-0 p-0 mt-2">
 								<li class="me-2">
 									<a href="https://www.facebook.com/greeting.dk" class="text-white">
-										<svg xmlns="http://www.w3.org/2000/svg" width="40" class="float-end" height="40" fill="currentColor" class="bi bi-facebook" viewBox="0 0 18 18">
+										<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="float-end bi bi-facebook" viewBox="0 0 18 18">
 											<path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951z"/>
 										</svg>
 									</a>
