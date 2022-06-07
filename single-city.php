@@ -37,38 +37,40 @@ get_header('green', array('city' => $cityName, 'postalcode' => $cityPostalcode))
 <?php
 
 // get user meta query
-#$args = array(
-#  'role' => 'dc_vendor',
-#  'meta_query' => array(
-#      'key' => 'delivery_zips',
-#      'value' => $cityPostalcode,
-#      'compare' => 'CONTAINS'
-#    )
-#);
-#$vendors = new WP_User_Query( $args	);
-#$vendor_arr = $vendors->get_results();
-
-$query = $wpdb->prepare("
-  SELECT
-    u.id
-  FROM
-    wp_users u
-  RIGHT JOIN
-    wp_usermeta um ON um.user_id = u.ID
-  RIGHT JOIN
-    wp_usermeta um2 ON um2.user_id = u.ID
-  WHERE
-	(um.meta_key = 'wp_capabilities' AND um.meta_value LIKE %s)
-    AND
-	(um2.meta_key = 'delivery_zips' AND um2.meta_value LIKE %s)
-  AND
-    NOT EXISTS (SELECT NULL FROM wp_usermeta um3 WHERE um3.meta_key = '_vendor_turn_off' AND um3.user_id = u.id)", '%dc_vendor%', '%'.$cityPostalcode.'%');
-$results = $wpdb->get_results($query);
+$args = array(
+  'role' => 'dc_vendor',
+  'orderby' => 'meta_value',
+  'meta_key' => 'delivery_type',
+  'order' => 'DESC',
+  'meta_query' => array(
+      'relation' => 'AND',
+      array(
+        'relation' => 'OR',
+        array(
+            'key'     => 'vendor_turn_off',
+            'value'   => 0,
+            'compare' => '='
+        ),
+        array(
+            'key'     => 'vendor_turn_off',
+            'compare' => 'NOT EXISTS',
+        ),
+      ),
+      array(
+        'key' => 'delivery_zips',
+        'value' => $cityPostalcode,
+        'compare' => 'LIKE'
+      )
+    )
+);
+$vendors = new WP_User_Query( $args	);
+$vendor_arr = $vendors->get_results();
 
 $UserIdArrayForCityPostalcode = array();
-foreach($results as $v){
-  $UserIdArrayForCityPostalcode[] = $v->id;
+foreach($vendor_arr as $v){
+  $UserIdArrayForCityPostalcode[] = $v->data->ID;
 }
+
 
 // pass to backend
 $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>

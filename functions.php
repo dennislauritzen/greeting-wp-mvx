@@ -2008,8 +2008,9 @@ function greeting_delivery_date_display_admin_order_meta( $order ) {
 	 $str .= '</p>';
 	 $str .= '<p><strong>Modtagers telefonnr.:</strong> ' . get_post_meta( $order->get_id(), '_receiver_phone', true ) . '</p>';
 	 $str .= '<p><strong>Besked til modtager:</strong> ' . get_post_meta( $order->get_id(), '_greeting_message', true ) . '</p>';
-	 $str .= '<p><strong>Leveringsinstruktioner:</strong> ' . get_post_meta( $order->get_id(), '_delivery_instructions', true ) . '</p>';
 
+
+	 $str .= '<p><strong>Leveringsinstruktioner:</strong> ' . get_post_meta( $order->get_id(), '_delivery_instructions', true ) . '</p>';
 	 $leave_gift_at_address = (get_post_meta( $order->get_id(), '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej');
 	 $str .= '<p><strong>Må gaven stilles på adressen:</strong> ' . $leave_gift_at_address . '</p>';
 	 $leave_gift_at_neighbour = (get_post_meta( $order->get_id(), '_leave_gift_neighbour', true ) == "1" ? 'Ja' : 'Nej');
@@ -2022,7 +2023,7 @@ function greeting_delivery_date_display_admin_order_meta( $order ) {
 // @todo - $order is not defined. Therefore we should not try to access object, just use function variable.
 add_action( 'woocommerce_thankyou', 'greeting_view_order_and_thankyou_page', 20 );
 function greeting_view_order_and_thankyou_page( $order_id ){
-    # global $order;
+    global $order;
 
     if( empty($order_id) || !is_numeric($order_id)){
         $order_id = $order->get_id();
@@ -2083,9 +2084,9 @@ function custom_display_order_data_in_admin(){
 		$str .= '<div style="margin:15px 0px 0px 15px;"><strong>Leveringsinstruktioner:</strong> {{data.delivery_instructions_key}}</div>';
 
 
-		$str .= '<div style="margin:15px 0px 0px 15px;"><strong>Leveringsinstruktioner:</strong> {{data.delivery_instructions_key}}</div>';
+		$str .= '<div style="margin:15px 0px 0px 15px;"><strong>Gaven må efterlades på adressen:</strong> {{data.leave_gift_address_key}}</div>';
 
-		$str .= '<div style="margin:15px 0px 0px 15px;"><strong>Leveringsinstruktioner:</strong> {{data.delivery_instructions_key}}</div>';
+		$str .= '<div style="margin:15px 0px 0px 15px;"><strong>Gaven må afleveres til naboen:</strong> {{data.leave_gift_neighbour_key}}</div>';
 }
 
 
@@ -2117,12 +2118,12 @@ function custom_woocommerce_email_order_meta_fields( $fields, $sent_to_admin, $o
 
     $leave_gift_at_address = (get_post_meta( $order->get_id(), '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej');
     $fields['leave_gift_address'] = array(
-        'label' => __( 'Leveringsinstruktioner' ),
+        'label' => __( 'Efterlad gaven på adressen' ),
         'value' => $leave_gift_at_address
     );
 		$leave_gift_at_neighbour = (get_post_meta( $order->get_id(), '_leave_gift_neighbour', true ) == "1" ? 'Ja' : 'Nej');
 		$fields['leave_gift_neighbour'] = array(
-        'label' => __( 'Leveringsinstruktioner' ),
+        'label' => __( 'Gaven må afleveres til naboen' ),
         'value' => $leave_gift_at_neighbour
     );
 		$fields['delivery_instructions'] = array(
@@ -2484,11 +2485,13 @@ add_filter( 'woocommerce_variation_option_name','display_price_in_variation_opti
 function display_price_in_variation_option_name( $term ) {
     global $product;
 
-    if ( empty( $term ) ) {
+    if ( empty($term) ) {
         return $term;
     }
     // @todo - Check if this shouldn't be get_id() function instead of trying to access object directly.
-    if ( empty( $product->id ) ) {
+    $product_id = (!empty($product->get_id())) ? $product->get_id() : $product->id;
+
+    if ( empty( $product_id ) ) {
         return $term;
     }
 
@@ -2499,7 +2502,6 @@ function display_price_in_variation_option_name( $term ) {
         $variation_data = $_product->get_variation_attributes();
 
         foreach ( $variation_data as $key => $data ) {
-
             if ( $data == $term ) {
 							$html = ( $_product->get_stock_quantity() ) ? ' - ' . $_product->get_stock_quantity() : '';
 							$html .= $term . ' - ';
@@ -3271,4 +3273,63 @@ function styling_admin_order_list() {
         }
     </style>
     <?php
+}
+
+
+
+/**
+ * Function for customizing subject of Order Completed mail
+ *
+ * @since 1.0.1
+ * @author Dennis Lauritzen
+ *
+ */
+add_filter( 'woocommerce_email_subject_customer_completed_order', 'custom_email_subject_completed', 20, 2 );
+function custom_email_subject_completed( $formated_subject, $order ){
+    $data = $order->get_data();
+
+    # $inv_name = $data['billing']['first_name'];
+    $delivery_name = $data['shipping']['first_name'];
+    $shop_id = get_field('greeting_marketplace_order_shop_id', $data['id']);
+    $delivery_type = get_field('delivery_type','user'.$shop_id);
+    # $greeting_store_name = get_field('company_name', 'options');
+
+    # 0 = delivery with post, 1 = personal delivery
+    $del_value = '';
+    $del_type = '';
+    if(empty($delivery_type['label'])){
+        $del_value = $delivery_type;
+        $del_type = $delivery_type;
+    } else {
+        $del_value = $delivery_type['value'];
+        $del_type = $delivery_type['label'];
+    }
+
+    if($del_value == "1")
+    {
+        // Personal delivery
+        return __( 'Din gave til '.$delivery_name.' er nu leveret 🎁', 'woocommerce' );
+    } else {
+        // Delivery by courier
+        return __( 'Din gave til '.$delivery_name.' 🎁', 'woocommerce' );
+    }
+}
+
+/**
+ * Minimum order value required for shopping
+ * @since 1.0.3
+ * @author Dennis Lauritzen
+ *
+ * @todo Make sure this is based on settings for the store.
+ * @todo Make sure there is put a warning if the cart doesn't meet requirements.
+ */
+# add_action('wp', 'greeting_marketplace_min_order_value');
+function greeting_marketplace_min_order_value(){
+    $min_order_value = get_option('greeting_marketplace_min_order_value');
+    if($min_order_value){
+        if(WC()->cart->subtotal < $min_order_value){
+            remove_action('woocommerce_proceed_to_checkout', 'woocommerce_button_proceed_to_checkout', 20);
+            remove_action('woocommerce_checkout_order_review', 'woocommerce_checkout_payment', 20);
+        }
+    }
 }
