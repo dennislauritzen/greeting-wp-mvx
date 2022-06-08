@@ -1625,7 +1625,7 @@ function getLastOrderId(){
 // Action based on last order
 use Dompdf\Dompdf; // reference the Dompdf namespace
 // add the action
-add_action( 'woocommerce_thankyou', 'call_order_status_completed', 10, 1);
+# add_action( 'woocommerce_thankyou', 'call_order_status_completed', 10, 1);
 // define woocommerce_order_status_completed callback function
 function call_order_status_completed( $array ) {
 
@@ -1673,10 +1673,8 @@ function call_order_status_completed( $array ) {
 	$qrcode = 'https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl='.$codeContents;
 	// qr code end
 
-    // $orderedStoreName = '';
-	//$orderedStoreEmail = '';
+	$orderedStoreEmail = '';
 	$orderedVendorStoreName = '';
-
 	// Loop through order items
 	foreach ( $order->get_items() as $itemId => $item ) {
 		// Get the product object
@@ -1684,13 +1682,15 @@ function call_order_status_completed( $array ) {
 		// Get the product Id
 		$productId = $product->get_id();
 
-		$orderProductVendor = get_wcmp_product_vendors($productId);
-    if( $orderProductVendor ) {
-      $term_vendor = wp_get_post_terms($productId, 'dc_vendor_shop');
-			foreach($term_vendor as $ven){
-				$orderedVendorStoreName = $ven->name;
-			}
-  	}
+		$product_meta = get_post($product_id);
+		$vendor_id = $product_meta->post_author;
+		$orderProductVendor = get_wcmp_vendor($vendor_id);
+		$orderedVendorStoreName = (is_object($orderProductVendor) ? ucfirst(esc_html($orderProductVendor->user_data->data->display_name)) : '');
+		$orderedVendorStoreEmail = (is_object($orderProductVendor) ? ucfirst(esc_html($orderProductVendor->user_data->data->user_email)) : '');
+
+		if(!empty($orderedVendorStoreName)){
+			break;
+		}
 	} // end foreach
 
 		// send email
@@ -1767,35 +1767,39 @@ function call_order_status_completed( $array ) {
   </div>';
 
   // dompdf begin
-  require_once 'dompdf/autoload.inc.php'; // include autoloader
-  $dompdf = new Dompdf(); // instantiate and use the dompdf class
-  $dompdf->loadHtml($body);
-	$dompdf->setPaper('A4', 'landscape'); // (Optional) Setup the paper size and orientation
+  #require_once 'dompdf/autoload.inc.php'; // include autoloader
+  #$dompdf = new Dompdf(); // instantiate and use the dompdf class
+#  $dompdf->loadHtml($body);
+	#$dompdf->setPaper('A4', 'landscape'); // (Optional) Setup the paper size and orientation
 	// Render the HTML as PDF
-  $dompdf->render();
+  #$dompdf->render();
   // $dompdf->stream(); // Output the generated PDF to Browser
   //save the pdf file on the server
-  $uploadpdf = wp_upload_dir();
-  $uploadpdf_dir = $uploadpdf['basedir'] .'/pdf-files/';
-  $permissions = 0755;
-  $oldmask = umask(0);
-  if (!is_dir($uploadpdf_dir)) mkdir($uploadpdf_dir, $permissions);
-  $umask = umask($oldmask);
-  $chmod = chmod($uploadpdf_dir, $permissions);
-  file_put_contents($uploadpdf_dir.'/'.$latestOrderId.'.pdf', $dompdf->output());
+  #$uploadpdf = wp_upload_dir();
+  #	$uploadpdf_dir = $uploadpdf['basedir'] .'/pdf-files/';
+		#  $permissions = 0755;
+  #$oldmask = umask(0);
+  #if (!is_dir($uploadpdf_dir)) mkdir($uploadpdf_dir, $permissions);
+  #$umask = umask($oldmask);
+  #$chmod = chmod($uploadpdf_dir, $permissions);
+  #file_put_contents($uploadpdf_dir.'/'.$latestOrderId.'.pdf', $dompdf->output());
 	// dompdf end
 
 	// attached pdf file begin
 	// $filename = $latestOrderId.'.pdf';
   // $attachments = array( WP_CONTENT_DIR . '/uploads/pdf-files/'.$filename );
   // attach pdf file end
-	// $headers = array('Content-Type: text/html; charset=UTF-8'); // To send HTML formatted mail, you also can specify the Content-Type HTTP header in the $headers parameter:
-	// wp_mail( $to, $subject, $body, $headers, $attachments );
+
+	$to = $orderedStoreEmail;
+	$subject = '👋🎁 Ny bestilling på Greeting.dk';
+	$attachments = '';
+	$headers = array('Content-Type: text/html; charset=UTF-8'); // To send HTML formatted mail, you also can specify the Content-Type HTTP header in the $headers parameter:
+	#wp_mail( $to, $subject, $body, $headers, $attachments );
 };
 
 
 // vendor attachment begin
-add_filter( 'woocommerce_email_attachments', 'attach_pdf_to_email', 10, 3);
+#add_filter( 'woocommerce_email_attachments', 'attach_pdf_to_email', 10, 3);
 function attach_pdf_to_email ( $attachments, $email_id , $order ) {
 
     // Avoiding errors and problems
@@ -2004,7 +2008,7 @@ function greeting_save_custom_fields_with_order( $order_id ) {
 add_action( 'woocommerce_admin_order_data_after_billing_address', 'greeting_delivery_date_display_admin_order_meta' );
 function greeting_delivery_date_display_admin_order_meta( $order ) {
    $str = '<p><strong>Leveringsdato:</strong> ';
-	 if ( $_POST['delivery_date'] ) { $str .= get_post_meta( $order->get_id(), '_delivery_date', true ); } else { $str .= 'Hurtigst muligt'; }
+	 if ( !empty(get_post_meta( $order->get_id(), '_delivery_date', true )) ) { $str .= get_post_meta( $order->get_id(), '_delivery_date', true ); } else { $str .= 'Hurtigst muligt'; }
 	 $str .= '</p>';
 	 $str .= '<p><strong>Modtagers telefonnr.:</strong> ' . get_post_meta( $order->get_id(), '_receiver_phone', true ) . '</p>';
 	 $str .= '<p><strong>Besked til modtager:</strong> ' . get_post_meta( $order->get_id(), '_greeting_message', true ) . '</p>';
@@ -3314,6 +3318,13 @@ function custom_email_subject_completed( $formated_subject, $order ){
         return __( 'Din gave til '.$delivery_name.' 🎁', 'woocommerce' );
     }
 }
+
+/**
+*
+* Remove vendor details / information in mails
+*
+*/
+add_filter ( 'wcmp_display_vendor_message_to_buyer','__return_false');
 
 /**
  * Minimum order value required for shopping

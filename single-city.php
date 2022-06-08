@@ -45,16 +45,8 @@ $args = array(
   'meta_query' => array(
       'relation' => 'AND',
       array(
-        'relation' => 'OR',
-        array(
-            'key'     => 'vendor_turn_off',
-            'value'   => 0,
-            'compare' => '='
-        ),
-        array(
-            'key'     => 'vendor_turn_off',
-            'compare' => 'NOT EXISTS',
-        ),
+          'key'     => 'vendor_turn_off',
+          'compare' => 'NOT EXISTS'
       ),
       array(
         'key' => 'delivery_zips',
@@ -172,7 +164,7 @@ jQuery(document).ready(function(){
               <svg class="pe-2" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#ffffff" class="bi bi-funnel" viewBox="0 0 16 16">
                 <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2zm1 .5v1.308l4.372 4.858A.5.5 0 0 1 7 8.5v5.306l2-.666V8.5a.5.5 0 0 1 .128-.334L13.5 3.308V2h-11z"/>
               </svg>
-              <h6 class="accordion-header float-start filter-header">Filtrér</h6>
+              <h6 class="accordion-header float-start filter-header">Vælg leveringsmåde - og filtrér gavehilsner</h6>
             </a>
           </div>
         </div>
@@ -189,16 +181,25 @@ jQuery(document).ready(function(){
            * ---------------------
           **/
           ?>
-          <h5 class="text-uppercase">Levering</h5>
+          <h5 class="text-uppercase mb-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#ffc107" class="bi bi-star-fill" viewBox="0 0 16 16">
+              <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+            </svg>&nbsp;
+            Levering
+          </h5>
           <ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
 
           <div class="form-check">
-              <input type="checkbox" name="filter_del_city" class="form-check-input filter-on-city-page" id="filter_delivery_1" value="1">
-              <label class="form-check-label" for="filter_delivery_1">Personlig levering</label>
+              <input type="checkbox" name="filter_del_city" class="form-check-input filter-on-city-page" id="filter_delivery_1" checked="checked" value="1">
+              <label class="form-check-label" for="filter_delivery_1">
+                Personlig levering fra lokal butik
+              </label>
           </div>
           <div class="form-check">
-              <input type="checkbox" name="filter_del_city" class="form-check-input filter-on-city-page" id="filter_delivery_0" value="0">
-              <label class="form-check-label" for="filter_delivery_0">Forsendelse med fragtfirma</label>
+              <input type="checkbox" name="filter_del_city" class="form-check-input filter-on-city-page" id="filter_delivery_0" checked="checked" value="0">
+              <label class="form-check-label" for="filter_delivery_0">
+                Forsendelse med fragtfirma
+              </label>
           </div>
 
           </ul>
@@ -211,7 +212,12 @@ jQuery(document).ready(function(){
            * ---------------------
           **/
           ?>
-          <h5 class="text-uppercase">Kategori</h5>
+          <h5 class="text-uppercase mb-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#ffc107" class="bi bi-balloon-heart" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="m8 2.42-.717-.737c-1.13-1.161-3.243-.777-4.01.72-.35.685-.451 1.707.236 3.062C4.16 6.753 5.52 8.32 8 10.042c2.479-1.723 3.839-3.29 4.491-4.577.687-1.355.587-2.377.236-3.061-.767-1.498-2.88-1.882-4.01-.721L8 2.42Zm-.49 8.5c-10.78-7.44-3-13.155.359-10.063.045.041.089.084.132.129.043-.045.087-.088.132-.129 3.36-3.092 11.137 2.624.357 10.063l.235.468a.25.25 0 1 1-.448.224l-.008-.017c.008.11.02.202.037.29.054.27.161.488.419 1.003.288.578.235 1.15.076 1.629-.157.469-.422.867-.588 1.115l-.004.007a.25.25 0 1 1-.416-.278c.168-.252.4-.6.533-1.003.133-.396.163-.824-.049-1.246l-.013-.028c-.24-.48-.38-.758-.448-1.102a3.177 3.177 0 0 1-.052-.45l-.04.08a.25.25 0 1 1-.447-.224l.235-.468ZM6.013 2.06c-.649-.18-1.483.083-1.85.798-.131.258-.245.689-.08 1.335.063.244.414.198.487-.043.21-.697.627-1.447 1.359-1.692.217-.073.304-.337.084-.398Z"/>
+            </svg>
+            Kategori
+          </h5>
           <ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
 
           <?php
@@ -261,7 +267,13 @@ jQuery(document).ready(function(){
            * ---------------------
           **/
           ?>
-          <h5 class="text-uppercase">Anledning</h5>
+          <h5 class="text-uppercase mb-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#ffc107" class="bi bi-calendar3-event" viewBox="0 0 16 16">
+              <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857V3.857z"/>
+              <path d="M12 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+            </svg>&nbsp;
+            Anledning
+          </h5>
           <ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
           <?php
           // for used on occasion prepare here
@@ -333,7 +345,15 @@ jQuery(document).ready(function(){
           }
           ?>
 
-          <h5 class="text-uppercase">Pris</h5>
+          <h5 class="text-uppercase mb-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#ffc107" class="bi bi-cash-coin" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M11 15a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm5-4a5 5 0 1 1-10 0 5 5 0 0 1 10 0z"/>
+              <path d="M9.438 11.944c.047.596.518 1.06 1.363 1.116v.44h.375v-.443c.875-.061 1.386-.529 1.386-1.207 0-.618-.39-.936-1.09-1.1l-.296-.07v-1.2c.376.043.614.248.671.532h.658c-.047-.575-.54-1.024-1.329-1.073V8.5h-.375v.45c-.747.073-1.255.522-1.255 1.158 0 .562.378.92 1.007 1.066l.248.061v1.272c-.384-.058-.639-.27-.696-.563h-.668zm1.36-1.354c-.369-.085-.569-.26-.569-.522 0-.294.216-.514.572-.578v1.1h-.003zm.432.746c.449.104.655.272.655.569 0 .339-.257.571-.709.614v-1.195l.054.012z"/>
+              <path d="M1 0a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h4.083c.058-.344.145-.678.258-1H3a2 2 0 0 0-2-2V3a2 2 0 0 0 2-2h10a2 2 0 0 0 2 2v3.528c.38.34.717.728 1 1.154V1a1 1 0 0 0-1-1H1z"/>
+              <path d="M9.998 5.083 10 5a2 2 0 1 0-3.132 1.65 5.982 5.982 0 0 1 3.13-1.567z"/>
+            </svg>&nbsp;
+            Pris
+          </h5>
           <form>
             <div id="slideInput" class="my-3">
               <div class="row">
@@ -380,6 +400,14 @@ jQuery(document).ready(function(){
         <h1 class="d-none d-lg-block d-xl-block my-3 my-xs-3 my-sm-3 my-md-3 my-lg-0 my-xl-0 mb-lg-4 mb-xl-4">Find gavehilsner til <?php the_title();?></h1>
         <div class="applied-filters row mt-xs-0 mt-sm-0 mt-md-0 mt-2 mb-4 lh-lg">
           <div class="col-12 filter-list">
+            <div id="filterfilter_cat0" class="badge rounded-pill border-yellow py-2 px-2 me-1 my-1 my-lg-0 my-xl-0 text-dark dynamic-filters">
+                Forsendelse med fragtfirma
+              <button type="button" class="btn-close filter-btn-delete" data-filter-id="0" data-label="Forsendelsemedfragtfirma" data-filter-remove="filter_cat0"></button>
+            </div>
+            <div id="filterfilter_cat1" class="badge rounded-pill border-yellow py-2 px-2 me-1 my-1 my-lg-0 my-xl-0 text-dark dynamic-filters">
+                Personlig levering fra lokal butik
+              <button type="button" class="btn-close filter-btn-delete" data-filter-id="1" data-label="Personligleveringfralokalbutik" data-filter-remove="filter_cat1"></button>
+            </div>
             <a href="<?php echo home_url(); ?>"class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 text-dark">
               <?php echo $cityPostalcode.' '.$cityName; ?>
               <button type="button" class="btn-close" aria-label="Close"></button>
@@ -415,8 +443,9 @@ jQuery(document).ready(function(){
                         <a href="<?php echo esc_url($vendor->get_permalink()); ?>" class="text-dark">
                           <h6><?php echo esc_html($button_text); ?></h6>
                         </a>
+                        <!--<p class="lh-sm" style="font-size: 13px !important;">Butikken har flere forskellige gavehilsner, du kan vælge i mellem.</p>-->
                         <a href="<?php echo esc_url($vendor->get_permalink()); ?>" class="cta rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-3 px-md-4">
-                          Gå til butik<span class="d-none d-md-inline"> ></span>
+                          Se alle gaver<span class="d-none d-md-inline"></span>
                         </a>
                       </div>
                     </div>
@@ -425,6 +454,7 @@ jQuery(document).ready(function(){
 
                   <div class="col-12 col-md-9">
                     <div class="row">
+                      <h6 class="py-2">Udvalgte produkter fra butikkens sortiment</h6>
                     <?php
                     $vendorProducts = $vendor->get_products(array('fields' => 'all', 'posts_per_page' => 3));
                     foreach ($vendorProducts as $prod) {
@@ -441,7 +471,7 @@ jQuery(document).ready(function(){
                       ?>
                       <div class="col-4 col-xs-4 col-sm-4 col-md-4">
                         <div class="card border-0">
-                            <a href="<?php echo get_permalink($product->get_id());?>"><img src="<?php echo $imageUrl;?>" class="card-img-top" alt="<?php echo $product->get_name();?>"></a>
+                            <a href="<?php echo get_permalink($product->get_id()); ?>"><img src="<?php echo $imageUrl;?>" class="card-img-top" alt="<?php echo $product->get_name();?>"></a>
                             <div class="card-body">
                                 <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark"><?php echo $product->get_name();?></a></h6>
                                 <p class="price"><?php echo woocommerce_template_loop_price(); ?></p>
