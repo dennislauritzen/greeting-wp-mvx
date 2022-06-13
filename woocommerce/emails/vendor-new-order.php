@@ -64,26 +64,26 @@ if (apply_filters('show_cust_order_calulations_field', true, $vendor->id)) {
     }
     ?>
 
-    <h2><?php _e('Delivery Details', 'dc-woocommerce-multi-vendor'); ?></h2>
+    <h2><?php __('Delivery Details', 'dc-woocommerce-multi-vendor'); ?></h2>
     <?php if ( !empty(get_post_meta($order->get_id(), '_delivery_date', true)) ) { $delivery_date = get_post_meta( $order_id, '_delivery_date', true ); } else { $delivery_date = 'Hurtigst muligt'; } ?>
-    <p><strong><?php _e('Leveringsdato:', 'dc-woocommerce-multi-vendor'); ?></strong> <?php echo $delivery_date; ?></p>
+    <p><strong><?php __('Leveringsdato:', 'dc-woocommerce-multi-vendor'); ?></strong> <?php echo $delivery_date; ?></p>
 
-    <p><strong><?php _e('Afsenders telefonnummer:', 'dc-woocommerce-multi-vendor'); ?></strong> <?php echo $order->get_billing_phone(); ?></p>
-    <p><strong><?php _e('Modtagers telefonnummer:', 'dc-woocommerce-multi-vendor'); ?></strong> <?php echo get_post_meta( $order->get_id(), '_receiver_phone', true ); ?></p>
+    <p><strong><?php __('Afsenders telefonnummer:', 'dc-woocommerce-multi-vendor'); ?></strong> <?php echo $order->get_billing_phone(); ?></p>
+    <p><strong><?php __('Modtagers telefonnummer:', 'dc-woocommerce-multi-vendor'); ?></strong> <?php echo get_post_meta( $order->get_id(), '_receiver_phone', true ); ?></p>
 
-    <p><strong><?php _e('Besked til modtager', 'dc-woocommerce-multi-vendor'); ?></strong> <?php echo get_post_meta( $order->get_id(), '_greeting_message', true ); ?></p>
+    <p><strong><?php __('Besked til modtager', 'dc-woocommerce-multi-vendor'); ?></strong> <?php echo get_post_meta( $order->get_id(), '_greeting_message', true ); ?></p>
 
-    <p><strong><?php _e('Leveringsinstruktioner', 'dc-woocommerce-multi-vendor'); ?></strong> <?php echo get_post_meta( $order->get_id(), '_delivery_instructions', true ); ?></p>
+    <p><strong><?php __('Leveringsinstruktioner', 'dc-woocommerce-multi-vendor'); ?></strong> <?php echo get_post_meta( $order->get_id(), '_delivery_instructions', true ); ?></p>
 
     <?php $leave_gift_at_address = (get_post_meta( $order->get_id(), '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej'); ?>
-    <p><strong><?php _e('Må stilles på adressen:', 'dc-woocommerce-multi-vendor'); ?></strong> <?php echo $leave_gift_at_address; ?></p>
+    <p><strong><?php __('Må stilles på adressen:', 'dc-woocommerce-multi-vendor'); ?></strong> <?php echo $leave_gift_at_address; ?></p>
 
     <?php $leave_gift_at_neighbour = (get_post_meta( $order->get_id(), '_leave_gift_neighbour', true ) == "1" ? 'Ja' : 'Nej'); ?>
-    <p><strong><?php _e('Må gaven afleveres hos naboen:', 'dc-woocommerce-multi-vendor'); ?></strong> <?php echo $leave_gift_at_neighbour; ?></p>
+    <p><strong><?php __('Må gaven afleveres hos naboen:', 'dc-woocommerce-multi-vendor'); ?></strong> <?php echo $leave_gift_at_neighbour; ?></p>
 
     <?php if ($order->get_billing_email()) { ?>
-        <p><strong><?php _e('Customer Name:', 'dc-woocommerce-multi-vendor'); ?></strong> <?php echo $order->get_billing_first_name() . ' ' . $order->get_billing_last_name(); ?></p>
-        <p><strong><?php _e('Email:', 'dc-woocommerce-multi-vendor'); ?></strong> <?php echo $order->get_billing_email(); ?></p>
+        <p><strong><?php __('Customer Name:', 'dc-woocommerce-multi-vendor'); ?></strong> <?php echo $order->get_billing_first_name() . ' ' . $order->get_billing_last_name(); ?></p>
+        <p><strong><?php __('Email:', 'dc-woocommerce-multi-vendor'); ?></strong> <?php echo $order->get_billing_email(); ?></p>
     <?php } ?>
     <?php
     }

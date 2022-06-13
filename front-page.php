@@ -68,7 +68,7 @@ get_header();
 <section id="maintop" class=" position-relative">
     <div class="row g-0">
       <div class="col-12 d-flex  align-items-bottom align-items-md-center align-items-lg-center align-items-xl-center video-wrapper">
-        <video class="position-absolute top-0 start-0" playsinline autoplay muted loop poster="">
+        <video playsinline autoplay muted loop class="position-absolute top-0 start-0" poster="">
           <source src="https://www.greeting.dk/wp-content/uploads/2022/04/greeting_top_q23.mp4" type="video/mp4">
           <source src="https://www.greeting.dk/wp-content/uploads/2022/04/Greeting_webm_q33.webm" type="video/webm">
         </video>
