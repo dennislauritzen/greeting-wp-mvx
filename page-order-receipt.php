@@ -22,6 +22,9 @@ if($order_id != $order_id_data){
 	return;
 }
 
+do_action( 'woocommerce_thankyou_' . $order->get_payment_method(), $order->get_id() ); 
+do_action( 'woocommerce_thankyou', $order->get_id() );
+
 get_header('checkout');
 
 //the_post();
