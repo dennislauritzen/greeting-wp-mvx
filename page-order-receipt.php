@@ -5,12 +5,13 @@
  *
  */
 
-$order_id 	= $_GET['o'];
-$order_key 	= $_GET['key'];
-
-if(empty($_GET['o']) || empty($_GET['key'])){
+if(empty($_GET['o']) || empty($_GET['key']) || empty($_GET['order_id'])){
 	return;
 }
+
+$order_id 		= $_GET['o'];
+$order_old_id 	= $_GET['order_id'];
+$order_key 		= $_GET['key'];
 
 $order_id_data = wc_get_order_id_by_order_key( $order_key );
 
@@ -22,13 +23,49 @@ if($order_id != $order_id_data){
 	return;
 }
 
-do_action( 'woocommerce_thankyou_' . $order->get_payment_method(), $order->get_id() ); 
-do_action( 'woocommerce_thankyou', $order->get_id() );
+#do_action( 'woocommerce_thankyou_' . $order->get_payment_method(), $order->get_id() ); 
+#do_action( 'woocommerce_thankyou', $order->get_id() );
 
 get_header('checkout');
 
 //the_post();
 ?>
+<script>
+	dataLayer.push({
+		'ecommerce': {
+		'currencyCode': '<?php echo $order->get_order_currency(); ?>',
+		'purchase': {
+			'actionField':{
+			'id': '<?php echo $order->get_order_number(); ?>',
+			'affiliation': 'WooCommerce',
+			'revenue': <?php echo number_format($order->get_subtotal(), 2, ".", ""); ?>,
+			'tax': <?php echo number_format($order->get_total_tax(), 2, ".", ""); ?>,
+			'shipping': <?php echo number_format($order->calculate_shipping(), 2, ".", ""); ?>,
+			<?php if($order->get_used_coupons()): ?>
+				'coupon': '<?php echo implode("-", $order->get_used_coupons()); ?>'
+			<?php endif; ?>
+			},
+			'products': [
+				<?php
+				foreach($order->get_items() as $key => $item):
+					$product = $order->get_product_from_item( $item );
+					$variant_name = ($item['variation_id']) ? wc_get_product($item['variation_id']) : '';
+				?>
+					{
+					'name': '<?php echo $item['name']; ?>',
+					'id': '<?php echo $item['product_id']; ?>',
+					'price': '<?php echo number_format($order->get_line_subtotal($item), 2, ".", ""); ?>',
+					'brand': '',
+					'category': '<?php echo strip_tags($product->get_categories(', ', '', '')); ?>',
+					'variant': '<?php echo ($variant_name) ? implode("-", $variant_name->get_variation_attributes()) : ''; ?>',
+					'quantity': <?php echo $item['qty']; ?>
+					},
+				<?php endforeach; ?>
+			]
+		}
+		}
+	});
+</script>
 <div class="container">
 	<div class="row">
 		<div class="offset-lg-1 offset-xl-2 col-md-12 col-lg-10 col-xl-8">
