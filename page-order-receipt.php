@@ -5,7 +5,7 @@
  *
  */
 
-if(empty($_GET['o']) || empty($_GET['key']) || empty($_GET['order_id'])){
+if(empty($_GET['o']) || empty($_GET['key'])){
 	return;
 }
 
