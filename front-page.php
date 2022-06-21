@@ -89,12 +89,28 @@ get_header();
                     <path d="m474.15 87.426c0.753-1.5772 1.356-3.4925 1.808-5.7457 0.452-2.2533 0.679-5.4829 0.679-9.689v-51.261c0-3.6803-0.528-6.647-1.583-8.9003-0.98-2.2532-2.148-4.1309-3.504-5.6331v-0.22532l16.39-5.9711v71.878c0 4.206 0.227 7.4732 0.679 9.8016 0.527 2.3283 1.205 4.2436 2.034 5.7457v0.2253h-16.503v-0.2253zm34.138 0.2253-19.443-27.94 12.999-14.083c1.809-1.9528 3.015-3.9807 3.618-6.0837 0.602-2.1782 0.452-3.9808-0.453-5.4078v-0.2253h14.695v0.2253c-3.391 1.5022-6.367 3.4174-8.93 5.7458-2.562 2.2532-5.011 4.6191-7.347 7.0977l-5.878 6.4217 16.617 23.884c1.733 2.4035 3.315 4.4314 4.747 6.0838s3.128 3.0043 5.087 4.0558v0.2253h-15.712z"/>
                     </svg>
                 </div>
-                <h4 class="text-teal fs-6">#STØTLOKALT</h4>
+                <h4 class="text-teal fs-6">#SENDENGAVE #STØTLOKALT</h4>
                 <h1 class="text-white pb-3">Skal vi levere <span id="spinner"></span> <br>til én du holder af?</h1>
+                <script type="text/javascript">
+                //set responsive mobile input field placeholder text
+                if (jQuery(window).width() < 769) {
+                    jQuery("input#front_Search-new_ucsa").attr("placeholder", "By eller postnr. (eks. <?php echo (!empty($user_postal) ? $user_postal : '8000'); ?>)");
+                }
+                else {
+                    jQuery("input#front_Search-new_ucsa").attr("placeholder", "Indtast by eller postnr. (eks. <?php echo (!empty($user_postal) ? $user_postal : '8000'); ?>)");
+                }
+                jQuery(window).resize(function () {
+                    if (jQuery(window).width() < 769) {
+                        jQuery("input#front_Search-new_ucsa").attr("placeholder", "By eller postnr. (eks. <?php echo (!empty($user_postal) ? $user_postal : '8000'); ?>)");
+                    }
+                    else {
+                        jQuery("input#front_Search-new_ucsa").attr("placeholder", "Indtast by eller postnr. (eks. <?php echo (!empty($user_postal) ? $user_postal : '8000'); ?>)");
+                    }
+                });
+                </script>
                 <form role="search" method="get" autocomplete="off" id="searchform">
                 <div class="input-group pb-4 w-100 me-0 me-xs-0 me-sm-0 me-md-0 me-lg-5 me-xl-5">
-                  <input type="text" name="keyword" id="front_Search-new_ucsa" class="d-sm-block d-md-none form-control border-0 ps-5 pe-3 py-3 shadow-sm rounded" placeholder="By eller postnr. (eks. <?php echo (!empty($user_postal) ? $user_postal : '8000'); ?>)">
-                  <input type="text" name="keyword" id="front_Search-new_ucsa" class="d-none d-md-block form-control border-0 ps-5 pe-3 py-3 shadow-sm rounded" placeholder="Indtast by eller postnr. (eks. <?php echo (!empty($user_postal) ? $user_postal : '8000'); ?>)">
+                  <input type="text" name="keyword" id="front_Search-new_ucsa" class="form-control border-0 ps-5 pe-3 py-3 shadow-sm rounded" placeholder="Indtast by eller postnr. (eks. <?php echo (!empty($user_postal) ? $user_postal : '8000'); ?>)">
                   <figure class="position-absolute mt-2 mb-3 ps-3" style="padding-top:5px; z-index:1000;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#333333" class="bi bi-geo-alt" viewBox="0 0 16 16">
                       <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A31.493 31.493 0 0 1 8 14.58a31.481 31.481 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94zM8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10z"/>
