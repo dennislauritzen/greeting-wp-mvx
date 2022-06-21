@@ -4,6 +4,7 @@
  *
  * Override this template by copying it to yourtheme/dc-product-vendor/emails/vendor-new-order.php
  *
+ * From Dennis Lauritzen - this is the active vendor-new-order template
  * @author 		WC Marketplace
  * @package 	dc-product-vendor/Templates
  * @version   0.0.1
@@ -14,12 +15,22 @@ global $WCMp;
 $vendor = get_wcmp_vendor(absint($vendor_id));
 do_action( 'woocommerce_email_header', $email_heading, $email );
 $text_align = is_rtl() ? 'right' : 'left';
+
+$parent_order_id = wp_get_post_parent_id($order->get_id());
+
+// The different number orders
+$latestOrderId = $parent_order_id; // Last order ID
+$order_hash = hash('md4','gree_ting_dk#!4r1242142fgriejgfto'.$latestOrderId.$latestOrderId);
+$order_hash2 = hash('md4', 'vvkrne12onrtnFG_:____'.$latestOrderId);
+
+$codeContents = site_url().'/shop-order-status/?order_id='.$latestOrderId.'&oh='.$order_hash.'&sshh='.$order_hash2;
+$qrcode = 'https://chart.googleapis.com/chart?chs=135x135&cht=qr&chl='.$codeContents;
 ?>
 
-<div style="margin-top: 20px;">
-  <a href="<?php echo site_url().'/index.php/shop-order-status/?order_id='. $order->get_id();?>">
-    <img src="<?php echo site_url().'/wp-content/uploads/qr-codes/'.$order->get_id().'.png' ;?>" alt="qr code"/>
-    Update Order Status
+<div style="margin-top: 0px;">
+  <a href="<?php echo $codeContents; ?>">
+    <img src="<?php echo $qrcode; ?>" alt="" style="width:150px;"/>
+    Markér ordre som leveret
   </a>
 </div>
 
@@ -72,15 +83,26 @@ if (apply_filters('show_cust_order_calulations_field', true, $vendor->id)) {
     }
     if (apply_filters('show_cust_address_field', true, $vendor->id) || apply_filters( 'is_vendor_can_see_customer_details', true, $vendor->id, $order ) ) {
     ?>
-    <h2><?php _e('Customer Details', 'dc-woocommerce-multi-vendor'); ?></h2>
-    <?php if ($order->get_billing_email()) { ?>
-        <p><strong><?php _e('Customer Name:', 'dc-woocommerce-multi-vendor'); ?></strong> <?php echo $order->get_billing_first_name() . ' ' . $order->get_billing_last_name(); ?></p>
-        <p><strong><?php _e('Email:', 'dc-woocommerce-multi-vendor'); ?></strong> <?php echo $order->get_billing_email(); ?></p>
-    <?php } ?>
-    <?php if ($order->get_billing_phone()) { ?>
-        <p><strong><?php _e('Telephone:', 'dc-woocommerce-multi-vendor'); ?></strong> <?php echo $order->get_billing_phone(); ?></p>
+
+
+    <h2><?php __('Delivery Details', 'dc-woocommerce-multi-vendor'); ?></h2>
+    <?php if ( !empty(get_post_meta($parent_order_id, '_delivery_date', true)) ) { $delivery_date = get_post_meta( $parent_order_id, '_delivery_date', true ); } else { $delivery_date = 'Hurtigst muligt'; } ?>
+    <p><strong><?php _e('Leveringsdato:', 'woocommerce'); ?></strong> <?php echo $delivery_date; ?></p>
+
+    <p><strong><?php _e('Afsenders telefonnummer:', 'woocommerce'); ?></strong> <?php echo $order->get_billing_phone(); ?></p>
+    <p><strong><?php _e('Modtagers telefonnummer:', 'woocommerce'); ?></strong> <?php echo get_post_meta( $parent_order_id, '_receiver_phone', true ); ?></p>
+
+    <p><strong><?php _e('Besked til modtager', 'woocommerce'); ?></strong> <?php echo get_post_meta( $parent_order_id, '_greeting_message', true ); ?></p>
+
+    <p><strong><?php _e('Leveringsinstruktioner', 'woocommerce'); ?></strong> <?php echo get_post_meta( $parent_order_id, '_delivery_instructions', true ); ?></p>
+
+    <?php $leave_gift_at_address = (get_post_meta( $parent_order_id, '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej'); ?>
+    <p><strong><?php _e('Må stilles på adressen:', 'woocommerce'); ?></strong> <?php echo $leave_gift_at_address; ?></p>
+
+    <?php $leave_gift_at_neighbour = (get_post_meta( $parent_order_id, '_leave_gift_neighbour', true ) == "1" ? 'Ja' : 'Nej'); ?>
+    <p><strong><?php _e('Må gaven afleveres hos naboen:', 'woocommerce'); ?></strong> <?php echo $leave_gift_at_neighbour; ?></p>
+
     <?php
-        }
     }
     ?>
     <table id="addresses" cellspacing="0" cellpadding="0" style="width: 100%; vertical-align: top; margin-bottom: 40px; padding:0;" border="0">
@@ -91,6 +113,7 @@ if (apply_filters('show_cust_order_calulations_field', true, $vendor->id)) {
                 <address class="address">
                     <?php echo ( $address = $order->get_formatted_billing_address() ) ? $address : esc_html__( 'N/A', 'dc-woocommerce-multi-vendor' ); ?>
                 </address>
+                <p><strong><?php _e('Email:', 'woocommerce'); ?></strong> <?php echo $order->get_billing_email(); ?></p>
             </td>
             <?php } ?>
             <?php if ( apply_filters('show_cust_shipping_address_field', true, $vendor->id) && ! wc_ship_to_billing_address_only() && $order->needs_shipping_address() && ( $shipping = $order->get_formatted_shipping_address() ) ) : ?>

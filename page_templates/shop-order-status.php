@@ -3,6 +3,8 @@
   Template Name: Shop Order Status
  */
 
+global $WCMp;
+
 //get path
 $urlPath = $_SERVER["REQUEST_URI"];
 //get last element
@@ -27,6 +29,9 @@ if(empty($order_id) || !isset($order_id)
 
 $order = wc_get_order( $order_id );
 $order_data = $order->get_data();
+$suborder_id = $WCMp->order->get_suborders($order_id);
+$__order_id       = '';
+$__order_id_child = '';
 if($order && $order_data){
   $orderStatus = $order->get_status();
 } else {
@@ -35,10 +40,12 @@ if($order && $order_data){
   exit();
 }
 
-$update_link = (isset($_GET['_u']) ? $urlPath : $urlPath.'_u=u');
-if(isset($_GET['_u']) && $_GET['_u'] == 'update'){
+$update_link = (isset($_GET['_u']) ? $urlPath : $urlPath.'&_u=u');
+if(isset($_GET['_u']) && $_GET['_u'] == 'u'){
   if($orderStatus == 'processing'){
-    $order->update_status( 'wc-completed' );
+    $order->update_status( 'completed' );
+    wp_redirect($urlPath);
+    exit();
   }
 }
 
@@ -83,7 +90,7 @@ get_header('green');
           <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="#28a745" class="bi bi-check-all pb-2" viewBox="0 0 16 16">
             <path d="M8.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L2.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093L8.95 4.992a.252.252 0 0 1 .02-.022zm-.92 5.14.92.92a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 1 0-1.091-1.028L9.477 9.417l-.485-.486-.943 1.179z"/>
           </svg>
-          <p><b>Leveret/Afsendt</b><br>Ordren ser ud til allerede at være leveret - fedt! :)</p>
+          <p><b>Leveret/Afsendt</b><br>Ordren ser ud til allerede at være leveret/afsendt - fedt! :)</p>
         </div>
     <?php } else { ?>
       <div class="text-center btn bg-light shadow border border-dark border-1 rounded p-3 w-25" style="min-width: 200px; min-height: 100px;">

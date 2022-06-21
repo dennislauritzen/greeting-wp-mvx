@@ -2103,20 +2103,21 @@ function custom_display_order_data_in_admin(){
 add_filter( 'woocommerce_email_order_meta_fields', 'custom_woocommerce_email_order_meta_fields', 10, 3 );
 
 function custom_woocommerce_email_order_meta_fields( $fields, $sent_to_admin, $order ) {
-    $delivery_date = (empty(get_post_meta( $order->get_id(), '_delivery_date', true ))?: 'Hurtigst muligt');
+		$del_date = get_post_meta( $order->get_id(), '_delivery_date', true );
+    $delivery_date = (!empty($del_date) ? $del_date : 'Hurtigst muligt');
     $fields['delivery_date'] = array(
         'label' => __( 'Leveringsdato' ),
         'value' => $delivery_date,
     );
 		$fields['billing_phone'] = array(
         'label' => __( 'Afsenders telefonnr.' ),
-        'value' => get_post_meta( $order->id, '_billing_phone', true ),
+        'value' => get_post_meta( $order->get_id(), '_billing_phone', true ),
     );
 
 
     $fields['greeting_message'] = array(
         'label' => __( 'Besked til modtager' ),
-        'value' => get_post_meta( $order->id, '_greeting_message', true ),
+        'value' => get_post_meta( $order->get_id(), '_greeting_message', true ),
     );
 
 
@@ -2132,17 +2133,17 @@ function custom_woocommerce_email_order_meta_fields( $fields, $sent_to_admin, $o
     );
 		$fields['delivery_instructions'] = array(
         'label' => __( 'Leveringsinstruktioner' ),
-        'value' => get_post_meta( $order->id, '_delivery_instructions', true ),
+        'value' => get_post_meta( $order->get_id(), '_delivery_instructions', true ),
     );
 		$fields['receiver_phone'] = array(
         'label' => __( 'Modtagers telefonnr.' ),
-        'value' => get_post_meta( $order->id, '_receiver_phone', true ),
+        'value' => get_post_meta( $order->get_id(), '_receiver_phone', true ),
     );
 
     return $fields;
 }
 
-
+do_action('wcmp_checkout_vendor_order_processed', $vendor_order_id, $posted_data, $order);
 
 
 
@@ -3320,6 +3321,31 @@ function custom_email_subject_completed( $formated_subject, $order ){
 }
 
 /**
+ * Remove sold by from vendor mails and admin mails
+ *
+ *
+ *
+ */
+add_filter( 'woocommerce_display_item_meta','wcmp_email_change_sold_by_text', 10, 3 );
+function wcmp_email_change_sold_by_text($html, $item, $args ){
+    $strings = array();
+    $html    = '';
+    foreach ( $item->get_formatted_meta_data() as $meta_id => $meta ) {
+        $value = $args['autop'] ? wp_kses_post( $meta->display_value ) : wp_kses_post( make_clickable( trim( $meta->display_value ) ) );
+        if (0 !== strcasecmp( $meta->display_key, 'Sold By' ) ) {
+            $strings[] = $args['label_before'] . wp_kses_post( $meta->display_key ) . $args['label_after'] . $value;
+        }
+    }
+
+    if ( $strings ) {
+        $html = $args['before'] . implode( $args['separator'], $strings ) . $args['after'];
+    }
+
+    return $html;
+}
+
+
+/**
 *
 * Remove vendor details / information in mails
 *
@@ -3343,4 +3369,69 @@ function greeting_marketplace_min_order_value(){
             remove_action('woocommerce_checkout_order_review', 'woocommerce_checkout_payment', 20);
         }
     }
+}
+
+
+/**
+ * Function for vendor new order template
+ *
+ * @author Dennis Lauritzen
+ */
+
+function restrict_vendor_new_order_mail($recipient, $order) {
+   $order_status = $order == NULL ? "cancelled": $order->get_status();
+    if ( $order_status == 'processing') {
+       return $recipient ;
+    } else {
+       return;
+    }
+}
+add_filter('woocommerce_email_recipient_vendor_new_order', 'restrict_vendor_new_order_mail', 1, 2);
+
+add_action('woocommerce_order_status_changed', 'woo_order_status_change_custom', 100, 3);
+function woo_order_status_change_custom( $order_id, $from_status, $to_status ) {
+    if( !$order_id ) return;
+    if( !wp_get_post_parent_id( $order_id )) return;
+    if($to_status == 'processing'){
+        $emails = WC()->mailer()->emails;
+        $email_vendor = $emails['WC_Email_Vendor_New_Order']->trigger( $order_id );
+    }
+}
+
+/**
+ * Add new column to the order table on WCMP frontend order table
+ * This is the Parent Order ID / Hoved ordre nr.
+ *
+ * @author Dennis Lauritzen
+ */
+add_filter('wcmp_datatable_order_list_table_headers', 'wcmp_add_order_table_column_callback', 10, 2);
+function wcmp_add_order_table_column_callback($orders_list_table_headers, $current_user_id) {
+	$wcmp_custom_columns = array(
+		'order_p_id'    => array('label' => __( 'Hoved ordre nr.', 'dc-woocommerce-multi-vendor' ))
+	);
+
+	return (array_slice($orders_list_table_headers, 0, 2) + $wcmp_custom_columns + array_slice($orders_list_table_headers, 2));
+}
+
+/**
+ * Add the data to new column the order table on WCMP frontend order table
+ * This is the Parent Order ID / Hoved ordre nr.
+ *
+ * @author Dennis Lauritzen
+ */
+add_filter('wcmp_datatable_order_list_row_data', 'wcmp_add_order_table_row_data', 10, 2);
+function wcmp_add_order_table_row_data($vendor_rows, $order) {
+	$item_sku = array();
+	$vendor = get_current_vendor();
+	if($vendor){
+		$vendor_items = $vendor->get_vendor_items_from_order($order, $vendor->term_id);
+		if($vendor_items){
+			foreach ($vendor_items as $item) {
+		           $product = wc_get_product( $item['product_id'] );
+	    }
+		}
+	}
+	$parents_order_id = wp_get_post_parent_id($order->id);
+	$vendor_rows['order_p_id'] = isset( $parents_order_id ) ? $parents_order_id : '-';
+	return $vendor_rows;
 }
