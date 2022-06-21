@@ -299,7 +299,7 @@ if(!empty($results)){
                 </path>
               </svg>
             </figure>
-            <p>Søg på modtagerens adresse</p>
+            <p>Skriv det postnummer, du gerne vil se gaveudvalg for</p>
           </li>
           <li>
             <figure class="shop-icon flex flex-cy flex-cx">
@@ -315,7 +315,7 @@ if(!empty($results)){
                 </g>
               </svg>
             </figure>
-            <p>Vælg gave fra en butik</p>
+            <p>Vælg din foretrukne butik</p>
           </li>
           <li>
             <figure class="pen-paper-icon flex flex-cy flex-cx">
@@ -328,7 +328,7 @@ if(!empty($results)){
                 </g>
               </svg>
             </figure>
-            <p>Skriv en personlig hilsen </p>
+            <p>Læg gaven i kurven, vælg leveringsdato & skriv din personlige hilsen</p>
           </li>
           <li>
             <figure class="gift-icon flex flex-cy flex-cx">
