@@ -3188,22 +3188,6 @@ function wcmp_change_default_status( $order_status, $order ){
 	return $order_status;
 }
 
-
-/**
- *
- * Add photos to order e-mails
- *
- * @author Dennis Lauritzen
- * @since v1.0
- */
-function greeting_add_photos_to_wc_emails( $args ) {
-
-    $args['show_sku'] = false;
-    $args['show_image'] = true;
-    return $args;
-}
-add_filter( 'woocommerce_email_order_items_args', 'greeting_add_photos_to_wc_emails' );
-
 /**
  *
  * Add photos to order e-mails
@@ -3376,6 +3360,7 @@ function greeting_marketplace_min_order_value(){
  * Function for vendor new order template
  *
  * @author Dennis Lauritzen
+ * @paused by Dennis 25/06-22
  */
 
 function restrict_vendor_new_order_mail($recipient, $order) {
@@ -3386,9 +3371,15 @@ function restrict_vendor_new_order_mail($recipient, $order) {
        return;
     }
 }
-add_filter('woocommerce_email_recipient_vendor_new_order', 'restrict_vendor_new_order_mail', 1, 2);
+#add_filter('woocommerce_email_recipient_vendor_new_order', 'restrict_vendor_new_order_mail', 1, 2);
 
-add_action('woocommerce_order_status_changed', 'woo_order_status_change_custom', 100, 3);
+/**
+ * Function for vendor new order template
+ *
+ * @author Dennis Lauritzen
+ * @paused by Dennis 25/06-22
+ */
+#add_action('woocommerce_order_status_changed', 'woo_order_status_change_custom', 100, 3);
 function woo_order_status_change_custom( $order_id, $from_status, $to_status ) {
     if( !$order_id ) return;
     if( !wp_get_post_parent_id( $order_id )) return;
