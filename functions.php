@@ -2490,15 +2490,11 @@ add_filter( 'woocommerce_variation_option_name','display_price_in_variation_opti
 function display_price_in_variation_option_name( $term ) {
     global $product;
 
-    if ( empty($term) ) {
-        return $term;
-    }
-    // @todo - Check if this shouldn't be get_id() function instead of trying to access object directly.
-    $product_id = (!empty($product->get_id())) ? $product->get_id() : $product->id;
+    if(empty($term)){ return $term;  }
+		if(empty($product->id)){ return $term; }
 
-    if ( empty( $product_id ) ) {
-        return $term;
-    }
+    $product_id = (!empty($product->id) ? $product->id : '');
+    if ( empty( $product_id ) ) { return $term; }
 
     $variation_id = $product->get_children();
 
