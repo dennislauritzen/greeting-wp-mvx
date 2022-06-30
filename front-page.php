@@ -3,20 +3,26 @@
 global $wpdb, $post;
 $this_post_id = $post->ID;
 
+
+
 $ip_detail_ipinfo = call_ip_apis(get_client_ip());
 
 if(!empty($ip_detail_ipinfo) AND (isset($ip_detail_ipinfo->postal) || isset($ip_detail_ipinfo->zip))){
   #print $ip_details->postal;
   $user_postal = (!empty($ip_detail_ipinfo->postal) ? $ip_detail_ipinfo->postal : $ip_detail_ipinfo->zip);
+  print "<!-- IP'en blev hentet -->";
 } else {
   $user_postal = '';
 }
-
-
+print "<!-- IP hentet: ".get_client_ip()."-->";
+print "<!-- IP data";print_r($ip_detail_ipinfo);print "-->";
 $user_areas = array(
   'start' => 1000,
   'end' => 9999
 );
+
+print "<!--";print_r($user_areas);print "-->";
+
 if(!empty($user_postal)){
   if($user_postal >= 1000 && $user_postal < 3000){
     $user_areas['start'] = 1000;
