@@ -3178,23 +3178,15 @@ function handle_price_range_query_var( $query, $query_vars ) {
  */
 function get_client_ip() {
     $ipaddress = '';
-    if (getenv('HTTP_CLIENT_IP')){
-			 $ipaddress = getenv('HTTP_CLIENT_IP');
-    } else if(getenv('REMOTE_ADDR')){
-			$ipaddress = getenv('REMOTE_ADDR');
-    } else if(getenv('HTTP_X_FORWARDED_FOR')){
-			$ipaddress = getenv('HTTP_X_FORWARDED_FOR');
-    } else if(getenv('HTTP_X_FORWARDED')){
-			$ipaddress = getenv('HTTP_X_FORWARDED');
-    } else if(getenv('HTTP_FORWARDED_FOR')){
-    	$ipaddress = getenv('HTTP_FORWARDED_FOR');
-    } else if(getenv('HTTP_FORWARDED')){
-      $ipaddress = getenv('HTTP_FORWARDED');
-    } else {
-      $ipaddress = 'UNKNOWN';
+
+		if(isset($_SERVER['HTTP_CF_CONNECTING_IP'])){
+			$_SERVER['REMOTE_ADDR'] = $_SERVER['HTTP_CF_CONNECTING_IP'];
 		}
+
 		if(get_home_url() == 'http://greeting'){
-				$ipaddress = '212.10.115.191';
+			$ipaddress = '212.10.115.191';
+		} else {
+			$ipaddress = $_SERVER['REMOTE_ADDR'];
 		}
 
     return $ipaddress;
