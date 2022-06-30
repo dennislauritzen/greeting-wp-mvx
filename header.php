@@ -458,6 +458,13 @@
 		display: block;
 	}
 	/** loading end */
+
+	/* Inserting this collapsed row between two flex items will make
+ 	* the flex item that comes after it break to a new row */
+	.break {
+	  flex-basis: 100%;
+	  height: 0;
+	}
 	</style>
 
   <!-- Google Tag Manager -->
@@ -502,7 +509,7 @@
 								'menu' => 'Main Navigation Menu (Top)',
 								'theme_location' => 'main-menu-desktop',
 								'container' => 'ul',
-								'menu_class' => 'nav d-none d-lg-inline-flex m-0',
+								'menu_class' => 'nav d-none d-lg-inline-flex m-0 order-0',
 								'depth' => '1',
     						'fallback_cb'    => false, // Do not fall back to wp_page_menu(),
 								'add_li_class' => 'nav-item',
@@ -510,7 +517,20 @@
 							)
 						);
 						?>
-            <ul class="nav d-inline-flex m-0">
+						<!-- TrustBox script -->
+	          <script type="text/javascript" src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
+	          <!-- End TrustBox script -->
+	          <!-- TrustBox widget - Micro Review Count -->
+	          <div
+	            class="nav d-none d-md-inline trustpilot-widget align-self-center order-1"
+							style="text-align: left; overflow-x: visible;"
+	            data-locale="da-DK"
+	            data-template-id="5419b6a8b0d04a076446a9ad"
+	            data-businessunit-id="60133f8342c1850001d9606a" data-style-height="24px" data-style-width="100%" data-theme="light" data-min-review-count="10">
+	            <a href="https://dk.trustpilot.com/review/greeting.dk" target="_blank" rel="noopener">Trustpilot</a>
+	          </div>
+	          <!-- End TrustBox widget -->
+            <ul class="nav d-flex d-md-inline-flex m-0 order-0 order-md-2">
                 <li class="nav-item">
                     <a class="nav-link text-dark" href="mailto:<?php echo get_field('greeting_contact_mail_address', 'option'); ?>">
 											<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-envelope-heart" viewBox="0 0 16 16">
@@ -528,6 +548,20 @@
                 </li>
             </ul>
         </div>
+				<div class="container d-flex justify-content-center">
+					<div class="row">
+						<div class="col-sm-12 d-md-none align-items-center justify-content-center">
+							<div
+		            class="nav trustpilot-widget"
+								style="text-align: center; overflow-x: visible; width: 100%;"
+		            data-locale="da-DK"
+		            data-template-id="5419b6a8b0d04a076446a9ad"
+		            data-businessunit-id="60133f8342c1850001d9606a" data-style-height="24px" data-style-width="100%" data-theme="light" data-min-review-count="10">
+		            <a href="https://dk.trustpilot.com/review/greeting.dk" target="_blank" rel="noopener">Trustpilot</a>
+		          </div>
+						</div>
+					</div>
+				</div>
     </div>
 	</header>
 	<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasMenu" aria-labelledby="offcanvasMenu">

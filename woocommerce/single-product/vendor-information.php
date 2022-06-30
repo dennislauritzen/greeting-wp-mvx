@@ -72,7 +72,12 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor_id))){
           if(!empty($vendor_city)){
             $location .= $vendor_city.' ';
           }
-          echo esc_html($location); ?>
+
+          if(!empty($location) && $vendor_id != "38" && $vendor_id != "76"){
+            echo esc_html($location);
+          } else if($vendor_id == "38" || $vendor_id == "76"){
+            echo 'Leveres fra en fysisk gavebutik, der ligger nær din modtager.';
+          } ?>
         </p>
         <?php
 				$vendor_hide_description = apply_filters('wcmp_vendor_store_header_hide_description', get_user_meta($vendor_id, '_vendor_hide_description', true), $vendor_id);
@@ -123,7 +128,7 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor_id))){
             ?>.
           </p>
           <p>
-            Butikken leverer
+            Butikken leverer senest
             <?php
               if(get_field('vendor_require_delivery_day', 'user_'.$vendor_id) == 0)
               {

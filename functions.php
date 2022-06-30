@@ -936,7 +936,6 @@ function greeting_save_product_cat_meta( $post_id ) {
  * Vendor filter on City Page
  * city filter
  */
-
 function catOccaDeliveryAction() {
 	// default user array come from front end
 	$cityDefaultUserIdAsString = $_POST['cityDefaultUserIdAsString'];
@@ -989,6 +988,9 @@ function catOccaDeliveryAction() {
 			array_push($userIdArrayGetFromCatOcca, $product->post_author);
 		}
 	}
+	// Remove all the stores that doesnt match from default array
+	$userIdArrayGetFromCatOcca = array_intersect($defaultUserArray, $userIdArrayGetFromCatOcca);
+	$defaultUserArray = $userIdArrayGetFromCatOcca;
 
 	////////////////////////
 	// FILTER: Delivery
@@ -1019,8 +1021,9 @@ function catOccaDeliveryAction() {
 			}
 		}
 	}
+	// Remove all the stores that doesnt match from default array
 	$userIdArrayGetFromDelivery = array_intersect($defaultUserArray, $userIdArrayGetFromDelivery);
-
+	$defaultUserArray = $userIdArrayGetFromDelivery;
 
 	////////////////
 	// Filter: Price
@@ -1048,19 +1051,17 @@ function catOccaDeliveryAction() {
 	$productQuery = new WP_Query($query);
 	$userIdArrayGetFromPriceFilter = wp_list_pluck( $productQuery->posts, 'post_author' );
 
+	// Remove all the stores that doesnt match from default array
+	$userIdArrayGetFromPriceFilter = array_intersect($defaultUserArray, $userIdArrayGetFromPriceFilter);
+	$defaultUserArray = $userIdArrayGetFromDelivery;
+
 	// three array is
 	// $userIdArrayGetFromCatOcca
 	// $userIdArrayGetFromDelivery
 	// $userIdArrayGetFromPriceFilter
 
-	// check condition
-	$full_arr = array_merge($userIdArrayGetFromCatOcca, $userIdArrayGetFromPriceFilter);
-	if(!empty($deliveryIdArray)){
-		$full_arr = array_merge($userIdArrayGetFromDelivery, $full_arr);
-	}
-	$full_arr = array_unique($full_arr);
 
-	$return_arr = array_intersect($defaultUserArray, $full_arr);
+	$return_arr = $defaultUserArray;
 
 	if(!empty($return_arr)){
 		foreach ($return_arr as $filteredUser) {
@@ -1989,7 +1990,7 @@ function greeting_load_calendar_dates( $available_gateways ) {
  * function to add order meta in admin
  * #add delivery_date
  *
- *
+ * @todo: Remember to add the redirect for order pages again!!!! (@line 3095)
  */
 add_action( 'woocommerce_checkout_update_order_meta', 'greeting_save_custom_fields_with_order' );
 function greeting_save_custom_fields_with_order( $order_id ) {
@@ -2002,7 +2003,66 @@ function greeting_save_custom_fields_with_order( $order_id ) {
 
 		if ( $_POST['leave_gift_address'] ) update_post_meta( $order_id, '_leave_gift_address', esc_attr( $_POST['leave_gift_address'] ) );
 		if ( $_POST['leave_gift_neighbour'] ) update_post_meta( $order_id, '_leave_gift_neighbour', esc_attr( $_POST['leave_gift_neighbour'] ) );
+
+
+		// -----------------------
+		// Get data from child order.
+		$order = wc_get_order( $order_id );
+		foreach ($order->get_items() as $item_key => $item) {
+			$product = get_post($item['product_id']);
+			$vendor_id = $product->post_author;
+
+			if(!empty($vendor_id)){
+				update_post_meta($order_id, '_vendor_id', $vendor_id);
+				break;
+			}
+		}
+
+		#$child_order = new WP_Query(array('post_parent' => $order_id));
+		#while($child_order->have_posts()){
+		#	$child_order->the_post();
+		#	$child_order_id = get_the_ID();
+
+		#	$vendor_id = get_post_meta($child_order_id, '_vendor_id', true);
+			// Add vendor ID to the main order.
+		#	if ( $vendor_id ) update_post_meta( $order_id, '_vendor_id', $vendor_id );
+
+
+			// -----------------------
+			// Add data to the child order, so meta data is visible.
+		#	if ( $_POST['delivery_date'] ) update_post_meta( $child_order_id, '_delivery_date', esc_attr( $_POST['delivery_date'] ) );
+		#	if ( $_POST['greeting_message'] ) update_post_meta( $child_order_id, '_greeting_message', esc_attr( $_POST['greeting_message'] ) );
+		#	if ( $_POST['receiver_phone'] ) update_post_meta( $child_order_id, '_receiver_phone', esc_attr( $_POST['receiver_phone'] ) );
+
+		#	if ( $_POST['delivery_instructions'] ) update_post_meta( $child_order_id, '_delivery_instructions', esc_attr( $_POST['delivery_instructions'] ) );
+
+		#	if ( $_POST['leave_gift_address'] ) update_post_meta( $child_order_id, '_leave_gift_address', esc_attr( $_POST['leave_gift_address'] ) );
+		#	if ( $_POST['leave_gift_neighbour'] ) update_post_meta( $child_order_id, '_leave_gift_neighbour', esc_attr( $_POST['leave_gift_neighbour'] ) );
+	#	}
 }
+
+add_action( 'wcmp_checkout_vendor_order_processed' , 'update_sub_order_meta' ,10 , 3);
+function update_sub_order_meta($vendor_order_id, $posted_data, $order){
+	global $WCMp;
+
+	$vendor_order = wc_get_order($vendor_order_id);
+	$vendor_id = get_post_meta($vendor_order_id, '_vendor_id', true);
+}
+
+/* replace suborder id with parent order id in email */
+#add_filter('wcmp_vendor_new_order_email_subject', 'change_order_number', 10, 2);
+function change_order_number($subject, $order) {
+#$order_id = wp_get_post_parent_id($order->get_id());
+#return __(‘[{site_title}] New vendor order (‘.$order_id.’) – {order_date}’, ‘dc-woocommerce-multi-vendor’);
+}
+/* replace suborder id with parent order id in vendor dashboard */
+#add_filter('wcmp_datatable_order_list_row_data', 'change_order_number_dashboard');
+function change_order_number_dashboard($data) {
+  #$order_id = wp_get_post_parent_id($data['order_id']);
+  #$data['order_id'] = $order_id;
+  #return $data;
+}
+
 
 
 add_action( 'woocommerce_admin_order_data_after_billing_address', 'greeting_delivery_date_display_admin_order_meta' );
@@ -2143,7 +2203,7 @@ function custom_woocommerce_email_order_meta_fields( $fields, $sent_to_admin, $o
     return $fields;
 }
 
-do_action('wcmp_checkout_vendor_order_processed', $vendor_order_id, $posted_data, $order);
+#do_action('wcmp_checkout_vendor_order_processed', $vendor_order_id, $posted_data, $order);
 
 
 
@@ -3118,20 +3178,25 @@ function handle_price_range_query_var( $query, $query_vars ) {
  */
 function get_client_ip() {
     $ipaddress = '';
-    if (getenv('HTTP_CLIENT_IP'))
-        $ipaddress = getenv('HTTP_CLIENT_IP');
-    else if(getenv('REMOTE_ADDR'))
-         $ipaddress = getenv('REMOTE_ADDR');
-    else if(getenv('HTTP_X_FORWARDED_FOR'))
-        $ipaddress = getenv('HTTP_X_FORWARDED_FOR');
-    else if(getenv('HTTP_X_FORWARDED'))
-        $ipaddress = getenv('HTTP_X_FORWARDED');
-    else if(getenv('HTTP_FORWARDED_FOR'))
-        $ipaddress = getenv('HTTP_FORWARDED_FOR');
-    else if(getenv('HTTP_FORWARDED'))
-       $ipaddress = getenv('HTTP_FORWARDED');
-    else
-        $ipaddress = 'UNKNOWN';
+    if (getenv('HTTP_CLIENT_IP')){
+			 $ipaddress = getenv('HTTP_CLIENT_IP');
+    } else if(getenv('REMOTE_ADDR')){
+			$ipaddress = getenv('REMOTE_ADDR');
+    } else if(getenv('HTTP_X_FORWARDED_FOR')){
+			$ipaddress = getenv('HTTP_X_FORWARDED_FOR');
+    } else if(getenv('HTTP_X_FORWARDED')){
+			$ipaddress = getenv('HTTP_X_FORWARDED');
+    } else if(getenv('HTTP_FORWARDED_FOR')){
+    	$ipaddress = getenv('HTTP_FORWARDED_FOR');
+    } else if(getenv('HTTP_FORWARDED')){
+      $ipaddress = getenv('HTTP_FORWARDED');
+    } else {
+      $ipaddress = 'UNKNOWN';
+		}
+		if(get_home_url() == 'http://greeting'){
+				$ipaddress = '212.10.115.191';
+		}
+
     return $ipaddress;
 }
 
@@ -3145,21 +3210,28 @@ function get_client_ip() {
  */
 function call_ip_apis($ip){
   $urls = array(
-    0 => 'http://ip-api.com/json/'.$ip,
-    1 => 'http://ipinfo.io/'.$ip.'/json' // return HTTP=429 if usage limit reached
+		'0' => 'https://ipapi.co/'.$ip.'/json/',
+    '1' => 'http://ip-api.com/json/'.$ip,
+    '2' => 'http://ipinfo.io/'.$ip.'/json' // return HTTP=429 if usage limit reached
   );
 
   $curl = curl_init();
-  curl_setopt($curl, CURLOPT_URL, $urls[0]);
-  curl_setopt($curl, CURLOPT_BINARYTRANSFER, true);
+  curl_setopt($curl, CURLOPT_URL, $urls['0']);
   curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
   $jsonData = json_decode(curl_exec($curl));
+
+		# If error, try no. 2
   if(curl_getinfo($curl, CURLINFO_RESPONSE_CODE) != '200'){
-    curl_setopt($curl, CURLOPT_URL, $urls[1]);
+    curl_setopt($curl, CURLOPT_URL, $urls['1']);
   }
   #curl_setopt($curl, CURLOPT_GET, true);
-
   $jsonData = json_decode(curl_exec($curl));
+
+	# If error, try no. 3
+	if(curl_getinfo($curl, CURLINFO_RESPONSE_CODE) != '200'){
+    curl_setopt($curl, CURLOPT_URL, $urls['2']);
+  }
+	$jsonData = json_decode(curl_exec($curl));
   curl_close($curl);
 
   return $jsonData;

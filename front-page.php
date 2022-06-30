@@ -133,6 +133,7 @@ get_header();
                   </ul>
                   </div>
                 </form>
+                <h6 style="font-family: 'Rubik',sans-serif; font-size:18px; color: #ffffff;" class="pb-2">Udvalgte byer<?php if(!empty($user_postal)){ echo ' tæt på dig'; } ?></h6>
                 <ul class="list-inline my-2">
                   <?php
                   if(!empty($user_postal)){

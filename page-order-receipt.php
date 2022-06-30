@@ -23,7 +23,7 @@ if($order_id != $order_id_data){
 	return;
 }
 
-#do_action( 'woocommerce_thankyou_' . $order->get_payment_method(), $order->get_id() ); 
+#do_action( 'woocommerce_thankyou_' . $order->get_payment_method(), $order->get_id() );
 #do_action( 'woocommerce_thankyou', $order->get_id() );
 
 get_header('checkout');
@@ -85,7 +85,17 @@ get_header('checkout');
 					<p>
 						<strong class="text-uppercase">Levering</strong>
 						<br>
-						<?php echo esc_html( wc_format_datetime( $order->get_date_created() ) ); ?>
+						<?php
+						$delivery_date = get_post_meta($order->get_id(), '_delivery_date', true);
+						$wc_date = new WC_Datetime($delivery_date);
+						$delivery_date = wc_format_datetime( $wc_date );
+
+						if(!empty($delivery_date)){
+							echo esc_html( $delivery_date );
+						} else {
+							echo 'Hurtigst muligt';
+						}
+						?>
 						<br>til <?php echo $order->get_shipping_first_name().' '.$order->get_shipping_last_name(); ?>
 					</p>
 				</div>

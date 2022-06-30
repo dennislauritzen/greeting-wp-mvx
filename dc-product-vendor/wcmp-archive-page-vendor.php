@@ -348,11 +348,17 @@ do_action('after_wcmp_vendor_description', $vendorId);
             <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
           </svg>
           <?php
-			$location = get_user_meta($vendorId, '_vendor_address_1', true).', '.get_user_meta($vendorId, '_vendor_postcode', true).' '.get_user_meta($vendorId, '_vendor_city', true);
-			echo esc_html($location); ?>
+			       $location = get_user_meta($vendorId, '_vendor_address_1', true).', '.get_user_meta($vendorId, '_vendor_postcode', true).' '.get_user_meta($vendorId, '_vendor_city', true);
+
+             if(!empty($location) && $vendorId != "38" && $vendorId != "76"){
+               echo esc_html($location);
+             } else if($vendorId == "38" || $vendorId == "76"){
+               echo 'Leveres fra en fysisk gavebutik, der ligger nær din modtager.';
+             }
+          ?>
         </p>
         <?php
-				$vendor_hide_description = apply_filters('wcmp_vendor_store_header_hide_description', get_user_meta($vendorId, '_vendor_hide_description', true), $vendor->id);
+				$vendor_hide_description = apply_filters('wcmp_vendor_store_header_hide_description', get_user_meta($vendorId, '_vendor_hide_description', true), $vendorId);
 				$description = get_user_meta($vendorId, '_vendor_description', true);
 				if (!$vendor_hide_description && !empty($description)) { ?>
         <div>
@@ -373,31 +379,33 @@ do_action('after_wcmp_vendor_description', $vendorId);
           <p>Butikken leverer på flg. dage:
             <?php
             $del_days = get_field('openning', 'user_'.$vendorId);
-  					$day_array = array('mandag','tirsdag','onsdag','torsdag','fredag','lørdag','søndag');
+            $day_array = array(1 => 'mandag', 2 => 'tirsdag', 3 => 'onsdag', 4 => 'torsdag', 5 => 'fredag', 6 => 'lørdag', 7 => 'søndag');
 
-  					$i = 0;
-            foreach($del_days as $v){
-              //$day = $day_array[$v];
-              if ($i == 0){
-                //$day = ucfirst($day);
-              }
-
-              if(count($del_days) > 1)
-              {
-                if($i < count($del_days)-2){
-                 // $day .= ', ';
-                } else if($i == count($del_days)-1) {
-                  // $day = ' og '.$day;
+            if(is_array($del_days) && count($del_days) > 0){
+    					$i = 1;
+              foreach($del_days as $v){
+                $day = $day_array[$i];
+                if ($i == 1){
+                  $day = ucfirst($day);
                 }
-              }
 
-              // print $day;
-              $i++;
-            }
+                if(count($del_days) > 1)
+                {
+                  if($i < count($del_days)-1){
+                    $day .= ', ';
+                  } else if($i == count($del_days)) {
+                    $day = ' og '.$day;
+                  }
+                }
+
+                print $day;
+                $i++;
+              } // endforeach
+            } // endif
             ?>.
           </p>
           <p>
-            Butikken leverer
+            Butikken leverer senest
             <?php
               if(get_field('vendor_require_delivery_day', 'user_'.$vendorId) == 0)
               {

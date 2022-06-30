@@ -437,7 +437,13 @@ $cart_url = wc_get_cart_url();  // Set Cart URL
           if(!empty($vendor_city)){
             $location .= $vendor_city.' ';
           }
-          echo esc_html($location); ?>
+
+          if(!empty($location) && $vendor_id != "38" && $vendor_id != "76"){
+            echo esc_html($location);
+          } else if($vendor_id == "38" || $vendor_id == "76"){
+            echo 'Leveres fra en fysisk gavebutik, der ligger nær din modtager.';
+          }
+          ?>
         </div>
       </div>
 	  </div>
