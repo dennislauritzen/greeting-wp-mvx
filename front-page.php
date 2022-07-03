@@ -139,8 +139,8 @@ get_header();
                   </ul>
                   </div>
                 </form>
-                <h6 style="font-family: 'Rubik',sans-serif; font-size:18px; color: #ffffff;" class="pb-2">Udvalgte byer<?php if(!empty($user_postal)){ echo ' tæt på dig'; } ?></h6>
-                <ul class="list-inline my-2">
+                <h6 style="font-family: 'Rubik',sans-serif; font-size:18px; color: #ffffff;" class="pb-1">Udvalgte byer<?php if(!empty($user_postal)){ echo ' tæt på dig'; } ?></h6>
+                <ul class="list-inline my-1">
                   <?php
                   if(!empty($user_postal)){
                     $postal_args2 = array(
@@ -158,8 +158,8 @@ get_header();
                     $postal_query2 = new WP_Query($postal_args2);
                     foreach($postal_query2->posts as $k => $postal){
                   ?>
-                  <li class="list-inline-item pb-1">
-                    <a href="<?php echo get_permalink($postal->ID);?>" class="btn btn-link rounded-pill pb-2 border-1 border-white text-white">
+                  <li class="list-inline-item pb-1 me-0 ms-0">
+                    <a href="<?php echo get_permalink($postal->ID);?>" class="btn btn-link rounded-pill pb-2 border-1 border-white text-white" style="font-size: 15px;">
                       <?php echo get_post_meta($postal->ID, 'postalcode', true)." ".get_post_meta($postal->ID, 'city', true);?>
                     </a>
                   </li>
@@ -189,13 +189,15 @@ get_header();
                         'type' => 'numeric'
                       )
                     ),
-                    'no_found_rows' => true
+                    'no_found_rows' => true,
+                    'update_post_meta_cache' => false,
+                    'update_post_term_cache' => false
                   );
                   $postal_query = new WP_Query($postal_args);
                   foreach($postal_query->posts as $k => $postal){
                     $postal_query->the_post();?>
-                    <li class="list-inline-item pb-1">
-                      <a href="<?php echo get_permalink($postal->ID);?>" class="btn btn-link rounded-pill pb-2 border-1 border-white text-white">
+                    <li class="list-inline-item pb-1 me-0 ms-1">
+                      <a href="<?php echo get_permalink($postal->ID);?>" class="btn btn-link rounded-pill pb-2 border-1 border-white text-white" style="font-size: 15px;">
                         <?php echo get_post_meta($postal->ID, 'postalcode', true)." ".get_post_meta($postal->ID, 'city', true);?>
                       </a>
                     </li>
@@ -467,7 +469,7 @@ if (have_rows('frontpage_full_width_boxes', $this_post_id) ){
       <div class="col-12 col-md-10 offset-md-1 col-lg-8 offset-lg-2 col-xl-6 offset-xl-3">
         <h4 class="pt-4 pb-3">🤔 Vidste du, at...</h4>
         <p class="px-lg-3 px-xl-3">Du på <b>Greeting.dk</b> handler i lokale, fysiske specialbutikker - og dermed er med til at støtte
-          en dansk iværksætter og selvstændig?</p>
+          de fysiske, danske butikker?</p>
         <p class="px-lg-3 px-xl-3 pb-3">Der er netop nu mere end <strong>70 forskellige specialbutikker</strong> at vælge i mellem, næste gang du skal sende en lækker gave til én, du holder af.</p>
         <a href="<?php echo site_url(); ?>/om-os" class="btn bg-teal text-white py-3 px-4 rounded-pill">Mere om Greeting.dk ></a>
       </div>

@@ -1,5 +1,7 @@
-<?php get_header(); ?>
-<?php get_header('green'); ?>
+<?php
+get_header();
+get_header('green', array('city' => '', 'postalcode' => ''));
+?>
 
 <?php
 /**
@@ -9,369 +11,6 @@
 */
  ?>
 
-<style type="text/css">
-  .bg-pink {
-    background: #F8F8F8;
-  }
-  .bg-rose {
-    background: #fecbca;
-  }
-  .bg-teal {
-    background: #446a6b;
-  }
-  .border-teal {
-    border-color: #446a6b;
-  }
-  .bg-light-grey {
-    background: #F8F8F8;
-  }
-  .bg-yellow {
-    background: #d6bf75;
-  }
-  .border-teal {
-    border: 1px solid #446a6b;
-  }
-  .border-yellow {
-    border: 1px solid #d6bf75;
-  }
-
-  #top {
-    border-top: 3px solid #fecbca;
-  }
-  #top div.right-col {
-    font-family: 'Inter', sans-serif;
-  }
-  #top div.right-col .btn {
-    font-size: 13px;
-  }
-  #top .top-search-btn {
-    width: 40px;
-    height: 35px;
-    margin-top: 2px;
-    z-index: 1000;
-    background-image: url('https://greeting.dk/wp-content/plugins/greeting-marketplace/assets/img/search-icon.svg');
-    background-repeat: no-repeat;
-    background-position: center center;
-  }
-  #top .top-search-input {
-    padding-left: 30px;
-  }
-  .btn-create {
-    border: 1px solid #58a2a2;
-  }
-
-  #content h1 {
-    padding-bottom: 15px;
-    position: relative;
-  }
-  #content h1::before {
-    position: absolute;
-    background: linear-gradient(to right, #555555 75px, #ffffff 75px);
-    height: 3px;
-    content: '';
-    bottom: 0;
-    right: 0;
-    left: 0;
-  }
-
-  #content #topoccassions .card .card-img-top {
-		width: 100%;
-    height: 10vw;
-    object-fit: cover;
-	}
-  #content #topoccassions .card h5.card-title {
-    font-family: 'Inter',sans-serif;
-    font-size: 14px;
-  }
-
-  .filter a[aria-expanded='true'] {
-    background: #d6bf75;
-  }
-  .accordion-button:not(.collapsed)::after {
-    background-image: url('data:image/svg+xml, %3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%23222222%22%20class%3D%22bi%20bi-chevron-down%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M1.646%204.646a.5.5%200%200%201%20.708%200L8%2010.293l5.646-5.647a.5.5%200%200%201%20.708.708l-6%206a.5.5%200%200%201-.708%200l-6-6a.5.5%200%200%201%200-.708z%22%2F%3E%3C%2Fsvg%3E');
-    transform: rotate(180deg);
-  }
-
-  .filter h5 {
-    font-family: 'Rubik','Inter', serif;
-    font-weight: 500;
-    font-size: 12px;
-  }
-  .filter h6 {
-    font-family: 'Inter','Rubik',serif;
-    font-weight: 800;
-    font-size: 13px;
-  }
-  .filter ul {
-    font-family: 'Inter', sans-serif;
-    font-size: 12px;
-  }
-  .filter span.price-filter-text {
-    font-size: 11px;
-  }
-  .filter input[type="range"]::-webkit-slider-thumb {
-    background: #446a6b;
-    border: 1px solid #446a6b;
-  }
-  .filter input[type="range"]::-ms-thumb {
-    background: #446a6b;
-    border: 1px solid #446a6b;
-  }
-  .filter input[type="range"]::-moz-range-thumb {
-    background: #446a6b;
-    border: 1px solid #446a6b;
-  }
-
-  div.applied-filters {
-    font-family: 'Inter', sans-serif;
-    font-size: 15px;
-    font-weight: 200;
-  }
-
-  div.store h6.card-title {
-    font-family: 'Rubik','Inter', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-  }
-  div.store small {
-    font-family: 'Inter', sans-serif;
-    font-size: 10px;
-    font-weight: 400;
-  }
-  div.store div.card p.price {
-    font-size: 13px;
-  }
-
-  h1, h2 {
-    font-family: 'Rubik','Inter', sans-serif;
-    font-weight: 600;
-  }
-
-  .store {
-    transition: all .15s ease-in-out;
-  }
-  .store:hover {
-    transform: scale(1.015);
-  }
-  @media (max-width: 768px){
-    .store a.cta {
-      font-size: 0.725rem;
-    }
-  }
-
-
-  /*
-  * section#hotitworks
-  * How it works section
-  * --
-  */
-  #howitworks h1,
-  #howitworks h2,
-  #howitworks h3 {
-    font-family: "Dela Gothic One", cursive, serif;
-    font-weight: 300;
-  }
-  ul.timeline {
-    width: 100%;
-    position: relative;
-    list-style: none;
-    line-height: 1.8em;
-    min-height: 50px;
-    float: left;
-    text-align: center;
-  }
-  ul.timeline::before {
-    content: "";
-    display: block;
-    background-color: #446a6b;
-    height: 0.5px;
-    margin: 0 ;
-    position:relative;
-    top:23px;
-  }
-  ul.timeline li {
-    float: left;
-    width: 20%;
-    min-width: 125px;
-    padding: 0 10px;
-  }
-  ul.timeline li figure {
-    position: relative;
-    z-index: 2;
-    background: #F8F8F8;
-    height: 50px;
-    width: 80px;
-    border-radius: 50%;
-    margin: 0 auto 10px auto;
-    box-sizing: inherit;
-  }
-  @media (min-width: 769px){
-    ul.timeline::before {
-      margin: 0 100px;
-    }
-  }
-  @media (max-width: 768px){
-    ul.timeline {
-      text-align: left;
-    }
-    ul.timeline::before {
-      content: "";
-      position: absolute;
-      width: 1px;
-      top: 10px;
-      left: 59px;
-      margin-top: 25px;
-      height: calc(100% - 75px);
-    }
-    ul.timeline li {
-      display: flex;
-      align-items: center;
-      width: 100%;
-      min-width: 200px;
-      padding: 5px 10px 10px 10px;
-    }
-    ul.timeline li figure {
-      width: 34px;
-      text-align: left;
-      margin: 0 15px 0 0;
-    }
-    ul.timeline li svg {
-      width: 34px;
-    }
-  }
-
-  /*
-  * #learnmore
-  * Learn more section
-  */
-  #learnmore h1,
-  #learnmore h2,
-  #learnmore h3,
-  #learnmore h4 {
-    font-family: "Dela Gothic One", cursive, serif;
-  }
-  #learnmore .card .card-img-top {
-    width: 100%;
-    height: 10vw;
-    min-height: 200px;
-    object-fit: cover;
-  }
-  #learnmore .card .card-title {
-    font-family: 'Rubik',sans-serif;
-  }
-  #learnmore .card .card-text {
-    font-family: 'Inter',sans-serif;
-    font-size: 14px;
-    line-height: 23px;
-  }
-
-
-
-  #greeting-footer h6 {
-    font-family: 'Rubik', 'Inter', 'Comic Sans', sans-serif;
-    font-size: 20px;
-    color: #1b4949;
-  }
-  #greeting-footer h6.light {
-    font-family: 'Rubik', 'Inter', 'Comic Sans', sans-serif;
-    font-size: 18px;
-    text-transform: uppercase;
-    color: #ffffff;
-  }
-  #greeting-footer ul {
-    font-family: 'Inter', 'Comic Sans', sans-serif;
-    font-weight: 300;
-    font-size: 13px;
-  }
-  #greeting-footer ul.social {
-    width: 100px;
-    list-style: none;
-    margin: -30px 0 0 -100px;
-    padding: 0 5px 0 0;
-  }
-  #greeting-footer ul.social li {
-    float: left;
-    width: 45px;
-    margin: 0;
-    padding: 0;
-  }
-
-  #formal-footer {
-    border-top: 3px solid #fecbca;
-    font-family: 'Inter',sans-serif;
-    font-size: 12px;
-    color: #555555;
-  }
-  #formal-footer ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-  #formal-footer ul li {
-    float: left;
-    margin: 0;
-    padding: 0 10px 0 0;
-  }
-
-
-  /** price filter begin */
-
-	#priceSlider {
-		background-color: #ddd !important;
-	}
-
-	.ui-widget-content {
-		height: 7px !important;
-	}
-
-	.ui-slider .ui-slider-handle {
-		background-color: #494932 !important;
-		border-radius: 8px;
-		height: 17px !important;
-		width: 17px !important;
-	}
-
-	input[type='text'] {
-		padding: 4px 15px;
-		border: 1px solid #c1c1c1;
-	}
-	#slideStartPoint {
-		max-width: 60px;
-		background-color: #c6c6c6;
-		color: white;
-	}
-
-	#slideEndPoint {
-		max-width: 60px;
-		background-color: #c6c6c6;
-		float: right;
-		color: white;
-	}
-  /** price filter end */
-
-  /** loading begin */
-    .overlay {
-		display: none;
-		position: fixed;
-		width: 100%;
-		height: 100%;
-		top: 0;
-		left: 0;
-		z-index: 999;
-		background: rgba(255,255,255,0.8) url("<?php echo get_stylesheet_directory_uri() . '/image/loading3.gif';?>") center no-repeat;
-	}
-	/* Turn off scrollbar when body element has the loading class */
-	div.loading {
-		overflow: hidden;
-	}
-	/* Make spinner image visible when body element has the loading class */
-	div.loading .overlay {
-		display: block;
-	}
-  /** loading end */
-
-</style>
-
 
 <main id="main" class="container"<?php if ( isset( $navbar_position ) && 'fixed_top' === $navbar_position ) : echo ' style="padding-top: 100px;"'; elseif ( isset( $navbar_position ) && 'fixed_bottom' === $navbar_position ) : echo ' style="padding-bottom: 100px;"'; endif; ?>>
 <?php
@@ -380,48 +19,80 @@
  * Perform start setup
  *
 **/
-$pageId = get_the_ID();
-
-$cityIdArr = get_post_meta($pageId, 'postal_code_relation', true);
-$cityId = $cityIdArr[0];
-
 global $wpdb;
 
-$cityPostRow = $wpdb->get_row( "
-    SELECT * FROM {$wpdb->prefix}posts
-    WHERE ID = $cityId
-" );
+$pageId = get_the_ID();
+$page_id = $pageId;
+$usersForThisLP = array();
 
-$cityName = $cityPostRow->post_title;
+// ----
+// Generate array of postal codes for this landing page.
+#$cityIdArr = get_post_meta($pageId, 'postal_code_relation', true);
+#$cityId = $cityIdArr[0];
+$postal_codes = get_field('postal_code_relation', $pageId);
+$postcodes = array();
+$postalcodesForFilter = array();
 
+foreach($postal_codes as $postcode){
+  $post_code_val = get_field('postalcode', $postcode->ID);
+  $postcodes[] = $post_code_val;
+  $postalcodesForFilter[] = array('id' => $postcode->ID, 'postcode' => $post_code_val, 'title' => $postcode->post_title, 'shorttag' => $postcode->post_name);
+}
+
+// -------------------
+
+// ---
+// Get the store ID's that can delivery products from this
+// category and postal code range.
+// -------------------
 $postRowCategory = $wpdb->get_row( "
     SELECT * FROM {$wpdb->prefix}postmeta
     WHERE post_id = $pageId
     AND meta_key = 'landingpage_category'
 " );
-
+// delete above.
+$lp_cat_conn = get_post_meta($pageId, 'landingpage_category', true);
 $searchCategoryId = $postRowCategory->meta_value;
 
-$adminSettedCityPostcodeArray = get_post_meta($pageId, 'postal_code_relation', true);
 
-$adminSettedCityPostcodeFirstItem = $adminSettedCityPostcodeArray[0];
-
-$adminSettedCityPostcode = get_post_meta($adminSettedCityPostcodeFirstItem, 'postalcode', true);
-
-$userMetaQuery = $wpdb->get_results( "
-SELECT * FROM {$wpdb->prefix}usermeta
-WHERE meta_key = 'delivery_zips'");
-
-$userForThisPostcode = array();
-foreach($userMetaQuery as $userMeta){
-    if (str_contains($userMeta->meta_value, $adminSettedCityPostcode)) {
-        array_push($userForThisPostcode, $userMeta->user_id);
-    }
+$where = array();
+$placeholder_arr = array_fill(0, count($postcodes), 'um.meta_value LIKE %s');
+foreach($postcodes as $postcode){
+  $where[] = '%'.$postcode.'%';
 }
 
-$userForThisCategory = array();
+$sql = "SELECT
+        	DISTINCT(u.ID)
+        FROM
+        	{$wpdb->prefix}users u
+        LEFT JOIN
+        	{$wpdb->prefix}usermeta um
+            ON um.user_id = u.ID
+        WHERE
+      	(
+          um.meta_key = 'delivery_zips'
+          AND";
 
-foreach ($userForThisPostcode as $queryUserId) {
+
+$sql .= "
+      		(".implode(" OR ",$placeholder_arr).")
+        )
+        AND
+        NOT EXISTS (SELECT um.meta_value FROM {$wpdb->prefix}usermeta um2 WHERE um2.user_id = u.ID AND um2.meta_key = 'vendor_turn_off')
+        ORDER BY
+      		CASE u.ID
+      			WHEN 38 THEN 0
+      			WHEN 76 THEN 0
+      			ELSE 1
+      		END DESC,
+		      (SELECT um3.meta_value FROM wp_usermeta um3 WHERE um3.user_id = u.ID AND um3.meta_key = 'delivery_type') ASC
+";
+
+$sql_prepare = $wpdb->prepare($sql, $where);
+$users_from_postcode = wp_list_pluck( $wpdb->get_results($sql_prepare), 'ID' );
+
+$userForThisCategory = array();
+foreach ($users_from_postcode as $queryUserId) {
     $vendor = get_wcmp_vendor($queryUserId);
     $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
     foreach ($vendorProducts as $productId) {
@@ -435,62 +106,68 @@ foreach ($userForThisPostcode as $queryUserId) {
 }
 
 // pass to backend
-$landingPageDefaultUserIdArray = array_intersect($userForThisPostcode, $userForThisCategory);
+$landingPageDefaultUserIdArray = array_intersect($users_from_postcode, $userForThisCategory);
 
 $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray); ?>
 
 <input type="hidden" id="landingPageDefaultUserIdAsString" value="<?php echo $landingPageDefaultUserIdAsString;?>">
 
-
-<section id="content" class="row">
+<section id="citycontent" class="row">
   <div class="container">
     <div class="row d-inline d-lg-none d-xl-none">
       <div class="col-12">
-        <h1 class="d-inline d-lg-none d-xl-none my-3 my-xs-3 my-sm-3 my-md-3 my-lg-0 my-xl-0 mb-lg-4 mb-xl-4">Find gavehilsner til <?php the_title();?></h1>
+        <h1 class="d-inline d-lg-none d-xl-none my-3 my-xs-3 my-sm-3 my-md-3 my-lg-0 my-xl-0 mb-lg-4 mb-xl-4"><?php the_title();?></h1>
       </div>
     </div>
 
     <div class="row mt-4 mb-5" id="topoccassions">
     <?php
-    $occasionTermListArray = array();
+    // Get the top occassions
 
-    $productPriceArray = array(); // for price filter
-
-    foreach ($landingPageDefaultUserIdArray as $vendorId) {
-        $vendor = get_wcmp_vendor($vendorId);
-        $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
-        foreach ($vendorProducts as $productId) {
-            $occasionTermList = wp_get_post_terms($productId, 'occasion', array('fields' => 'all'));
-            // for price filter begin
-            $singleProduct = wc_get_product( $productId );
-            array_push($productPriceArray, $singleProduct->get_price()); // for price filter
-            // for price filter end
-            foreach($occasionTermList as $occasionTerm){
-                array_push($occasionTermListArray, $occasionTerm);
-            }
-        }
-    }
-
-    foreach($occasionTermListArray as $occasion){
-      $uploadedOccasionImage = '';
-      $placeHolderImage = wc_placeholder_img_src();
-      $occasionImageUrl;
-      if($uploadedOccasionImage != ''){
-        $occasionImageUrl = $uploadedOccasionImage;
+    $occasion_featured_list = $wpdb->get_results( "
+    SELECT
+      tt.term_id,
+      tt.taxonomy,
+		  t.name,
+      t.slug,
+      (SELECT tm.meta_value FROM {$wpdb->prefix}termmeta tm WHERE tm.term_id = tt.term_id AND tm.meta_key = 'featured_image') as image_src
+    FROM
+      {$wpdb->prefix}term_taxonomy tt
+    INNER JOIN
+      {$wpdb->prefix}terms t
+    ON
+      t.term_id = tt.term_id
+    WHERE
+      tt.taxonomy IN ('occasion','product_cat')
+    AND
+      tt.term_id IN (SELECT term_id FROM {$wpdb->prefix}termmeta tm WHERE meta_key = 'featured' AND meta_value = 1)
+    ORDER BY
+		  tt.count DESC
+    LIMIT 6
+    ");
+    $placeHolderImage = wc_placeholder_img_src();
+    foreach($occasion_featured_list as $occasion){
+      $occasionImageUrl = '';
+      if(!empty($occasion->image_src)){
+        $occasionImageUrl = wp_get_attachment_image($occasion->image_src, 'thumbnail', false, array('class' => 'card-img-top', 'alt' => $occasion->name));
       } else {
         $occasionImageUrl = $placeHolderImage;
       }
     ?>
     <div class="col-6 col-md-2">
-        <div class="card border-0 shadow-sm">
-          <img src="<?php echo $occasionImageUrl;?>" class="card-img-top" alt="Påskegaver">
-          <div class="card-body">
-            <h5 class="card-title"><?php echo $occasion->name;?></h5>
-          </div>
+      <div class="card border-0 shadow-sm">
+        <?php echo $occasionImageUrl;?>
+        <div class="card-body">
+          <h5 class="card-title">
+            <a href="#" class="stretched-link text-dark">
+              <?php echo $occasion->name;?>
+            </a>
+          </h5>
         </div>
       </div>
-
-    <?php }
+    </div>
+    <?php
+    }
     ?>
     </div>
 
@@ -502,7 +179,7 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
               <svg class="pe-2" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#ffffff" class="bi bi-funnel" viewBox="0 0 16 16">
                 <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2zm1 .5v1.308l4.372 4.858A.5.5 0 0 1 7 8.5v5.306l2-.666V8.5a.5.5 0 0 1 .128-.334L13.5 3.308V2h-11z"/>
               </svg>
-              <h6 class="accordion-header float-start filter-header">Filtrér</h6>
+              <h6 class="accordion-header float-start filter-header">Vælg leveringsmåde - og filtrér gavehilsner</h6>
             </a>
           </div>
         </div>
@@ -510,6 +187,102 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
           <h6 class="float-start d-none d-lg-inline d-xl-inline py-2 border-bottom filter-header">Filtrér</h6>
         </div>
         <div class="collapse d-lg-block accordion-collapse " id="colFilter">
+
+
+          <?php
+          $productPriceArray = array(); // for price filter
+          $categoryTermListArray = array(); // for cat term filter
+          $occasionTermListArray = array();
+
+          // for price filter
+          foreach ($landingPageDefaultUserIdArray as $vendorId) {
+              $vendor = get_wcmp_vendor($vendorId);
+              $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
+              foreach ($vendorProducts as $productId) {
+                  // for price filter begin
+                  $singleProduct = wc_get_product( $productId );
+                  array_push($productPriceArray, $singleProduct->get_price()); // for price filter
+                  // for price filter end
+
+                  // for cat terms filter
+                  $categoryTermList = wp_get_post_terms($productId, 'product_cat', array('fields' => 'ids'));
+                  foreach($categoryTermList as $catTerm){
+                      array_push($categoryTermListArray, $catTerm);
+                  }
+                  // --
+
+                  // for occassions
+                  $occasionTermList = wp_get_post_terms($productId, 'occasion', array('fields' => 'ids'));
+                  foreach($occasionTermList as $occasionTerm){
+                      array_push($occasionTermListArray, $occasionTerm);
+                  }
+              }
+          }
+
+
+          /**
+           * ---------------------
+           * Delivery type filter
+           * ---------------------
+          **/
+          ?>
+          <h5 class="text-uppercase mb-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#ffc107" class="bi bi-star-fill" viewBox="0 0 16 16">
+              <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+            </svg>&nbsp;
+            Levering
+          </h5>
+          <ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
+
+          <div class="form-check">
+              <input type="checkbox" name="filter_del_city" class="form-check-input filter-on-city-page" id="filter_delivery_1" checked="checked" value="1">
+              <label class="form-check-label" for="filter_delivery_1">
+                Personlig levering fra lokal butik
+              </label>
+          </div>
+          <div class="form-check">
+              <input type="checkbox" name="filter_del_city" class="form-check-input filter-on-city-page" id="filter_delivery_0" checked="checked" value="0">
+              <label class="form-check-label" for="filter_delivery_0">
+                Forsendelse med fragtfirma
+              </label>
+          </div>
+
+          </ul>
+
+
+          <?php
+          /**
+           * ---------------------
+           * Postalcode filter
+           * ---------------------
+          **/
+          if(count($postalcodesForFilter) <= 15){
+          ?>
+            <h5 class="text-uppercase mb-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#ffc107" class="bi bi-geo-alt" viewBox="0 0 16 16">
+                <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A31.493 31.493 0 0 1 8 14.58a31.481 31.481 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94zM8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10z"/>
+                <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+              </svg>
+              Postnumre
+            </h5>
+            <ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
+
+            <?php
+            // search users for get filtered category
+            foreach($postalcodesForFilter as $postcode){
+            ?>
+                <div class="form-check">
+                    <input type="checkbox" name="filter_catocca_city" class="form-check-input filter-on-city-page" id="filter_cat<?php echo $postcode['id']; ?>" value="<?php echo $postcode['id']; ?>">
+                    <label for="filter_cat<?php echo $category->term_id; ?>" class="form-check-label">
+                      <?php echo $postcode['title']; ?>
+                    </label>
+                </div>
+          <?php
+            }
+          }
+          ?>
+          </ul>
+
           <?php
           /**
            * ---------------------
@@ -517,24 +290,19 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
            * ---------------------
           **/
           ?>
-          <h5 class="text-uppercase">Anledning</h5>
+          <h5 class="text-uppercase mb-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#ffc107" class="bi bi-calendar3-event" viewBox="0 0 16 16">
+              <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857V3.857z"/>
+              <path d="M12 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+            </svg>&nbsp;
+            Anledning
+          </h5>
           <ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
           <?php
-          // for used on occasion prepare here
-          $occasionTermListArray = array();
+          // Occassion
 
-          foreach ($landingPageDefaultUserIdArray as $vendorId) {
-              $vendor = get_wcmp_vendor($vendorId);
-              $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
-              foreach ($vendorProducts as $productId) {
-                  $occasionTermList = wp_get_post_terms($productId, 'occasion', array('fields' => 'ids'));
-                  foreach($occasionTermList as $occasionTerm){
-                      array_push($occasionTermListArray, $occasionTerm);
-                  }
-              }
-          }
+          // Take the occassion term array and make sure we only get uniques.
           $occasionTermListArrayUnique = array_unique($occasionTermListArray);
-          // for occasion end
 
           $args = array(
               'taxonomy'   => "occasion",
@@ -546,7 +314,7 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
             foreach($occasionTermListArrayUnique as $occasionTerm){
               if($occasionTerm == $occasion->term_id){ ?>
                 <div class="form-check">
-                    <input type="checkbox" name="filter_landing_page" class="form-check-input filter-on-landing-page" id="filter_occ_<?php echo $occasion->term_id; ?>" value="<?php echo $occasion->term_id; ?>">
+                    <input type="checkbox" name="filter_catocca_city" class="form-check-input filter-on-city-page" id="filter_occ_<?php echo $occasion->term_id; ?>" value="<?php echo $occasion->term_id; ?>">
                     <label class="form-check-label" for="filter_occ_<?php echo $occasion->term_id; ?>"><?php echo $occasion->name; ?></label>
                 </div>
           <?php
@@ -556,50 +324,10 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
           ?>
           </ul>
 
+          <!-- price filter filter-->
           <?php
-          /**
-           * ---------------------
-           * Delivery type filter
-           * ---------------------
-          **/
-          ?>
-          <h5 class="text-uppercase">Levering</h5>
-          <ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
-          <?php
-          $args = array (
-              'role' => 'dc_vendor'
-          );
-
-          // Create the WP_User_Query object
-          $userQuery = new WP_User_Query($args);
-
-          // Get the results
-          $vendors = $userQuery->get_results();
-          $deliveryTypeArray = array();
-          foreach($vendors as $vendor){
-              $userMetas = get_user_meta($vendor->ID, 'delivery_type', true);
-              $label = get_field_object('delivery_type','user_'.$vendor->ID);
-              foreach($userMetas as $deliveryType){
-                  if(!array_key_exists($deliveryType, $deliveryTypeArray)){
-                      $deliveryTypeArray[$deliveryType] = array(
-                          'label' => $label['value']['0'],
-                          'id' => $deliveryType
-                        );
-                  }
-              }
-          }
-
-          foreach($deliveryTypeArray as $delivery){?>
-              <div class="form-check">
-                  <input type="checkbox" name="filter_landing_page" class="form-check-input filter-on-landing-page" id="filter_delivery_<?php echo $delivery['id']; ?>" value="<?php echo $delivery['id']; ?>">
-                  <label class="form-check-label" for="filter_delivery_<?php echo $delivery['id']; ?>"><?php echo $delivery['label']['label']; ?></label>
-              </div>
-          <?php }
-          ?>
-          </ul>
 
 
-          <?php
           // for price filter
           $minProductPrice;
           $maxProductPrice;
@@ -616,23 +344,54 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
             $minProductPrice = 0;
             $maxProductPrice = max($productPriceArray);
           }
+
+          $start_val = $minProductPrice;
+          $end_val = $maxProductPrice;
+          if(isset($_GET['price'])){
+            $price_arr = explode(',',$_GET['price']);
+            if(is_numeric($price_arr['0']) && $price_arr['0'] >= $minProductPrice){
+              $start_val = $price_arr['0'];
+            }
+            if(is_numeric($price_arr['1']) && $price_arr['1'] <= $maxProductPrice){
+              $end_val = $price_arr['1'];
+            }
+          }
           ?>
-          <h5 class="text-uppercase">Pris</h5>
+
+          <h5 class="text-uppercase mb-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#ffc107" class="bi bi-cash-coin" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M11 15a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm5-4a5 5 0 1 1-10 0 5 5 0 0 1 10 0z"/>
+              <path d="M9.438 11.944c.047.596.518 1.06 1.363 1.116v.44h.375v-.443c.875-.061 1.386-.529 1.386-1.207 0-.618-.39-.936-1.09-1.1l-.296-.07v-1.2c.376.043.614.248.671.532h.658c-.047-.575-.54-1.024-1.329-1.073V8.5h-.375v.45c-.747.073-1.255.522-1.255 1.158 0 .562.378.92 1.007 1.066l.248.061v1.272c-.384-.058-.639-.27-.696-.563h-.668zm1.36-1.354c-.369-.085-.569-.26-.569-.522 0-.294.216-.514.572-.578v1.1h-.003zm.432.746c.449.104.655.272.655.569 0 .339-.257.571-.709.614v-1.195l.054.012z"/>
+              <path d="M1 0a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h4.083c.058-.344.145-.678.258-1H3a2 2 0 0 0-2-2V3a2 2 0 0 0 2-2h10a2 2 0 0 0 2 2v3.528c.38.34.717.728 1 1.154V1a1 1 0 0 0-1-1H1z"/>
+              <path d="M9.998 5.083 10 5a2 2 0 1 0-3.132 1.65 5.982 5.982 0 0 1 3.13-1.567z"/>
+            </svg>&nbsp;
+            Pris
+          </h5>
           <form>
             <div id="slideInput" class="my-3">
               <div class="row">
                 <div class="col-2 col-xs-2 col-sm-2 col-md-2 col-lg-4 col-xl-3">
-                  <input type="text" id="slideStartPoint" class="form-control" data-index="0" value="<?php echo $minProductPrice;?>" readonly/>
+                  <input type="text" id="slideStartPoint" class="form-control price-field" data-index="0" value="<?php echo $start_val;?>" readonly/>
                 </div>
                 <div class="col-2 offset-8 col-xs-2 col-sm-2 offset-xs-8 offset-sm-8 col-md-2 offset-md-8 col-lg-4 offset-lg-4 col-xl-3 offset-xl-6">
-                  <input type="text" id="slideEndPoint" class="form-control" data-index="1" value="<?php echo ceil($maxProductPrice);?>" readonly/>
+                  <input type="text" id="slideEndPoint" class="form-control price-field" data-index="1" value="<?php echo ceil($end_val);?>" readonly/>
                 </div>
               </div>
               <div class="row">
                 <div class="col-12">
                   <div class="px-3 px-lg-2 pt-3 pt-lg-2 pt-xl-2 pb-4">
+                    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/css/bootstrap-slider.min.css">
+                    <style type="text/css">
+                    .slider.slider-horizontal{
+                      width:100%;
+                    }
+                    .slider .slider-handle {
+                      background-color: #446a6b;
+                      background-image: none;
+                    }
+                    </style>
                     <input
-                      id="sliderLandingPage"
+                      id="sliderPrice"
                       type="text"
                       class="form-range py-3"
                       value="array"
@@ -640,31 +399,7 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
                       data-slider-max="<?php echo ceil($maxProductPrice); ?>"
                       data-slider-step="1"
                       data-slider-tooltip="hide"
-                      data-slider-value="[0,<?php echo ceil($maxProductPrice); ?>]"/>
-
-                      <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/css/bootstrap-slider.css">
-                      <style type="text/css">
-                      .slider.slider-horizontal{
-                        width:100%;
-                      }
-                      .slider .slider-handle {
-                        background-color: #446a6b;
-                        background-image: none;
-                      }
-                      </style>
-                      <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/bootstrap-slider.min.js"></script>
-                      <script type="text/javascript">
-                        var slider = new Slider('#sliderLandingPage', {
-                          'tooltip_split': true
-                        });
-                        slider.on("slideStop", function(sliderValue){
-                          var val = slider.getValue();
-                          var min_val = val[0];
-                          var max_val = val[1];
-                          document.getElementById("slideStartPoint").value = min_val;
-                          document.getElementById("slideEndPoint").value = max_val;
-                        });
-                      </script>
+                      data-slider-value="[<?php echo $start_val; ?>,<?php echo ceil($end_val); ?>]"/>
                   </div>
                 </div>
               </div>
@@ -674,33 +409,38 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
         </div> <!-- #colFilter -->
       </div>
 
+
       <div class="col-md-12 col-lg-9 mb-5">
-        <h1 class="d-none d-lg-block d-xl-block my-3 my-xs-3 my-sm-3 my-md-3 my-lg-0 my-xl-0 mb-lg-4 mb-xl-4">
-          <?php the_title();?>
-        </h1>
+        <h1 class="d-none d-lg-block d-xl-block my-3 my-xs-3 my-sm-3 my-md-3 my-lg-0 my-xl-0 mb-lg-4 mb-xl-4"><?php the_title();?></h1>
         <div class="applied-filters row mt-xs-0 mt-sm-0 mt-md-0 mt-2 mb-4 lh-lg">
-          <div class="col-12 filterItemShow">
-
-            <a class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 text-dark">Påske <button type="button" class="btn-close" aria-label="Close"></button></a>
-
-            <a class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 text-dark">Påske <button type="button" class="btn-close" aria-label="Close"></button></a>
-            <a class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 text-dark">Pris: 250,- til 750,- <button type="button" class="btn-close" aria-label="Close"></button></a>
-            <a class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 text-dark">5683 Haarby <button type="button" class="btn-close" aria-label="Close"></button></a>
-
-            <a class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 bg-yellow text-white">Nulstil alle <button type="button" class="btn-close  btn-close-white" aria-label="Close"></button></a>
-
-            <button id="landingPageReset" type="button" class="rounded-pill border-yellow bg-yellow text-white">Reset All</button>
-
+          <div class="col-12 filter-list">
+            <div id="filterfilter_cat0" class="badge rounded-pill border-yellow py-2 px-2 me-1 my-1 my-lg-0 my-xl-0 text-dark dynamic-filters">
+                Forsendelse med fragtfirma
+              <button type="button" class="btn-close filter-btn-delete" data-filter-id="0" data-label="Forsendelsemedfragtfirma" data-filter-remove="filter_cat0"></button>
+            </div>
+            <div id="filterfilter_cat1" class="badge rounded-pill border-yellow py-2 px-2 me-1 my-1 my-lg-0 my-xl-0 text-dark dynamic-filters">
+                Personlig levering fra lokal butik
+              <button type="button" class="btn-close filter-btn-delete" data-filter-id="1" data-label="Personligleveringfralokalbutik" data-filter-remove="filter_cat1"></button>
+            </div>
+            <a href="<?php echo home_url(); ?>"class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 text-dark">
+              <?php echo $cityPostalcode.' '.$cityName; ?>
+              <button type="button" class="btn-close" aria-label="Close"></button>
+            </a>
+            <a href="#" id="cityPageReset" onclick="event.preventDefault();" class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 bg-yellow text-white">
+              Nulstil alle
+              <button type="button" class="btn-close  btn-close-white" aria-label="Close">
+              </button>
+            </a>
           </div>
         </div>
 
-
+        <div id="defaultStore">
       <?php
       foreach ($landingPageDefaultUserIdArray as $user) {
         $vendor = get_wcmp_vendor($user);
         $image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
         ?>
-        <div id="defaultStore" class="store row">
+        <div class="store row">
           <div class="col-12">
             <div class="card shadow border-0 mb-3">
               <div class="card-body">
@@ -766,6 +506,37 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
       <!-- show filtered result here-->
       <div class="filteredStore row"></div>
 
+      </div>
+    </div>
+  </div>
+</section>
+<section id="description" class="my-4">
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <p><?php echo the_content(); ?></p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <h4>Find andre gavehilsner i <?php echo get_field('city_name', $page_id); ?></h4>
+      </div>
+      <div class="col-sm-12 col-md-3">
+      <?php
+      $i++;
+      $num = count($postalcodesForFilter);
+      $num4 = ceil($num / 4);
+      $i = 0;
+      foreach($postalcodesForFilter as $postcode){
+        echo '<a href="'.get_permalink($postcode['id']).'" class="text-dark fs-6 fw-light py-1">';
+        print $postcode['title'];
+        echo '</a>';
+        echo '<br>';
+        if(($i % $num4) == 0){
+          print '</div><div class="col-sm-12 col-md-3">';
+        }
+      }
+      ?>
       </div>
     </div>
   </div>

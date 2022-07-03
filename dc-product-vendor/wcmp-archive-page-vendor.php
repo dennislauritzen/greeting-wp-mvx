@@ -426,103 +426,138 @@ do_action('after_wcmp_vendor_description', $vendorId);
   				$dates = explode(",",$closed_dates);
   				$viable_dates = array();
 
-  				foreach($dates as $val){
-  					$date_u = strtotime($val);
-  					$date = date("d-m-Y", $date_u);
-  					$today = date("U");
+          function groupDates($input) {
+            $arr = explode(", ", $input);
+            foreach($arr as $k => $v){
+              $arr[$k] = strtotime($v);
+            }
+            sort($arr);
+            $expected = -1;
+            foreach ($arr as $date) {
+              if ($date == $expected) {
+                array_splice($range, 1, 1, date("d-m-Y",$date));
+              } else {
+                unset($range);
+                $range = [date("d-m-Y",$date)];
+                $ranges[] = &$range;
+              }
+              $expected = strtotime(date("d-m-Y",$date) . ' + 1 day');
+            }
 
-  					if($date_u >= ($today-(60*60*24)) && $date_u <= ($today+(60*60*24*30))){
-  						$weekday = date('N',$date_u);
-  						$weekday_str = '';
-  						$date = date('j',$date_u);
-  						$month = date('m',$date_u);
-  						$month_str = '';
+            foreach ($ranges as $entry) {
+              $result[] = $entry;
+            }
+            return $result;
+          }
 
-  						switch($weekday){
-  							case 1:
-  								$weekday_str = 'mandag';
-  								break;
-  							case 2:
-  								$weekday_str = 'tirsdag';
-  								break;
-  							case 3:
-  								$weekday_str = 'onsdag';
-  								break;
-  							case 4:
-  								$weekday_str = 'torsdag';
-  								break;
-  							case 5:
-  								$weekday_str = 'fredag';
-  								break;
-  							case 6:
-  								$weekday_str = 'lørdag';
-  								break;
-  							case 7:
-  								$weekday_str = 'søndag';
-  								break;
-  						}
+          function rephraseDate($weekday, $date, $month, $year){
+            switch($weekday){
+              case '1':
+                $weekday_str = 'mandag';
+                break;
+              case '2':
+                $weekday_str = 'tirsdag';
+                break;
+              case '3':
+                $weekday_str = 'onsdag';
+                break;
+              case '4':
+                $weekday_str = 'torsdag';
+                break;
+              case '5':
+                $weekday_str = 'fredag';
+                break;
+              case '6':
+                $weekday_str = 'lørdag';
+                break;
+              case '7':
+                $weekday_str = 'søndag';
+                break;
+            }
 
-  						switch($month){
-  							case 1:
-  								$month_str = 'januar';
-  								break;
-  							case 2:
-  								$month_str = 'februar';
-  								break;
-  							case 3:
-  								$month_str = 'marts';
-  								break;
-  							case 4:
-  								$month_str = 'april';
-  								break;
-  							case 5:
-  								$month_str = 'maj';
-  								break;
-  							case 6:
-  								$month_str = 'juni';
-  								break;
-  							case 7:
-  								$month_str = 'juli';
-  								break;
-  							case 8:
-  								$month_str = 'august';
-  								break;
-  							case 9:
-  								$month_str = 'september';
-  								break;
-  							case 10:
-  								$month_str = 'oktober';
-  								break;
-  							case 11:
-  								$month_str = 'november';
-  								break;
-  							case 12:
-  								$month_str = 'december';
-  								break;
-  						}
-  						$viable_dates[] = $weekday_str." d. ".$date.". ".$month_str;
-  					}
-  				}
+            switch($month){
+              case '1':
+                $month_str = 'januar';
+                break;
+              case '2':
+                $month_str = 'februar';
+                break;
+              case '3':
+                $month_str = 'marts';
+                break;
+              case '4':
+                $month_str = 'april';
+                break;
+              case '5':
+                $month_str = 'maj';
+                break;
+              case '6':
+                $month_str = 'juni';
+                break;
+              case '7':
+                $month_str = 'juli';
+                break;
+              case '8':
+                $month_str = 'august';
+                break;
+              case '9':
+                $month_str = 'september';
+                break;
+              case '10':
+                $month_str = 'oktober';
+                break;
+              case '11':
+                $month_str = 'november';
+                break;
+              case '12':
+                $month_str = 'december';
+                break;
+            }
 
-  				$dates_for_str = '';
-  				$i = 0;
-  				foreach($viable_dates as $v){
-  					$i++;
-  					$dates_for_str .= $v;
-  					if(count($viable_dates) > 1){
-  						if($i == count($viable_dates)-1){
-  							$dates_for_str .= ' og ';
-  						} else if($i < count($viable_dates)){
-  							$dates_for_str .= ', ';
-  						}
-  					}
-  				}
+            $year_str = ($year != date("Y") ? $year : '');
 
-  				if(count($viable_dates) > 0){
-  				?>
-  			 		<p>Bemærk dog at butikken ikke leverer <?php print $dates_for_str; ?>.</p>
-  				<?php
-  				}
+            return $weekday_str." d. ".$date.". ".$month_str. " ". $year_str;
+          }
+
+          // Demo run
+          $str = $closed_dates;
+          $result = groupDates($str);
+
+          if(count($result) > 0)
+          {
+            print '<p>Bemærk dog at butikken ikke leverer:</p>';
+
+            $today = date("U");
+
+            foreach($result as $v){
+              if(strtotime($v[0]) > $today || strtotime($v[1]) > $today){
+                // Rephrase the dato for readable dates.
+                $start = rephraseDate(
+                  date("N", strtotime($v[0])),
+                  date("j", strtotime($v[0])),
+                  date("m", strtotime($v[0])),
+                  date("Y", strtotime($v[0]))
+                );
+                if(count($v) > 1){
+                  $end = rephraseDate(
+                    date("N", strtotime($v[1])),
+                    date("j", strtotime($v[1])),
+                    date("m", strtotime($v[1])),
+                    date("Y", strtotime($v[1]))
+                  );
+                }
+
+                // Print the dates
+                print '<li>';
+                print $start;
+                if(count($v) > 1){
+                  print ' til ';
+                  print $end;
+                }
+                print '</li>';
+              }
+            }
+          }
   				// --- END of CLOSED DATES --- Dennis.
   				?>
 

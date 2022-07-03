@@ -5,7 +5,7 @@
  * Perform start setup
  *
 **/
-global $woocommerce;
+global $woocommerce, $wpdb;
 
 $postId = get_the_ID();
 $cityPostalcode = get_post_meta($postId, 'postalcode', true);
@@ -19,9 +19,8 @@ if($cityPostalcode != $checkout_postalcode){
   $woocommerce->cart->empty_cart();
 }
 
+// Get header designs.
 get_header();
-
-
 get_header('green', array('city' => $cityName, 'postalcode' => $cityPostalcode)); ?>
 
 
@@ -37,30 +36,35 @@ get_header('green', array('city' => $cityName, 'postalcode' => $cityPostalcode))
 <?php
 
 // get user meta query
-$args = array(
-  'role' => 'dc_vendor',
-  'orderby' => 'meta_value',
-  'meta_key' => 'delivery_type',
-  'order' => 'DESC',
-  'meta_query' => array(
-      'relation' => 'AND',
-      array(
-          'key'     => 'vendor_turn_off',
-          'compare' => 'NOT EXISTS'
-      ),
-      array(
-        'key' => 'delivery_zips',
-        'value' => $cityPostalcode,
-        'compare' => 'LIKE'
-      )
-    )
-);
-$vendors = new WP_User_Query( $args	);
-$vendor_arr = $vendors->get_results();
+$sql = "SELECT
+            u.ID
+        FROM
+        	{$wpdb->prefix}users u
+        LEFT JOIN
+        	{$wpdb->prefix}usermeta um
+        	ON
+            um.user_id = u.ID
+        WHERE
+        	(um.meta_key = 'delivery_zips' AND um.meta_value LIKE %s)
+            AND
+            NOT EXISTS (SELECT um.meta_value FROM {$wpdb->prefix}usermeta um2 WHERE um2.user_id = u.ID AND um2.meta_key = 'vendor_turn_off')
+        ORDER BY
+        	CASE u.ID
+        		WHEN 38 THEN 0
+        		WHEN 76 THEN 0
+                ELSE 1
+        	END DESC,
+        	(SELECT um3.meta_value FROM {$wpdb->prefix}usermeta um3 WHERE um3.user_id = u.ID AND um3.meta_key = 'delivery_type') DESC";
+$vendor_query = $wpdb->prepare($sql, '%'.$cityPostalcode.'%');
+$vendor_arr = $wpdb->get_results($vendor_query);
 
 $UserIdArrayForCityPostalcode = array();
 foreach($vendor_arr as $v){
-  $UserIdArrayForCityPostalcode[] = $v->data->ID;
+  if(isset($v->data)){
+    $UserIdArrayForCityPostalcode[] = $v->data->ID;
+  } else {
+    $UserIdArrayForCityPostalcode[] = $v->ID;
+  }
 }
 
 
@@ -88,26 +92,6 @@ jQuery(document).ready(function(){
 
     <div class="row mt-4 mb-5" id="topoccassions">
     <?php
-    $occasionTermListArray = array();
-
-    $productPriceArray = array(); // for price filter
-
-    foreach ($UserIdArrayForCityPostalcode as $vendorId) {
-        $vendor = get_wcmp_vendor($vendorId);
-        $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
-        foreach ($vendorProducts as $productId) {
-            $occasionTermList = wp_get_post_terms($productId, 'occasion', array('fields' => 'all'));
-            // for price filter begin
-            $singleProduct = wc_get_product( $productId );
-            array_push($productPriceArray, $singleProduct->get_price()); // for price filter
-            // for price filter end
-            foreach($occasionTermList as $occasionTerm){
-                array_push($occasionTermListArray, $occasionTerm);
-            }
-        }
-    }
-
-
     // get user meta query
     $occasion_featured_list = $wpdb->get_results( "
     SELECT
@@ -140,17 +124,17 @@ jQuery(document).ready(function(){
       }
     ?>
     <div class="col-6 col-md-2">
-        <div class="card border-0 shadow-sm">
-          <?php echo $occasionImageUrl;?>
-          <div class="card-body">
-            <h5 class="card-title">
-              <a href="#" class="stretched-link text-dark">
-                <?php echo $occasion->name;?>
-              </a>
-            </h5>
-          </div>
+      <div class="card border-0 shadow-sm">
+        <?php echo $occasionImageUrl;?>
+        <div class="card-body">
+          <h5 class="card-title">
+            <a href="#" class="stretched-link text-dark">
+              <?php echo $occasion->name;?>
+            </a>
+          </h5>
         </div>
       </div>
+    </div>
 
     <?php }
     ?>
@@ -175,6 +159,36 @@ jQuery(document).ready(function(){
 
 
           <?php
+          $productPriceArray = array(); // for price filter
+          $categoryTermListArray = array(); // for cat term filter
+          $occasionTermListArray = array();
+
+          // for price filter
+          foreach ($UserIdArrayForCityPostalcode as $vendorId) {
+              $vendor = get_wcmp_vendor($vendorId);
+              $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
+              foreach ($vendorProducts as $productId) {
+                  // for price filter begin
+                  $singleProduct = wc_get_product( $productId );
+                  array_push($productPriceArray, $singleProduct->get_price()); // for price filter
+                  // for price filter end
+
+                  // for cat terms filter
+                  $categoryTermList = wp_get_post_terms($productId, 'product_cat', array('fields' => 'ids'));
+                  foreach($categoryTermList as $catTerm){
+                      array_push($categoryTermListArray, $catTerm);
+                  }
+                  // --
+
+                  // for occassions
+                  $occasionTermList = wp_get_post_terms($productId, 'occasion', array('fields' => 'ids'));
+                  foreach($occasionTermList as $occasionTerm){
+                      array_push($occasionTermListArray, $occasionTerm);
+                  }
+              }
+          }
+
+
           /**
            * ---------------------
            * Delivery type filter
@@ -222,19 +236,6 @@ jQuery(document).ready(function(){
 
           <?php
           // search users for get filtered category
-          // for category
-          $categoryTermListArray = array();
-
-          foreach ($UserIdArrayForCityPostalcode as $vendorId) {
-             $vendor = get_wcmp_vendor($vendorId);
-             $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
-             foreach ($vendorProducts as $productId) {
-                 $categoryTermList = wp_get_post_terms($productId, 'product_cat', array('fields' => 'ids'));
-                 foreach($categoryTermList as $catTerm){
-                     array_push($categoryTermListArray, $catTerm);
-                 }
-             }
-          }
           $categoryTermListArrayUnique = array_unique($categoryTermListArray);
 
           // product category
@@ -276,21 +277,10 @@ jQuery(document).ready(function(){
           </h5>
           <ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
           <?php
-          // for used on occasion prepare here
-          $occasionTermListArray = array();
+          // Occassion
 
-          foreach ($UserIdArrayForCityPostalcode as $vendorId) {
-              $vendor = get_wcmp_vendor($vendorId);
-              $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
-              foreach ($vendorProducts as $productId) {
-                  $occasionTermList = wp_get_post_terms($productId, 'occasion', array('fields' => 'ids'));
-                  foreach($occasionTermList as $occasionTerm){
-                      array_push($occasionTermListArray, $occasionTerm);
-                  }
-              }
-          }
+          // Take the occassion term array and make sure we only get uniques.
           $occasionTermListArrayUnique = array_unique($occasionTermListArray);
-          // for occasion end
 
           $args = array(
               'taxonomy'   => "occasion",
@@ -312,9 +302,10 @@ jQuery(document).ready(function(){
           ?>
           </ul>
 
-
           <!-- price filter filter-->
           <?php
+
+
           // for price filter
           $minProductPrice;
           $maxProductPrice;
@@ -471,7 +462,7 @@ jQuery(document).ready(function(){
                       ?>
                       <div class="col-4 col-xs-4 col-sm-4 col-md-4">
                         <div class="card border-0">
-                            <a href="<?php echo get_permalink($product->get_id()); ?>"><img src="<?php echo $imageUrl;?>" class="card-img-top" alt="<?php echo $product->get_name();?>"></a>
+                            <a href="<?php echo esc_url($vendor->get_permalink()); ?>"><img src="<?php echo $imageUrl;?>" class="card-img-top" alt="<?php echo $product->get_name();?>"></a>
                             <div class="card-body">
                                 <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark"><?php echo $product->get_name();?></a></h6>
                                 <p class="price"><?php echo woocommerce_template_loop_price(); ?></p>

@@ -560,7 +560,7 @@ function greeting_custom_post_type() {
             'public'      => true,
             'has_archive' => true,
 						'rewrite' => array('slug' => 'l'),
-            'supports' => array('title'),
+            'supports' => array('title','editor'),
 						'capabilities' => array(
 								'publish_posts' => 'publish_wcmppages',
 				        'edit_posts' => 'edit_wcmppages',
@@ -967,7 +967,6 @@ function catOccaDeliveryAction() {
 			}
 		}
 
-
 		$sql = "SELECT
 			p.post_author
 		FROM ".$wpdb->prefix."posts p
@@ -989,9 +988,10 @@ function catOccaDeliveryAction() {
 		}
 	}
 	// Remove all the stores that doesnt match from default array
-	$userIdArrayGetFromCatOcca = array_intersect($defaultUserArray, $userIdArrayGetFromCatOcca);
-	$defaultUserArray = $userIdArrayGetFromCatOcca;
-
+	if(!empty($userIdArrayGetFromCatOcca)){
+		$userIdArrayGetFromCatOcca = array_intersect($defaultUserArray, $userIdArrayGetFromCatOcca);
+		$defaultUserArray = $userIdArrayGetFromCatOcca;
+	}
 	////////////////////////
 	// FILTER: Delivery
 	// Prepare the statement for delivery array
@@ -1022,8 +1022,10 @@ function catOccaDeliveryAction() {
 		}
 	}
 	// Remove all the stores that doesnt match from default array
-	$userIdArrayGetFromDelivery = array_intersect($defaultUserArray, $userIdArrayGetFromDelivery);
-	$defaultUserArray = $userIdArrayGetFromDelivery;
+	if(!empty($userIdArrayGetFromDelivery)){
+		$userIdArrayGetFromDelivery = array_intersect($defaultUserArray, $userIdArrayGetFromDelivery);
+		$defaultUserArray = $userIdArrayGetFromDelivery;
+	}
 
 	////////////////
 	// Filter: Price
@@ -1045,15 +1047,19 @@ function catOccaDeliveryAction() {
 				'compare' => 'BETWEEN',
 				'type' => 'NUMERIC'
 			)
-		)
+		),
+		'posts_per_page' => -1
 	);
 
 	$productQuery = new WP_Query($query);
-	$userIdArrayGetFromPriceFilter = wp_list_pluck( $productQuery->posts, 'post_author' );
+	$userIdArrayGetFromPriceFilter = array_unique(wp_list_pluck( $productQuery->posts, 'post_author' ));
 
 	// Remove all the stores that doesnt match from default array
-	$userIdArrayGetFromPriceFilter = array_intersect($defaultUserArray, $userIdArrayGetFromPriceFilter);
-	$defaultUserArray = $userIdArrayGetFromDelivery;
+	if(!empty($userIdArrayGetFromPriceFilter)){
+		$userIdArrayGetFromPriceFilter = array_intersect($defaultUserArray, $userIdArrayGetFromPriceFilter);
+
+		$defaultUserArray = $userIdArrayGetFromPriceFilter;
+	}
 
 	// three array is
 	// $userIdArrayGetFromCatOcca
@@ -2731,17 +2737,17 @@ function greeting_echo_receiver_info( ) {
 			'id'					=> 'greetingMessage',
 			'class'				=> array('form-row-wide'),
 			'required'		=> true,
-			'label'				=> __('Din hilsen til modtager (max 165 tegn)'),
-			'placeholder'	=> __('Skriv din hilsen til din modtager her :)'),
-			'maxlength' 	=> 165
+			'label'				=> __('Din hilsen til modtager (max 160 tegn)', 'greeting2'),
+			'placeholder'	=> __('Skriv din hilsen til din modtager her :)', 'greeting2'),
+			'maxlength' 	=> 160
 		), WC()->checkout->get_value( 'greeting_message' ) );
 
 		woocommerce_form_field( 'receiver_phone', array(
 			'type'          => 'text',
 			'class'         => array('form-row-wide', 'greeting-custom-input'),
 			'required'      => true,
-			'label'         => __('Receiver phone'),
-			'placeholder'       => __('Enter phone number of the receiver'),
+			'label'         => __('Modtagerens telefonnr.', 'greeting2'),
+			'placeholder'       => __('Indtast modtagerens telefonnummer.', 'greeting2'),
 			), WC()->checkout->get_value( 'receiver_phone' ));
 		#echo '<tr class="message-pro-radio"><td>';
 
@@ -2752,7 +2758,7 @@ function greeting_echo_receiver_info( ) {
 			'type'				=> 'checkbox',
 			'id'					=> 'deliveryLeaveGiftAddress',
 			'class'				=> array('form-row-wide'),
-			'label'				=> __('Ja, gaven må efterlades på adressen'),
+			'label'				=> __('Ja, gaven må efterlades på adressen', 'greeting2'),
 			'placeholder'	=> ''
 		),  1 );
 
@@ -2761,7 +2767,7 @@ function greeting_echo_receiver_info( ) {
 			'type'				=> 'checkbox',
 			'id'					=> 'deliveryLeaveGiftNeighbour',
 			'class'				=> array('form-row-wide'),
-			'label'				=> __('Ja, gaven må afleveres til/hos naboen'),
+			'label'				=> __('Ja, gaven må afleveres til/hos naboen', 'greeting2'),
 			'placeholder'	=> ''
 		), 0 );
 
@@ -2769,8 +2775,8 @@ function greeting_echo_receiver_info( ) {
 			'type'				=> 'textarea',
 			'id'					=> 'deliveryInstructions',
 			'class'				=> array('form-row-wide'),
-			'label'				=> __('Leveringsinstruktioner'),
-			'placeholder'	=> __('Har du særlige instruktioner til leveringen? Eks. en dørkode, særlige forhold på leveringsadressen, en dato hvor gaven må åbnes eller lignende? Notér dem her :)')
+			'label'				=> __('Leveringsinstruktioner', 'greeting2'),
+			'placeholder'	=> __('Har du særlige instruktioner til leveringen? Eks. en dørkode, særlige forhold på leveringsadressen, en dato hvor gaven må åbnes eller lignende? Notér dem her :)', 'greeting2')
 		), WC()->checkout->get_value( 'delivery_instructions' ) );
 
 	// Insert the delivery date area
@@ -2932,6 +2938,7 @@ function greeting_echo_date_picker(  ) {
 	$closed_dates_arr = explode(",",get_vendor_closed_dates($vendor_id));
 
 
+
 	if($del_value == '0'){
 		echo '<h3 class="pt-4">Leveringsdato</h3>';
 		echo '<p>';
@@ -2951,12 +2958,83 @@ function greeting_echo_date_picker(  ) {
 		), WC()->checkout->get_value( 'delivery_date' ) );
 
 
+		function build_intervals($items, $is_contiguous, $make_interval) {
+				$intervals = array();
+				$end   = false;
+				if(is_array($items) || is_object($items)){
+					foreach ($items as $item) {
+							if (false === $end) {
+									$begin = (int) $item;
+									$end   = (int) $item;
+									continue;
+							}
+							if ($is_contiguous($end, $item)) {
+									$end = (int) $item;
+									continue;
+							}
+							$intervals[] = $make_interval($begin, $end);
+							$begin = (int) $item;
+							$end   = (int) $item;
+					}
+				}
+				if (false !== $end) {
+						$intervals[] = $make_interval($begin, $end);
+				}
+				return $intervals;
+		}
+
+		$opening = get_field('openning', 'user_'.$vendor_id);
+		$open_iso_days = array();
+		$open_label_days = array();
+		foreach($opening as $k => $v){
+			$open_iso_days[] = (int) $v['value'];
+			$open_label_days[$v['value']] = $v['label'];
+		}
+
+		$interv = array();
+		if(!empty($open_iso_days) && is_array($open_iso_days)){
+			$interv = build_intervals($open_iso_days, function($a, $b) { return ($b - $a) <= 1; }, function($a, $b) { return $a."..".$b; });
+		} else {
+			print 'Butikkens leveringsdage er ukendte';
+		}
+		$i = 1;
+
+		if(!empty($opening) && !empty($interv) && count($interv) > 0){
+
+			if($del_value == "1"){
+				echo '<p>Butikken kan levere gaver ';
+			} else if($del_value == "0"){
+				echo '<p>Butikken afsender gaver ';
+			}
+
+			foreach($interv as $v){
+				$val = explode('..',$v);
+				if(!empty($val)){
+					$start = isset($open_label_days[$val[0]])? $open_label_days[$val[0]] : '';
+					if($val[0] != $val[1]){
+						$end = isset($open_label_days[$val[1]]) ? $open_label_days[$val[1]] : '';
+						if(!empty($start) && !empty($end)){
+							print strtolower($start."-".$end);
+						}
+					} else {
+						print strtolower($start);
+					}
+					if(count($interv) > 1){
+						if(count($interv)-1 == $i){ print " og "; }
+						else if(count($interv) > $i) { print ', ';}
+					}
+				}
+				$i++;
+			}
+		}
+		echo '.</p>';
+
+
 		echo '<div id="show-if-shipping">';
-		echo '<span>Butikken kan levere om ';
-		echo $vendorDeliverDayReq. ' leveringsdag(e), hvis du ';
-		echo 'bestiller inden kl. ';
-		echo $vendorDropOffTime;
-		echo ':00</span>';
+		echo '<span>Ved bestillingen inden klokken ';
+		echo $vendorDropOffTime.':00</span>';
+		echo ' kan butikken levere om  '.$vendorDeliverDayReq;
+		echo ' leveringsdage.';
 
 		#$closed_days_date_iteration = count($closed_dates_arr);
 		#$cdi = 0;
@@ -3395,6 +3473,20 @@ function wcmp_email_change_sold_by_text($html, $item, $args ){
 *
 */
 add_filter ( 'wcmp_display_vendor_message_to_buyer','__return_false');
+
+/**
+ * Add product image to e-mail new vendor order #mails #transactional
+ *
+ * @access public
+ * @author Dennis Lauritzen
+ * @return void
+ */
+add_action('wcmp_before_vendor_order_item_table', 'add_prod_img_to_vendor_email', 10, 4);
+function add_prod_img_to_vendor_email($item, $order, $vendor_id, $is_ship) {
+		$product = wc_get_product( $item['product_id'] );
+		$wcmp_product_img = $product->get_image( array( 100, 100 ));
+		echo wp_kses_post( $wcmp_product_img  );
+}
 
 /**
  * Minimum order value required for shopping

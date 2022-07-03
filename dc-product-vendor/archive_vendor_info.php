@@ -401,9 +401,9 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
           <button type="submit" name="submit" class="top-search-btn rounded-pill position-absolute border-0 end-0 bg-teal p-3 me-1"></button>
           <?php
           if(!empty($args['city']) && !empty($args['postalcode'])){
-            $val = $args['postalcode'] . ' ' . $args['city'];
+            $city_search_val = $args['postalcode'] . ' ' . $args['city'];
           } else {
-            $val = '';
+            $city_search_val = '';
           ?>
           <script type="text/javascript">
             jQuery(document).ready(function(){
@@ -418,7 +418,7 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
           <?php
           }
           ?>
-          <input type="text" class="top-search-input form-control rounded-pill border-0 py-2" id="front_Search-new_ucsa" name="keyword" value="<?php echo $val; ?>" placeholder="Indtast by eller postnr.">
+          <input type="text" class="top-search-input form-control rounded-pill border-0 py-2" id="front_Search-new_ucsa" name="keyword" value="<?php echo $city_search_val; ?>" placeholder="Indtast by eller postnr.">
           <ul id="datafetch_wrapper" class="d-none list-group position-relative recommandations position-absolute list-unstyled rounded w-100 bg-light bg-white" style="top: 42px; z-index: 100000;">
           </ul>
           <figure class="location-pin position-absolute ms-2 mt-1 top-0" style="padding-top:1px;">
@@ -643,5 +643,30 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
         </div>
       </div>
     </div>
+
+    <?php
+    if(isset($city_search_val) && !empty($city_search_val)){
+      $display = 'block';
+    } else {
+      $display = 'none';
+    }?>
+    <div class="row pt-4" id="backbutton_city__" style="display: none;">
+      <div class="col-12">
+        <a class="text-dark" id="backbutton_city_a_link__">< Gå tilbage til udvalget af butikker i <?php echo $city_search_val; ?></a>
+      </div>
+    </div>
+    <script type="text/javascript">
+      jQuery(document).ready(function(){
+        var postalcode2 = window.localStorage.getItem('postalcode');
+        var city2 = window.localStorage.getItem('city');
+        var city2_link = window.localStorage.getItem('city_link');
+
+        if(postalcode2 && city2){
+          document.getElementById('backbutton_city_a_link__').innerHTML += ''+postalcode2+" "+city2+'';
+          document.getElementById('backbutton_city_a_link__').href = city2_link;
+          document.getElementById('backbutton_city__').style.display = "block";
+        }
+      });
+    </script>
   </div>
 </section>

@@ -32,7 +32,6 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
     <tbody>
         <?php
         $vendor->vendor_order_item_table($order, $vendor->term_id);
-
         ?>
     </tbody>
 </table>
