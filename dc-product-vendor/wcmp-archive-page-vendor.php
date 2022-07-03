@@ -422,10 +422,6 @@ do_action('after_wcmp_vendor_description', $vendorId);
           </p>
   				<?php
   				// --- CLOSED DATES --- Dennis.
-  				$closed_dates = get_field('vendor_closed_day', 'user_'.$vendorId);
-  				$dates = explode(",",$closed_dates);
-  				$viable_dates = array();
-
           function groupDates($input) {
             $arr = explode(", ", $input);
             foreach($arr as $k => $v){
@@ -519,7 +515,12 @@ do_action('after_wcmp_vendor_description', $vendorId);
             return $weekday_str." d. ".$date.". ".$month_str. " ". $year_str;
           }
 
-          // Demo run
+          // Get the date string and run the functions.
+          $closed_dates = get_field('vendor_closed_day', 'user_'.$vendorId);
+  				$dates = explode(",",$closed_dates);
+  				$viable_dates = array();
+
+          // Run the dates.
           $str = $closed_dates;
           $result = groupDates($str);
 
