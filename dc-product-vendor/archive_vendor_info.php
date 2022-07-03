@@ -478,7 +478,7 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
     </div>
   </div>
 </section>
-<section class="sticky-top mt-n3 mb-5" style="margin-top: -25px;">
+<section class="sticky-top mb-1" style="margin-top: -25px;">
   <div class="container">
     <div class="row">
       <div class="col-12 rounded bg-white py-3 shadow-sm">
@@ -643,7 +643,10 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
         </div>
       </div>
     </div>
-
+  </div>
+</section>
+<section id="backbutton" class="mb-4 mt-1">
+  <div class="container">
     <?php
     if(isset($city_search_val) && !empty($city_search_val)){
       $display = 'block';
