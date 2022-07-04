@@ -5,7 +5,7 @@
  * Perform start setup
  *
 **/
-global $woocommerce, $wpdb, $WCMp;
+global $woocommerce, $wpdb;
 
 $postId = get_the_ID();
 $cityPostalcode = get_post_meta($postId, 'postalcode', true);
@@ -44,10 +44,16 @@ $sql = "SELECT
         	{$wpdb->prefix}usermeta um
         	ON
             um.user_id = u.ID
+        LEFT JOIN
+          {$wpdb->prefix}usermeta um5
+          ON
+            u.ID = um5.user_id
         WHERE
         	(um.meta_key = 'delivery_zips' AND um.meta_value LIKE %s)
-            AND
-            NOT EXISTS (SELECT um.meta_value FROM {$wpdb->prefix}usermeta um2 WHERE um2.user_id = u.ID AND um2.meta_key = 'vendor_turn_off')
+          AND
+          NOT EXISTS (SELECT um2.meta_value FROM {$wpdb->prefix}usermeta um2 WHERE um2.user_id = u.ID AND um2.meta_key = 'vendor_turn_off')
+          and
+          (um5.meta_key = 'wp_capabilities' AND um5.meta_value LIKE %s)
         ORDER BY
         	CASE u.ID
         		WHEN 38 THEN 0
@@ -55,7 +61,7 @@ $sql = "SELECT
                 ELSE 1
         	END DESC,
         	(SELECT um3.meta_value FROM {$wpdb->prefix}usermeta um3 WHERE um3.user_id = u.ID AND um3.meta_key = 'delivery_type') DESC";
-$vendor_query = $wpdb->prepare($sql, '%'.$cityPostalcode.'%');
+$vendor_query = $wpdb->prepare($sql, '%'.$cityPostalcode.'%', '%dc_vendor%');
 $vendor_arr = $wpdb->get_results($vendor_query);
 
 $UserIdArrayForCityPostalcode = array();
@@ -166,7 +172,6 @@ jQuery(document).ready(function(){
           // for price filter
 
           foreach ($UserIdArrayForCityPostalcode as $vendorId) {
-
               $vendor = get_wcmp_vendor($vendorId);
               // Denne fejler i seneste version.
               $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
