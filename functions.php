@@ -3255,18 +3255,11 @@ function handle_price_range_query_var( $query, $query_vars ) {
  * @return string
  */
 function get_client_ip() {
-    $ipaddress = '';
+		$ipaddress = $_SERVER['HTTP_CF_CONNECTING_IP'] ?: $_SERVER['REMOTE_ADDR'];
 
-		if(isset($_SERVER['HTTP_CF_CONNECTING_IP'])){
-			$_SERVER['REMOTE_ADDR'] = $_SERVER['HTTP_CF_CONNECTING_IP'];
-		}
-
-		if(get_home_url() == 'http://greeting'){
+		if(home_url() == 'http://greeting'){
 			$ipaddress = '212.10.115.191';
-		} else {
-			$ipaddress = $_SERVER['REMOTE_ADDR'];
 		}
-
     return $ipaddress;
 }
 
