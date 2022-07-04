@@ -5,7 +5,7 @@
  * Perform start setup
  *
 **/
-global $woocommerce, $wpdb;
+global $woocommerce, $wpdb, $WCMp;
 
 $postId = get_the_ID();
 $cityPostalcode = get_post_meta($postId, 'postalcode', true);
@@ -37,7 +37,7 @@ get_header('green', array('city' => $cityName, 'postalcode' => $cityPostalcode))
 
 // get user meta query
 $sql = "SELECT
-            u.ID
+          u.ID
         FROM
         	{$wpdb->prefix}users u
         LEFT JOIN
@@ -164,8 +164,11 @@ jQuery(document).ready(function(){
           $occasionTermListArray = array();
 
           // for price filter
+
           foreach ($UserIdArrayForCityPostalcode as $vendorId) {
+
               $vendor = get_wcmp_vendor($vendorId);
+              // Denne fejler i seneste version.
               $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
               foreach ($vendorProducts as $productId) {
                   // for price filter begin
@@ -176,14 +179,16 @@ jQuery(document).ready(function(){
                   // for cat terms filter
                   $categoryTermList = wp_get_post_terms($productId, 'product_cat', array('fields' => 'ids'));
                   foreach($categoryTermList as $catTerm){
+                    if($catTerm != '15' && $catTerm != '16'){
                       array_push($categoryTermListArray, $catTerm);
+                    }
                   }
                   // --
 
                   // for occassions
                   $occasionTermList = wp_get_post_terms($productId, 'occasion', array('fields' => 'ids'));
                   foreach($occasionTermList as $occasionTerm){
-                      array_push($occasionTermListArray, $occasionTerm);
+                    array_push($occasionTermListArray, $occasionTerm);
                   }
               }
           }
@@ -240,23 +245,23 @@ jQuery(document).ready(function(){
 
           // product category
           $categoryArgs = array(
-             'taxonomy'   => "product_cat",
-             'exclude' => array(15,16),
-             // 'pad_counts' => true,
-             // 'hide_empty' => 1,
+            'fields' => 'all',
+            'taxonomy'   => "product_cat",
+            'exclude' => array('15','16'),
+            'include' => $categoryTermListArrayUnique
+            // 'pad_counts' => true,
+            // 'hide_empty' => 1,
           );
           $productCategories = get_terms($categoryArgs);
-          foreach($productCategories as $category){
-             foreach($categoryTermListArrayUnique as $catTerm){
-                 if($catTerm == $category->term_id){ ?>
-                    <div class="form-check">
-                        <input type="checkbox" name="filter_catocca_city" class="form-check-input filter-on-city-page" id="filter_cat<?php echo $category->term_id; ?>" value="<?php echo $category->term_id; ?>">
-                        <label for="filter_cat<?php echo $category->term_id; ?>" class="form-check-label">
-                          <?php echo $category->name; ?>
-                        </label>
-                    </div>
-                 <?php }
-             }
+
+          foreach($productCategories as $category){ ?>
+            <div class="form-check">
+                <input type="checkbox" name="filter_catocca_city" class="form-check-input filter-on-city-page" id="filter_cat<?php echo $category->term_id; ?>" value="<?php echo $category->term_id; ?>">
+                <label for="filter_cat<?php echo $category->term_id; ?>" class="form-check-label">
+                  <?php echo $category->name; ?>
+                </label>
+            </div>
+          <?php
           }
           ?>
           </ul>
@@ -284,20 +289,18 @@ jQuery(document).ready(function(){
 
           $args = array(
               'taxonomy'   => "occasion",
+              'include' => $occasionTermListArrayUnique
               // 'hide_empty' => 1,
               // 'include'    => $ids
           );
           $productOccasions = get_terms($args);
           foreach($productOccasions as $occasion){
-            foreach($occasionTermListArrayUnique as $occasionTerm){
-              if($occasionTerm == $occasion->term_id){ ?>
-                <div class="form-check">
-                    <input type="checkbox" name="filter_catocca_city" class="form-check-input filter-on-city-page" id="filter_occ_<?php echo $occasion->term_id; ?>" value="<?php echo $occasion->term_id; ?>">
-                    <label class="form-check-label" for="filter_occ_<?php echo $occasion->term_id; ?>"><?php echo $occasion->name; ?></label>
-                </div>
+            ?>
+            <div class="form-check">
+                <input type="checkbox" name="filter_catocca_city" class="form-check-input filter-on-city-page" id="filter_occ_<?php echo $occasion->term_id; ?>" value="<?php echo $occasion->term_id; ?>">
+                <label class="form-check-label" for="filter_occ_<?php echo $occasion->term_id; ?>"><?php echo $occasion->name; ?></label>
+            </div>
           <?php
-              }
-            }
           }
           ?>
           </ul>
