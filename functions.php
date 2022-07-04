@@ -3300,6 +3300,198 @@ function call_ip_apis($ip){
   return $jsonData;
 }
 
+add_action('wp_ajax_get_close_stores' , 'get_close_stores');
+add_action('wp_ajax_nopriv_get_close_stores','get_close_stores');
+function get_close_stores(){
+	$postal_code = esc_attr($_POST['postal_code'] );
+
+	global $wpdb, $WCMp;
+
+	$uploadDir = wp_upload_dir();
+	$uploadDirBaseUrl = $uploadDir['baseurl'];
+
+	$args = array(
+    'role' => 'dc_vendor',
+    'orderby' => 'meta_value',
+    'meta_key' => 'delivery_zips',
+    'order' => 'DESC',
+    'number' => 4,
+    'meta_query' => array(
+      'relation' => 'AND',
+      array(
+        'key' => 'delivery_zips',
+        'value' => $postal_code,
+        'compare' => 'LIKE'
+      ),
+      array(
+        'key' => 'delivery_type',
+        'value' => array(0,1),
+        'type' => 'numeric',
+        'compare' => 'IN'
+      )
+    )
+  );
+  $query = new WP_User_Query($args);
+  $results = $query->get_results();
+
+	$store_arr = array();
+	foreach($results as $k => $v){
+		$vendor = get_user_meta($v->ID);
+		$vendor_page_slug = get_wcmp_vendor($v->ID);
+
+		$image = (!empty($vendor['_vendor_profile_image'])? $vendor['_vendor_profile_image'][0] : '');
+		$banner = (!empty($vendor['_vendor_banner'])? $vendor['_vendor_banner'][0] : '');
+
+		$vendor_banner = (!empty(wp_get_attachment_image_src($banner)) ? wp_get_attachment_image_src($banner, 'medium')[0] : $uploadDirBaseUrl.'/woocommerce-placeholder-300x300.png');
+		$vendor_picture = (!empty(wp_get_attachment_image_src($image)) ? wp_get_attachment_image_src($image, 'medium')[0] : $uploadDirBaseUrl.'/woocommerce-placeholder-300x300.png');
+		#$vendor_url = get_permalink();
+		#$vendor_desc = get_user_meta();
+
+		$description2 = (!empty($vendor['_vendor_description'][0]) ? $vendor['_vendor_description'][0] : '');
+
+		if(strlen(wp_strip_all_tags($description2)) >= '98'){
+			$description = substr(wp_strip_all_tags($description2), 0, 95).'...';
+		} else {
+			$description = $description2;
+		}
+
+		$store = array(
+			'store_name' => $vendor['nickname']['0'],
+			'description' => $description,
+			'link' => $vendor_page_slug->get_permalink(),
+			'image' => $vendor_picture,
+			'banner' => $vendor_banner
+		);
+
+		$store_arr[] = $store;
+	}
+
+	print json_encode($store_arr);
+
+	wp_die();
+}
+
+function get_user_area($user_postal = ''){
+	$user_areas = array(
+	  'start' => 1000,
+	  'end' => 9999
+	);
+	if(!empty($user_postal)){
+	  if($user_postal >= 1000 && $user_postal < 3000){
+	    $user_areas['start'] = 1000;
+	    $user_areas['end'] = 3000;
+	  } else if($user_postal >= 3000 && $user_postal < 3700){
+	    $user_areas['start'] = 3000;
+	    $user_areas['end'] = 3700;
+	  } else if($user_postal >= 3700 && $user_postal < 4000){
+	    $user_areas['start'] = 3700;
+	    $user_areas['end'] = 4000;
+	  } else if($user_postal >= 4000 && $user_postal < 4800){
+	    $user_areas['start'] = 4000;
+	    $user_areas['end'] = 4800;
+	  } else if($user_postal >= 4800 && $user_postal < 5000){
+	    $user_areas['start'] = 4800;
+	    $user_areas['end'] = 5000;
+	  } else if($user_postal >= 5000 && $user_postal < 6000){
+	    $user_areas['start'] = 5000;
+	    $user_areas['end'] = 6000;
+	  } else if($user_postal >= 6000 && $user_postal < 6700){
+	    $user_areas['start'] = 6000;
+	    $user_areas['end'] = 6700;
+	  } else if($user_postal >= 6700 && $user_postal < 7000){
+	    $user_areas['start'] = 6700;
+	    $user_areas['end'] = 7000;
+	  } else if($user_postal >= 7000 && $user_postal < 7500){
+	    $user_areas['start'] = 7000;
+	    $user_areas['end'] = 7500;
+	  } else if($user_postal >= 7500 && $user_postal < 8000){
+	    $user_areas['start'] = 7500;
+	    $user_areas['end'] = 8000;
+	  } else if($user_postal >= 8000 && $user_postal < 9000){
+	    $user_areas['start'] = 8000;
+	    $user_areas['end'] = 9000;
+	  } else if($user_postal >= 9000 && $user_postal < 10000){
+	    $user_areas['start'] = 9000;
+	    $user_areas['end'] = 9999;
+	  }
+	}
+
+	return $user_areas;
+}
+
+add_action('wp_ajax_get_featured_postal_codes' , 'get_featured_postal_codes');
+add_action('wp_ajax_nopriv_get_featured_postal_codes','get_featured_postal_codes');
+function get_featured_postal_codes(){
+	global $wpdb;
+
+	$postal_code = $_POST['postal_code'];
+
+	$user_areas = get_user_area($postal_code);
+
+	// Postal code array to submit
+	$postal_code_arr = array();
+
+	// Get the actual postal code
+	$postal_args2 = array(
+		'post_type' => 'city',
+		'posts_per_page' => '1',
+		'meta_query' => array(
+			array(
+				'key' => 'postalcode',
+				'value' => $postal_code,
+				'compare' => '='
+			)
+		),
+		'no_found_rows' => true
+	);
+	$postal_query2 = new WP_Query($postal_args2);
+	foreach($postal_query2->posts as $k => $postal){
+		$postal_code_arr[] = array(
+			'link' => get_permalink($postal->ID),
+			'postal' =>  get_post_meta($postal->ID, 'postalcode', true),
+			'city' => get_post_meta($postal->ID, 'city', true)
+		);
+	}
+
+	// Get the close areas
+	$postal_args = array(
+		'post_type' => 'city',
+		'posts_per_page' => '7',
+		'orderby' => 'meta_value',
+		'meta_key' => 'is_featured_city',
+		'order' => 'DESC',
+		'meta_query' => array(
+			'relation' => 'AND',
+			array(
+				'key' => 'postalcode',
+				'value' => array($user_areas['start'], $user_areas['end']),
+				'compare' => 'BETWEEN',
+				'type' => 'numeric'
+			),
+			array(
+				'key' => 'postalcode',
+				'value' => (!empty($postal_code) ? $postal_code : (int) '0999'),
+				'compare' => '!=',
+				'type' => 'numeric'
+			)
+		),
+		'no_found_rows' => true,
+		'update_post_meta_cache' => false,
+		'update_post_term_cache' => false
+	);
+	$postal_query = new WP_Query($postal_args);
+	foreach($postal_query->posts as $k => $postal){
+		$postal_query->the_post();
+		$postal_code_arr[] = array(
+			'link' => get_permalink($postal->ID),
+			'postal' =>  get_post_meta($postal->ID, 'postalcode', true),
+			'city' => get_post_meta($postal->ID, 'city', true)
+		);
+	}
+	print json_encode($postal_code_arr);
+	wp_die();
+}
+
 /**
  * Removing vendors ability to set some of the
  * order statuses on orders.

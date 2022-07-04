@@ -3,73 +3,12 @@
 global $wpdb, $post;
 $this_post_id = $post->ID;
 
-
-
-$ip_detail_ipinfo = call_ip_apis(get_client_ip());
-
-if(!empty($ip_detail_ipinfo) AND (isset($ip_detail_ipinfo->postal) || isset($ip_detail_ipinfo->zip))){
-  #print $ip_details->postal;
-  $user_postal = (!empty($ip_detail_ipinfo->postal) ? $ip_detail_ipinfo->postal : $ip_detail_ipinfo->zip);
-  print "<!-- IP'en blev hentet -->";
-} else {
-  $user_postal = '';
-}
-print "<!-- IP hentet: ".get_client_ip()."-->";
-print "<!-- IP data";print_r($ip_detail_ipinfo);print "-->";
-$user_areas = array(
-  'start' => 1000,
-  'end' => 9999
-);
-
-print "<!--";print_r($user_areas);print "-->";
-
-if(!empty($user_postal)){
-  if($user_postal >= 1000 && $user_postal < 3000){
-    $user_areas['start'] = 1000;
-    $user_areas['end'] = 3000;
-  } else if($user_postal >= 3000 && $user_postal < 3700){
-    $user_areas['start'] = 3000;
-    $user_areas['end'] = 3700;
-  } else if($user_postal >= 3700 && $user_postal < 4000){
-    $user_areas['start'] = 3700;
-    $user_areas['end'] = 4000;
-  } else if($user_postal >= 4000 && $user_postal < 4800){
-    $user_areas['start'] = 4000;
-    $user_areas['end'] = 4800;
-  } else if($user_postal >= 4800 && $user_postal < 5000){
-    $user_areas['start'] = 4800;
-    $user_areas['end'] = 5000;
-  } else if($user_postal >= 5000 && $user_postal < 6000){
-    $user_areas['start'] = 5000;
-    $user_areas['end'] = 6000;
-  } else if($user_postal >= 6000 && $user_postal < 6700){
-    $user_areas['start'] = 6000;
-    $user_areas['end'] = 6700;
-  } else if($user_postal >= 6700 && $user_postal < 7000){
-    $user_areas['start'] = 6700;
-    $user_areas['end'] = 7000;
-  } else if($user_postal >= 7000 && $user_postal < 7500){
-    $user_areas['start'] = 7000;
-    $user_areas['end'] = 7500;
-  } else if($user_postal >= 7500 && $user_postal < 8000){
-    $user_areas['start'] = 7500;
-    $user_areas['end'] = 8000;
-  } else if($user_postal >= 8000 && $user_postal < 9000){
-    $user_areas['start'] = 8000;
-    $user_areas['end'] = 9000;
-  } else if($user_postal >= 9000 && $user_postal < 10000){
-    $user_areas['start'] = 9000;
-    $user_areas['end'] = 9999;
-  }
-}
-
 // =========================
 // =========================
 
 // Start the template
 get_header();
 ?>
-
 
 <section id="maintop" class=" position-relative">
     <div class="row g-0">
@@ -140,154 +79,121 @@ get_header();
                   </div>
                 </form>
                 <h6 style="font-family: 'Rubik',sans-serif; font-size:18px; color: #ffffff;" class="pb-1">Udvalgte byer<?php if(!empty($user_postal)){ echo ' tæt på dig'; } ?></h6>
-                <ul class="list-inline my-1">
-                  <?php
-                  if(!empty($user_postal)){
-                    $postal_args2 = array(
-                      'post_type' => 'city',
-                      'posts_per_page' => '1',
-                      'meta_query' => array(
-                        array(
-                          'key' => 'postalcode',
-                          'value' => $user_postal,
-                          'compare' => '='
-                        )
-                      ),
-                      'no_found_rows' => true
-                    );
-                    $postal_query2 = new WP_Query($postal_args2);
-                    foreach($postal_query2->posts as $k => $postal){
-                  ?>
-                  <li class="list-inline-item pb-1 me-0 ms-0">
-                    <a href="<?php echo get_permalink($postal->ID);?>" class="btn btn-link rounded-pill pb-2 border-1 border-white text-white" style="font-size: 15px;">
-                      <?php echo get_post_meta($postal->ID, 'postalcode', true)." ".get_post_meta($postal->ID, 'city', true);?>
-                    </a>
-                  </li>
-                  <?php
-                    }
-                  }
-                  ?>
-                  <?php
-                  $postal_args = array(
-                    'post_type' => 'city',
-                    'posts_per_page' => '7',
-                    'orderby' => 'meta_value',
-                    'meta_key' => 'is_featured_city',
-                    'order' => 'DESC',
-                    'meta_query' => array(
-                      'relation' => 'AND',
-                      array(
-                        'key' => 'postalcode',
-                        'value' => array($user_areas['start'], $user_areas['end']),
-                        'compare' => 'BETWEEN',
-                        'type' => 'numeric'
-                      ),
-                      array(
-                        'key' => 'postalcode',
-                        'value' => (!empty($user_postal) ? $user_postal : (int) '0999'),
-                        'compare' => '!=',
-                        'type' => 'numeric'
-                      )
-                    ),
-                    'no_found_rows' => true,
-                    'update_post_meta_cache' => false,
-                    'update_post_term_cache' => false
-                  );
-                  $postal_query = new WP_Query($postal_args);
-                  foreach($postal_query->posts as $k => $postal){
-                    $postal_query->the_post();?>
-                    <li class="list-inline-item pb-1 me-0 ms-1">
-                      <a href="<?php echo get_permalink($postal->ID);?>" class="btn btn-link rounded-pill pb-2 border-1 border-white text-white" style="font-size: 15px;">
-                        <?php echo get_post_meta($postal->ID, 'postalcode', true)." ".get_post_meta($postal->ID, 'city', true);?>
-                      </a>
-                    </li>
-                  <?php
-                  } // endwhile
-                  ?>
+                <ul id="postalcodelist" class="list-inline my-1">
+
                 </ul>
             </div>
         </div>
       </div>
     </div>
 </section>
-
-<?php
-
-if(!empty($user_postal)){
-  $args = array(
-    'role' => 'dc_vendor',
-    'orderby' => 'meta_value',
-    'meta_key' => 'delivery_zips',
-    'order' => 'DESC',
-    'number' => 4,
-    'meta_query' => array(
-      'relation' => 'AND',
-      array(
-        'key' => 'delivery_zips',
-        'value' => $user_postal,
-        'compare' => 'LIKE'
-      ),
-      array(
-        'key' => 'delivery_type',
-        'value' => array(0,1),
-        'type' => 'numeric',
-        'compare' => 'IN'
-      )
-    )
-  );
-  $query = new WP_User_Query($args);
-  $results = $query->get_results();
-}
-
-
-if(!empty($results)){
-?>
-<section id="inspiration" class="inspirationstores">
+<section id="inspiration" class="inspirationstores" style="display: none;">
   <div class="container">
-    <div class="row my-4 py-5">
+    <div class="store_container row my-4 py-5">
       <div clsas="col-12">
         <h4 class="h1 pb-5 mb-3 text-center">📍 Bliv inspireret i lækre butikker nær dig</h4>
       </div>
-      <?php
-      global $WCMp;
-      foreach($results as $k => $v){
-        $vendor = get_user_meta($v->ID);
-        $vendor_page_slug = get_wcmp_vendor($v->ID);
-
-        $image = (!empty($vendor['_vendor_profile_image'])? $vendor['_vendor_profile_image'][0] : '');
-        $banner = (!empty($vendor['_vendor_banner'])? $vendor['_vendor_banner'][0] : '');
-
-        $vendor_banner = (!empty(wp_get_attachment_image_src($banner)) ? wp_get_attachment_image_src($banner, 'medium')[0] : '');
-        $vendor_picture = (!empty(wp_get_attachment_image_src($image)) ? wp_get_attachment_image_src($image, 'medium')[0] : '');
-        #$vendor_url = get_permalink();
-        #$vendor_desc = get_user_meta();
-
-        $description2 = (!empty($vendor['_vendor_description'][0]) ? $vendor['_vendor_description'][0] : '');
-
-        if(strlen(wp_strip_all_tags($description2)) >= '98'){
-          $description = substr(wp_strip_all_tags($description2), 0, 95).'...';
-        } else {
-          $description = $description2;
-        }
-
-      ?>
-      <div class="col-12 pb-3 pb-lg-0 pb-xl-0 col-sm-6 col-lg-3">
-        <div class="card" style="">
-          <img src="<?php echo $vendor_banner; ?>" class="card-img-top" alt="<?php echo $vendor['nickname']['0']; ?>">
-          <div class="card-body">
-            <h5 class="card-title"><?php echo $vendor['nickname']['0']; ?></h5>
-            <p class="card-text"><?php echo $description; ?></p>
-            <a href="<?php echo $vendor_page_slug->get_permalink(); ?>" class="rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link">Se butikkens udvalg</a>
-          </div>
-        </div>
-      </div>
-      <?php
-      } // endforeach
-      ?>
     </div>
   </div>
 </section>
-<?php } ?>
+
+<script type="text/javascript">
+jQuery(document).ready(function(){
+  var ip = '';
+  jQuery.get('https://ipapi.co/postal/', function(ip_data){
+    ip = ip_data;
+
+    jQuery.ajax({
+      url: '<?php echo admin_url('admin-ajax.php'); ?>',
+      type: 'post',
+      data: { action: 'get_featured_postal_codes', postal_code: ip },
+      beforeSend: function(){
+        if(ip == null){
+          currentRequest.abort();
+        }
+      },
+      success: function(data) {
+        data_arr = jQuery.parseJSON(data);
+        jQuery.each(data_arr, function(k, v) {
+          var link = v.link;
+          var postal = v.postal;
+          var city = v.city;
+
+          var div_elm = jQuery("<li>", {"class": "list-inline-item pb-1 me-0 ms-0 pe-1"});
+          var card_link = jQuery("<a>",{"class": "btn btn-link rounded-pill pb-2 border-1 border-white text-white", "href": link}).text(postal+' '+city).css('font-size','15px');
+
+          div_elm.append(card_link);
+
+          jQuery("ul#postalcodelist").append(div_elm);
+        });
+      }
+    });
+
+    if(ip){
+      jQuery.ajax({
+        url: '<?php echo admin_url('admin-ajax.php'); ?>',
+        type: 'post',
+        data: { action: 'get_close_stores', postal_code: ip },
+        beforeSend: function(){
+          if(ip == null){
+            currentRequest.abort();
+          }
+        },
+        success: function(data) {
+          data_arr = jQuery.parseJSON(data);
+          jQuery.each(data_arr, function(k, v) {
+            var banner = v.banner;
+            var name = v.store_name;
+            var description = v.description;
+            var link = v.link;
+
+            var div_elm = jQuery("<div>", {"class": "col-12 pb-3 pb-lg-0 pb-xl-0 col-sm-6 col-lg-3"});
+            var card_elm = jQuery("<div>",{"class": "card"});
+            var card_img = jQuery("<img>",{"class": "card-img-top", "src": banner, "alt": name})
+            var card_body = jQuery("<div>",{"class": "card-body"});
+            var card_title = jQuery("<div>",{"class": "card-title"}).text(name);
+            var card_text = jQuery("<p>",{"class": "card-text"}).text(description);
+            var card_link = jQuery("<a>",{"class": "rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link", "href": link}).text('Gå til butik');
+
+            card_body.append(card_title).append(card_text).append(card_link);
+            card_elm.append(card_img).append(card_body);
+            div_elm.append(card_elm);
+
+            jQuery("#inspiration div.store_container").append(div_elm);
+          });
+          jQuery("#inspiration").css('display','block');
+        }
+      });
+    }
+  }).fail(function(){
+    jQuery.ajax({
+      url: '<?php echo admin_url('admin-ajax.php'); ?>',
+      type: 'post',
+      data: { action: 'get_featured_postal_codes', postal_code: '' },
+      beforeSend: function(){
+        if(ip == null){
+          currentRequest.abort();
+        }
+      },
+      success: function(data) {
+        data_arr = jQuery.parseJSON(data);
+        jQuery.each(data_arr, function(k, v) {
+          var link = v.link;
+          var postal = v.postal;
+          var city = v.city;
+
+          var div_elm = jQuery("<li>", {"class": "list-inline-item pb-1 me-0 ms-0 pe-1"});
+          var card_link = jQuery("<a>",{"class": "btn btn-link rounded-pill pb-2 border-1 border-white text-white", "href": link}).text(postal+' '+city).css('font-size','15px');
+
+          div_elm.append(card_link);
+
+          jQuery("ul#postalcodelist").append(div_elm);
+        });
+      }
+    });
+  });
+});
+</script>
 
 <section id="howitworks" class="bg-light-grey py-5">
   <div class="container text-center py-5 my-4">
