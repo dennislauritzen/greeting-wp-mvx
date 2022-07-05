@@ -2248,10 +2248,10 @@ add_action( 'woocommerce_after_checkout_validation', 'greeting_validate_new_rece
 function greeting_validate_new_receiver_info_fields($fields, $errors) {
 	global $woocommerce;
 
-	if ( isset($_POST['receiver_phone']) && (empty($_POST['receiver_phone']) || !preg_match('/^[0-9]{8,12}$/D', $_POST['receiver_phone'])) ){
+	if ( isset($_POST['receiver_phone']) && (empty($_POST['receiver_phone']) || !preg_match('/^[0-9\s\+]{8,15}$/', trim($_POST['receiver_phone']))) ){
 		$errors->add(
 			'validation',
-			__('Indtast et gyldigt telefonnummer til modtager, så vi kan kontakte vedkommende ved eventuelle spørgsmål om levering eller lignende.','greeting2')
+			__('Indtast et gyldigt telefonnummer til modtager i step 3 (8 cifre - uden mellemrum og landekode), så vi kan kontakte vedkommende ved eventuelle spørgsmål om levering eller lignende.','greeting2')
 		);
 	}
 	if ( isset($_POST['greeting_message']) && empty($_POST['greeting_message']) ){
