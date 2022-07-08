@@ -146,9 +146,9 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor_id))){
   				<?php
           // --- CLOSED DATES --- Dennis.
           function groupDates($input) {
-            $arr = explode(", ", $input);
+            $arr = explode(",", $input);
             foreach($arr as $k => $v){
-              $arr[$k] = strtotime($v);
+              $arr[$k] = strtotime(trim($v));
             }
             sort($arr);
             $expected = -1;
@@ -248,7 +248,7 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor_id))){
 
           if(count($result) > 0)
           {
-            print '<p>Bemærk dog at butikken ikke leverer:</p>';
+            print '<p>Bemærk dog at butikken ikke leverer på følgende dage:</p>';
 
             $today = date("U");
 

@@ -748,10 +748,18 @@ function ajax_fetch() { ?>
 
 			jQuery("#searchform").submit(function(event){
 				event.preventDefault();
+				var hid_pc_link = document.getElementById('hidden__s_link').value;
 				var val = jQuery("#datafetch_wrapper li.recomms:first-child a").prop('href');
+				var location;
 
-				if(val.length){
-					window.location.href = val;
+				if(hid_pc_link) {
+					location = hid_pc_link;
+				}
+				if(val){
+					location = val;
+				}
+				if(location.length){
+					window.location.href = location;
 				}
 				return false;
 			});
@@ -759,7 +767,6 @@ function ajax_fetch() { ?>
 			/*Do the search with delay 500ms*/
 			jQuery('#front_Search-new_ucsa').keyup(delay(500, function (e) {
 				var text = jQuery(this).val();
-
 
 				jQuery.ajax({
 					url: '<?php echo admin_url('admin-ajax.php'); ?>',
@@ -2235,8 +2242,6 @@ function checkout_message_choice_to_session( $posted_data ) {
     }
 }
 
-
-
 /**
 *
 * Function for the greeting text / greeting message
@@ -2248,12 +2253,12 @@ add_action( 'woocommerce_after_checkout_validation', 'greeting_validate_new_rece
 function greeting_validate_new_receiver_info_fields($fields, $errors) {
 	global $woocommerce;
 
-	if ( isset($_POST['receiver_phone']) && (empty($_POST['receiver_phone']) || !preg_match('/^[0-9\s\+]{8,15}$/', trim($_POST['receiver_phone']))) ){
-		$errors->add(
-			'validation',
-			__('Indtast et gyldigt telefonnummer til modtager i step 3 (8 cifre - uden mellemrum og landekode), så vi kan kontakte vedkommende ved eventuelle spørgsmål om levering eller lignende.','greeting2')
-		);
-	}
+	#if ( isset($_POST['receiver_phone']) && (empty($_POST['receiver_phone']) || !preg_match('/^[0-9\s\+]{8,15}$/', trim($_POST['receiver_phone']))) ){
+	#	$errors->add(
+	#		'validation',
+	#		__('Indtast et gyldigt telefonnummer til modtager i step 3  (8 cifre, uden mellemrum og landekode), så vi kan kontakte vedkommende ved evt. spørgsmål om levering. Klik på "Gennmfør bestilling" når du har rettet telefonnummeret.','greeting2')
+	#	);
+	#}
 	if ( isset($_POST['greeting_message']) && empty($_POST['greeting_message']) ){
 		$errors->add(
 			'validation',
@@ -2743,8 +2748,9 @@ function greeting_echo_receiver_info( ) {
 		), WC()->checkout->get_value( 'greeting_message' ) );
 
 		woocommerce_form_field( 'receiver_phone', array(
-			'type'          => 'text',
+			'type'          => 'tel',
 			'class'         => array('form-row-wide', 'greeting-custom-input'),
+			'input_class'		=> array('input-text validate[required] validate[custom[phone]'),
 			'required'      => true,
 			'label'         => __('Modtagerens telefonnr.', 'greeting2'),
 			'placeholder'       => __('Indtast modtagerens telefonnummer.', 'greeting2'),
@@ -3763,3 +3769,36 @@ function wcmp_add_order_table_row_data($vendor_rows, $order) {
 	$vendor_rows['order_p_id'] = isset( $parents_order_id ) ? $parents_order_id : '-';
 	return $vendor_rows;
 }
+
+
+function vendor_redirect_to_home( $query ){
+	$page_slug = $query->dc_vendor_shop;
+	global $wpdb;
+
+	#var_dump(get_query_var());
+
+	if( is_tax('dc_vendor_shop') ) {
+		$sql = "SELECT
+				u.id
+			FROM  wp_users u
+			INNER JOIN wp_usermeta um
+			ON um.user_id = u.id
+			WHERE um.meta_key = '_vendor_page_slug' AND um.meta_value LIKE %s";
+
+		$sql_query = $wpdb->prepare( $sql, $query->query['dc_vendor_shop'] );
+		$results = $wpdb->get_results($sql_query);
+
+		$vendor_id = $results['0']->id;
+		if( isset($vendor_id) && !empty($vendor_id) ){
+			$user_meta = get_userdata($vendor_id);
+			$user_roles = $user_meta->roles;
+
+			if(in_array('dc_rejected_vendor', $user_roles) || in_array('dc_pending_vendor', $user_roles)){
+
+			}
+		}
+		#wp_redirect( home_url() );
+	  #exit;
+  }
+}
+add_action( 'parse_query', 'vendor_redirect_to_home' );

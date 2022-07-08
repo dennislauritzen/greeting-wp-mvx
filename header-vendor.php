@@ -359,13 +359,19 @@ $cart_url = wc_get_cart_url();  // Set Cart URL
           } else {
             $val = '';
           ?>
+
+          <input type="hidden" name="__s_link" value="" id="hidden__s_link">
           <script type="text/javascript">
             jQuery(document).ready(function(){
               var postalcode = window.localStorage.getItem('postalcode');
               var city = window.localStorage.getItem('city');
+              var pc_link = window.localStorage.getItem('city_link');
 
               if(postalcode && city){
                 document.getElementById('front_Search-new_ucsa').value = postalcode+' '+city;
+              }
+              if(pc_link){
+                document.getElementById('hidden__s_link').value = pc_link;
               }
             });
           </script>

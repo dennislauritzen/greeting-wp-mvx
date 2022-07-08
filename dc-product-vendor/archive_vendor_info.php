@@ -396,7 +396,7 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
         </a>
       </div>
       <div class="col-md-12 col-lg-5 col-xl-6">
-        <form action="" method="" class="position-relative mx-5">
+        <form role="search" method="get" autocomplete="off" id="searchform" class="position-relative mx-5">
           <label for="" class="screen-reader-text">Indtast det postnummer, du ønsker at sende en gave til - og se udvalget af butikker</label>
           <button type="submit" name="submit" class="top-search-btn rounded-pill position-absolute border-0 end-0 bg-teal p-3 me-1"></button>
           <?php
@@ -405,13 +405,19 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
           } else {
             $city_search_val = '';
           ?>
+
+          <input type="hidden" name="__s_link" value="" id="hidden__s_link">
           <script type="text/javascript">
             jQuery(document).ready(function(){
               var postalcode = window.localStorage.getItem('postalcode');
               var city = window.localStorage.getItem('city');
+              var pc_link = window.localStorage.getItem('city_link');
 
               if(postalcode && city){
                 document.getElementById('front_Search-new_ucsa').value = postalcode+' '+city;
+              }
+              if(pc_link){
+                document.getElementById('hidden__s_link').value = pc_link;
               }
             });
           </script>

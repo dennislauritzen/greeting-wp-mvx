@@ -12,14 +12,18 @@ global $WCMp;
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
+
 // Get vendor
 $vendor_id = wcmp_find_shop_page_vendor();
 $vendor = get_wcmp_vendor($vendor_id);
 if(!$vendor){
-    // Redirect if not vendor
-    wp_safe_redirect(get_permalink( woocommerce_get_page_id( 'shop' ) ));
-    exit();
+  // Redirect if not vendor
+  #wp_safe_redirect(get_permalink( woocommerce_get_page_id( 'shop' ) ));
+
+	wp_safe_redirect( home_url() );
+	exit();
 }
+
 $is_block = get_user_meta($vendor->id, '_vendor_turn_off' , true);
 $user_type = get_user_meta($vendor->id, 'wp_capabilities');
 
