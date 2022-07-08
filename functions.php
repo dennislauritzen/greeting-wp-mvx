@@ -748,7 +748,10 @@ function ajax_fetch() { ?>
 
 			jQuery("#searchform").submit(function(event){
 				event.preventDefault();
-				var hid_pc_link = document.getElementById('hidden__s_link').value;
+				var hid_pc_link = '';
+				if(document.getElementById('hidden__s_link')){
+					hid_pc_link = document.getElementById('hidden__s_link').value;
+				}
 				var val = jQuery("#datafetch_wrapper li.recomms:first-child a").prop('href');
 				var location;
 
@@ -3416,8 +3419,14 @@ function get_user_area($user_postal = ''){
 	  } else if($user_postal >= 8000 && $user_postal < 9000){
 	    $user_areas['start'] = 8000;
 	    $user_areas['end'] = 9000;
-	  } else if($user_postal >= 9000 && $user_postal < 10000){
-	    $user_areas['start'] = 9000;
+	  } else if($user_postal >= 9000 && $user_postal < 9500){
+			$user_areas['start'] = 9000;
+	    $user_areas['end'] = 9500;
+	  } else if($user_postal >= 9500 && $user_postal < 9700){
+			$user_areas['start'] = 9500;
+	    $user_areas['end'] = 9700;
+	  } else if($user_postal >= 9700 && $user_postal < 10000){
+	    $user_areas['start'] = 9700;
 	    $user_areas['end'] = 9999;
 	  }
 	}
@@ -3801,4 +3810,4 @@ function vendor_redirect_to_home( $query ){
 	  #exit;
   }
 }
-add_action( 'parse_query', 'vendor_redirect_to_home' );
+#add_action( 'parse_query', 'vendor_redirect_to_home' );
