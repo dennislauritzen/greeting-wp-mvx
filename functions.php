@@ -2860,12 +2860,13 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 	$today = new DateTime('now');
 
 	// Loop through the closed dates from admin.
-	$meta_closed_days = get_vendor_closed_dates($vendor_id);
-	$closed_days_date = (!empty($meta_closed_days[0]) ? explode(",",$meta_closed_days) : array());
+	$meta_closed_days = get_user_meta($vendor_id, 'vendor_closed_day', true);
+	$closed_days_date = (!empty($meta_closed_days) ? explode(",",$meta_closed_days) : array());
 	$closed_dates_arr = array();
+
 	if(!empty($closed_days_date)){
 		foreach($closed_days_date as $ok_date){
-			$date_time_object = new DateTime($ok_date);
+			$date_time_object = new DateTime(trim($ok_date));
 			if($date_time_object > $today){
 				$closed_dates_arr[] = $date_time_object->format($date_format);
 			}
