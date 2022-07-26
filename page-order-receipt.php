@@ -9,9 +9,9 @@ if(empty($_GET['o']) || empty($_GET['key'])){
 	return;
 }
 
-$order_id 		= $_GET['o'];
-$order_old_id 	= $_GET['order_id'];
-$order_key 		= $_GET['key'];
+$order_id 		= (isset($_GET['o']) ? $_GET['o'] : 0);
+$order_old_id 	= (isset($_GET['order_id']) ? $_GET['order_id'] : 0);
+$order_key 		= (isset($_GET['key']) ? $_GET['key'] : '');
 
 $order_id_data = wc_get_order_id_by_order_key( $order_key );
 
@@ -63,7 +63,17 @@ get_header('checkout');
 				<?php endforeach; ?>
 			]
 		}
-		}
+	},
+	'user_details': {
+		'phone': '<?php echo ($order->get_billing_phone()) ? $order->get_billing_phone() : ''; ?>',
+		'mail': '<?php echo ($order->get_billing_email()) ? $order->get_billing_email() : ''; ?>',
+		'full_name': '<?php echo $order->get_formatted_billing_full_name(); ?>',
+		'address': '<?php echo ($order->get_billing_address_1()) ? $order->get_billing_address_1() : ''; ?>',
+		'city': '<?php echo ($order->get_billing_city()) ? $order->get_billing_city() : ''; ?>',
+		'country': '<?php echo ($order->get_billing_country()) ? $order->get_billing_country() : ''; ?>',
+		'postcode': '<?php echo ($order->get_billing_postcode()) ? $order->get_billing_postcode() : ''; ?>',
+		'delivery_phone': '<?php echo (get_post_meta($order->get_id(), '_receiver_phone', true)) ? get_post_meta($order->get_id(), '_receiver_phone', true) : ''; ?>'
+	}
 	});
 </script>
 <div class="container">
@@ -208,33 +218,37 @@ get_header('checkout');
 				<div class="col-6">
 					<h4>Leveringsoplysninger</h4>
 					<p>
-						<?php echo $order->get_formatted_shipping_full_name(); ?>
-						<?php echo ($order->get_shipping_company()) ? '<br>'.$order->get_shipping_company() : ''; ?>
+						<?php echo '<span id="ship_fullname">'.$order->get_formatted_shipping_full_name().'</span>'; ?>
+						<?php echo ($order->get_shipping_company()) ? '<br><span id="ship_company">'.$order->get_shipping_company().'</span>' : ''; ?>
 
-						<?php echo ($order->get_shipping_address_1()) ? '<br>'.$order->get_shipping_address_1() : ''; ?>
+						<?php echo ($order->get_shipping_address_1()) ? '<br><span id="ship_address">'.$order->get_shipping_address_1().'</span>' : ''; ?>
 
-						<?php echo ($order->get_shipping_postcode()) ? '<br>'.$order->get_shipping_postcode() : ''; ?>
-						<?php echo ($order->get_shipping_city()) ? ' '.$order->get_shipping_city() : ''; ?>
+						<?php echo ($order->get_shipping_postcode()) ? '<br><span id="ship_postcode">'.$order->get_shipping_postcode().'</span>' : ''; ?>
+						<?php echo ($order->get_shipping_city()) ? ' <span id="ship_city">'.$order->get_shipping_city().'</span>' : ''; ?>
 
-						<?php echo ($order->get_shipping_country()) ? '<br>'.$order->get_shipping_country() : ''; ?>
+						<?php echo ($order->get_shipping_country()) ? '<br><span id="ship_country">'.$order->get_shipping_country().'</span>' : ''; ?>
+
+						<?php
+						$delivery_phone = get_post_meta($order->get_id(), '_receiver_phone', true);
+						echo ($delivery_phone) ? '<br><span id="ship_phone">'.$delivery_phone.'</span>' : ''; ?>
 					</p>
 				</div>
 				<div class="col-6">
 					<h4>Dine oplysninger</h4>
 					<p>
-						<?php echo $order->get_formatted_billing_full_name(); ?>
-						<?php echo ($order->get_billing_company()) ? '<br>'.$order->get_billing_company() : ''; ?>
+						<?php echo '<span id="bill_fullname">'.$order->get_formatted_billing_full_name().'</span>'; ?>
+						<?php echo ($order->get_billing_company()) ? '<span id="bill_company"><br>'.$order->get_billing_company().'</span>' : ''; ?>
 
-						<?php echo ($order->get_billing_address_1()) ? '<br>'.$order->get_billing_address_1() : ''; ?>
+						<?php echo ($order->get_billing_address_1()) ? '<br><span id="bill_address">'.$order->get_billing_address_1().'</span>' : ''; ?>
 
-						<?php echo ($order->get_billing_postcode()) ? '<br>'.$order->get_billing_postcode() : ''; ?>
-						<?php echo ($order->get_billing_city()) ? ' '.$order->get_billing_city() : ''; ?>
+						<?php echo ($order->get_billing_postcode()) ? '<br><span id="bill_postcode">'.$order->get_billing_postcode().'</span>' : ''; ?>
+						<?php echo ($order->get_billing_city()) ? ' <span id="bill_city">'.$order->get_billing_city().'</span>' : ''; ?>
 
-						<?php echo ($order->get_billing_country()) ? '<br>'.$order->get_billing_country() : ''; ?>
+						<?php echo ($order->get_billing_country()) ? '<br><span id="bill_country">'.$order->get_billing_country().'</span>' : ''; ?>
 
 
-						<?php echo ($order->get_billing_email()) ? '<br><br>'.$order->get_billing_email() : ''; ?>
-						<?php echo ($order->get_billing_phone()) ? '<br>'.$order->get_billing_phone() : ''; ?>
+						<?php echo ($order->get_billing_email()) ? '<br><br><span id="bill_email">'.$order->get_billing_email().'</span>' : ''; ?>
+						<?php echo ($order->get_billing_phone()) ? '<br><span id="bill_phone">'.$order->get_billing_phone().'</span>' : ''; ?>
 					</p>
 				</div>
 			</div>
