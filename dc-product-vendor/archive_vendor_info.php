@@ -92,7 +92,12 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
   h1 {
     font-family: 'Rubik','Inter', sans-serif;
     font-weight: 500;
-    font-size: 60px;
+    font-size: 55px;
+  }
+  @media (max-width: 991px){
+    h1 {
+      font-size: 40px;
+    }
   }
 
   #top {
@@ -501,7 +506,7 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
               </a>
             </div>
             <div class="d-lg-none col-3 col-lg-0">
-              <button type="button" id="toggleOpening" class="d-lg-none btn btn-primary bg-teal border-0 py-2 px-1 px-sm-3" style="font-size:12px; word-break: break-word;">
+              <button type="button" id="toggleOpening" class="d-lg-none btn btn-primary bg-teal border-0 py-2 px-1 px-sm-4" style="font-size:12px;">
                 Se leveringstid & øvrig info
               </button>
               <script type="text/javascript">

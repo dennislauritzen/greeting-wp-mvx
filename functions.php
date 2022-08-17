@@ -808,7 +808,7 @@ function data_fetch(){
 		FROM {$wpdb->prefix}posts
 		WHERE post_title LIKE %s
 		AND post_type = 'city'
-		LIMIT 5", '%'.$search_query.'%');
+		LIMIT 5", '%'.trim($search_query).'%');
 	$landing_page_query = $wpdb->get_results($prepared_statement, OBJECT);
 
 	if (!empty($landing_page_query)) {?>
@@ -2957,14 +2957,17 @@ function greeting_echo_date_picker(  ) {
 		echo '</p>';
 	} else {
 		echo '<h3 class="pt-4">Leveringsdato</h3>';
-
+		echo '<script>';
+		echo 'jQuery("#datepicker").prop("readonly", true).prop("disabled","disabled");';
+		echo '</script>';
 		woocommerce_form_field( 'delivery_date', array(
 			'type'          => 'text',
 			'class'         => array('form-row-wide'),
 			'id'            => 'datepicker',
 			'required'      => false,
 			'label'         => __('Hvornår skal gaven leveres?'),
-			'placeholder'   => __('Vælg dato hvor gaven skal leveres')
+			'placeholder'   => __('Vælg dato hvor gaven skal leveres'),
+			'read_only' 		=> true
 		), WC()->checkout->get_value( 'delivery_date' ) );
 
 

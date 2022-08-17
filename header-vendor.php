@@ -19,7 +19,12 @@
 	h1 {
     font-family: 'Rubik','Inter', sans-serif;
     font-weight: 500;
-    font-size: 60px;
+    font-size: 55px;
+  }
+  @media (max-width: 991px){
+    h1 {
+      font-size: 40px;
+    }
   }
 
   #top {
@@ -70,12 +75,12 @@
 
   .top-search-btn {
     width: 40px;
-    height: 35px;
-    margin-top: 2px;
-    z-index: 1000;
-    background-image: url('https://greeting.dk/wp-content/plugins/greeting-marketplace/assets/img/search-icon.svg');
-    background-repeat: no-repeat;
-    background-position: center center;
+		height: 35px;
+		margin-top: 2px;
+		z-index: 1000;
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23ffffff' class='bi bi-search' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
+		background-repeat: no-repeat;
+		background-position: center center;
   }
   .top-search-input {
     padding-left: 30px;
@@ -83,7 +88,13 @@
 
 	#product h1 {
 		font-family: 'Rubik','Inter',sans-serif;
+    font-size: 32px;
 	}
+  @media (max-width: 768px){
+    #product h1 {
+      font-size: 24px;
+    }
+  }
 	#product div.description {
 		font-family: 'Inter',sans-serif;
 	}
@@ -313,7 +324,7 @@ $cart_url = wc_get_cart_url();  // Set Cart URL
  ?>
 
 
- <section id="top" class="pt-1" style="min-height: 350px; background-size: cover; background-position: center center; background-image: linear-gradient(rgba(0, 0, 0, 0.35),rgba(0, 0, 0, 0.35)),url('<?php echo (empty($vendor_banner) ? 'https://www.greeting.dk/wp-content/uploads/2022/04/pexels-furkanfdemir-6309844-1-scaled.jpg' : esc_url($vendor_banner)); ?>');">
+ <section id="top" class="pt-1" style="min-height: 300px; background-size: cover; background-position: center center; background-image: linear-gradient(rgba(0, 0, 0, 0.35),rgba(0, 0, 0, 0.35)),url('<?php echo (empty($vendor_banner) ? 'https://www.greeting.dk/wp-content/uploads/2022/04/pexels-furkanfdemir-6309844-1-scaled.jpg' : esc_url($vendor_banner)); ?>');">
   <div class="container py-4">
     <div class="row">
 			<div class="d-flex pb-3 pb-lg-0 pb-xl-0 position-relative justify-content-center justify-content-lg-start justify-content-xl-start col-md-12 col-lg-3">
