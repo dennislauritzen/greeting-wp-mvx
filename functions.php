@@ -3815,3 +3815,43 @@ function vendor_redirect_to_home( $query ){
   }
 }
 #add_action( 'parse_query', 'vendor_redirect_to_home' );
+
+
+// ADDING 2 NEW COLUMNS WITH THEIR TITLES (keeping "Total" and "Actions" columns at the end)
+add_filter( 'manage_edit-shop_order_columns', 'custom_shop_order_column', 20 );
+function custom_shop_order_column($columns)
+{
+    $reordered_columns = array();
+
+    // Inserting columns to a specific location
+    foreach( $columns as $key => $column){
+        $reordered_columns[$key] = $column;
+        if( $key ==  'order_status' ){
+            // Inserting after "Status" column
+            $reordered_columns['my-column-delivery-date'] = __( 'Leveringsdato','greeting2');
+        }
+    }
+    return $reordered_columns;
+}
+
+// Adding custom fields meta data for each new column (example)
+add_action( 'manage_shop_order_posts_custom_column' , 'custom_orders_list_column_content', 20, 2 );
+function custom_orders_list_column_content( $column, $post_id )
+{
+    switch ( $column )
+    {
+        case 'my-column-delivery-date' :
+            // Get custom post meta data
+            $my_var_one = get_post_meta( $post_id, '_delivery_date', true );
+						$date = new DateTime($my_var_one);
+						$date_format = $date->format('D, j. M \'y');
+            if(!empty($date_format))
+                echo $date_format;
+
+            // Testing (to be removed) - Empty value case
+            else
+                echo '<small>(<em>Hurtigst muligt</em>)</small>';
+
+            break;
+    }
+}
