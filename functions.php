@@ -3860,3 +3860,30 @@ function custom_orders_list_column_content( $column, $post_id )
         break;
     }
 }
+
+// Make custom column sortable
+function filter_manage_edit_shop_order_sortable_columns( $sortable_columns ) {  
+    return wp_parse_args( array( 'delivery_date' => '_delivery_date' ), $sortable_columns );
+}
+add_filter( 'manage_edit-shop_order_sortable_columns', 'filter_manage_edit_shop_order_sortable_columns', 10, 1 );
+
+// Orderby for custom column
+function action_pre_get_posts( $query ) {   
+    // If it is not admin area, exit
+    if ( ! is_admin() ) return;
+    
+    global $pagenow;
+
+    // Compare
+    if ( $pagenow === 'edit.php' && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'shop_order' ) {      
+        // Get orderby
+        $orderby = $query->get( 'orderby' );
+
+        // Set query
+        if ( $orderby == '_delivery_date' ) {           
+            $query->set( 'meta_key', '' );
+            $query->set( 'orderby', 'meta_value' );
+        }
+    }
+}
+add_action( 'pre_get_posts', 'action_pre_get_posts', 10, 1 );
