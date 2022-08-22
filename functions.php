@@ -3843,15 +3843,16 @@ function custom_orders_list_column_content( $column, $post_id )
         case 'my-column-delivery-date' :
             // Get custom post meta data
             $my_var_one = get_post_meta( $post_id, '_delivery_date', true );
-			$datetime = strtotime($my_var_one);
-			$date = substr($my_var_one, 0, 2);
-			$month = substr($my_var_one, 3, 2);
-			$year = substr($my_var_one, 6, 4);
 
-			$dateobj = new DateTime($year.'-'.$month.'-'.$date);
-			$date_format = $dateobj->format('D, j. M \'y');
+            if(!empty($my_var_one)){
+				$datetime = strtotime($my_var_one);
+				$date = substr($my_var_one, 0, 2);
+				$month = substr($my_var_one, 3, 2);
+				$year = substr($my_var_one, 6, 4);
 
-            if(!empty($date_format)){
+				$dateobj = new DateTime($year.'-'.$month.'-'.$date);
+				$date_format = $dateobj->format('D, j. M \'y');
+
                 echo $date_format;
 			} else {
                 echo '<small>(<em>Hurtigst muligt</em>)</small>';
