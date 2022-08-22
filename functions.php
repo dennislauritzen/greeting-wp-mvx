@@ -3828,7 +3828,7 @@ function custom_shop_order_column($columns)
         $reordered_columns[$key] = $column;
         if( $key ==  'order_status' ){
             // Inserting after "Status" column
-            $reordered_columns['my-column-delivery-date'] = __( 'Leveringsdato','greeting2');
+            $reordered_columns['delivery-date'] = __( 'Leveringsdato','greeting2');
         }
     }
     return $reordered_columns;
@@ -3840,7 +3840,7 @@ function custom_orders_list_column_content( $column, $post_id )
 {
     switch ( $column )
     {
-        case 'my-column-delivery-date' :
+        case 'delivery-date' :
             // Get custom post meta data
             $my_var_one = get_post_meta( $post_id, '_delivery_date', true );
 
@@ -3863,7 +3863,7 @@ function custom_orders_list_column_content( $column, $post_id )
 
 // Make custom column sortable
 function filter_manage_edit_shop_order_sortable_columns( $sortable_columns ) {  
-    return wp_parse_args( array( 'delivery_date' => '_delivery_date' ), $sortable_columns );
+    return wp_parse_args( array( 'delivery-date' => '_delivery_date' ), $sortable_columns );
 }
 add_filter( 'manage_edit-shop_order_sortable_columns', 'filter_manage_edit_shop_order_sortable_columns', 10, 1 );
 
@@ -3881,7 +3881,7 @@ function action_pre_get_posts( $query ) {
 
         // Set query
         if ( $orderby == '_delivery_date' ) {           
-            $query->set( 'meta_key', '' );
+            $query->set( 'meta_key', '_delivery_date' );
             $query->set( 'orderby', 'meta_value' );
         }
     }
