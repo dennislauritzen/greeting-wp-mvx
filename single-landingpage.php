@@ -25,8 +25,18 @@ $pageId = get_the_ID();
 $page_id = $pageId;
 $usersForThisLP = array();
 
+// TODOS!!!!!
+// --
+// @todo - move from custom relation to ACF Relation on occassion / category (line 54-66).
+// @todo - add a filter if there is less than 10 postal codes.
+// @todo - if more than 10 (only Copenhagen) then we think they deliver to all postal codes.
+// @todo - SEO text should be compiled.
+// @todo - check if it is an occassion or a category that is connected to the landing page - and only filter for the "other".
+// @todo - make the postal code connection perform better
+
 // ----
 // Generate array of postal codes for this landing page.
+//
 #$cityIdArr = get_post_meta($pageId, 'postal_code_relation', true);
 #$cityId = $cityIdArr[0];
 $postal_codes = get_field('postal_code_relation', $pageId);
@@ -55,6 +65,8 @@ $lp_cat_conn = get_post_meta($pageId, 'landingpage_category', true);
 $searchCategoryId = $postRowCategory->meta_value;
 
 
+// Prepare the placeholders
+// And the where statement
 $where = array();
 $placeholder_arr = array_fill(0, count($postcodes), 'um.meta_value LIKE %s');
 foreach($postcodes as $postcode){
@@ -80,12 +92,12 @@ $sql .= "
         AND
         NOT EXISTS (SELECT um.meta_value FROM {$wpdb->prefix}usermeta um2 WHERE um2.user_id = u.ID AND um2.meta_key = 'vendor_turn_off')
         ORDER BY
-      		CASE u.ID
-      			WHEN 38 THEN 0
-      			WHEN 76 THEN 0
-      			ELSE 1
-      		END DESC,
-		      (SELECT um3.meta_value FROM wp_usermeta um3 WHERE um3.user_id = u.ID AND um3.meta_key = 'delivery_type') ASC
+          CASE u.ID
+            WHEN 38 THEN 0
+            WHEN 76 THEN 0
+                ELSE 1
+          END DESC,
+          (SELECT um3.meta_value FROM {$wpdb->prefix}usermeta um3 WHERE um3.user_id = u.ID AND um3.meta_key = 'delivery_type') DESC
 ";
 
 $sql_prepare = $wpdb->prepare($sql, $where);
@@ -235,13 +247,13 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
           <ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
 
           <div class="form-check">
-              <input type="checkbox" name="filter_del_city" class="form-check-input filter-on-city-page" id="filter_delivery_1" checked="checked" value="1">
+              <input type="checkbox" name="filter_del_city" class="form-check-input filter-on-lp-page" id="filter_delivery_1" checked="checked" value="1">
               <label class="form-check-label" for="filter_delivery_1">
                 Personlig levering fra lokal butik
               </label>
           </div>
           <div class="form-check">
-              <input type="checkbox" name="filter_del_city" class="form-check-input filter-on-city-page" id="filter_delivery_0" checked="checked" value="0">
+              <input type="checkbox" name="filter_del_city" class="form-check-input filter-on-lp-page" id="filter_delivery_0" checked="checked" value="0">
               <label class="form-check-label" for="filter_delivery_0">
                 Forsendelse med fragtfirma
               </label>
@@ -272,7 +284,7 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
             foreach($postalcodesForFilter as $postcode){
             ?>
                 <div class="form-check">
-                    <input type="checkbox" name="filter_catocca_city" class="form-check-input filter-on-city-page" id="filter_cat<?php echo $postcode['id']; ?>" value="<?php echo $postcode['id']; ?>">
+                    <input type="checkbox" name="filter_occa_lp" class="form-check-input filter-on-lp-page" id="filter_cat<?php echo $postcode['id']; ?>" value="<?php echo $postcode['id']; ?>">
                     <label for="filter_cat<?php echo $category->term_id; ?>" class="form-check-label">
                       <?php echo $postcode['title']; ?>
                     </label>
@@ -314,7 +326,7 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
             foreach($occasionTermListArrayUnique as $occasionTerm){
               if($occasionTerm == $occasion->term_id){ ?>
                 <div class="form-check">
-                    <input type="checkbox" name="filter_catocca_city" class="form-check-input filter-on-city-page" id="filter_occ_<?php echo $occasion->term_id; ?>" value="<?php echo $occasion->term_id; ?>">
+                    <input type="checkbox" name="filter_occa_lp" class="form-check-input filter-on-lp-page" id="filter_occ_<?php echo $occasion->term_id; ?>" value="<?php echo $occasion->term_id; ?>">
                     <label class="form-check-label" for="filter_occ_<?php echo $occasion->term_id; ?>"><?php echo $occasion->name; ?></label>
                 </div>
           <?php
@@ -423,7 +435,7 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
               <button type="button" class="btn-close filter-btn-delete" data-filter-id="1" data-label="Personligleveringfralokalbutik" data-filter-remove="filter_cat1"></button>
             </div>
             <a href="<?php echo home_url(); ?>"class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 text-dark">
-              <?php echo $cityPostalcode.' '.$cityName; ?>
+              <?php echo the_title(); ?>
               <button type="button" class="btn-close" aria-label="Close"></button>
             </a>
             <a href="#" id="cityPageReset" onclick="event.preventDefault();" class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 bg-yellow text-white">
@@ -489,12 +501,25 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
               <div class="card-footer">
                 <small class="text-muted">
                   <div>
+                    <?php
+                    $delivery_type = get_field('delivery_type','user_'.$vendor->id);
+                    $delivery_type = (!empty($delivery_type['0']['value']) ? $delivery_type['0']['value'] : '');
+                    if($delivery_type == 1){
+                    ?>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bicycle" viewBox="0 0 16 16">
                       <path d="M4 4.5a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1v.5h4.14l.386-1.158A.5.5 0 0 1 11 4h1a.5.5 0 0 1 0 1h-.64l-.311.935.807 1.29a3 3 0 1 1-.848.53l-.508-.812-2.076 3.322A.5.5 0 0 1 8 10.5H5.959a3 3 0 1 1-1.815-3.274L5 5.856V5h-.5a.5.5 0 0 1-.5-.5zm1.5 2.443-.508.814c.5.444.85 1.054.967 1.743h1.139L5.5 6.943zM8 9.057 9.598 6.5H6.402L8 9.057zM4.937 9.5a1.997 1.997 0 0 0-.487-.877l-.548.877h1.035zM3.603 8.092A2 2 0 1 0 4.937 10.5H3a.5.5 0 0 1-.424-.765l1.027-1.643zm7.947.53a2 2 0 1 0 .848-.53l1.026 1.643a.5.5 0 1 1-.848.53L11.55 8.623z"/>
+                    </svg> Personlig levering i <?php print the_title(); ?>
+                    <?php
+                    } else if($delivery_type == 0) {
+                    ?>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-truck" viewBox="0 0 16 16">
+                      <path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h9A1.5 1.5 0 0 1 12 3.5V5h1.02a1.5 1.5 0 0 1 1.17.563l1.481 1.85a1.5 1.5 0 0 1 .329.938V10.5a1.5 1.5 0 0 1-1.5 1.5H14a2 2 0 1 1-4 0H5a2 2 0 1 1-3.998-.085A1.5 1.5 0 0 1 0 10.5v-7zm1.294 7.456A1.999 1.999 0 0 1 4.732 11h5.536a2.01 2.01 0 0 1 .732-.732V3.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .294.456zM12 10a2 2 0 0 1 1.732 1h.768a.5.5 0 0 0 .5-.5V8.35a.5.5 0 0 0-.11-.312l-1.48-1.85A.5.5 0 0 0 13.02 6H12v4zm-9 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm9 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
                     </svg>
-                    <!-- Leverer til: 8000 Aarhus C, 8200 Aarhus N, 8270 Højbjerg -->
-                    Leverer til: <?php echo $cityName;?>
-                    <input type="hidden" id="cityName" value="<?php echo $cityName;?>">
+                      Sender med fragtfirma til <?php print the_title(); ?>
+                    <?php
+                    }
+                    ?>
+                    <input type="hidden" id="cityName" value="<?php echo the_title();?>">
                   </div>
                 </small>
               </div>
@@ -502,11 +527,10 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
           </div>
         </div>
       <?php } ?>
+    </div>
+    <!-- show filtered result here-->
+    <div class="filteredStore row"></div>
 
-      <!-- show filtered result here-->
-      <div class="filteredStore row"></div>
-
-      </div>
     </div>
   </div>
 </section>
@@ -865,6 +889,223 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
 			// var val = jQuery('#priceSlider').slider("option", "values");
 		});
 	});
+</script>
+
+
+<script type="text/javascript">
+  // Start the jQuery
+  jQuery(document).ready(function($) {
+    var ajaxurl = "<?php echo admin_url('admin-ajax.php');?>";
+    var occassionDeliveryIdArray = [];
+    var inputPriceRangeArray = [];
+    var deliveryIdArray = [];
+    var priceSliderMin = jQuery("#sliderPrice").data("slider-min");
+    var priceSliderMax = jQuery("#sliderPrice").data("slider-max");
+    // $('#cityPageReset').hide();
+
+    var url_string = window.location.href; //window.location.href
+    var url = new URL(url_string);
+
+    var del_url_val = url.searchParams.get("d");
+    var cat_url_val = url.searchParams.get("c");
+    var price_url_val = url.searchParams.get("price");
+
+    if(del_url_val){
+      deliveryIdArray = del_url_val.split(",");
+
+      jQuery.each( deliveryIdArray, function(i,v){
+        if(	$("input#filter_delivery_"+v).length){
+          $("input#filter_delivery_"+v).prop('checked',true);
+        }
+      });
+    }
+    if(cat_url_val){
+      occassionDeliveryIdArray = cat_url_val.split(",");
+
+      jQuery.each( occassionDeliveryIdArray, function(i,v){
+        if(	$("input#filter_cat"+v).length){
+          $("input#filter_cat"+v).prop('checked',true);
+        } else if($("input#filter_occ_"+v).length) {
+          $("input#filter_occ_"+v).prop('checked',true);
+        }
+      });
+    }
+    if(price_url_val){
+      inputPriceRangeArray = price_url_val.split(",");
+
+      var priceRangeMinVal = 0;
+      var priceRangeMaxVal = priceSliderMax;
+      if(inputPriceRangeArray[0] >= priceSliderMin &&  !isNaN(parseFloat(inputPriceRangeArray[0])) && isFinite(inputPriceRangeArray[0])){
+        priceRangeMinVal = inputPriceRangeArray[0];
+      }
+      if(inputPriceRangeArray[1] <= priceSliderMax &&  !isNaN(parseFloat(inputPriceRangeArray[1])) && isFinite(inputPriceRangeArray[1])){
+        priceRangeMaxVal = inputPriceRangeArray[1];
+      }
+
+      jQuery("#sliderPrice").data('data-slider-value','['+priceRangeMinVal+','+priceRangeMaxVal+']');
+      document.getElementById("slideStartPoint").value = priceRangeMinVal;
+      document.getElementById("slideEndPoint").value =  priceRangeMaxVal;
+    }
+
+    if(deliveryIdArray.length > 0 && occassionDeliveryIdArray.length > 0 && inputPriceRangeArray.length > 0){
+      update();
+    }
+
+    jQuery(".filter-on-lp-page").click(function(){
+      update();
+
+      if(this.checked){
+        setFilterBadgeCity(
+          $('label[for='+this.id+']').text(),
+          this.value,
+          'filter_cat'+this.value
+        );
+      } else {
+        removeFilterBadgeCity(
+          $('label[for='+this.id+']').text(),
+          this.value,
+          'filter_cat'+this.value,
+          false
+        );
+      }
+    });
+    slider.on("slideStop", function(sliderValue){
+      update();
+    });
+
+    function update(){
+      var cityName = $('#cityName').val();
+      var postalCode = $('#postalCode').val();
+      occaIdArray = [];
+      deliveryIdArray = [];
+      inputPriceRangeArray = [];
+
+      $("input:checkbox[name=filter_occa_lp]:checked").each(function(){
+        occaIdArray.push($(this).val());
+      });
+      $("input:checkbox[name=filter_del_city]:checked").each(function(){
+        deliveryIdArray.push($(this).val());
+      });
+
+      var sliderValMin = jQuery("#sliderPrice").data("slider-min");
+      var sliderValMax = jQuery("#sliderPrice").data("slider-max");
+      inputPriceRangeArray = [
+        document.getElementById("slideStartPoint").value,
+        document.getElementById("slideEndPoint").value
+      ];
+      var priceChange = 0;
+      if(sliderValMin < document.getElementById("slideStartPoint").value || sliderValMax > document.getElementById("slideEndPoint").value){
+        priceChange = 1;
+      }
+
+      var data = {
+        'action': 'lp_filter_action',
+        landingPageDefaultUserIdAsString: jQuery("#landingPageDefaultUserIdAsString").val(),
+        occaIdArray: occaIdArray,
+        deliveryIdArray: deliveryIdArray,
+        inputPriceRangeArray: inputPriceRangeArray
+      };
+      jQuery.post(ajaxurl, data, function(response) {
+        jQuery('#defaultStore').hide();
+        jQuery('.filteredStore').show();
+        jQuery('.filteredStore').html(response);
+
+        if(occaIdArray.length == 0 && deliveryIdArray.length == 0 && priceChange == 1){
+          jQuery('#defaultStore').show();
+          jQuery('.filteredStore').hide();
+          jQuery('#noVendorFound').hide();
+        } else if(occaIdArray.length == 0 && deliveryIdArray.length == 0 && priceChange == 0){
+          jQuery('#defaultStore').show();
+          jQuery('.filteredStore').hide();
+          jQuery('#noVendorFound').hide();
+        }
+
+        var state = { 'd': deliveryIdArray, 'c': occaIdArray, 'p': inputPriceRangeArray }
+        var url = '';
+        if(deliveryIdArray.length > 0){
+          if(url){ 	url += '&'; }
+          url += 'd='+deliveryIdArray;
+        }
+        if(occaIdArray.length > 0){
+          if(url){ 	url += '&'; }
+          url += 'c='+occaIdArray;
+        }
+
+        if(inputPriceRangeArray.length > 0 && (inputPriceRangeArray[0] > sliderValMin || inputPriceRangeArray[1] < sliderValMax)){
+          if(url){ 	url += '&'; }
+          url += 'price='+inputPriceRangeArray;
+        }
+        if(url.length > 0){
+          url = '?'+url;
+        }
+
+        if(url){
+          history.pushState(state, '', url);
+        } else {
+          window.history.replaceState({}, '', location.pathname);
+        }
+      });
+    }
+
+    // Filter badges on the vendor page.
+    function setFilterBadgeCity(label, id, dataRemove){
+      var elm = document.createElement('div');
+      elm.id = 'filter'+dataRemove;
+      elm.classList.add('badge', 'rounded-pill', 'border-yellow', 'py-2', 'px-2', 'me-1', 'my-1', 'my-lg-0', 'my-xl-0', 'text-dark', 'dynamic-filters');
+      elm.href = '#';
+      elm.innerHTML = label;
+
+      elmbtn = document.createElement('button');
+      elmbtn.type = 'button';
+      elmbtn.classList.add('btn-close', 'filter-btn-delete');
+      elmbtn.dataset.filterId = id;
+      elmbtn.dataset.label = label.replace(/ /g,'');
+      elmbtn.onclick = function(){removeFilterBadgeCity('"'+label.replace(/ /g,'')+'"', id, dataRemove, true);};
+      elmbtn.dataset.filterRemove = dataRemove;
+      elm.appendChild(elmbtn);
+
+      jQuery('div.filter-list').prepend(elm);
+    }
+    function removeFilterBadgeCity(label, id, dataRemove, updateVendors){
+      if(updateVendors === true){
+        var elmId = dataRemove;
+        console.log(elmId+' '+dataRemove);
+        document.getElementById(elmId).checked = false;
+        update();
+      }
+      jQuery('#filter'+dataRemove).remove();
+    }
+
+    // reset filter
+    $('#cityPageReset').click(function(){
+      $("input:checkbox[name=filter_occa_lp], input:checkbox[name=filter_del_city]").removeAttr("checked");
+      var val_max = $("input#sliderPrice").data('slider-max');
+
+      slider.setValue([0,val_max]);
+      $("input#sliderPrice").data('slider-value', '[0,'+val_max+']');
+      $("input#sliderPrice").data('slider-max', val_max);
+
+      $("input#slideEndPoint").val(val_max);
+      $("input#slideStartPoint").val(0);
+
+      catOccaDeliveryIdArray.length = 0;
+
+      $('div.filter-list div.dynamic-filters').remove();
+
+      jQuery('#defaultStore').show();
+      jQuery('.filteredStore').hide();
+    });
+  });
+
+  // Add remove loading class on body element based on Ajax request status
+  jQuery(document).on({
+    ajaxStart: function(){
+      jQuery("div").addClass("loading");
+    },
+    ajaxStop: function(){
+      jQuery("div").removeClass("loading");
+    }
+  });
 </script>
 
 

@@ -2012,6 +2012,14 @@ add_action( 'woocommerce_checkout_update_order_meta', 'greeting_save_custom_fiel
 function greeting_save_custom_fields_with_order( $order_id ) {
     global $woocommerce;
     if ( $_POST['delivery_date'] ) update_post_meta( $order_id, '_delivery_date', esc_attr( $_POST['delivery_date'] ) );
+		if ( $_POST['delivery_date'] ){
+			$post_date = $_POST['delivery_date'];
+			$d_date = substr($post_date, 0, 2);
+			$d_month = substr($post_date, 3, 2);
+			$d_year = substr($post_date, 6, 4);
+			$unix_date = date("U", strtotime($d_year.'-'.$d_month.'-'.$d_date));
+			update_post_meta( $order_id, '_delivery_unixdate', esc_attr( $unix_date ) );
+		}
 		if ( $_POST['greeting_message'] ) update_post_meta( $order_id, '_greeting_message', esc_attr( $_POST['greeting_message'] ) );
 		if ( $_POST['receiver_phone'] ) update_post_meta( $order_id, '_receiver_phone', esc_attr( $_POST['receiver_phone'] ) );
 
@@ -3195,9 +3203,9 @@ function woocommerce_thankyou_redirect( $order_id ) {
 		 }
 		 global $wp;
 		 if ( is_checkout() && !empty( $wp->query_vars['order-received'] ) ) {
-     wp_redirect( site_url() . '/order-received?o='.$order->ID.'&key='.$order_key );
-     exit;
-	 }
+	     wp_redirect( site_url() . '/order-received?o='.$order->ID.'&key='.$order_key );
+	     exit;
+		 }
 }
 
 /**
@@ -3571,8 +3579,16 @@ function register_order_seen_order_status() {
         'exclude_from_search'       => false,
         'label_count'               => _n_noop( 'Order Seen by Vendor <span class="count">(%s)</span>', 'Shipment Arrival <span class="count">(%s)</span>' )
     ) );
-}
 
+		register_post_status( 'wc-order-forwarded', array(
+        'label'                     => 'Order Sent to Vendor',
+        'public'                    => true,
+        'show_in_admin_status_list' => true,
+        'show_in_admin_all_list'    => true,
+        'exclude_from_search'       => false,
+        'label_count'               => _n_noop( 'Order Forwarded to Vendor <span class="count">(%s)</span>', 'Shipment Arrival <span class="count">(%s)</span>' )
+    ) );
+}
 
 add_filter( 'wc_order_statuses', 'add_order_seen_to_order_statuses' );
 function add_order_seen_to_order_statuses( $order_statuses ) {
@@ -3581,11 +3597,11 @@ function add_order_seen_to_order_statuses( $order_statuses ) {
         $new_order_statuses[ $key ] = $status;
         if ( 'wc-processing' === $key ) {
             $new_order_statuses['wc-order-seen'] = 'Order Seen by Vendor';
+						$new_order_statuses['wc-order-forwarded'] = 'Order Forwarded to Vendor';
         }
     }
     return $new_order_statuses;
 }
-
 
 add_action('admin_head', 'styling_admin_order_list' );
 function styling_admin_order_list() {
@@ -3596,14 +3612,20 @@ function styling_admin_order_list() {
 
     // HERE we set your custom status
     $order_status = 'Order Seen'; // <==== HERE
-    ?>
-    <style>
-        .order-status.status-<?php echo sanitize_title( $order_status ); ?> {
-            background: #d7f8a7;
-            color: #0c942b;
-        }
-    </style>
-    <?php
+		echo '<style>
+      .order-status.status-'.sanitize_title( $order_status ).'{
+          background: #d7f8a7;
+          color: #0c942b;
+      }
+    </style>';
+
+		$order_status = 'Order Forwarded'; // <==== HERE
+		echo '<style>
+      .order-status.status-'.sanitize_title( $order_status ).'{
+          background: #d6bf75;
+          color: #888888;
+      }
+    </style>';
 }
 
 
@@ -3840,50 +3862,111 @@ function custom_orders_list_column_content( $column, $post_id )
 {
     switch ( $column )
     {
-        case 'delivery-date' :
-            // Get custom post meta data
-            $my_var_one = get_post_meta( $post_id, '_delivery_date', true );
+      case 'delivery-date' :
+        // Get custom post meta data
+        $del_date_unix = get_post_meta( $post_id, '_delivery_unixdate', true );
+				$del_date = get_post_meta( $post_id, '_delivery_unixdate', true );
 
-            if(!empty($my_var_one)){
-				$datetime = strtotime($my_var_one);
-				$date = substr($my_var_one, 0, 2);
-				$month = substr($my_var_one, 3, 2);
-				$year = substr($my_var_one, 6, 4);
+	      if(!empty($del_date_unix)){
+					$dateobj = new DateTime();
+					$dateobj->setTimestamp($del_date_unix);
+					$date_format = $dateobj->format('D, j. M \'y');
 
-				$dateobj = new DateTime($year.'-'.$month.'-'.$date);
-				$date_format = $dateobj->format('D, j. M \'y');
+	        echo $date_format;
+				} else {
+					if(!empty($del_date)){
+						$date_d = substr($del_date, 0, 2);
+						$month_d = substr($del_date, 3, 2);
+						$year_d = substr($del_date, 6, 4);
+						$date_old = new DateTime($year_d.'-'.$month_d.'-'.$date_d);
+						$date_old_format = $date_old->format('D, j. M \'y');
 
-                echo $date_format;
-			} else {
-                echo '<small>(<em>Hurtigst muligt</em>)</small>';
-			}
-        break;
+						echo $date_old_format;
+					} else {
+	        	echo '<small>(<em>Hurtigst muligt</em>)</small>';
+					}
+				}
+    break;
     }
 }
 
 // Make custom column sortable
-function filter_manage_edit_shop_order_sortable_columns( $sortable_columns ) {  
-    return wp_parse_args( array( 'delivery-date' => '_delivery_date' ), $sortable_columns );
+function filter_manage_edit_shop_order_sortable_columns( $sortable_columns ) {
+    return wp_parse_args( array( 'delivery-date' => '_delivery_unixdate' ), $sortable_columns );
 }
 add_filter( 'manage_edit-shop_order_sortable_columns', 'filter_manage_edit_shop_order_sortable_columns', 10, 1 );
 
 // Orderby for custom column
-function action_pre_get_posts( $query ) {   
+function action_pre_get_posts( $query ) {
     // If it is not admin area, exit
     if ( ! is_admin() ) return;
-    
+
     global $pagenow;
 
     // Compare
-    if ( $pagenow === 'edit.php' && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'shop_order' ) {      
+    if ( $pagenow === 'edit.php' && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'shop_order' ) {
         // Get orderby
         $orderby = $query->get( 'orderby' );
 
         // Set query
-        if ( $orderby == '_delivery_date' ) {           
-            $query->set( 'meta_key', '_delivery_date' );
+        if ( $orderby == '_delivery_date' ) {
+            $query->set( 'meta_key', '_delivery_unixdate' );
             $query->set( 'orderby', 'meta_value' );
         }
     }
 }
 add_action( 'pre_get_posts', 'action_pre_get_posts', 10, 1 );
+
+
+function wcmp_admin_filter_by_vendor() {
+	global $typenow;
+	if ($typenow == 'shop_order') {
+		$admin_dd_html = '<select name="admin_order_vendor" id="dropdown_admin_order_vendor"><option value="">'.__("Show All Vendors", "dc-woocommerce-multi-vendor").'</option>';
+		$vendors = get_wcmp_vendors();
+
+		if($vendors){
+			$vendor_arr = array();
+			foreach ($vendors as $vendor) {
+				$vendor_arr[$vendor->term_id] = $vendor->page_title;
+			}
+
+		 	asort($vendor_arr);
+			foreach($vendor_arr as $vendor => $value){
+				$checked = sanitize_text_field($_REQUEST['admin_order_vendor']);
+				$checked = ($checked == $vendor) ? ' selected="selected"' : '';
+				$admin_dd_html .= '<option value="'.$vendor.'"'.$checked.'>'.$value.'</option>';
+			}
+
+		}
+
+		$admin_dd_html .= '</select>';
+		echo $admin_dd_html;
+	}
+}
+add_action( 'restrict_manage_posts', 'wcmp_admin_filter_by_vendor');
+
+function get_vendor_parent_order($id) {
+	$vendor_orders = get_posts( array(
+																	'numberposts' => -1,
+																	'meta_key'    => '_vendor_id',
+																	'meta_value'  => $id,
+																	'post_type'   => 'shop_order',
+																	'post_status' => 'any',
+													) );
+	foreach( $vendor_orders as $vendor_order ) {
+			$parent_order = wp_get_post_parent_id( $vendor_order->ID );
+			$parent_orders[] = $parent_order;
+	}
+	return $parent_orders;
+}
+function filter_orders_by_vendor_in_admin_dashboard( $query ) {
+    if (current_user_can('administrator') && !empty($_REQUEST['admin_order_vendor'])) {
+			$vendor_term_id = isset($_GET['admin_order_vendor'])?$_GET['admin_order_vendor']:'';
+			$vendor =  get_wcmp_vendor_by_term($vendor_term_id);
+			$parent_orders = get_vendor_parent_order($vendor->id);
+			$query['post__in'] = $parent_orders;
+			return $query;
+   }
+   return $query;
+}
+add_filter( 'wcmp_shop_order_query_request', 'filter_orders_by_vendor_in_admin_dashboard');

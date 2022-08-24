@@ -262,7 +262,7 @@
   #greeting-footer h6 {
     font-family: 'Rubik', 'Inter', 'Comic Sans', sans-serif;
     font-size: 20px;
-    color: #1b4949;
+    color: #094444;
   }
   #greeting-footer h6.light {
     font-family: 'Rubik', 'Inter', 'Comic Sans', sans-serif;

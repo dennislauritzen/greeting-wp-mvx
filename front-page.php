@@ -147,18 +147,21 @@ jQuery(document).ready(function(){
       },
       success: function(data) {
         data_arr = jQuery.parseJSON(data);
-        jQuery.each(data_arr, function(k, v) {
-          var link = v.link;
-          var postal = v.postal;
-          var city = v.city;
 
-          var div_elm = jQuery("<li>", {"class": "list-inline-item pb-1 me-0 ms-0 pe-1"});
-          var card_link = jQuery("<a>",{"class": "btn btn-link rounded-pill pb-2 border-1 border-white text-white", "href": link}).text(postal+' '+city).css('font-size','15px');
+        if(data_arr.length > 0){
+          jQuery.each(data_arr, function(k, v) {
+            var link = v.link;
+            var postal = v.postal;
+            var city = v.city;
 
-          div_elm.append(card_link);
+            var div_elm = jQuery("<li>", {"class": "list-inline-item pb-1 me-0 ms-0 pe-1"});
+            var card_link = jQuery("<a>",{"class": "btn btn-link rounded-pill pb-2 border-1 border-white text-white", "href": link}).text(postal+' '+city).css('font-size','15px');
 
-          jQuery("ul#postalcodelist").append(div_elm);
-        });
+            div_elm.append(card_link);
+
+            jQuery("ul#postalcodelist").append(div_elm);
+          });
+        }
       }
     });
 
@@ -174,27 +177,30 @@ jQuery(document).ready(function(){
         },
         success: function(data) {
           data_arr = jQuery.parseJSON(data);
-          jQuery.each(data_arr, function(k, v) {
-            var banner = v.banner;
-            var name = v.store_name;
-            var description = v.description;
-            var link = v.link;
 
-            var div_elm = jQuery("<div>", {"class": "col-12 pb-3 pb-lg-0 pb-xl-0 col-sm-6 col-lg-3"});
-            var card_elm = jQuery("<div>",{"class": "card"});
-            var card_img = jQuery("<img>",{"class": "card-img-top", "src": banner, "alt": name})
-            var card_body = jQuery("<div>",{"class": "card-body"});
-            var card_title = jQuery("<div>",{"class": "card-title"}).text(name);
-            var card_text = jQuery("<p>",{"class": "card-text"}).text(description);
-            var card_link = jQuery("<a>",{"class": "rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link", "href": link}).text('Gå til butik');
+          if(data_arr.length > 0){
+            jQuery.each(data_arr, function(k, v) {
+              var banner = v.banner;
+              var name = v.store_name;
+              var description = v.description;
+              var link = v.link;
 
-            card_body.append(card_title).append(card_text).append(card_link);
-            card_elm.append(card_img).append(card_body);
-            div_elm.append(card_elm);
+              var div_elm = jQuery("<div>", {"class": "col-12 pb-3 pb-lg-0 pb-xl-0 col-sm-6 col-lg-3"});
+              var card_elm = jQuery("<div>",{"class": "card"});
+              var card_img = jQuery("<img>",{"class": "card-img-top", "src": banner, "alt": name})
+              var card_body = jQuery("<div>",{"class": "card-body"});
+              var card_title = jQuery("<div>",{"class": "card-title"}).text(name);
+              var card_text = jQuery("<p>",{"class": "card-text"}).text(description);
+              var card_link = jQuery("<a>",{"class": "rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link", "href": link}).text('Gå til butik');
 
-            jQuery("#inspiration div.store_container").append(div_elm);
-          });
-          jQuery("#inspiration").css('display','block');
+              card_body.append(card_title).append(card_text).append(card_link);
+              card_elm.append(card_img).append(card_body);
+              div_elm.append(card_elm);
+
+              jQuery("#inspiration div.store_container").append(div_elm);
+            });
+            jQuery("#inspiration").css('display','block');
+          }
         }
       });
     }
