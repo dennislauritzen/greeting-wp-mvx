@@ -1,4 +1,28 @@
 <?php
+/**
+ *
+ * Perform start setup
+ *
+**/
+global $wpdb;
+
+$pageId = get_the_ID();
+$page_id = $pageId;
+$usersForThisLP = array();
+
+// Get the connectors fields and check if they are empty.
+// If empty, then redirect to home.
+$lp_category_conn = get_field('category_relation', $page_id);
+$lp_occasion_conn = get_field('occasion_relation', $page_id);
+#var_dump($lp_category_conn);var_dump($lp_occasion_conn);
+$connection_id = !empty($lp_category_conn) ? $lp_category_conn : $lp_occasion_conn;
+$connection_type = !empty($lp_category_conn) ? 'category' : (!empty($lp_occasion_conn) ? 'occassion' : '');
+
+if(empty($connection_id)){
+  wp_redirect(home_url());
+  exit();
+}
+
 get_header();
 get_header('green', array('city' => '', 'postalcode' => ''));
 ?>
@@ -14,25 +38,15 @@ get_header('green', array('city' => '', 'postalcode' => ''));
 
 <main id="main" class="container"<?php if ( isset( $navbar_position ) && 'fixed_top' === $navbar_position ) : echo ' style="padding-top: 100px;"'; elseif ( isset( $navbar_position ) && 'fixed_bottom' === $navbar_position ) : echo ' style="padding-bottom: 100px;"'; endif; ?>>
 <?php
-/**
- *
- * Perform start setup
- *
-**/
-global $wpdb;
-
-$pageId = get_the_ID();
-$page_id = $pageId;
-$usersForThisLP = array();
-
 // TODOS!!!!!
 // --
-// @todo - move from custom relation to ACF Relation on occassion / category (line 54-66).
-// @todo - add a filter if there is less than 10 postal codes.
-// @todo - if more than 10 (only Copenhagen) then we think they deliver to all postal codes.
+// (v) @todo - move from custom relation to ACF Relation on occassion / category (line 54-66).
+// (v) @todo - add a filter if there is less than 10 postal codes.
+// (v) @todo - if more than 10 (only Copenhagen) then we think they deliver to all postal codes.
 // @todo - SEO text should be compiled.
-// @todo - check if it is an occassion or a category that is connected to the landing page - and only filter for the "other".
-// @todo - make the postal code connection perform better
+// (v) @todo - check if it is an occassion or a category that is connected to the landing page - and only filter for the "other".
+// (v) @todo - make the postal code connection perform better
+// @todo - Make sure  the mobile view has postal codes as the "top boxes".
 
 // ----
 // Generate array of postal codes for this landing page.
@@ -40,8 +54,6 @@ $usersForThisLP = array();
 #$cityIdArr = get_post_meta($pageId, 'postal_code_relation', true);
 #$cityId = $cityIdArr[0];
 $postal_codes = get_field('postal_code_relation', $pageId);
-$postcodes = array();
-$postalcodesForFilter = array();
 
 foreach($postal_codes as $postcode){
   $post_code_val = get_field('postalcode', $postcode->ID);
@@ -49,20 +61,15 @@ foreach($postal_codes as $postcode){
   $postalcodesForFilter[] = array('id' => $postcode->ID, 'postcode' => $post_code_val, 'title' => $postcode->post_title, 'shorttag' => $postcode->post_name);
 }
 
-// -------------------
+if(count($postal_codes) > 15){
+  $pc_filter = 0;
+} else {
+  $pc_filter = 1;
+}
 
-// ---
-// Get the store ID's that can delivery products from this
-// category and postal code range.
+
+
 // -------------------
-$postRowCategory = $wpdb->get_row( "
-    SELECT * FROM {$wpdb->prefix}postmeta
-    WHERE post_id = $pageId
-    AND meta_key = 'landingpage_category'
-" );
-// delete above.
-$lp_cat_conn = get_post_meta($pageId, 'landingpage_category', true);
-$searchCategoryId = $postRowCategory->meta_value;
 
 
 // Prepare the placeholders
@@ -73,6 +80,9 @@ foreach($postcodes as $postcode){
   $where[] = '%'.$postcode.'%';
 }
 
+// Add the user role to the where array:
+$where[] = '%dc_vendor%';
+
 $sql = "SELECT
         	DISTINCT(u.ID)
         FROM
@@ -80,17 +90,22 @@ $sql = "SELECT
         LEFT JOIN
         	{$wpdb->prefix}usermeta um
             ON um.user_id = u.ID
+        LEFT JOIN
+          {$wpdb->prefix}usermeta um5
+          ON
+            u.ID = um5.user_id
         WHERE
       	(
           um.meta_key = 'delivery_zips'
-          AND";
-
-
-$sql .= "
+          AND
       		(".implode(" OR ",$placeholder_arr).")
         )
         AND
-        NOT EXISTS (SELECT um.meta_value FROM {$wpdb->prefix}usermeta um2 WHERE um2.user_id = u.ID AND um2.meta_key = 'vendor_turn_off')
+          NOT EXISTS (SELECT um.meta_value FROM {$wpdb->prefix}usermeta um2 WHERE um2.user_id = u.ID AND um2.meta_key = 'vendor_turn_off')
+        AND
+          NOT EXISTS (SELECT um2.meta_value FROM {$wpdb->prefix}usermeta um2 WHERE um2.user_id = u.ID AND um2.meta_key = 'vendor_turn_off')
+          and
+          (um5.meta_key = 'wp_capabilities' AND um5.meta_value LIKE %s)
         ORDER BY
           CASE u.ID
             WHEN 38 THEN 0
@@ -106,11 +121,12 @@ $users_from_postcode = wp_list_pluck( $wpdb->get_results($sql_prepare), 'ID' );
 $userForThisCategory = array();
 foreach ($users_from_postcode as $queryUserId) {
     $vendor = get_wcmp_vendor($queryUserId);
+
     $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
     foreach ($vendorProducts as $productId) {
         $categoryTermList = wp_get_post_terms($productId, 'product_cat', array('fields' => 'ids'));
         foreach($categoryTermList as $catTerm){
-            if($catTerm == $searchCategoryId){
+            if($catTerm == $connection_id){
                 array_push($userForThisCategory, $queryUserId);
             }
         }
@@ -118,11 +134,10 @@ foreach ($users_from_postcode as $queryUserId) {
 }
 
 // pass to backend
-$landingPageDefaultUserIdArray = array_intersect($users_from_postcode, $userForThisCategory);
+$defaultUserArray = array_intersect($users_from_postcode, $userForThisCategory);
+$defaultUserString = implode(",", $defaultUserArray); ?>
 
-$landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray); ?>
-
-<input type="hidden" id="landingPageDefaultUserIdAsString" value="<?php echo $landingPageDefaultUserIdAsString;?>">
+<input type="hidden" id="landingPageDefaultUserIdAsString" value="<?php echo $defaultUserString;?>">
 
 <section id="citycontent" class="row">
   <div class="container">
@@ -207,7 +222,7 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
           $occasionTermListArray = array();
 
           // for price filter
-          foreach ($landingPageDefaultUserIdArray as $vendorId) {
+          foreach ($defaultUserArray as $vendorId) {
               $vendor = get_wcmp_vendor($vendorId);
               $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
               foreach ($vendorProducts as $productId) {
@@ -284,8 +299,8 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
             foreach($postalcodesForFilter as $postcode){
             ?>
                 <div class="form-check">
-                    <input type="checkbox" name="filter_occa_lp" class="form-check-input filter-on-lp-page" id="filter_cat<?php echo $postcode['id']; ?>" value="<?php echo $postcode['id']; ?>">
-                    <label for="filter_cat<?php echo $category->term_id; ?>" class="form-check-label">
+                    <input type="checkbox" name="filter_postalcode" class="form-check-input filter-on-lp-page" id="filter_postalcode<?php echo $postcode['id']; ?>" value="<?php echo $postcode['postcode']; ?>">
+                    <label for="filter_postalcode<?php echo $postcode['id']; ?>" class="form-check-label">
                       <?php echo $postcode['title']; ?>
                     </label>
                 </div>
@@ -307,27 +322,38 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
               <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857V3.857z"/>
               <path d="M12 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
             </svg>&nbsp;
-            Anledning
+            <?php echo ($connection_type == 'category' ? 'Anledning' : 'Kategori'); ?>
           </h5>
           <ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
           <?php
           // Occassion
 
           // Take the occassion term array and make sure we only get uniques.
-          $occasionTermListArrayUnique = array_unique($occasionTermListArray);
+          if($connection_type == 'category'){
+            $filterTermList = array_unique($occasionTermListArray);
+            $args = array(
+                'taxonomy'   => "occasion",
+                // 'hide_empty' => 1,
+                // 'include'    => $ids
+            );
+            $filterTermListUnique = $filterTermList;
+          } else if($connection_type == 'occasion'){
+            $filterTermList = array_unique($categoryTermListArray);
+            $args = array(
+                'taxonomy'   => "product_cat",
+                // 'hide_empty' => 1,
+                // 'include'    => $ids
+            );
+            $filterTermListUnique = $filterTermList;
+          }
 
-          $args = array(
-              'taxonomy'   => "occasion",
-              // 'hide_empty' => 1,
-              // 'include'    => $ids
-          );
-          $productOccasions = get_terms($args);
-          foreach($productOccasions as $occasion){
-            foreach($occasionTermListArrayUnique as $occasionTerm){
-              if($occasionTerm == $occasion->term_id){ ?>
+          $productFilterList = get_terms($args);
+          foreach($productFilterList as $filter){
+            foreach($filterTermListUnique as $filterTerm){
+              if($filterTerm == $filter->term_id){ ?>
                 <div class="form-check">
-                    <input type="checkbox" name="filter_occa_lp" class="form-check-input filter-on-lp-page" id="filter_occ_<?php echo $occasion->term_id; ?>" value="<?php echo $occasion->term_id; ?>">
-                    <label class="form-check-label" for="filter_occ_<?php echo $occasion->term_id; ?>"><?php echo $occasion->name; ?></label>
+                    <input type="checkbox" name="filter_co_lp" class="form-check-input filter-on-lp-page" id="filter_co_<?php echo $filter->term_id; ?>" value="<?php echo $filter->term_id; ?>">
+                    <label class="form-check-label" for="filter_co_<?php echo $filter->term_id; ?>"><?php echo $filter->name; ?></label>
                 </div>
           <?php
               }
@@ -448,7 +474,7 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
 
         <div id="defaultStore">
       <?php
-      foreach ($landingPageDefaultUserIdArray as $user) {
+      foreach ($defaultUserArray as $user) {
         $vendor = get_wcmp_vendor($user);
         $image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
         ?>
@@ -459,9 +485,13 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
                 <div class="row align-items-center">
 
                   <div class="col-3 text-center">
-                    <img class="img-fluid rounded-start" src="<?php echo $image;?>" style="max-width: 100px;">
+                    <a href="<?php echo esc_url($vendor->get_permalink()); ?>" class="border-0">
+                      <img class="img-fluid rounded-start" src="<?php echo $image;?>" style="max-width: 100px;">
+                    </a>
                     <?php $button_text = apply_filters('wcmp_vendor_lists_single_button_text', $vendor->page_title); ?>
-                    <h6><?php echo esc_html($button_text); ?></h6>
+                    <a href="<?php echo esc_url($vendor->get_permalink()); ?>" class="text-dark">
+                      <h6 class="pt-2"><?php echo esc_html($button_text); ?></h6>
+                    </a>
                     <a href="<?php echo esc_url($vendor->get_permalink()); ?>" class="cta rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-3 px-md-4">
                       Gå til butik<span class="d-none d-md-inline"> ></span>
                     </a>
@@ -486,7 +516,7 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
                       ?>
                       <div class="col-6 col-xs-6 col-sm-6 col-md-4">
                         <div class="card border-0">
-                            <a href="<?php echo get_permalink($product->get_id());?>"><img src="<?php echo $imageUrl;?>" class="card-img-top" alt="REPLACEME"></a>
+                            <a href="<?php echo get_permalink($product->get_id());?>"><img src="<?php echo $imageUrl;?>" class="card-img-top" alt="<?php echo $product->get_name();?>"></a>
                             <div class="card-body">
                                 <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark"><?php echo $product->get_name();?></a></h6>
                                 <p class="price">Fra <?php echo $product->get_price();?> kr.</p>
@@ -508,18 +538,18 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
                     ?>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bicycle" viewBox="0 0 16 16">
                       <path d="M4 4.5a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1v.5h4.14l.386-1.158A.5.5 0 0 1 11 4h1a.5.5 0 0 1 0 1h-.64l-.311.935.807 1.29a3 3 0 1 1-.848.53l-.508-.812-2.076 3.322A.5.5 0 0 1 8 10.5H5.959a3 3 0 1 1-1.815-3.274L5 5.856V5h-.5a.5.5 0 0 1-.5-.5zm1.5 2.443-.508.814c.5.444.85 1.054.967 1.743h1.139L5.5 6.943zM8 9.057 9.598 6.5H6.402L8 9.057zM4.937 9.5a1.997 1.997 0 0 0-.487-.877l-.548.877h1.035zM3.603 8.092A2 2 0 1 0 4.937 10.5H3a.5.5 0 0 1-.424-.765l1.027-1.643zm7.947.53a2 2 0 1 0 .848-.53l1.026 1.643a.5.5 0 1 1-.848.53L11.55 8.623z"/>
-                    </svg> Personlig levering i <?php print the_title(); ?>
+                    </svg> Personlig levering i <?php print get_field('city_name'); ?>
                     <?php
                     } else if($delivery_type == 0) {
                     ?>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-truck" viewBox="0 0 16 16">
                       <path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h9A1.5 1.5 0 0 1 12 3.5V5h1.02a1.5 1.5 0 0 1 1.17.563l1.481 1.85a1.5 1.5 0 0 1 .329.938V10.5a1.5 1.5 0 0 1-1.5 1.5H14a2 2 0 1 1-4 0H5a2 2 0 1 1-3.998-.085A1.5 1.5 0 0 1 0 10.5v-7zm1.294 7.456A1.999 1.999 0 0 1 4.732 11h5.536a2.01 2.01 0 0 1 .732-.732V3.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .294.456zM12 10a2 2 0 0 1 1.732 1h.768a.5.5 0 0 0 .5-.5V8.35a.5.5 0 0 0-.11-.312l-1.48-1.85A.5.5 0 0 0 13.02 6H12v4zm-9 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm9 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
                     </svg>
-                      Sender med fragtfirma til <?php print the_title(); ?>
+                      Sender med fragtfirma til <?php print get_field('city_name'); ?>
                     <?php
                     }
                     ?>
-                    <input type="hidden" id="cityName" value="<?php echo the_title();?>">
+                    <input type="hidden" id="cityName" value="<?php echo get_field('city_name');?>">
                   </div>
                 </small>
               </div>
@@ -543,7 +573,7 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
     </div>
     <div class="row">
       <div class="col-12">
-        <h4>Find andre gavehilsner i <?php echo get_field('city_name', $page_id); ?></h4>
+        <h4>Vil sende sende andet end blomster? Se alle butikker i <?php echo get_field('city_name', $page_id); ?></h4>
       </div>
       <div class="col-sm-12 col-md-3">
       <?php
@@ -566,6 +596,32 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
   </div>
 </section>
 </main>
+
+<section id="pressmentions" class="pressmentions bg-white">
+  <div class="container">
+    <div class="row py-5">
+      <div class="col-12 col-md-3 pb-3 pb-md-0 d-flex align-items-center text-center">
+        <div class="w-100 align-middle" style="font-family: 'Inter',sans-serif;">Greeting.dk har været nævnt i</div>
+      </div>
+      <div class="col-12 col-md-9">
+        <div class="row d-flex align-items-center pb-3 pb-md-0">
+          <div class="col-6 col-md-3 align-middle">
+            <img class="w-75 align-middle" src="https://www.greeting.dk/wp-content/uploads/2022/08/jyllands-posten-logo.png">
+          </div>
+          <div class="col-6 col-md-3 align-middle pb-3 pb-md-0">
+            <img class="w-75 align-middle" src="https://www.greeting.dk/wp-content/uploads/2022/08/finans-logo.png">
+          </div>
+          <div class="col-6 col-md-3 align-middle pb-3 pb-md-0">
+            <img class="w-75 align-middle" src="https://www.greeting.dk/wp-content/uploads/2022/08/migogodense-logo.png">
+          </div>
+          <div class="col-6 col-md-3 align-middle pb-3 pb-md-0">
+            <img class="w-75 align-middle" src="https://www.greeting.dk/wp-content/uploads/2022/08/hsfo-logo.png">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <section id="howitworks" class="bg-light-grey py-5">
   <div class="container text-center">
@@ -866,39 +922,28 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
 <script src="//code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
 <link rel="stylesheet" type="text/css" href="//code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css">
 
-<script>
-	jQuery(document).ready(function() {
-		var minPrice = "<?php echo $minProductPrice;?>";
-		var maxPrice = "<?php echo $maxProductPrice;?>";
-		jQuery("#priceSlider").slider({
-			// min: minPrice,
-			min: 1,
-			max: maxPrice,
-			step: 1,
-			values: [minPrice, maxPrice],
-			slide: function(event, ui) {
-				for (var i = 0; i < ui.values.length; ++i) {
-					jQuery("input.sliderValue[data-index=" + i + "]").val(ui.values[i]);
-				}
-			}
-		});
-
-		jQuery("input.sliderValue").change(function() {
-			var $this = jQuery(this);
-			jQuery("#priceSlider").slider("values", $this.data("index"), $this.val());
-			// var val = jQuery('#priceSlider').slider("option", "values");
-		});
-	});
+<script type="text/javascript">
+  // Set the slider.
+  var slider = new Slider('#sliderPrice', {
+    'tooltip_split': true
+  });
+  slider.on("slideStop", function(sliderValue){
+    var val = slider.getValue();
+    var min_val = val[0];
+    var max_val = val[1];
+    document.getElementById("slideStartPoint").value = min_val;
+    document.getElementById("slideEndPoint").value = max_val;
+  });
 </script>
-
 
 <script type="text/javascript">
   // Start the jQuery
   jQuery(document).ready(function($) {
     var ajaxurl = "<?php echo admin_url('admin-ajax.php');?>";
-    var occassionDeliveryIdArray = [];
+    var filterOccasionCategoryArray = [];
     var inputPriceRangeArray = [];
     var deliveryIdArray = [];
+    var postalArray = [];
     var priceSliderMin = jQuery("#sliderPrice").data("slider-min");
     var priceSliderMax = jQuery("#sliderPrice").data("slider-max");
     // $('#cityPageReset').hide();
@@ -908,6 +953,7 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
 
     var del_url_val = url.searchParams.get("d");
     var cat_url_val = url.searchParams.get("c");
+    var postalcode_url_val = url.searchParams.get("pc");
     var price_url_val = url.searchParams.get("price");
 
     if(del_url_val){
@@ -920,9 +966,20 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
       });
     }
     if(cat_url_val){
-      occassionDeliveryIdArray = cat_url_val.split(",");
+      filterOccasionCategoryArray = cat_url_val.split(",");
 
-      jQuery.each( occassionDeliveryIdArray, function(i,v){
+      jQuery.each( filterOccasionCategoryArray, function(i,v){
+        if(	$("input#filter_cat"+v).length){
+          $("input#filter_cat"+v).prop('checked',true);
+        } else if($("input#filter_occ_"+v).length) {
+          $("input#filter_occ_"+v).prop('checked',true);
+        }
+      });
+    }
+    if(postalcode_url_val){
+      postalArray = postalcode_url_val.split(",");
+
+      jQuery.each( postalArray, function(i,v){
         if(	$("input#filter_cat"+v).length){
           $("input#filter_cat"+v).prop('checked',true);
         } else if($("input#filter_occ_"+v).length) {
@@ -947,7 +1004,7 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
       document.getElementById("slideEndPoint").value =  priceRangeMaxVal;
     }
 
-    if(deliveryIdArray.length > 0 && occassionDeliveryIdArray.length > 0 && inputPriceRangeArray.length > 0){
+    if(deliveryIdArray.length > 0 && postalArray.length > 0 && filterOccasionCategoryArray.length > 0 && inputPriceRangeArray.length > 0){
       update();
     }
 
@@ -976,12 +1033,16 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
     function update(){
       var cityName = $('#cityName').val();
       var postalCode = $('#postalCode').val();
-      occaIdArray = [];
+      occCatIdArray = [];
+      postalArray = [];
       deliveryIdArray = [];
       inputPriceRangeArray = [];
 
-      $("input:checkbox[name=filter_occa_lp]:checked").each(function(){
-        occaIdArray.push($(this).val());
+      $("input:checkbox[name=filter_postalcode]:checked").each(function(){
+        postalArray.push($(this).val());
+      });
+      $("input:checkbox[name=filter_co_lp]:checked").each(function(){
+        occCatIdArray.push($(this).val());
       });
       $("input:checkbox[name=filter_del_city]:checked").each(function(){
         deliveryIdArray.push($(this).val());
@@ -999,9 +1060,11 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
       }
 
       var data = {
-        'action': 'lp_filter_action',
+        'action': 'lpFilterAction',
+        cityName: cityName,
         landingPageDefaultUserIdAsString: jQuery("#landingPageDefaultUserIdAsString").val(),
-        occaIdArray: occaIdArray,
+        occCatIdArray: occCatIdArray,
+        postalArray: postalArray, // this should probably be the raw postal instead of the ID og the post
         deliveryIdArray: deliveryIdArray,
         inputPriceRangeArray: inputPriceRangeArray
       };
@@ -1010,25 +1073,29 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
         jQuery('.filteredStore').show();
         jQuery('.filteredStore').html(response);
 
-        if(occaIdArray.length == 0 && deliveryIdArray.length == 0 && priceChange == 1){
+        if(occCatIdArray.length == 0 && deliveryIdArray.length == 0 && priceChange == 1){
           jQuery('#defaultStore').show();
           jQuery('.filteredStore').hide();
           jQuery('#noVendorFound').hide();
-        } else if(occaIdArray.length == 0 && deliveryIdArray.length == 0 && priceChange == 0){
+        } else if(occCatIdArray.length == 0 && deliveryIdArray.length == 0 && priceChange == 0){
           jQuery('#defaultStore').show();
           jQuery('.filteredStore').hide();
           jQuery('#noVendorFound').hide();
         }
 
-        var state = { 'd': deliveryIdArray, 'c': occaIdArray, 'p': inputPriceRangeArray }
+        var state = { 'd': deliveryIdArray, 'c': occCatIdArray, 'pc' : postalArray, 'p': inputPriceRangeArray }
         var url = '';
         if(deliveryIdArray.length > 0){
           if(url){ 	url += '&'; }
           url += 'd='+deliveryIdArray;
         }
-        if(occaIdArray.length > 0){
+        if(occCatIdArray.length > 0){
           if(url){ 	url += '&'; }
-          url += 'c='+occaIdArray;
+          url += 'c='+occCatIdArray;
+        }
+        if(postalArray.length > 0){
+          if(url){ 	url += '&'; }
+          url += 'pc='+postalArray;
         }
 
         if(inputPriceRangeArray.length > 0 && (inputPriceRangeArray[0] > sliderValMin || inputPriceRangeArray[1] < sliderValMax)){
@@ -1088,7 +1155,7 @@ $landingPageDefaultUserIdAsString = implode(",", $landingPageDefaultUserIdArray)
       $("input#slideEndPoint").val(val_max);
       $("input#slideStartPoint").val(0);
 
-      catOccaDeliveryIdArray.length = 0;
+      occCatIdArray.length = 0;
 
       $('div.filter-list div.dynamic-filters').remove();
 

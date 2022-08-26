@@ -522,6 +522,31 @@ jQuery(document).ready(function(){
 </section>
 </main>
 
+<section id="pressmentions" class="pressmentions bg-white">
+  <div class="container">
+    <div class="row py-5">
+      <div class="col-12 col-md-3 pb-3 pb-md-0 d-flex align-items-center text-center">
+        <div class="w-100 align-middle" style="font-family: 'Inter',sans-serif;">Greeting.dk har været nævnt i</div>
+      </div>
+      <div class="col-12 col-md-9">
+        <div class="row d-flex align-items-center pb-3 pb-md-0">
+          <div class="col-6 col-md-3 align-middle">
+            <img class="w-75 align-middle" src="https://www.greeting.dk/wp-content/uploads/2022/08/jyllands-posten-logo.png">
+          </div>
+          <div class="col-6 col-md-3 align-middle pb-3 pb-md-0">
+            <img class="w-75 align-middle" src="https://www.greeting.dk/wp-content/uploads/2022/08/finans-logo.png">
+          </div>
+          <div class="col-6 col-md-3 align-middle pb-3 pb-md-0">
+            <img class="w-75 align-middle" src="https://www.greeting.dk/wp-content/uploads/2022/08/migogodense-logo.png">
+          </div>
+          <div class="col-6 col-md-3 align-middle pb-3 pb-md-0">
+            <img class="w-75 align-middle" src="https://www.greeting.dk/wp-content/uploads/2022/08/hsfo-logo.png">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <section id="howitworks" class="bg-light-grey py-5">
   <div class="container text-center">

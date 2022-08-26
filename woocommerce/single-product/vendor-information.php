@@ -32,7 +32,6 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor_id))){
     $del_type = $delivery_type['label'];
   }
 }
-
 ?>
 
 <section id="vendor" class="bg-light-grey py-5 mb-5">
@@ -99,33 +98,54 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor_id))){
         } else {
         ?>
           <b>Leveringsinformation</b>
-          <p>Butikken leverer på flg. dage:
+          <p>
             <?php
-            $del_days = get_field('openning', 'user_'.$vendor_id);
-            $day_array = array(1 => 'mandag', 2 => 'tirsdag', 3 => 'onsdag', 4 => 'torsdag', 5 => 'fredag', 6 => 'lørdag', 7 => 'søndag');
+              $opening = get_field('openning', 'user_'.$vendor_id);
+              $open_iso_days = array();
+              $open_label_days = array();
+              foreach($opening as $k => $v){
+                $open_iso_days[] = (int) $v['value'];
+                $open_label_days[$v['value']] = $v['label'];
+              }
 
-            if(is_array($del_days) && count($del_days) > 0){
-    					$i = 1;
-              foreach($del_days as $v){
-                $day = $day_array[$i];
-                if ($i == 1){
-                  $day = ucfirst($day);
+              $interv = array();
+              if(!empty($open_iso_days) && is_array($open_iso_days)){
+                $interv = build_intervals($open_iso_days, function($a, $b) { return ($b - $a) <= 1; }, function($a, $b) { return $a."..".$b; });
+              } else {
+                print 'Butikkens leveringsdage er ukendte';
+              }
+              $i = 1;
+
+              if(!empty($opening) && !empty($interv) && count($interv) > 0){
+
+                if($del_value == "1"){
+                  echo 'Butikken leverer ';
+                } else if($del_value == "0"){
+                  echo 'Butikken afsender ';
                 }
 
-                if(count($del_days) > 1)
-                {
-                  if($i < count($del_days)-1){
-                    $day .= ', ';
-                  } else if($i == count($del_days)) {
-                    $day = ' og '.$day;
+                foreach($interv as $v){
+                  $val = explode('..',$v);
+                  if(!empty($val)){
+                    $start = isset($open_label_days[$val[0]])? $open_label_days[$val[0]] : '';
+                    if($val[0] != $val[1])
+                    {
+                      $end = isset($open_label_days[$val[1]]) ? $open_label_days[$val[1]] : '';
+                      if(!empty($start) && !empty($end)){
+                        print strtolower($start."-".$end);
+                      }
+                    } else {
+                      print strtolower($start);
+                    }
+                    if(count($interv) > 1){
+                      if(count($interv)-1 == $i){ print " og "; }
+                      else if(count($interv) > $i) { print ', ';}
+                    }
                   }
+                  $i++;
                 }
-
-                print $day;
-                $i++;
-              } // endforeach
-            } // endif
-            ?>.
+              }
+            ?>
           </p>
           <p>
             Butikken leverer senest
@@ -235,7 +255,6 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor_id))){
               $month_str = 'december';
               break;
           }
-
           $year_str = ($year != date("Y") ? $year : '');
 
           return $weekday_str." d. ".$date.". ".$month_str. " ". $year_str;

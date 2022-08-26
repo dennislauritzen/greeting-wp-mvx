@@ -98,10 +98,10 @@ get_header('checkout');
 						<?php
 						$delivery_date = get_post_meta($order->get_id(), '_delivery_date', true);
 						$wc_date = new WC_Datetime($delivery_date);
-						$delivery_date = wc_format_datetime( $wc_date );
+						$delivery_date2 = wc_format_datetime( $wc_date );
 
 						if(!empty($delivery_date)){
-							echo esc_html( $delivery_date );
+							echo esc_html( $delivery_date2 );
 						} else {
 							echo 'Hurtigst muligt';
 						}
