@@ -3970,27 +3970,40 @@ function custom_orders_list_column_content( $column, $post_id )
 					</svg> ';
 				}
 
-				if(empty($del_date) && !empty($del_date_unix)){
+				if(!empty($del_date_unix)){
 					// The user didnt choose "delivery date", but it was calculated
 					$dateobj = new DateTime();
 					$dateobj->setTimestamp($del_date_unix);
 					$date_format = $dateobj->format('D, j. M \'y');
 
 					echo '<small><em>Hurtigst muligt (senest '.$date_format.')</em></small>';
-				} else if(!empty($del_date)){
-					// The user chose a delivery date.
-					$date_d = substr($del_date, 0, 2);
-					$month_d = substr($del_date, 3, 2);
-					$year_d = substr($del_date, 6, 4);
-					$date_old = new DateTime($year_d.'-'.$month_d.'-'.$date_d);
-					$date_old_format = $date_old->format('D, j. M \'y');
-
-					echo $date_old_format;
 				} else {
-					echo '<small>(<em>Hurtigst muligt</em>)</small>';
+					// The user chose a delivery date.
+					if(!empty($del_date)){
+						$date_d = substr($del_date, 0, 2);
+						$month_d = substr($del_date, 3, 2);
+						$year_d = substr($del_date, 6, 4);
+						if(validateDate($year_d.'-'.$month_d.'-'.$date_d)){
+							$date_old = new DateTime($year_d.'-'.$month_d.'-'.$date_d);
+							$date_old_format = $date_old->format('D, j. M \'y');
+
+							echo $date_old_format;
+						} else {
+							echo '<small>(<em>Hurtigst muligt</em>)</small>';
+						}
+					} else {
+						echo '<small>(<em>Hurtigst muligt</em>)</small>';
+					}
 				}
     break;
     }
+}
+
+function validateDate($date, $format = 'Y-m-d')
+{
+    $d = DateTime::createFromFormat($format, $date);
+    // The Y ( 4 digits year ) returns TRUE for any integer with any number of digits so changing the comparison from == to === fixes the issue.
+    return $d && $d->format($format) === $date;
 }
 
 // Make custom column sortable
