@@ -3053,7 +3053,7 @@ function greeting_echo_date_picker(  ) {
 			'required'      => true,
 			'label'         => __('Hvornår skal gaven leveres?'),
 			'placeholder'   => __('Vælg dato hvor gaven skal leveres'),
-			'read_only' 		=> true
+			'custom_attributes' => array('readonly' => 'readonly')
 		), WC()->checkout->get_value( 'delivery_date' ) );
 
 
@@ -3132,7 +3132,7 @@ function greeting_echo_date_picker(  ) {
 		echo '<div id="show-if-shipping">';
 		echo '<span>Ved bestillingen inden klokken ';
 		echo $vendorDropOffTime.':00</span>';
-		echo ' kan butikken levere om  '.$vendorDeliverDayReq;
+		echo ' kan butikken levere om '.$vendorDeliverDayReq;
 		echo ' leveringsdage.';
 
 		#$closed_days_date_iteration = count($closed_dates_arr);
@@ -3152,8 +3152,6 @@ function greeting_echo_date_picker(  ) {
 
 		echo '</div>';
 	}
-
-
 	?>
 
 	<input type="hidden" id="vendorDeliverDay" value="<?php echo $vendorDeliverDayReq;?>"/>
@@ -3970,30 +3968,29 @@ function custom_orders_list_column_content( $column, $post_id )
 					</svg> ';
 				}
 
-				if(!empty($del_date_unix)){
+				if(!empty($del_date_unix) && empty($del_date)){
 					// The user didnt choose "delivery date", but it was calculated
 					$dateobj = new DateTime();
 					$dateobj->setTimestamp($del_date_unix);
 					$date_format = $dateobj->format('D, j. M \'y');
 
 					echo '<small><em>Hurtigst muligt (senest '.$date_format.')</em></small>';
+				} else if(!empty($del_date)){
+					$date_d = substr($del_date, 0, 2);
+					$month_d = substr($del_date, 3, 2);
+					$year_d = substr($del_date, 6, 4);
+
+					if(validateDate($year_d.'-'.$month_d.'-'.$date_d)){
+						$date_old = new DateTime($year_d.'-'.$month_d.'-'.$date_d);
+						$date_old_format = $date_old->format('D, j. M \'y');
+
+						echo $date_old_format;
+					} else {
+						echo '<small>(Hurtigst muligt - <em>'.$del_date.'</em>)</small>';
+					}
 				} else {
 					// The user chose a delivery date.
-					if(!empty($del_date)){
-						$date_d = substr($del_date, 0, 2);
-						$month_d = substr($del_date, 3, 2);
-						$year_d = substr($del_date, 6, 4);
-						if(validateDate($year_d.'-'.$month_d.'-'.$date_d)){
-							$date_old = new DateTime($year_d.'-'.$month_d.'-'.$date_d);
-							$date_old_format = $date_old->format('D, j. M \'y');
-
-							echo $date_old_format;
-						} else {
-							echo '<small>(<em>Hurtigst muligt</em>)</small>';
-						}
-					} else {
-						echo '<small>(<em>Hurtigst muligt</em>)</small>';
-					}
+					echo '<small>(<em>Hurtigst muligt</em>)</small>';
 				}
     break;
     }
@@ -4085,3 +4082,150 @@ function filter_orders_by_vendor_in_admin_dashboard( $query ) {
    return $query;
 }
 add_filter( 'wcmp_shop_order_query_request', 'filter_orders_by_vendor_in_admin_dashboard');
+
+
+/**
+ * Function for showing the meta field
+ * for edit of delivery date
+ *
+ */
+
+add_filter( 'manage_edit-shop_order_columns', 'set_custom_edit_shop_order_columns' );
+function set_custom_edit_shop_order_columns($columns) {
+    $columns['delivery_date'] = __( 'Leveringsdato', 'greeting2' );
+    return $columns;
+}
+
+// Add the data to the custom columns for the order post type:
+add_action( 'manage_shop_order_posts_custom_column' , 'custom_shop_order_column2', 10, 2 );
+function custom_shop_order_column2( $column, $post_id ) {
+    switch ( $column ) {
+      case 'delivery_date' :
+        echo esc_html( get_post_meta( $post_id, '_delivery_date', true ) );
+        break;
+    }
+}
+
+// For display and saving in order details page.
+add_action( 'add_meta_boxes', 'add_shop_order_meta_box' );
+function add_shop_order_meta_box() {
+
+    add_meta_box(
+      'delivery_date',
+      __( 'Leveringsdato', 'greeting2' ),
+			'shop_order_display_callback',
+			'shop_order',
+			'side',
+			'core'
+    );
+
+}
+
+// For displaying.
+function shop_order_display_callback( $post ) {
+    $value = get_post_meta( $post->ID, '_delivery_date', true );
+
+		$order = wc_get_order($post->ID);
+
+		$vendor_id = 0;
+		$storeProductId = 0;
+		foreach ( $order->get_items() as $itemId => $item ) {
+			// Get the product object
+			$product = $item->get_product();
+
+			// Get the product Id
+			$productId = $product->get_id();
+			$product_meta = get_post($productId);
+
+			$vendor_id = $product_meta->post_author;
+
+			if(!empty($orderedVendorStoreName)){
+				break;
+			}
+		} // end foreach
+
+		$vendor_delivery_day_required = get_field('vendor_require_delivery_day', 'user_'.$vendor_id);
+		$vendor_drop_off_time = get_field('vendor_drop_off_time', 'user_'.$vendor_id);
+
+		// BEWARE: Not used because then we cant change date according to our needs
+		$dates = get_vendor_dates($vendor_id);
+		$dates_json = json_encode($dates);
+		?>
+
+		 <script type="text/javascript">
+				jQuery(document).ready(function($) {
+					$('#datepicker').click(function() {
+					var customMinDateVal = <?php echo $vendor_delivery_day_required; ?>;
+					var customMinDateValInt = parseInt(customMinDateVal);
+					var today = '';
+					let vendorDropOffTimeVal = <?php echo $vendor_drop_off_time; ?>;
+					let d = new Date();
+					let hour = d.getHours();
+				if(hour > vendorDropOffTimeVal){
+					var customMinDateVal = customMinDateValInt+1;
+				} else {
+					customMinDateVal = <?php echo $vendor_delivery_day_required; ?>;
+				}
+				// var vendorClosedDayArray = $('#vendorClosedDayId').val();
+				//var vendorClosedDayArray = '<?php echo $dates_json; ?>';
+				var vendorClosedDayArray = '';
+
+				$('#datepicker').datepicker({
+					dateFormat: 'dd-mm-yy',
+					// minDate: -1,
+					minDate: new Date(),
+					// maxDate: "+1M +10D"
+					maxDate: "+58D",
+					// closed on specific date
+					beforeShowDay: function(date){
+						var string = jQuery.datepicker.formatDate('dd-mm-yy', date);
+						return [ vendorClosedDayArray.indexOf(string) == -1 ];
+					}
+				}).datepicker( "show" );
+					 });
+				});
+		 </script>
+		 <?php
+
+		woocommerce_form_field( 'delivery_date', array(
+			'type'          => 'text',
+			'class'         => array(),
+			'id'            => 'datepicker',
+			'required'      => true,
+			'label'         => __('Hvornår skal gaven leveres?'),
+			'placeholder'   => __('Vælg dato hvor gaven skal leveres'),
+			'custom_attributes' => array('readonly' => 'readonly')
+		), esc_attr( $value ) );
+}
+
+// For saving.
+function save_shop_order_meta_box_data( $post_id, $post ) {
+    // If this is an autosave, our form has not been submitted, so we don't want to do anything.
+    if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+      return;
+    }
+
+    // Check the user's permissions.
+    if ( isset( $post->post_type ) && 'shop_order' == $post->post_type ) {
+      if ( ! current_user_can( 'edit_shop_order', $post_id ) ) {
+        return;
+      }
+    }
+
+    // Make sure that it is set.
+    if ( !isset($_POST['delivery_date']) ){
+      return;
+    }
+
+    // Sanitize user input.
+    $my_data = sanitize_text_field( $_POST['delivery_date'] );
+
+    // Update the meta field in the database.
+    update_post_meta( $post_id, '_delivery_date', $my_data );
+}
+add_action( 'save_post', 'save_shop_order_meta_box_data', 20, 2 );
+
+function save_post($post_id) {
+    ?><script>alert("post saved");</script><?php
+    die();
+}
