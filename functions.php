@@ -3968,13 +3968,23 @@ function custom_orders_list_column_content( $column, $post_id )
 					</svg> ';
 				}
 
-				if(!empty($del_date_unix) && empty($del_date)){
-					// The user didnt choose "delivery date", but it was calculated
-					$dateobj = new DateTime();
-					$dateobj->setTimestamp($del_date_unix);
-					$date_format = $dateobj->format('D, j. M \'y');
+				if(!empty($del_date_unix)){
+					if(empty($del_date)){
+						// The user didnt choose "delivery date", but it was calculated
+						$dateobj = new DateTime();
+						$dateobj->setTimestamp($del_date_unix);
+						$date_format = $dateobj->format('D, j. M \'y');
 
-					echo '<small><em>Hurtigst muligt (senest '.$date_format.')</em></small>';
+						echo '<small><em>Hurtigst muligt (senest '.$date_format.')</em></small>';
+					} else {
+						// The user didnt choose "delivery date", but it was calculated
+						$dateobj = new DateTime();
+						$dateobj->setTimestamp($del_date_unix);
+						$date_format = $dateobj->format('D, j. M \'y');
+
+						echo $date_format;
+					}
+
 				} else if(!empty($del_date)){
 					$date_d = substr($del_date, 0, 2);
 					$month_d = substr($del_date, 3, 2);
