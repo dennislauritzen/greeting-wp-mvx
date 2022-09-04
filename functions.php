@@ -4032,7 +4032,7 @@ function action_pre_get_posts( $query ) {
         $orderby = $query->get( 'orderby' );
 
         // Set query
-        if ( $orderby == '_delivery_date' ) {
+        if ( $orderby == '_delivery_unixdate' ) {
             $query->set( 'meta_key', '_delivery_unixdate' );
             $query->set( 'orderby', 'meta_value' );
         }
