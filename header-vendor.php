@@ -583,7 +583,15 @@ $cart_url = wc_get_cart_url();  // Set Cart URL
               <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
             </svg>
             Bestil inden kl.
-              <?php echo (!empty(get_field('vendor_drop_off_time', 'user_'.$vendor->id)) ? get_field('vendor_drop_off_time', 'user_'.$vendor->id) : '11'); ?>
+              <?php
+              $drop_off_time = (!empty(get_field('vendor_drop_off_time', 'user_'.$vendor->id)) ? get_field('vendor_drop_off_time', 'user_'.$vendor->id) : '11');
+              if(strpos($drop_off_time,':') === false && strpos($drop_off_time,'.') === false){
+                $drop_off_time = $drop_off_time.':00';
+              } else {
+                $drop_off_time = str_replace(array(':','.'),array(':',':'),$drop_off_time);
+              }
+              echo $drop_off_time;
+              ?>
             for
 
             <?php

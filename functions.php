@@ -832,8 +832,6 @@ function data_fetch(){
 	die();
 }
 
-//// amdad added
-
 
 /**
  * Add product category meta to landing page
@@ -2135,7 +2133,12 @@ function change_order_number_dashboard($data) {
 add_action( 'woocommerce_admin_order_data_after_billing_address', 'greeting_delivery_date_display_admin_order_meta' );
 function greeting_delivery_date_display_admin_order_meta( $order ) {
    $str = '<p><strong>Leveringsdato:</strong> ';
-	 if ( !empty(get_post_meta( $order->get_id(), '_delivery_date', true )) ) { $str .= get_post_meta( $order->get_id(), '_delivery_date', true ); } else { $str .= 'Hurtigst muligt ('. get_post_meta( $order->get_id(), '_delivery_unixdate', true ).')'; }
+	 if ( !empty(get_post_meta( $order->get_id(), '_delivery_date', true )) ) {
+		 $str .= get_post_meta( $order->get_id(), '_delivery_date', true );
+	 } else {
+		 $str .= 'Hurtigst muligt ('. get_post_meta( $order->get_id(), '_delivery_unixdate', true ).')';
+	 }
+	 //$str .= '('.get_post_meta( $order->get_id(), '_delivery_unixdate', true ).')';
 	 $str .= '</p>';
 	 $str .= '<p><strong>Modtagers telefonnr.:</strong> ' . get_post_meta( $order->get_id(), '_receiver_phone', true ) . '</p>';
 	 $str .= '<p><strong>Besked til modtager:</strong> ' . get_post_meta( $order->get_id(), '_greeting_message', true ) . '</p>';
@@ -2545,7 +2548,7 @@ function greeting_woocommerce_holiday_mode() {
 
 // Show Holiday Notice
 function greeting_wc_shop_disabled() {
-    wc_print_notice( 'Our Online Shop is Closed Today :)', 'error');
+    wc_print_notice( 'Greeting.dk er lukket ned pga. vedligehold netop nu, desværre :)', 'error');
 }
 
 add_action( 'woocommerce_single_product_summary', 'reorder_product_page_hooks', 1 );
@@ -2729,11 +2732,11 @@ function add_quantity_plus_and_minus_in_footer(){
 				}
 		}
 
-		jQuery('.woocommerce').on('click', '.plus-qty', function(e) {
+		jQuery('.plus-qty').click(function(e) {
 				incrementValue(e);
 		});
 
-		jQuery('.woocommerce').on('click', '.minus-qty', function(e) {
+		jQuery('.minus-qty').click(function(e) {
 				decrementValue(e);
 		});
 	</script>
@@ -2894,6 +2897,12 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 	$closed_days_date = array();
 
 	$vendorDropOffTime = get_vendor_dropoff_time($vendor_id);
+	if(strpos($vendorDropOffTime,':') === false && strpos($vendorDropOffTime,'.')){
+		$vendorDropOffTime = $vendorDropOffTime.':00';
+	} else {
+		$vendorDropOffTime = str_replace(array(':','.'),array(':',':'),$vendorDropOffTime);
+	}
+
 	$vendorDeliverDayReq = get_vendor_delivery_days_required($vendor_id);
 
 	// @todo - Dennis update according to latest updates in closing day-field.
@@ -2932,7 +2941,7 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 		$now->modify('+'.$vendorDeliverDayReq.' days');
 		if(!in_array($today->format('N'), $closed_days) && !in_array($today->format($date_format),$closed_dates_arr)){
 
-			if($now->format('H') > $vendorDropOffTime && $i == 0){
+			if($now->format('H:i') > $vendorDropOffTime && $i == 0){
 				$open_num--;
 			} else {
 				$open_num++;
@@ -2967,11 +2976,19 @@ function estimateDeliveryDate($days = 1, $cut_off = 15, $iso_opening_days = arra
 	$close_days = array_diff($iso_days, $iso_open_days);
 
 	$calc_days = 0;
-  if (date("H") <= $cut_off) {
-		$calc_days = $days;
-  } else {
-		$calc_days = $days+1;
-  }
+	if(strpos($cut_off, '.') === false || strpos($cut_off,':') === false){
+		if (date("H") <= $cut_off) {
+			$calc_days = $days;
+	  } else {
+			$calc_days = $days+1;
+	  }
+	} else {
+		if (date("H:i") <= $cut_off) {
+			$calc_days = $days;
+	  } else {
+			$calc_days = $days+1;
+	  }
+	}
 
 	$date_iso = date("N");
 
@@ -3031,6 +3048,12 @@ function greeting_echo_date_picker(  ) {
 	// Get delivery day requirement, cut-off-time for orders and the closed dates.
 	$vendorDeliverDayReq = get_vendor_delivery_days_required($vendor_id);
 	$vendorDropOffTime = get_vendor_dropoff_time($vendor_id);
+	if(strpos($vendorDropOffTime,':') === false && strpos($vendorDropOffTime,'.')){
+		$vendorDropOffTime = $vendorDropOffTime.':00';
+	} else {
+		$vendorDropOffTime = str_replace(array(':','.'),array(':',':'),$vendorDropOffTime);
+	}
+
 	$closed_dates_arr = explode(",",get_vendor_closed_dates($vendor_id));
 
 
@@ -3131,7 +3154,7 @@ function greeting_echo_date_picker(  ) {
 
 		echo '<div id="show-if-shipping">';
 		echo '<span>Ved bestillingen inden klokken ';
-		echo $vendorDropOffTime.':00</span>';
+		echo $vendorDropOffTime.'</span>';
 		echo ' kan butikken levere om '.$vendorDeliverDayReq;
 		echo ' leveringsdage.';
 
@@ -4156,6 +4179,15 @@ function shop_order_display_callback( $post ) {
 
 		$vendor_delivery_day_required = get_field('vendor_require_delivery_day', 'user_'.$vendor_id);
 		$vendor_drop_off_time = get_field('vendor_drop_off_time', 'user_'.$vendor_id);
+		if(strpos($vendor_drop_off_time,':') === false && strpos($vendor_drop_off_time,'.')){
+			$vendor_drop_off_time = $vendor_drop_off_time.':00';
+		} else {
+			$vendor_drop_off_time = str_replace(array(':','.'),array(':',':'),$vendor_drop_off_time);
+		}
+
+		if($vendor_drop_off_time < date('H:i')){
+			$vendor_delivery_day_required = $vendor_delivery_day_required+1;
+		}
 
 		// BEWARE: Not used because then we cant change date according to our needs
 		$dates = get_vendor_dates($vendor_id);
@@ -4168,14 +4200,9 @@ function shop_order_display_callback( $post ) {
 					var customMinDateVal = <?php echo $vendor_delivery_day_required; ?>;
 					var customMinDateValInt = parseInt(customMinDateVal);
 					var today = '';
-					let vendorDropOffTimeVal = <?php echo $vendor_drop_off_time; ?>;
+					var vendorDropOffTimeVal = '<?php echo $vendor_drop_off_time; ?>';
 					let d = new Date();
-					let hour = d.getHours();
-				if(hour > vendorDropOffTimeVal){
-					var customMinDateVal = customMinDateValInt+1;
-				} else {
-					customMinDateVal = <?php echo $vendor_delivery_day_required; ?>;
-				}
+					var hour = d.getHours()+':'+d.getMinutes();
 				// var vendorClosedDayArray = $('#vendorClosedDayId').val();
 				//var vendorClosedDayArray = '<?php echo $dates_json; ?>';
 				var vendorClosedDayArray = '';

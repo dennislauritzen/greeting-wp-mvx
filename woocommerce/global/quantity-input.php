@@ -46,8 +46,9 @@ if ( $max_value && $min_value === $max_value ) {
 	          placeholder="<?php echo esc_attr( $placeholder ); ?>"
 	          inputmode="<?php echo esc_attr( $inputmode ); ?>" />
 
-						<button type="button" class="btn btn-outline-secondary plus-qty" style="min-width: 50px;"  data-field="<?php echo esc_attr( $input_id ); ?>">+</button>
+
 						<button type="button" class="btn btn-outline-secondary minus-qty" style="min-width: 50px;" data-field="<?php echo esc_attr( $input_id ); ?>">-</button>
+						<button type="button" class="btn btn-outline-secondary plus-qty" style="min-width: 50px;"  data-field="<?php echo esc_attr( $input_id ); ?>">+</button>
 			</div>
     <?php do_action( 'woocommerce_after_quantity_input_field' ); ?>
 	<?php
