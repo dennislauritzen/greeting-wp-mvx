@@ -4225,7 +4225,12 @@ function save_shop_order_meta_box_data( $post_id, $post ) {
 }
 add_action( 'save_post', 'save_shop_order_meta_box_data', 20, 2 );
 
-function save_post($post_id) {
-    ?><script>alert("post saved");</script><?php
-    die();
+function remove_max_srcset_image_width( $max_width ) {
+    return false;
 }
+add_filter( 'max_srcset_image_width', 'remove_max_srcset_image_width' );
+
+function wdo_disable_srcset( $sources ) {
+    return false;
+}
+add_filter( 'wp_calculate_image_srcset', 'wdo_disable_srcset' );
