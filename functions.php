@@ -4262,12 +4262,15 @@ function save_shop_order_meta_box_data( $post_id, $post ) {
 }
 add_action( 'save_post', 'save_shop_order_meta_box_data', 20, 2 );
 
-function remove_max_srcset_image_width( $max_width ) {
-    return false;
-}
-add_filter( 'max_srcset_image_width', 'remove_max_srcset_image_width' );
 
-function wdo_disable_srcset( $sources ) {
-    return false;
+function shapeSpace_customize_image_sizes($sizes) {
+	unset($sizes['medium_large']); // 768px
+	return $sizes;
 }
-add_filter( 'wp_calculate_image_srcset', 'wdo_disable_srcset' );
+add_filter('intermediate_image_sizes_advanced', 'shapeSpace_customize_image_sizes');
+
+// disable srcset on frontend
+function disable_wp_responsive_images() {
+	return 1;
+}
+add_filter('max_srcset_image_width', 'disable_wp_responsive_images');
