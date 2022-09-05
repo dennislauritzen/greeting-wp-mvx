@@ -49,16 +49,7 @@ $classes = array('prod_hold');
 							src="<?php echo $img_src; ?>"
 							class="attachment-woocommerce_thumbnail size-woocommerce_thumbnail"
 							alt=""
-							loading="lazy"
-							srcset="<?php echo $img_src; ?> 370w,
-							<?php echo $img_src; ?> 150w,
-							<?php echo $img_src; ?> 300w,
-							<?php echo $img_src; ?> 768w,
-							<?php echo $img_src; ?> 640w,
-							<?php echo $img_src; ?> 100w,
-							<?php echo $img_src; ?> 60w,
-							<?php echo $img_src; ?> 620w,
-							<?php echo $img_src; ?> 800w" sizes="(max-width: 370px) 100vw, 370px">
+							loading="lazy">
 					</a>
 					<div class="card-body">
 							<h6 class="card-title" style="font-size: 12px;">

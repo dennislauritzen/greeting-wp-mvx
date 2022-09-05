@@ -26,16 +26,6 @@ foreach ($vendorProducts as $productId) {
 				alt=""
 				loading="lazy"
 				title="<?php echo $product->get_name();?>"
-				srcset="
-					<?php echo wp_get_attachment_url( $product->get_image_id() ); ?> 370w,
-					<?php echo wp_get_attachment_url( $product->get_image_id() ); ?> 150w,
-					<?php echo wp_get_attachment_url( $product->get_image_id() ); ?> 300w,
-					<?php echo wp_get_attachment_url( $product->get_image_id() ); ?> 768w,
-					<?php echo wp_get_attachment_url( $product->get_image_id() ); ?> 640w,
-					<?php echo wp_get_attachment_url( $product->get_image_id() ); ?> 100w,
-					<?php echo wp_get_attachment_url( $product->get_image_id() ); ?> 60w,
-					<?php echo wp_get_attachment_url( $product->get_image_id() ); ?> 620w,
-					<?php echo wp_get_attachment_url( $product->get_image_id() ); ?> 800w"
 				class="card-img-top"
 				alt="<?php echo $product->get_name();?>">
 			<?php } else { ?>
