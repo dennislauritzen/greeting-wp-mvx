@@ -41,7 +41,7 @@ if($args['cityName']){
             foreach ($vendorProducts as $prod) {
               $product = wc_get_product($prod->ID);
               $imageId = $product->get_image_id();
-              $uploadedImage = wp_get_attachment_image_url($imageId);
+              $uploadedImage = wp_get_attachment_image_url($imageId, 'vendor-product-box-size');
               $placeHolderImage = $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
 
               $imageUrl = '';
@@ -53,7 +53,9 @@ if($args['cityName']){
             ?>
               <div class="col-4 col-xs-4 col-sm-4 col-md-4">
                 <div class="card border-0">
-                    <a href="<?php echo get_permalink($product->get_id());?>"><img src="<?php echo $imageUrl;?>" class="card-img-top" alt="<?php echo $product->get_name();?>"></a>
+                    <a href="<?php echo get_permalink($product->get_id());?>">
+                      <img src="<?php echo $imageUrl;?>" class="card-img-top" alt="<?php echo $product->get_name();?>">
+                    </a>
                     <div class="card-body">
                         <h6 class="card-title" style="font-size: 14px;"><?php echo $product->get_name();?></a></h6>
                         <p class="price">Fra <?php echo $product->get_price();?> kr.</p>

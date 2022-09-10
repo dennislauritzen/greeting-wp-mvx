@@ -124,7 +124,7 @@ jQuery(document).ready(function(){
     foreach($occasion_featured_list as $occasion){
       $occasionImageUrl = '';
       if(!empty($occasion->image_src)){
-        $occasionImageUrl = wp_get_attachment_image($occasion->image_src, 'thumbnail', false, array('class' => 'card-img-top', 'alt' => $occasion->name));
+        $occasionImageUrl = wp_get_attachment_image($occasion->image_src, 'vendor-product-box-size', false, array('class' => 'card-img-top', 'alt' => $occasion->name));
       } else {
         $occasionImageUrl = $placeHolderImage;
       }
@@ -459,7 +459,7 @@ jQuery(document).ready(function(){
                     foreach ($vendorProducts as $prod) {
                       $product = wc_get_product($prod);
                       $imageId = $product->get_image_id();
-                        $uploadedImage = wp_get_attachment_image_url($imageId, 'medium');
+                        $uploadedImage = wp_get_attachment_image_url($imageId, 'vendor-product-box-size');
                         $placeHolderImage = wc_placeholder_img_src();
                         $imageUrl;
                         if($uploadedImage != ''){

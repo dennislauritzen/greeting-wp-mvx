@@ -61,7 +61,7 @@ foreach($postal_codes as $postcode){
   $postalcodesForFilter[] = array('id' => $postcode->ID, 'postcode' => $post_code_val, 'title' => $postcode->post_title, 'shorttag' => $postcode->post_name);
 }
 
-if(count($postal_codes) > 15){
+if(count($postal_codes) > 15 || count($postal_codes) == 1){
   $pc_filter = 0;
 } else {
   $pc_filter = 1;
@@ -176,7 +176,7 @@ $defaultUserString = implode(",", $defaultUserArray); ?>
     foreach($occasion_featured_list as $occasion){
       $occasionImageUrl = '';
       if(!empty($occasion->image_src)){
-        $occasionImageUrl = wp_get_attachment_image($occasion->image_src, 'thumbnail', false, array('class' => 'card-img-top', 'alt' => $occasion->name));
+        $occasionImageUrl = wp_get_attachment_image($occasion->image_src, 'vendor-product-box-size', false, array('class' => 'card-img-top', 'alt' => $occasion->name));
       } else {
         $occasionImageUrl = $placeHolderImage;
       }
@@ -283,7 +283,7 @@ $defaultUserString = implode(",", $defaultUserArray); ?>
            * Postalcode filter
            * ---------------------
           **/
-          if(count($postalcodesForFilter) <= 15){
+          if($pc_filter == 1){
           ?>
             <h5 class="text-uppercase mb-2">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#ffc107" class="bi bi-geo-alt" viewBox="0 0 16 16">
@@ -505,7 +505,7 @@ $defaultUserString = implode(",", $defaultUserArray); ?>
                     foreach ($vendorProducts as $prod) {
                       $product = wc_get_product($prod);
                       $imageId = $product->get_image_id();
-                        $uploadedImage = wp_get_attachment_image_url($imageId);
+                        $uploadedImage = wp_get_attachment_image_url($imageId, 'vendor-product-box-size');
                         $placeHolderImage = wc_placeholder_img_src();
                         $imageUrl;
                         if($uploadedImage != ''){
