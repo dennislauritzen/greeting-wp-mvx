@@ -673,7 +673,7 @@ function greeting_custom_taxonomy_occasion()  {
 	);
 	$args = array(
 		'labels'                     => $labels,
-		'hierarchical'               => false,
+		'hierarchical'               => true,
 		'public'                     => true,
 		'show_ui'                    => true,
 		'show_admin_column'          => true,
@@ -691,8 +691,8 @@ function greeting_custom_taxonomy_occasion()  {
         'read_post' => 'edit_posts' )
 	);
 	register_taxonomy( 'occasion', 'product', $args );
-
 }
+//add_filter( 'wpseo_primary_term_taxonomies', '__return_false' );
 
 /**
  *
@@ -4279,3 +4279,11 @@ add_filter('max_srcset_image_width', 'disable_wp_responsive_images');
  * Creating custom sizing for the images in the store view box.
  */
 add_image_size( 'vendor-product-box-size', 240, 240 );
+
+/**
+ * Remove the JetPack admin header notice.
+ */
+add_action('admin_head', 'custom_admin_head');
+function custom_admin_head() {
+	?><style>.notice.wcs-nux__notice{display:none;}</style><?php
+}
