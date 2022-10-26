@@ -16,7 +16,7 @@ $lp_category_conn = get_field('category_relation', $page_id);
 $lp_occasion_conn = get_field('occasion_relation', $page_id);
 #var_dump($lp_category_conn);var_dump($lp_occasion_conn);
 $connection_id = !empty($lp_category_conn) ? $lp_category_conn : $lp_occasion_conn;
-$connection_type = !empty($lp_category_conn) ? 'category' : (!empty($lp_occasion_conn) ? 'occassion' : '');
+$connection_type = !empty($lp_category_conn) ? 'category' : (!empty($lp_occasion_conn) ? 'occasion' : '');
 
 if(empty($connection_id)){
   wp_redirect(home_url());
@@ -123,8 +123,14 @@ foreach ($users_from_postcode as $queryUserId) {
     $vendor = get_wcmp_vendor($queryUserId);
 
     $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
+    #var_dump($vendorProducts);
     foreach ($vendorProducts as $productId) {
-        $categoryTermList = wp_get_post_terms($productId, 'product_cat', array('fields' => 'ids'));
+        if($connection_type == 'category'){
+          $categoryTermList = wp_get_post_terms($productId, 'product_cat', array('fields' => 'ids'));
+        } else {
+          $categoryTermList = wp_get_post_terms($productId, 'occasion', array('fields' => 'ids'));
+        }
+        #var_dump($categoryTermList);
         foreach($categoryTermList as $catTerm){
             if($catTerm == $connection_id){
                 array_push($userForThisCategory, $queryUserId);
@@ -135,8 +141,9 @@ foreach ($users_from_postcode as $queryUserId) {
 
 // pass to backend
 $defaultUserArray = array_intersect($users_from_postcode, $userForThisCategory);
-$defaultUserString = implode(",", $defaultUserArray); ?>
+$defaultUserString = implode(",", $defaultUserArray);
 
+?>
 <input type="hidden" id="landingPageDefaultUserIdAsString" value="<?php echo $defaultUserString;?>">
 
 <section id="citycontent" class="row">
@@ -564,16 +571,40 @@ $defaultUserString = implode(",", $defaultUserArray); ?>
     </div>
   </div>
 </section>
-<section id="description" class="my-4">
+<section id="description" class="mt-4 mb-5 pt-5">
   <div class="container">
     <div class="row">
       <div class="col-12">
-        <p><?php echo the_content(); ?></p>
+        <style type="text/css">
+        div.lpdesc h1,
+        div.lpdesc h2,
+        div.lpdesc h3,
+        div.lpdesc h4 {
+          font-family: 'Rubik', 'Inter', sans-serif;
+        }
+        div.lpdesc h2 {
+          font-size: 20px;
+        }
+        div.lpdesc h3 {
+          font-size: 18px;
+        }
+        div.lpdesc h4 {
+          font-size: 16px;
+        }
+
+        h3.altheader  {
+          font-family: 'Rubik', 'Inter', sans-serif;
+          font-size: 20px;
+        }
+        </style>
+        <div class="lpdesc">
+          <?php echo the_content(); ?>
+        </div>
       </div>
     </div>
     <div class="row">
       <div class="col-12">
-        <h4>Vil sende sende andet end blomster? Se alle butikker i <?php echo get_field('city_name', $page_id); ?></h4>
+        <h3 class="altheader pt-3">Vil du sende sende andet end blomster? Se alle butikker i <?php echo get_field('city_name', $page_id); ?></h3>
       </div>
       <div class="col-sm-12 col-md-3">
       <?php
@@ -623,7 +654,7 @@ $defaultUserString = implode(",", $defaultUserArray); ?>
   </div>
 </section>
 
-<section id="howitworks" class="bg-light-grey py-5">
+<section id="howitworks" class="bg-light-grey  py-5">
   <div class="container text-center">
     <div class="row">
       <div class="col-12">

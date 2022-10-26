@@ -583,7 +583,7 @@ function greeting_custom_post_type() {
 						'rewrite' => array('slug' => 'c'),
             'menu_icon' => 'dashicons-location-alt',
             'public'      => true,
-            'has_archive' => true,
+            'has_archive' => false,
             'supports' => array('title'),
 						'capabilities' => array(
 							'publish_posts' => 'publish_wcmppages',
@@ -2050,8 +2050,11 @@ function greeting_save_custom_fields_with_order( $order_id ) {
 			$product = get_post($item['product_id']);
 			$vendor_id = $product->post_author;
 
+			$vendor_name = get_user_meta($vendor_id, '_vendor_page_title', 1);
+
 			if(!empty($vendor_id)){
 				update_post_meta($order_id, '_vendor_id', $vendor_id);
+				update_post_meta($order_id, '_vendor_name', $vendor_name);
 				break;
 			}
 		}
@@ -2106,12 +2109,14 @@ function greeting_save_custom_fields_with_order( $order_id ) {
 	#	}
 }
 
-add_action( 'wcmp_checkout_vendor_order_processed' , 'update_sub_order_meta' ,10 , 3);
+#add_action( 'wcmp_checkout_vendor_order_processed' , 'update_sub_order_meta' ,10 , 3);
 function update_sub_order_meta($vendor_order_id, $posted_data, $order){
 	global $WCMp;
 
 	$vendor_order = wc_get_order($vendor_order_id);
 	$vendor_id = get_post_meta($vendor_order_id, '_vendor_id', true);
+
+	#$vendor_id = get_post_meta($vendor_order_id, '_vendor_id', true);
 }
 
 /* replace suborder id with parent order id in email */
