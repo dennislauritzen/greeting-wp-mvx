@@ -4313,7 +4313,7 @@ function custom_admin_head() {
 }
 
 function login_failed() {
-  $login_page  = home_url( '/login/' );
+  $login_page  = home_url( '/log-ind/' );
   wp_redirect( $login_page . '?login=failed' );
   exit;
 }
@@ -4345,7 +4345,7 @@ function custom_authenticate_wpcc( $user, $username, $password ) {
 add_filter( 'authenticate', 'custom_authenticate_wpcc', 31, 3);
 
 function logout_page() {
-  $login_page  = home_url( '/login/' );
+  $login_page  = home_url( '/log-ind/' );
   wp_redirect( $login_page . "?login=false" );
   exit;
 }

@@ -110,8 +110,18 @@ $cart_url = wc_get_cart_url();  // Set Cart URL
           </form>
         </div>
         <div class="d-none d-lg-inline d-xl-inline d-lg-inline col-lg-4 col-xl-3 right-col text-end">
-          <a href="<?php home_url(); ?>/log-ind" class="btn text-white">Log ind</a>
-          <a href="<?php echo get_permalink( get_option('woocommerce_myaccount_page_id') ); ?>" class="btn btn-create rounded text-white">Opret</a>
+          <?php
+          if ( is_user_logged_in() ) {
+          ?>
+            <a href="<?php echo get_permalink( get_option('woocommerce_myaccount_page_id') ); ?>" class="btn btn-create rounded text-white">Min konto</a>
+          <?php
+          } else {
+          ?>
+            <a href="<?php home_url(); ?>/log-ind" class="btn text-white">Log ind</a>
+            <a href="<?php echo get_permalink( get_option('woocommerce_myaccount_page_id') ); ?>" class="btn btn-create rounded text-white">Opret</a>
+          <?php
+          }
+          ?>
           <div class="btn position-relative ms-lg-0 ms-xl-1">
             <a href="<?php echo $cart_url; ?>">
               <span class="position-relative" aria-label="Se kurv">
