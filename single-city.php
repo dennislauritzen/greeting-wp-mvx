@@ -459,18 +459,25 @@ jQuery(document).ready(function(){
                     foreach ($vendorProducts as $prod) {
                       $product = wc_get_product($prod);
                       $imageId = $product->get_image_id();
-                        $uploadedImage = wp_get_attachment_image_url($imageId, 'vendor-product-box-size');
-                        $placeHolderImage = wc_placeholder_img_src();
-                        $imageUrl;
-                        if($uploadedImage != ''){
-                          $imageUrl = $uploadedImage;
-                        } else {
-                          $imageUrl = $placeHolderImage;
-                        }
+                      $uploadedImage = wp_get_attachment_image_url($imageId, 'medium');
+                      $placeHolderImage = wc_placeholder_img_src('medium');
+                      $imageUrl;
+                      if($uploadedImage != ''){
+                        $imageUrl = $uploadedImage;
+                      } else {
+                        $imageUrl = $placeHolderImage;
+                      }
                       ?>
                       <div class="col-4 col-xs-4 col-sm-4 col-md-4">
                         <div class="card border-0">
-                            <a href="<?php echo esc_url($vendor->get_permalink()); ?>"><img src="<?php echo $imageUrl;?>" class="card-img-top" alt="<?php echo $product->get_name();?>"></a>
+                            <a href="<?php echo esc_url($vendor->get_permalink()); ?>">
+                              <img
+                              src="<?php echo $imageUrl;?>"
+                              class="card-img-top"
+                              title="<?php echo $product->get_name();?>"
+                              alt="<?php echo $product->get_name();?>"
+                              >
+                            </a>
                             <div class="card-body">
                                 <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark"><?php echo $product->get_name();?></a></h6>
                                 <p class="price"><?php echo woocommerce_template_loop_price(); ?></p>

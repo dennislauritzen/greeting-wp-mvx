@@ -17,6 +17,10 @@ $get_order_hash2 = $_GET['sshh'];
 $order_hash = hash('md4','gree_ting_dk#!4r1242142fgriejgfto'.$order_id.$order_id);
 $order_hash2 = hash('md4', 'vvkrne12onrtnFG_:____'.$order_id);
 
+#print "<p>".$order_id."</p>";
+#print "<p>".$order_hash." - ".$get_order_hash."</p>";
+#print "<p>".$order_hash2." - ".$get_order_hash2."</p>";
+
 // Check if order id and order hash/salt is set.
 if(empty($order_id) || !isset($order_id)
   || empty($get_order_hash) || $get_order_hash != $order_hash
@@ -29,11 +33,12 @@ if(empty($order_id) || !isset($order_id)
 
 $order = wc_get_order( $order_id );
 $order_data = $order->get_data();
-$suborder_id = $WCMp->order->get_suborders($order_id);
+#$suborder_id = $WCMp->order->get_suborders($order_id);
 $__order_id       = '';
 $__order_id_child = '';
 if($order && $order_data){
   $orderStatus = $order->get_status();
+  $order->update_status( 'order-seen' );
 } else {
   wp_redirect(home_url());
   return;
@@ -43,7 +48,7 @@ if($order && $order_data){
 $update_link = (isset($_GET['_u']) ? $urlPath : $urlPath.'&_u=u');
 if(isset($_GET['_u']) && $_GET['_u'] == 'u'){
   if($orderStatus == 'processing'){
-    $order->update_status( 'completed' );
+    $order->update_status( 'delivered' );
     wp_redirect($urlPath);
     exit();
   }
@@ -66,7 +71,7 @@ get_header('green');
 	<div class="row">
     <div class="col-6">
       <p>Klik nedenfor for at markere ordren som leveret / afsendt:</p>
-      <?php if($orderStatus == 'processing'){?>
+      <?php if($orderStatus == 'processing' || $orderStatus == 'order-mail-open' || $orderStatus == 'order-seen' || $orderStatus == 'order-forwarded'){?>
       <a href="<?php echo $update_link; ?>">
         <div class="text-center btn bg-light shadow border border-success border-1 rounded p-3 w-50">
           <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="#28a745" class="bi bi-bicycle pb-2" viewBox="0 0 16 16">

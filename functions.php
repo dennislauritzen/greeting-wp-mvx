@@ -1615,7 +1615,10 @@ function add_awaiting_delivered_to_order_statuses( $order_statuses ) {
         $new_order_statuses[ $key ] = $status;
 
         if ( 'wc-processing' === $key ) {
-            $new_order_statuses['wc-delivered'] = 'Leveret';
+					$new_order_statuses['wc-order-mail-open'] = 'Vendor Opened Mail';
+					$new_order_statuses['wc-order-seen'] = 'Order Seen by Vendor';
+					$new_order_statuses['wc-order-forwarded'] = 'Order Forwarded to Vendor';
+          $new_order_statuses['wc-delivered'] = 'Leveret';
         }
 				if( 'wc-on-hold' === $key ){
 					unset( $new_order_statuses['wc-on-hold'] );
@@ -1629,7 +1632,7 @@ function add_awaiting_delivered_to_order_statuses( $order_statuses ) {
 add_filter( 'woocommerce_admin_order_actions', 'add_custom_order_status_actions_button', 100, 2 );
 function add_custom_order_status_actions_button( $actions, $order ) {
     // Display the button for all orders that have a 'processing' status
-    if ( $order->has_status( array( 'processing' ) ) ) {
+    if ( $order->has_status( array( 'processing', 'order-mail-open', 'order-seen', 'order-forwarded' ) ) ) {
 
         // Get Order ID (compatibility all WC versions)
         $order_id = method_exists( $order, 'get_id' ) ? $order->get_id() : $order->id;
@@ -1720,6 +1723,9 @@ function call_order_status_completed( $array ) {
 	$qrcode = 'https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl='.$codeContents;
 	// qr code end
 
+	// The tracking URL for tracking opening from the store.
+	$codeContents2 = site_url().'/be-shop-ot/?order_id='.$latestOrderId.'&oh='.$order_hash.'&sshh='.$order_hash2;
+
 	$orderedStoreEmail = '';
 	$orderedVendorStoreName = '';
 	// Loop through order items
@@ -1751,7 +1757,7 @@ function call_order_status_completed( $array ) {
 						Markér ordre som leveret
 					</a>
 					<div style="margin-top: 20px;">
-
+						<img src="'.$codeContents2.'" alt="" width="1" height="1"/>
 					</div>
           <p>Hej, '.$orderedVendorStoreName.'</p>
           <p>Der er gået en ordre i gennem</p>
@@ -3681,8 +3687,17 @@ function register_order_seen_order_status() {
         'show_in_admin_status_list' => true,
         'show_in_admin_all_list'    => true,
         'exclude_from_search'       => false,
-        'label_count'               => _n_noop( 'Order Seen by Vendor <span class="count">(%s)</span>', 'Shipment Arrival <span class="count">(%s)</span>' )
+        'label_count'               => _n_noop( 'Order Seen by Vendor <span class="count">(%s)</span>', 'Order Seen by Vendor <span class="count">(%s)</span>' )
     ) );
+
+		register_post_status( 'wc-order-mail-open', array(
+				'label'                     => 'Vendor Opened Mail',
+				'public'                    => true,
+				'show_in_admin_status_list' => true,
+				'show_in_admin_all_list'    => true,
+				'exclude_from_search'       => false,
+				'label_count'               => _n_noop( 'Vendor Opened Mail <span class="count">(%s)</span>', 'Vendor opened Mail <span class="count">(%s)</span>' )
+		) );
 
 		register_post_status( 'wc-order-forwarded', array(
         'label'                     => 'Order Sent to Vendor',
@@ -3690,22 +3705,10 @@ function register_order_seen_order_status() {
         'show_in_admin_status_list' => true,
         'show_in_admin_all_list'    => true,
         'exclude_from_search'       => false,
-        'label_count'               => _n_noop( 'Order Forwarded to Vendor <span class="count">(%s)</span>', 'Shipment Arrival <span class="count">(%s)</span>' )
+        'label_count'               => _n_noop( 'Order Forwarded to Vendor <span class="count">(%s)</span>', 'Order Forwarded to Vendor <span class="count">(%s)</span>' )
     ) );
 }
 
-add_filter( 'wc_order_statuses', 'add_order_seen_to_order_statuses' );
-function add_order_seen_to_order_statuses( $order_statuses ) {
-    $new_order_statuses = array();
-    foreach ( $order_statuses as $key => $status ) {
-        $new_order_statuses[ $key ] = $status;
-        if ( 'wc-processing' === $key ) {
-            $new_order_statuses['wc-order-seen'] = 'Order Seen by Vendor';
-						$new_order_statuses['wc-order-forwarded'] = 'Order Forwarded to Vendor';
-        }
-    }
-    return $new_order_statuses;
-}
 
 add_action('admin_head', 'styling_admin_order_list' );
 function styling_admin_order_list() {
@@ -3714,20 +3717,36 @@ function styling_admin_order_list() {
     if( $pagenow != 'edit.php') return; // Exit
     if( get_post_type($post->ID) != 'shop_order' ) return; // Exit
 
-    // HERE we set your custom status
-    $order_status = 'Order Seen'; // <==== HERE
+		// HERE we set your custom status
+    $order_status = 'Order Mail Open'; // <==== HERE
 		echo '<style>
       .order-status.status-'.sanitize_title( $order_status ).'{
-          background: #d7f8a7;
-          color: #0c942b;
+          background: #f2e59d;
+          color: #a39443;
+      }
+    </style>';
+
+		$order_status = 'Order Seen'; // <==== HERE
+		echo '<style>
+			.order-status.status-'.sanitize_title( $order_status ).'{
+					background: #d7f8a7;
+					color: #0c942b;
+			}
+		</style>';
+
+    $order_status = 'Delivered'; // <==== HERE
+		echo '<style>
+      .order-status.status-'.sanitize_title( $order_status ).'{
+          background: #0c942b;
+          color: #d7f8a7;
       }
     </style>';
 
 		$order_status = 'Order Forwarded'; // <==== HERE
 		echo '<style>
       .order-status.status-'.sanitize_title( $order_status ).'{
-          background: #d6bf75;
-          color: #888888;
+          background: #98d8ed;
+          color: #3d7d91;
       }
     </style>';
 }
@@ -4291,4 +4310,49 @@ add_image_size( 'vendor-product-box-size', 240, 240 );
 add_action('admin_head', 'custom_admin_head');
 function custom_admin_head() {
 	?><style>.notice.wcs-nux__notice{display:none;}</style><?php
+}
+
+function login_failed() {
+  $login_page  = home_url( '/login/' );
+  wp_redirect( $login_page . '?login=failed' );
+  exit;
+}
+add_action( 'wp_login_failed', 'login_failed' );
+
+function wpcc_front_end_login_fail( $username ) {
+      $referrer = $_SERVER['HTTP_REFERER'];
+      if ( !empty( $referrer ) && !strstr( $referrer,'wp-login' ) && !strstr( $referrer,'wp-admin' ) ) {
+        $referrer = esc_url( remove_query_arg( 'login', $referrer ) );
+        wp_redirect( $referrer . '?login=failed' );
+        exit;
+      }
+    }
+add_action( 'wp_login_failed', 'wpcc_front_end_login_fail' );
+
+function custom_authenticate_wpcc( $user, $username, $password ) {
+      if ( is_wp_error( $user ) && isset( $_SERVER[ 'HTTP_REFERER' ] ) && !strpos( $_SERVER[ 'HTTP_REFERER' ], 'wp-admin' ) && !strpos( $_SERVER[ 'HTTP_REFERER' ], 'wp-login.php' ) ) {
+        $referrer = $_SERVER[ 'HTTP_REFERER' ];
+        foreach ( $user->errors as $key => $error ) {
+            if ( in_array( $key, array( 'empty_password', 'empty_username') ) ) {
+              unset( $user->errors[ $key ] );
+              $user->errors[ 'custom_'.$key ] = $error;
+            }
+          }
+      }
+
+    return $user;
+}
+add_filter( 'authenticate', 'custom_authenticate_wpcc', 31, 3);
+
+function logout_page() {
+  $login_page  = home_url( '/login/' );
+  wp_redirect( $login_page . "?login=false" );
+  exit;
+}
+add_action('wp_logout','logout_page');
+
+add_filter('woocommerce_form_field_args',  'wc_form_field_args',10,3);
+function wc_form_field_args($args, $key, $value) {
+  $args['input_class'] = array( 'form-control' );
+  return $args;
 }

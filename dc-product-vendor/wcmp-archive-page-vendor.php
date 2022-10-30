@@ -264,7 +264,11 @@ $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
 				foreach ($vendorProducts as $productId) {
 					array_push($productIdArray, $productId);
 					$product = wc_get_product( $productId );
-					$uploadedImage = wp_get_attachment_url( $product->get_image_id() );
+
+          $imageId = $product->get_image_id();
+					$uploadedImage = wp_get_attachment_image_url($imageId, 'medium');
+          $placeHolderImage = wc_placeholder_img_src('medium');
+
 					$uploadDir = wp_upload_dir();
 					$uploadDirBaseUrl = $uploadDir['baseurl'];
 					?>
@@ -273,17 +277,17 @@ $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
 								<a href="<?php echo get_permalink($product->get_id());?>">
 								<?php if($uploadedImage != ''){?>
 									<img
-									src="<?php echo wp_get_attachment_url( $product->get_image_id() ); ?>"
+									src="<?php echo $uploadedImage; ?>"
 									class="attachment-shop_catalog size-shop_catalog"
-									alt=""
 									loading="lazy"
 									title="<?php echo $product->get_name();?>"
 									class="card-img-top"
 									alt="<?php echo $product->get_name();?>">
 								<?php } else { ?>
 									<img
-									src="<?php echo $uploadDirBaseUrl;?>/woocommerce-placeholder-300x300.png"
+									src="<?php echo $placeHolderImage;?>"
 									class="card-img-top"
+									title="<?php echo $product->get_name();?>"
 									alt="<?php echo $product->get_name();?>">
 								<?php } ?>
 								</a>
