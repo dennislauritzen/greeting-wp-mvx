@@ -493,7 +493,7 @@ $defaultUserString = implode(",", $defaultUserArray);
 
                   <div class="col-3 text-center">
                     <a href="<?php echo esc_url($vendor->get_permalink()); ?>" class="border-0">
-                      <img class="img-fluid rounded-start" src="<?php echo $image;?>" style="max-width: 100px;">
+                      <img class="img-fluid rounded-start" src="<?php echo $image;?>" alt="<?php echo $vendor->page_title; ?>" style="max-width: 100px;">
                     </a>
                     <?php $button_text = apply_filters('wcmp_vendor_lists_single_button_text', $vendor->page_title); ?>
                     <a href="<?php echo esc_url($vendor->get_permalink()); ?>" class="text-dark">
@@ -523,7 +523,9 @@ $defaultUserString = implode(",", $defaultUserArray);
                       ?>
                       <div class="col-6 col-xs-6 col-sm-6 col-md-4">
                         <div class="card border-0">
-                            <a href="<?php echo get_permalink($product->get_id());?>"><img src="<?php echo $imageUrl;?>" class="card-img-top" alt="<?php echo $product->get_name();?>"></a>
+                            <a href="<?php echo get_permalink($product->get_id());?>">
+                              <img src="<?php echo $imageUrl;?>" class="card-img-top" alt="<?php echo $product->get_name();?>">
+                            </a>
                             <div class="card-body">
                                 <h6 class="card-title" style="font-size: 14px;"><a href="#" class="text-dark"><?php echo $product->get_name();?></a></h6>
                                 <p class="price">Fra <?php echo $product->get_price();?> kr.</p>
@@ -604,7 +606,10 @@ $defaultUserString = implode(",", $defaultUserArray);
     </div>
     <div class="row">
       <div class="col-12">
-        <h3 class="altheader pt-3">Vil du sende sende andet end blomster? Se alle butikker i <?php echo get_field('city_name', $page_id); ?></h3>
+        <?php
+          $var_plural_array = explode(' ', the_title('','',false) );
+        ?>
+        <h3 class="altheader pt-3">Vil du sende sende andet end <?php echo strtolower($var_plural_array[0]); ?>? Se alle butikker i <?php echo get_field('city_name', $page_id); ?></h3>
       </div>
       <div class="col-sm-12 col-md-3">
       <?php
@@ -637,16 +642,16 @@ $defaultUserString = implode(",", $defaultUserArray);
       <div class="col-12 col-md-9">
         <div class="row d-flex align-items-center pb-3 pb-md-0">
           <div class="col-6 col-md-3 align-middle">
-            <img class="w-75 align-middle" src="https://www.greeting.dk/wp-content/uploads/2022/08/jyllands-posten-logo.png">
+            <img class="w-75 align-middle" alt="Jyllands Posten" src="https://www.greeting.dk/wp-content/uploads/2022/08/jyllands-posten-logo.png">
           </div>
           <div class="col-6 col-md-3 align-middle pb-3 pb-md-0">
-            <img class="w-75 align-middle" src="https://www.greeting.dk/wp-content/uploads/2022/08/finans-logo.png">
+            <img class="w-75 align-middle" alt="Finans" src="https://www.greeting.dk/wp-content/uploads/2022/08/finans-logo.png">
           </div>
           <div class="col-6 col-md-3 align-middle pb-3 pb-md-0">
-            <img class="w-75 align-middle" src="https://www.greeting.dk/wp-content/uploads/2022/08/migogodense-logo.png">
+            <img class="w-75 align-middle" alt="Mig og Odense" src="https://www.greeting.dk/wp-content/uploads/2022/08/migogodense-logo.png">
           </div>
           <div class="col-6 col-md-3 align-middle pb-3 pb-md-0">
-            <img class="w-75 align-middle" src="https://www.greeting.dk/wp-content/uploads/2022/08/hsfo-logo.png">
+            <img class="w-75 align-middle" alt="Horsens Folkeblad" src="https://www.greeting.dk/wp-content/uploads/2022/08/hsfo-logo.png">
           </div>
         </div>
       </div>
@@ -786,7 +791,7 @@ $defaultUserString = implode(",", $defaultUserArray);
     <div class="row">
       <div class="col-12 text-center pt-4 pb-5 mb-3 position-relative">
         <div class="">
-          <img src="https://www.greeting.dk/wp-content/uploads/2022/04/greeting-pink.png" style="width: 150px;">
+          <img src="https://www.greeting.dk/wp-content/uploads/2022/04/greeting-pink.png" alt="Greeting.dk" style="width: 150px;">
         </div>
         <div class="position-absolute top-50 start-100">
           <ul class="social">

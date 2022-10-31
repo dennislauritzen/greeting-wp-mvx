@@ -434,7 +434,7 @@ jQuery(document).ready(function(){
                     <div class="row mb-4 mb-md-0 d-flex">
                       <div class="col-4 col-md-12">
                         <a href="<?php echo esc_url($vendor->get_permalink()); ?>">
-                          <img class="img-fluid rounded-start" src="<?php echo $image;?>" style="max-width: 100px;">
+                          <img class="img-fluid rounded-start" alt="<?php echo $vendor->page_title; ?>" src="<?php echo $image;?>" style="max-width: 100px;">
                         </a>
                       </div>
                       <div class="col-8 col-md-12">
@@ -538,16 +538,16 @@ jQuery(document).ready(function(){
       <div class="col-12 col-md-9">
         <div class="row d-flex align-items-center pb-3 pb-md-0">
           <div class="col-6 col-md-3 align-middle">
-            <img class="w-75 align-middle" src="https://www.greeting.dk/wp-content/uploads/2022/08/jyllands-posten-logo.png">
+            <img class="w-75 align-middle" alt="Jyllands Posten" src="https://www.greeting.dk/wp-content/uploads/2022/08/jyllands-posten-logo.png">
           </div>
           <div class="col-6 col-md-3 align-middle pb-3 pb-md-0">
-            <img class="w-75 align-middle" src="https://www.greeting.dk/wp-content/uploads/2022/08/finans-logo.png">
+            <img class="w-75 align-middle" alt="Finans" src="https://www.greeting.dk/wp-content/uploads/2022/08/finans-logo.png">
           </div>
           <div class="col-6 col-md-3 align-middle pb-3 pb-md-0">
-            <img class="w-75 align-middle" src="https://www.greeting.dk/wp-content/uploads/2022/08/migogodense-logo.png">
+            <img class="w-75 align-middle" alt="Mig og Odense" src="https://www.greeting.dk/wp-content/uploads/2022/08/migogodense-logo.png">
           </div>
           <div class="col-6 col-md-3 align-middle pb-3 pb-md-0">
-            <img class="w-75 align-middle" src="https://www.greeting.dk/wp-content/uploads/2022/08/hsfo-logo.png">
+            <img class="w-75 align-middle" alt="Horsens Folkeblad" src="https://www.greeting.dk/wp-content/uploads/2022/08/hsfo-logo.png">
           </div>
         </div>
       </div>

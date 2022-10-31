@@ -52,7 +52,7 @@
                     <li class="pb-1"><a href="<?php echo site_url(); ?>/c/8800-viborg/" class="text-white">8800 Viborg</a></li>
                     <li class="pb-1"><a href="<?php echo site_url(); ?>/c/8900-randers-c/" class="text-white">8900 Randers C</a></li>
                     <li class="pb-1"><a href="<?php echo site_url(); ?>/c/8920-randers-nv/" class="text-white">8920 Randers NV</a></li>
-                    <li class="pb-1"><a href="<?php echo site_url(); ?>/c/9000-aalborg-c/" class="text-white">9000 Aalborg C</a></li>
+                    <li class="pb-1"><a href="<?php echo site_url(); ?>/c/9000-aalborg/" class="text-white">9000 Aalborg</a></li>
                     <li class="pb-1"><a href="<?php echo site_url(); ?>/c/9800-hjoerring/" class="text-white">9800 Hjørring</a></li>
 		        </ul>
 		      </div>

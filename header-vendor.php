@@ -16,7 +16,8 @@
   .bg-light-grey {
     background: #F8F8F8;
   }
-	h1 {
+	#top h1,
+  #top h2 {
     font-family: 'Rubik','Inter', sans-serif;
     font-weight: 500;
     font-size: 55px;
@@ -402,8 +403,18 @@ $cart_url = wc_get_cart_url();  // Set Cart URL
         </form>
       </div>
       <div class="d-none d-lg-inline d-xl-inline d-lg-inline col-lg-4 col-xl-3 right-col text-end">
-        <a href="#" class="btn text-white">Log ind</a>
-        <a href="#" class="btn btn-create rounded text-white">Opret</a>
+        <?php
+        if ( is_user_logged_in() ) {
+        ?>
+          <a href="<?php echo get_permalink( get_option('woocommerce_myaccount_page_id') ); ?>" class="btn btn-create rounded text-white">Min konto</a>
+        <?php
+        } else {
+        ?>
+          <a href="<?php home_url(); ?>/log-ind" class="btn text-white">Log ind</a>
+          <a href="<?php echo get_permalink( get_option('woocommerce_myaccount_page_id') ); ?>" class="btn btn-create rounded text-white">Opret</a>
+        <?php
+        }
+        ?>
         <div class="btn position-relative ms-lg-0 ms-xl-1">
   				<a href="<?php echo $cart_url; ?>">
             <span class="position-relative" aria-label="Se kurv">
@@ -422,7 +433,7 @@ $cart_url = wc_get_cart_url();  // Set Cart URL
   <div class="container d-flex align-items-end" style="height: inherit; min-height: inherit;">
     <div class="row">
 			<div class="col-12 m-0 p-0">
-        <h1 class="text-white m-0 p-0"><?php echo ucfirst(esc_html($vendor->page_title)); ?></h1>
+        <h2 class="text-white m-0 p-0"><?php echo ucfirst(esc_html($vendor->page_title)); ?></h2>
       </div>
       <div class="col-12 ">
         <div class="rating pb-2">

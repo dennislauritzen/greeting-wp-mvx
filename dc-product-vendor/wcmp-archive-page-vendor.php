@@ -333,7 +333,7 @@ do_action('after_wcmp_vendor_description', $vendorId);
 		<?php
 			$image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
 		?>
-		<img class="d-inline-block pb-3" src="<?php echo esc_attr($image); ?>">
+		<img class="d-inline-block pb-3" alt="<?php echo $vendor->user_data->data->display_name; ?>" src="<?php echo esc_attr($image); ?>">
       </div>
       <div class="col-lg-6">
         <h6><?php echo ucfirst(esc_html($vendor->user_data->data->display_name)); ?></h6>
