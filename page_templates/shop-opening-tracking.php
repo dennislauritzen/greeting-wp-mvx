@@ -37,7 +37,9 @@ if(empty($order_id) || !isset($order_id)
   $__order_id_child = '';
   if($order && $order_data){
     $orderStatus = $order->get_status();
-    $order->update_status( 'order-mail-open' );
+    if($orderStatus == 'processing'){
+      $order->update_status( 'order-mail-open' );
+    }
   }
 
   header('Content-Type: image/png');

@@ -38,7 +38,9 @@ $__order_id       = '';
 $__order_id_child = '';
 if($order && $order_data){
   $orderStatus = $order->get_status();
-  $order->update_status( 'order-seen' );
+  if($orderStatus == 'processing' || $orderStatus == 'order-mail-open'){
+    $order->update_status( 'order-seen' );
+  }
 } else {
   wp_redirect(home_url());
   return;
