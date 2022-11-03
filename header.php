@@ -480,6 +480,7 @@
 	<noscript><iframe src="https://gtm.greeting.dk/ns.html?id=GTM-N7VZGS3"
 	height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 	<!-- End LOCAL TM (noscript) -->
+	<meta name="google-site-verification" content="IzMcch4GbZsuyDXUn9Ar4A0kpVHugadljONNzrSZh3I" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
