@@ -1947,10 +1947,9 @@ function greeting_check_delivery_postcode( $fields, $errors ){
 
 
 
-add_action( 'woocommerce_after_checkout_form', 'greeting_show_hide_calendar' );
+#add_action( 'woocommerce_after_checkout_form', 'greeting_show_hide_calendar' );
 function greeting_show_hide_calendar( $available_gateways ) {?>
 <script type="text/javascript">
-
    function show_calendar( val ) {
       if ( val.match("^flat_rate") || val.match("^free_shipping") ) {
          jQuery('#show-if-shipping').fadeIn();
@@ -1963,9 +1962,7 @@ function greeting_show_hide_calendar( $available_gateways ) {?>
        var val = jQuery('input[name^="shipping_method"]:checked').val();
       show_calendar( val );
    });
-
 </script>
-
 <?php
 }
 
@@ -2021,7 +2018,7 @@ function greeting_load_calendar_dates( $available_gateways ) {
 			$('#datepicker').datepicker({
 				dateFormat: 'dd-mm-yy',
 				// minDate: -1,
-				minDate: customMinDateVal,
+				minDate: new Date(),
 				// maxDate: "+1M +10D"
 				maxDate: "+58D",
 				// closed on specific date
@@ -2772,8 +2769,6 @@ function argmcAddNewSteps($fields) {
             ) +
             array_slice($fields['steps'], $position - 1, count($fields['steps']) - 1, true);
 
-
-
 	return $fields;
 
 }
@@ -2810,6 +2805,7 @@ function greeting_echo_receiver_info( ) {
 			'id'					=> 'greetingMessage',
 			'class'				=> array('form-row-wide'),
 			'required'		=> true,
+			'input_class'	=> 'validate[required]',
 			'label'				=> __('Din hilsen til modtager (max 160 tegn)', 'greeting2'),
 			'placeholder'	=> __('Skriv din hilsen til din modtager her :)', 'greeting2'),
 			'maxlength' 	=> 160
@@ -2825,24 +2821,39 @@ function greeting_echo_receiver_info( ) {
 			), WC()->checkout->get_value( 'receiver_phone' ));
 		#echo '<tr class="message-pro-radio"><td>';
 
-		echo '<h3>Leveringsinstruktioner</h3>';
+		echo '<h3>Leveringsinstruktioner</h3>
+		<style type="text/css">
+			input#deliveryLeaveGiftAddress,
+			input#deliveryLeaveGiftNeighbour {
+				width: 18px;
+				height: 18px;
+			}
+		</style>
+		';
 
 
 		woocommerce_form_field( 'leave_gift_address', array(
 			'type'				=> 'checkbox',
 			'id'					=> 'deliveryLeaveGiftAddress',
 			'class'				=> array('form-row-wide'),
+			'label_class' => array(''),
+			'input_class' => array('input-checkbox'),
 			'label'				=> __('Ja, gaven må efterlades på adressen', 'greeting2'),
-			'placeholder'	=> ''
-		),  1 );
+			'placeholder'	=> '',
+			'required' 		=> false,
+			'default' 		=> 1
+		), 1 );
 
 
 		woocommerce_form_field( 'leave_gift_neighbour', array(
 			'type'				=> 'checkbox',
 			'id'					=> 'deliveryLeaveGiftNeighbour',
 			'class'				=> array('form-row-wide'),
+			'input_class' => array('input-checkbox'),
 			'label'				=> __('Ja, gaven må afleveres til/hos naboen', 'greeting2'),
-			'placeholder'	=> ''
+			'placeholder'	=> '',
+			'required' 		=> false,
+			'default' 		=> 1
 		), 0 );
 
 		woocommerce_form_field( 'delivery_instructions', array(
@@ -4353,6 +4364,8 @@ add_action('wp_logout','logout_page');
 
 add_filter('woocommerce_form_field_args',  'wc_form_field_args',10,3);
 function wc_form_field_args($args, $key, $value) {
-  $args['input_class'] = array( 'form-control' );
+	if($args['type'] !== 'checkbox'){
+  	$args['input_class'] = array( 'form-control' );
+	}
   return $args;
 }
