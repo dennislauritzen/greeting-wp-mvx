@@ -2331,7 +2331,7 @@ function greeting_validate_new_receiver_info_fields($fields, $errors) {
 		);
 	}
 	//if ($_POST['message-pro'] == "0" && (strlen($_POST['greeting_message']) > 165)){
-	if(strlen($_POST['greeting_message']) > 165){
+	if(mb_strlen(trim($_POST['greeting_message']),'UTF-8') > 165){
 		$errors->add(
 			'validation',
 			__( 'Standard package accept only 165 Character', 'greeting2')
