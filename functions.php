@@ -1995,8 +1995,9 @@ function greeting_load_calendar_dates( $available_gateways ) {
 	}
 
 	$vendor_id = get_post_field( 'post_author', $storeProductId );
-	$dates = get_vendor_dates($vendor_id);
+	$dates = get_vendor_dates($vendor_id, 'd-m-Y', 'close');
 	$dates_json = json_encode($dates);
+	var_dump($dates);
 ?>
 
    <script type="text/javascript">
@@ -2961,9 +2962,13 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 	for($i=0;$i<60;$i++){
 		$now = new DateTime('now');
 		$now->modify('+'.$vendorDeliverDayReq.' days');
-		if(!in_array($today->format('N'), $closed_days) && !in_array($today->format($date_format),$closed_dates_arr)){
+		print $now->format($date_format)." - ".$today->format($date_format).' i dag: ';
 
-			if($now->format('H:i') > $vendorDropOffTime && $i == 0){
+		if(!in_array($today->format('N'), $closed_days) && !in_array($today->format($date_format),$closed_dates_arr)){
+			if(
+				($now->format('H:i') > $vendorDropOffTime && $i == 0)
+				|| ($now->format($date_format) > $today->format($date_format))
+			){
 				$open_num--;
 			} else {
 				$open_num++;
@@ -2971,10 +2976,13 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 
 			if($open_num >= $vendorDeliverDayReq){
 				$dates[] = $today->format($date_format);
+				print "med<br>";
 			} else {
 				$closed_days_date[] = $today->format($date_format);
+				print "ikke med<br>";
 			}
 		} else {
+			print "ikke med<br>";
 			$closed_num++;
 			$closed_days_date[] = $today->format($date_format);
 		}
@@ -3079,7 +3087,6 @@ function greeting_echo_date_picker(  ) {
 	$closed_dates_arr = explode(",",get_vendor_closed_dates($vendor_id));
 
 
-
 	if($del_value == '0'){
 		echo '<h3 class="pt-4">Leveringsdato</h3>';
 		echo '<p>';
@@ -3101,32 +3108,7 @@ function greeting_echo_date_picker(  ) {
 			'custom_attributes' => array('readonly' => 'readonly')
 		), WC()->checkout->get_value( 'delivery_date' ) );
 
-
-		function build_intervals($items, $is_contiguous, $make_interval) {
-				$intervals = array();
-				$end   = false;
-				if(is_array($items) || is_object($items)){
-					foreach ($items as $item) {
-							if (false === $end) {
-									$begin = (int) $item;
-									$end   = (int) $item;
-									continue;
-							}
-							if ($is_contiguous($end, $item)) {
-									$end = (int) $item;
-									continue;
-							}
-							$intervals[] = $make_interval($begin, $end);
-							$begin = (int) $item;
-							$end   = (int) $item;
-					}
-				}
-				if (false !== $end) {
-						$intervals[] = $make_interval($begin, $end);
-				}
-				return $intervals;
-		}
-
+		// Build intervals.
 		$opening = get_field('openning', 'user_'.$vendor_id);
 		$open_iso_days = array();
 		$open_label_days = array();
@@ -3144,7 +3126,6 @@ function greeting_echo_date_picker(  ) {
 		$i = 1;
 
 		if(!empty($opening) && !empty($interv) && count($interv) > 0){
-
 			if($del_value == "1"){
 				echo '<p>Butikken kan levere gaver ';
 			} else if($del_value == "0"){
@@ -3173,12 +3154,11 @@ function greeting_echo_date_picker(  ) {
 		}
 		echo '.</p>';
 
-
 		echo '<div id="show-if-shipping">';
 		echo '<span>Ved bestillingen inden klokken ';
 		echo $vendorDropOffTime.'</span>';
 		echo ' kan butikken levere om '.$vendorDeliverDayReq;
-		echo ' leveringsdage.';
+		echo ' leveringsdag(e).';
 
 		#$closed_days_date_iteration = count($closed_dates_arr);
 		#$cdi = 0;
@@ -3202,6 +3182,33 @@ function greeting_echo_date_picker(  ) {
 	<input type="hidden" id="vendorDeliverDay" value="<?php echo $vendorDeliverDayReq;?>"/>
 	<input type="hidden" id="vendorDropOffTimeId" value="<?php echo $vendorDropOffTime;?>"/>
 	<?php
+}
+
+if( function_exists('build_intervals') == false){
+	function build_intervals($items, $is_contiguous, $make_interval) {
+			$intervals = array();
+			$end   = false;
+			if(is_array($items) || is_object($items)){
+				foreach ($items as $item) {
+						if (false === $end) {
+								$begin = (int) $item;
+								$end   = (int) $item;
+								continue;
+						}
+						if ($is_contiguous($end, $item)) {
+								$end = (int) $item;
+								continue;
+						}
+						$intervals[] = $make_interval($begin, $end);
+						$begin = (int) $item;
+						$end   = (int) $item;
+				}
+			}
+			if (false !== $end) {
+					$intervals[] = $make_interval($begin, $end);
+			}
+			return $intervals;
+	}
 }
 
 /**
