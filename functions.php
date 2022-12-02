@@ -3117,6 +3117,31 @@ function greeting_echo_date_picker(  ) {
 			$open_label_days[$v['value']] = $v['label'];
 		}
 
+		function build_intervals($items, $is_contiguous, $make_interval) {
+				$intervals = array();
+				$end   = false;
+				if(is_array($items) || is_object($items)){
+					foreach ($items as $item) {
+							if (false === $end) {
+									$begin = (int) $item;
+									$end   = (int) $item;
+									continue;
+							}
+							if ($is_contiguous($end, $item)) {
+									$end = (int) $item;
+									continue;
+							}
+							$intervals[] = $make_interval($begin, $end);
+							$begin = (int) $item;
+							$end   = (int) $item;
+					}
+				}
+				if (false !== $end) {
+						$intervals[] = $make_interval($begin, $end);
+				}
+				return $intervals;
+		}
+
 		$interv = array();
 		if(!empty($open_iso_days) && is_array($open_iso_days)){
 			$interv = build_intervals($open_iso_days, function($a, $b) { return ($b - $a) <= 1; }, function($a, $b) { return $a."..".$b; });
@@ -3182,33 +3207,6 @@ function greeting_echo_date_picker(  ) {
 	<input type="hidden" id="vendorDeliverDay" value="<?php echo $vendorDeliverDayReq;?>"/>
 	<input type="hidden" id="vendorDropOffTimeId" value="<?php echo $vendorDropOffTime;?>"/>
 	<?php
-}
-
-if( function_exists('build_intervals') == false){
-	function build_intervals($items, $is_contiguous, $make_interval) {
-			$intervals = array();
-			$end   = false;
-			if(is_array($items) || is_object($items)){
-				foreach ($items as $item) {
-						if (false === $end) {
-								$begin = (int) $item;
-								$end   = (int) $item;
-								continue;
-						}
-						if ($is_contiguous($end, $item)) {
-								$end = (int) $item;
-								continue;
-						}
-						$intervals[] = $make_interval($begin, $end);
-						$begin = (int) $item;
-						$end   = (int) $item;
-				}
-			}
-			if (false !== $end) {
-					$intervals[] = $make_interval($begin, $end);
-			}
-			return $intervals;
-	}
 }
 
 /**
@@ -4255,6 +4253,7 @@ function shop_order_display_callback( $post ) {
 					minDate: new Date(),
 					// maxDate: "+1M +10D"
 					maxDate: "+58D",
+					firstDay: 1,
 					// closed on specific date
 					beforeShowDay: function(date){
 						var string = jQuery.datepicker.formatDate('dd-mm-yy', date);
