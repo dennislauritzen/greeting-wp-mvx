@@ -2962,7 +2962,7 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 	for($i=0;$i<60;$i++){
 		$now = new DateTime('now');
 		$now->modify('+'.$vendorDeliverDayReq.' days');
-		print $now->format($date_format)." - ".$today->format($date_format).' i dag: ';
+		#print $now->format($date_format)." - ".$today->format($date_format).' i dag: ';
 
 		if(!in_array($today->format('N'), $closed_days) && !in_array($today->format($date_format),$closed_dates_arr)){
 			if(
@@ -2976,13 +2976,13 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 
 			if($open_num >= $vendorDeliverDayReq){
 				$dates[] = $today->format($date_format);
-				print "med<br>";
+				#print "med<br>";
 			} else {
 				$closed_days_date[] = $today->format($date_format);
-				print "ikke med<br>";
+				#print "ikke med<br>";
 			}
 		} else {
-			print "ikke med<br>";
+			#print "ikke med<br>";
 			$closed_num++;
 			$closed_days_date[] = $today->format($date_format);
 		}
