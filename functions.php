@@ -1935,12 +1935,12 @@ function greeting_check_delivery_postcode( $fields, $errors ){
 			'posts_per_page' => '1'
 		);
 		$city = new WP_Query( $args );
-		var_dump($city->posts[0]->post_title);
+		#var_dump($city->posts[0]->post_title);
 
 		if($city && $city->posts && count($city->posts) > 0){
-			$errors->add( 'validation', var_dump($city).'<p style="line-height:150%;">Beklager - den valgte butik kan ikke levere til '.$city->posts[0]->post_title.'. Du kan <a href="'.$vendor->get_permalink().'">gå til butikkens side</a> og se hvilke postnumre de leverer til eller <a href="'.get_permalink($city->posts[0]->ID).'">klikke her og se butikker der leverer i postnummer '.$city->posts[0]->post_title.'</a></p>' );
+			$errors->add( 'validation', '<p style="line-height:150%;">Beklager - den valgte butik kan ikke levere til '.$city->posts[0]->post_title.'. Du kan <a href="'.$vendor->get_permalink().'">gå til butikkens side</a> og se hvilke postnumre de leverer til eller <a href="'.get_permalink($city->posts[0]->ID).'">klikke her og se butikker der leverer i postnummer '.$city->posts[0]->post_title.'</a></p>' );
 		} else {
-			$errors->add( 'validation', var_dump($city).'Beklager - butikken kan desværre ikke levere til det postnummer, du har indtastet under levering. Du bedes enten ændre leveringens postnummer eller gå til <a href="'.home_url().'">forsiden</a> for at finde en butik i det ønskede postnummer.' );
+			$errors->add( 'validation', 'Beklager - butikken kan desværre ikke levere til det postnummer, du har indtastet under levering. Du bedes enten ændre leveringens postnummer eller gå til <a href="'.home_url().'">forsiden</a> for at finde en butik i det ønskede postnummer.' );
 		}
 	}
 }
@@ -1997,7 +1997,7 @@ function greeting_load_calendar_dates( $available_gateways ) {
 	$vendor_id = get_post_field( 'post_author', $storeProductId );
 	$dates = get_vendor_dates($vendor_id, 'd-m-Y', 'close');
 	$dates_json = json_encode($dates);
-	var_dump($dates);
+	#var_dump($dates);
 ?>
 
    <script type="text/javascript">
