@@ -2978,7 +2978,7 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 			# then push next possbile delivery day 1 day by
 			# substracting from the open_num variable.
 			if(	($now->format('H:i') > $vendorDropOffTime && $i == 0)
-			|| ($now->format('Y-m-d') > $today->format('Y-m-d')) ){
+			|| ($now->format('Y-m-d') >= $today->format('Y-m-d')) ){
 				$open_num--;
 			} else {
 				$open_num++;
@@ -3001,8 +3001,10 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 	}
 
 	if($open_close == 'close'){
+		var_dump($closed_days_date);
 		return $closed_days_date;
 	} else {
+		var_dump($dates);
 		return $dates;
 	}
 }
