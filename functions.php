@@ -3001,10 +3001,10 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 	}
 
 	if($open_close == 'close'){
-		var_dump($closed_days_date);
+		#var_dump($closed_days_date);
 		return $closed_days_date;
 	} else {
-		var_dump($dates);
+		#var_dump($dates);
 		return $dates;
 	}
 }
