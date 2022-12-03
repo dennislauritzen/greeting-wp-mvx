@@ -90,18 +90,18 @@ jQuery(document).ready(function(){
 <input type="hidden" id="postalCode" value="<?php echo $cityPostalcode; ?>">
 <section id="citycontent" class="row">
   <div class="container">
-    <div class="row d-inline d-lg-none d-xl-none">
+    <div class="row">
       <div class="col-12">
-        <h1 class="d-inline d-lg-none d-xl-none my-3 my-xs-3 my-sm-3 my-md-3 my-lg-0 my-xl-0 mb-lg-4 mb-xl-4">Find gavehilsner til <?php the_title();?></h1>
+        <h1 class="d-block my-0 my-xs-3 my-sm-2 my-md-2 mt-lg-4 pt-lg-1 mb-lg-3">Find gavehilsner til <?php the_title();?></h1>
       </div>
     </div>
 
-    <div class="row mt-4 mb-5" id="topoccassions">
+    <div class="row mt-0 mb-4" id="topoccassions">
     <?php
     // get user meta query
     $occasion_featured_list = $wpdb->get_results( "
     SELECT
-      tt.term_id,
+      tt.term_id as term_id,
       tt.taxonomy,
 		  t.name,
       t.slug,
@@ -124,21 +124,26 @@ jQuery(document).ready(function(){
     foreach($occasion_featured_list as $occasion){
       $occasionImageUrl = '';
       if(!empty($occasion->image_src)){
-        $occasionImageUrl = wp_get_attachment_image($occasion->image_src, 'vendor-product-box-size', false, array('class' => 'card-img-top', 'alt' => $occasion->name));
+        $occasionImageUrl = wp_get_attachment_image($occasion->image_src, 'vendor-product-box-size', false, array('class' => 'card-img-top ratio-4by3', 'alt' => $occasion->name));
       } else {
         $occasionImageUrl = $placeHolderImage;
       }
     ?>
-    <div class="col-6 col-md-2">
+    <style type="text/css">
+      .card-img-top {
+        min-height: 175px !important;
+      }
+    </style>
+    <div class="col-6 col-sm-6 col-md-4 col-lg-2 py-0 my-0">
       <div class="card border-0 shadow-sm">
-        <?php echo $occasionImageUrl;?>
-        <div class="card-body">
-          <h5 class="card-title">
-            <a href="#" class="stretched-link text-dark">
+        <a href="<?php echo get_permalink().'?c='.$occasion->term_id; ?>" class="stretched-link text-dark">
+          <?php echo $occasionImageUrl;?>
+          <div class="card-body">
+            <h5 class="card-title">
               <?php echo $occasion->name;?>
-            </a>
-          </h5>
-        </div>
+            </h5>
+          </div>
+        </a>
       </div>
     </div>
 
@@ -396,22 +401,25 @@ jQuery(document).ready(function(){
       </div>
 
       <div class="col-md-12 col-lg-9 mb-5">
-        <h1 class="d-none d-lg-block d-xl-block my-3 my-xs-3 my-sm-3 my-md-3 my-lg-0 my-xl-0 mb-lg-4 mb-xl-4">Find gavehilsner til <?php the_title();?></h1>
+        <!--<h1 class="d-none d-lg-block d-xl-block my-3 my-xs-3 my-sm-3 my-md-3 my-lg-0 my-xl-0 mb-lg-4 mb-xl-4">Find gavehilsner til <?php the_title();?></h1>-->
         <div class="applied-filters row mt-xs-0 mt-sm-0 mt-md-0 mt-2 mb-4 lh-lg">
           <div class="col-12 filter-list">
-            <div id="filterfilter_cat0" class="badge rounded-pill border-yellow py-2 px-2 me-1 my-1 my-lg-0 my-xl-0 text-dark dynamic-filters">
+            <div id="filterdel_dummy_0" class="badge rounded-pill border-yellow py-2 px-2 me-1 my-1 my-lg-0 my-xl-0 text-dark dynamic-filters">
                 Forsendelse med fragtfirma
-              <button type="button" class="btn-close filter-btn-delete" data-filter-id="0" data-label="Forsendelsemedfragtfirma" data-filter-remove="filter_cat0"></button>
+              <button type="button" class="btn-close filter-btn-delete"
+              data-filter-id="0" data-label="Forsendelsemedfragtfirma"
+              data-filter-remove="filter_delivery_0" onclick="removeFilterBadgeCity('Forsendelsemedfragtfirma', 'filterfilter_delivery_0', 'filter_delivery_0', true);"></button>
             </div>
-            <div id="filterfilter_cat1" class="badge rounded-pill border-yellow py-2 px-2 me-1 my-1 my-lg-0 my-xl-0 text-dark dynamic-filters">
+            <div id="filterdel_dummy_1" class="badge rounded-pill border-yellow py-2 px-2 me-1 my-1 my-lg-0 my-xl-0 text-dark dynamic-filters">
                 Personlig levering fra lokal butik
-              <button type="button" class="btn-close filter-btn-delete" data-filter-id="1" data-label="Personligleveringfralokalbutik" data-filter-remove="filter_cat1"></button>
+              <button type="button" class="btn-close filter-btn-delete" data-filter-id="1" data-label="Personligleveringfralokalbutik"
+              data-filter-remove="filter_delivery_1" onclick="removeFilterBadgeCity('Personligleveringfralokalbutik', 'filterfilter_delivery_1', 'filter_delivery_1', true);"></button>
             </div>
             <a href="<?php echo home_url(); ?>"class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 text-dark">
               <?php echo $cityPostalcode.' '.$cityName; ?>
               <button type="button" class="btn-close" aria-label="Close"></button>
             </a>
-            <a href="#" id="cityPageReset" onclick="event.preventDefault();" class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 bg-yellow text-white">
+            <a href="#" id="cityPageReset" onclick="event.preventDefault();" class="badge rounded-pill border-yellow py-2 pe-2 my-1 my-lg-0 my-xl-0 bg-yellow text-white">
               Nulstil alle
               <button type="button" class="btn-close  btn-close-white" aria-label="Close">
               </button>
@@ -419,7 +427,7 @@ jQuery(document).ready(function(){
           </div>
         </div>
 
-        <div id="defaultStore">
+      <div id="defaultStore">
       <?php
       foreach ($UserIdArrayForCityPostalcode as $user) {
         $vendor = get_wcmp_vendor($user);
@@ -710,6 +718,11 @@ jQuery(document).ready(function(){
 <script type="text/javascript">
   // Start the jQuery
   jQuery(document).ready(function($) {
+    document.getElementById('filterdel_dummy_0').outerHTML = "";
+    document.getElementById('filterdel_dummy_1').outerHTML = "";
+    setFilterBadgeCity('Personlig levering fra lokal butik', 'filterfilter_delivery_0', 'filter_delivery_0');
+    setFilterBadgeCity('Forsendelse med fragtfirma', 'filterfilter_delivery_1', 'filter_delivery_1');
+
     var ajaxurl = "<?php echo admin_url('admin-ajax.php');?>";
     var catOccaDeliveryIdArray = [];
     var inputPriceRangeArray = [];
@@ -773,13 +786,13 @@ jQuery(document).ready(function(){
         setFilterBadgeCity(
           $('label[for='+this.id+']').text(),
           this.value,
-          'filter_cat'+this.value
+          this.id
         );
       } else {
         removeFilterBadgeCity(
           $('label[for='+this.id+']').text(),
           this.value,
-          'filter_cat'+this.value,
+          this.id,
           false
         );
       }
@@ -868,15 +881,17 @@ jQuery(document).ready(function(){
     function setFilterBadgeCity(label, id, dataRemove){
       var elm = document.createElement('div');
       elm.id = 'filter'+dataRemove;
-      elm.classList.add('badge', 'rounded-pill', 'border-yellow', 'py-2', 'px-2', 'me-1', 'my-1', 'my-lg-0', 'my-xl-0', 'text-dark', 'dynamic-filters');
+      elm.classList.add('badge', 'rounded-pill', 'border-yellow', 'py-2', 'pe-2', 'my-1', 'my-lg-0', 'my-xl-0', 'me-1', 'text-dark', 'dynamic-filters');
       elm.href = '#';
       elm.innerHTML = label;
 
       elmbtn = document.createElement('button');
       elmbtn.type = 'button';
-      elmbtn.classList.add('btn-close', 'filter-btn-delete');
+      elmbtn.classList.add('btn-close', 'filter-btn-delete', 'ms-1');
       elmbtn.dataset.filterId = id;
       elmbtn.dataset.label = label.replace(/ /g,'');
+
+
       elmbtn.onclick = function(){removeFilterBadgeCity('"'+label.replace(/ /g,'')+'"', id, dataRemove, true);};
       elmbtn.dataset.filterRemove = dataRemove;
       elm.appendChild(elmbtn);
@@ -886,7 +901,6 @@ jQuery(document).ready(function(){
     function removeFilterBadgeCity(label, id, dataRemove, updateVendors){
       if(updateVendors === true){
         var elmId = dataRemove;
-        console.log(elmId+' '+dataRemove);
         document.getElementById(elmId).checked = false;
         update();
       }
@@ -913,6 +927,7 @@ jQuery(document).ready(function(){
       jQuery('.filteredStore').hide();
     });
   });
+
 
   // Add remove loading class on body element based on Ajax request status
   jQuery(document).on({

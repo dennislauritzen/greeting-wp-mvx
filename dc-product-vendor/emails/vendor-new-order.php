@@ -46,6 +46,7 @@ $qrcode = 'https://chart.googleapis.com/chart?chs=135x135&cht=qr&chl='.$codeCont
     <thead>
         <tr>
             <?php do_action('wcmp_before_vendor_order_table_header', $order, $vendor->term_id); ?>
+            <th scope="col" style="text-align:<?php echo $text_align; ?>; border: 1px solid #eee;">&nbsp;</th>
             <th scope="col" style="text-align:<?php echo $text_align; ?>; border: 1px solid #eee;"><?php _e('Product', 'dc-woocommerce-multi-vendor'); ?></th>
             <th scope="col" style="text-align:<?php echo $text_align; ?>; border: 1px solid #eee;"><?php _e('Quantity', 'dc-woocommerce-multi-vendor'); ?></th>
             <th scope="col" style="text-align:<?php echo $text_align; ?>; border: 1px solid #eee;"><?php _e('Commission', 'dc-woocommerce-multi-vendor'); ?></th>
@@ -55,7 +56,6 @@ $qrcode = 'https://chart.googleapis.com/chart?chs=135x135&cht=qr&chl='.$codeCont
     <tbody>
         <?php
         $vendor->vendor_order_item_table($order, $vendor->term_id);
-
         ?>
     </tbody>
 </table>

@@ -2940,7 +2940,11 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 
 	$open_days = array();
 	$dates = array();
-	$today = new DateTime('now');
+
+	// Explicitly set todays timezone and date.
+	// The $today variable is the date to check (check if it should be open.)
+	$timezone = new DateTimeZone('Europe/Copenhagen');
+	$today = new DateTime('now', $timezone);
 
 	// Loop through the closed dates from admin.
 	$meta_closed_days = get_user_meta($vendor_id, 'vendor_closed_day', true);
@@ -2960,19 +2964,26 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 	$open_num = 0;
 	$closed_num = 0;
 	for($i=0;$i<60;$i++){
-		$now = new DateTime('now');
+		$now = new DateTime('now', $timezone);
+		$now->modify('-1 day');
 		$now->modify('+'.$vendorDeliverDayReq.' days');
-		#print $now->format($date_format)." - ".$today->format($date_format).' i dag: ';
+		#print $now->format($date_format);
+
+		#print "[NU]=>".$now->format($date_format)."(".$now->format('H:i').") - DATO=>".$today->format($date_format).' i dag: ';
+		#print "¤- I -¤:".$i;
 
 		if(!in_array($today->format('N'), $closed_days) && !in_array($today->format($date_format),$closed_dates_arr)){
-			if(
-				($now->format('H:i') > $vendorDropOffTime && $i == 0)
-				|| ($now->format($date_format) > $today->format($date_format))
-			){
+			# If time has crossed the drop off (and the checked date is the first), or
+			# the date is before the date checked,
+			# then push next possbile delivery day 1 day by
+			# substracting from the open_num variable.
+			if(	($now->format('H:i') > $vendorDropOffTime && $i == 0)
+			|| ($now->format('Y-m-d') > $today->format('Y-m-d')) ){
 				$open_num--;
 			} else {
 				$open_num++;
 			}
+			#print "{OPEN_NUM=".$open_num."}";
 
 			if($open_num >= $vendorDeliverDayReq){
 				$dates[] = $today->format($date_format);
