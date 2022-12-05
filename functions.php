@@ -2965,7 +2965,6 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 	$closed_num = 0;
 	for($i=0;$i<60;$i++){
 		$now = new DateTime('now', $timezone);
-		$now->modify('-1 day');
 		$now->modify('+'.$vendorDeliverDayReq.' days');
 		#print $now->format($date_format);
 
