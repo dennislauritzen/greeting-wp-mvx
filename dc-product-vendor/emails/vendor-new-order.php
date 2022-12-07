@@ -55,6 +55,7 @@ $qrcode = 'https://chart.googleapis.com/chart?chs=135x135&cht=qr&chl='.$codeCont
     <tbody>
         <?php
         $vendor->vendor_order_item_table($order, $vendor->term_id);
+
         ?>
     </tbody>
 </table>
