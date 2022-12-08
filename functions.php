@@ -2920,7 +2920,7 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 	$closed_days_date = array();
 
 	$vendorDropOffTime = get_vendor_dropoff_time($vendor_id);
-	if(strpos($vendorDropOffTime,':') === false && strpos($vendorDropOffTime,'.')){
+	if(strpos($vendorDropOffTime,':') === false && strpos($vendorDropOffTime,'.') === false){
 		$vendorDropOffTime = $vendorDropOffTime.':00';
 	} else {
 		$vendorDropOffTime = str_replace(array(':','.'),array(':',':'),$vendorDropOffTime);
@@ -2963,36 +2963,19 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 	// Generate array of all open days next 60 days.
 	$open_num = 0;
 	$closed_num = 0;
+	$now = new DateTime('now', $timezone);
+	$vendorDeliveryDayRequiredCalculated = ($now->format('H:i') > $vendorDropOffTime) ? $vendorDeliverDayReq+1 : $vendorDeliverDayReq;
+
 	for($i=0;$i<60;$i++){
-		$now = new DateTime('now', $timezone);
-		$now->modify('+'.$vendorDeliverDayReq.' days');
-		#print $now->format($date_format);
-
-		#print "[NU]=>".$now->format($date_format)."(".$now->format('H:i').") - DATO=>".$today->format($date_format).' i dag: ';
-		#print "¤- I -¤:".$i;
-
 		if(!in_array($today->format('N'), $closed_days) && !in_array($today->format($date_format),$closed_dates_arr)){
-			# If time has crossed the drop off (and the checked date is the first), or
-			# the date is before the date checked,
-			# then push next possbile delivery day 1 day by
-			# substracting from the open_num variable.
-			if(	($now->format('H:i') > $vendorDropOffTime && $i == 0)
-			|| ($now->format('Y-m-d') >= $today->format('Y-m-d')) ){
-				$open_num--;
-			} else {
-				$open_num++;
-			}
-			#print "{OPEN_NUM=".$open_num."}";
-
-			if($open_num >= $vendorDeliverDayReq){
+			if($open_num >= $vendorDeliveryDayRequiredCalculated){
 				$dates[] = $today->format($date_format);
-				#print "med<br>";
+				#print $open_num."(".$today->format('N')."): ".$today->format('d-m-Y')." => med<br>";
 			} else {
 				$closed_days_date[] = $today->format($date_format);
-				#print "ikke med<br>";
 			}
+			$open_num++;
 		} else {
-			#print "ikke med<br>";
 			$closed_num++;
 			$closed_days_date[] = $today->format($date_format);
 		}
@@ -3000,10 +2983,8 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 	}
 
 	if($open_close == 'close'){
-		#var_dump($closed_days_date);
 		return $closed_days_date;
 	} else {
-		#var_dump($dates);
 		return $dates;
 	}
 }
