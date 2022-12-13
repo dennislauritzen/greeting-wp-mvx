@@ -40,7 +40,7 @@ $qrcode = 'https://chart.googleapis.com/chart?chs=135x135&cht=qr&chl='.$codeCont
   $main_order_id = $main_order->ID;
 ?>
 <p>Ordrenr.: #<?php echo $main_order_id; ?> (Sub-ordre ID: #<?php echo $order->get_id(); ?>)</p>
-<p><?php printf(esc_html__('A new order was received from %s. Their order is as follows:', 'dc-woocommerce-multi-vendor'), $order->get_billing_first_name() . ' ' . $order->get_billing_last_name()); ?></p>
+<p><p><?php printf(esc_html__('A new order was received and marked as %s from %s. Their order is as follows:', 'dc-woocommerce-multi-vendor'), $order->get_status( 'edit' ), $order->get_billing_first_name() . ' ' . $order->get_billing_last_name()); ?></p></p>
 
 <?php do_action('woocommerce_email_before_order_table', $order, true, false, $email); ?>
 <table cellspacing="0" cellpadding="6" style="width: 100%; border: 1px solid #eee;" border="1" bordercolor="#eee">
