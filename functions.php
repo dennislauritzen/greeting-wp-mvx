@@ -2938,6 +2938,14 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 		$closed_days = $default_days;
 	}
 
+	// Closed datse.
+	$global_closed_dates = array(
+		'24-12-2022',
+		'25-12-2022',
+		'31-12-2022',
+		'01-01-2023'
+	);
+
 	$open_days = array();
 	$dates = array();
 
@@ -2967,7 +2975,9 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 	$vendorDeliveryDayRequiredCalculated = ($now->format('H:i') > $vendorDropOffTime) ? $vendorDeliverDayReq+1 : $vendorDeliverDayReq;
 
 	for($i=0;$i<60;$i++){
-		if(!in_array($today->format('N'), $closed_days) && !in_array($today->format($date_format),$closed_dates_arr)){
+		if(!in_array($today->format('N'), $closed_days)
+		&& !in_array($today->format($date_format),$closed_dates_arr)
+		&& !in_array($today->format($date_format), $global_closed_dates)){
 			if($open_num >= $vendorDeliveryDayRequiredCalculated){
 				$dates[] = $today->format($date_format);
 				#print $open_num."(".$today->format('N')."): ".$today->format('d-m-Y')." => med<br>";
