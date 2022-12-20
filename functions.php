@@ -2872,15 +2872,8 @@ function greeting_echo_receiver_info( ) {
 }
 
 function get_vendor_delivery_days_required($vendor_id){
-	global $wpdb;
-
-	// get vendor delivery day
-	$vendorDeliveryDay = $wpdb->get_row( "
-		SELECT * FROM {$wpdb->prefix}usermeta
-		WHERE user_id = $vendor_id
-		AND meta_key = 'vendor_require_delivery_day'
-	" );
-	return $vendorDeliveryDay->meta_value;
+	$delday_req = get_field('vendor_require_delivery_day', 'user_'.$vendor_id);
+	return $delday_req;
 }
 
 function get_vendor_closed_dates($vendor_id){
@@ -2917,9 +2910,14 @@ function get_vendor_dropoff_time($vendor_id){
 function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'close'){
 	global $wpdb;
 
+	// Explicitly set arrays used in the formula.
 	$closed_days_date = array();
+	$open_days = array();
+	$dates = array();
 
+	// Get the time the store has chosen as their "cut-off" / drop-off for next order.
 	$vendorDropOffTime = get_vendor_dropoff_time($vendor_id);
+	# Check if the field contains full time or just first 2 numbers
 	if(strpos($vendorDropOffTime,':') === false && strpos($vendorDropOffTime,'.') === false){
 		$vendorDropOffTime = $vendorDropOffTime.':00';
 	} else {
@@ -2930,7 +2928,10 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 
 	// @todo - Dennis update according to latest updates in closing day-field.
 	// open close days begin
+	// Generate an array of all days ISO.
 	$default_days = ['1','2','3','4','5','6','7'];
+
+	// Get the opening days string/array from the database and handle it.
 	$openning_days = get_user_meta($vendor_id, 'openning', true); // true for not array return
 	if(is_array($openning_days)){
 		$closed_days = array_diff($default_days, $openning_days);
@@ -2938,27 +2939,27 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 		$closed_days = $default_days;
 	}
 
-	// Closed datse.
-	$global_closed_dates = array(
-		'24-12-2022',
-		'25-12-2022',
-		'31-12-2022',
-		'01-01-2023'
-	);
+	// Global closed dates (when Greeting.dk is totally closed).
+	$global_closed_dates = array( '24-12-2022', '25-12-2022',	'31-12-2022', '01-01-2023');
 
-	$open_days = array();
-	$dates = array();
-
-	// Explicitly set todays timezone and date.
+	// Explicitly set todays timezone and date, since there is some problems with this if not set explicitly.
 	// The $today variable is the date to check (check if it should be open.)
 	$timezone = new DateTimeZone('Europe/Copenhagen');
-	$today = new DateTime('now', $timezone);
 
+	// Define today and now
+	# $today is used for incrementing in the for loop.
+	# $now is used for getting the time right now.
+	$today = new DateTime('now', $timezone);
+	$now = new DateTime('now', $timezone);
+
+	// Get the explicitly defined closed DATES from admin (e.g. if one store is closed on a specific date)
 	// Loop through the closed dates from admin.
 	$meta_closed_days = get_user_meta($vendor_id, 'vendor_closed_day', true);
 	$closed_days_date = (!empty($meta_closed_days) ? explode(",",$meta_closed_days) : array());
 	$closed_dates_arr = array();
 
+	// Loop through the closed dates string from admin (exploded above)
+	// Check if it is larger than today, if so then add to array of closed dates.
 	if(!empty($closed_days_date)){
 		foreach($closed_days_date as $ok_date){
 			$date_time_object = new DateTime(trim($ok_date));
@@ -2971,24 +2972,30 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 	// Generate array of all open days next 60 days.
 	$open_num = 0;
 	$closed_num = 0;
-	$now = new DateTime('now', $timezone);
 	$vendorDeliveryDayRequiredCalculated = ($now->format('H:i') > $vendorDropOffTime) ? $vendorDeliverDayReq+1 : $vendorDeliverDayReq;
 
 	for($i=0;$i<60;$i++){
-		if(!in_array($today->format('N'), $closed_days)
-		&& !in_array($today->format($date_format),$closed_dates_arr)
-		&& !in_array($today->format($date_format), $global_closed_dates)){
-			if($open_num >= $vendorDeliveryDayRequiredCalculated){
+		if(in_array($today->format('N'), $closed_days)){
+			// If the date is a day of the week, where the store is not opened, then...
+			// @todo eliminate deliveryday requirement.
+			$closed_days_date[] = $today->format($date_format);
+			$closed_num++;
+		} else if(in_array($today->format($date_format), $closed_dates_arr)){
+			// If the date is explicitly closed in the admin closed dates array
+			$closed_days_date[] = $today->format($date_format);
+			$closed_num++;
+		} else if(in_array($today->format($date_format), $global_closed_dates)) {
+			// If the date is one of the globally closed dates, then...
+			$closed_days_date[] = $today->format($date_format);
+			$closed_num++;
+		} else {
+			if($i >= $vendorDeliveryDayRequiredCalculated){
 				$dates[] = $today->format($date_format);
-				#print $open_num."(".$today->format('N')."): ".$today->format('d-m-Y')." => med<br>";
 			} else {
 				$closed_days_date[] = $today->format($date_format);
 			}
-			$open_num++;
-		} else {
-			$closed_num++;
-			$closed_days_date[] = $today->format($date_format);
 		}
+
 		$today->modify('+1 day');
 	}
 

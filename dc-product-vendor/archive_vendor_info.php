@@ -442,17 +442,29 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
         </form>
       </div>
       <div class="d-none d-lg-inline d-xl-inline d-lg-inline col-lg-4 col-xl-3 right-col text-end">
-        <a href="#" class="btn text-white">Log ind</a>
-        <a href="#" class="btn bg-teal rounded text-white">Opret</a>
+        <?php
+        if ( is_user_logged_in() ) {
+        ?>
+          <a href="<?php echo get_permalink( get_option('woocommerce_myaccount_page_id') ); ?>" class="btn btn-create rounded text-white">Min konto</a>
+        <?php
+        } else {
+        ?>
+          <a href="<?php home_url(); ?>/log-ind" class="btn text-white">Log ind</a>
+          <a href="<?php echo get_permalink( get_option('woocommerce_myaccount_page_id') ); ?>" class="btn btn-create rounded text-white">Opret</a>
+        <?php
+        }
+        ?>
         <div class="btn position-relative ms-lg-0 ms-xl-1">
-          <span class="position-relative" aria-label="Se kurv">
-            <svg width="21" height="23" viewBox="0 0 21 23" xmlns="http://www.w3.org/2000/svg">
-              <path d="M6.434 6.967H3.306l-1.418 14.47h17.346L17.82 6.967h-3.124c.065.828.097 1.737.097 2.729h-1.5c0-1.02-.031-1.927-.093-2.729H7.93a35.797 35.797 0 00-.093 2.729h-1.5c0-.992.032-1.9.097-2.729zm.166-1.5C7.126 1.895 8.443.25 10.565.25s3.44 1.645 3.965 5.217h4.65l1.708 17.47H.234l1.712-17.47H6.6zm6.432 0c-.407-2.65-1.27-3.717-2.467-3.717-1.196 0-2.06 1.066-2.467 3.717h4.934z" fill="#ffffff">
-              </path>
-            </svg>
-            <span class="position-absolute start-50 top-0 badge rounded-circle text-white" style="background: #cea09f;"><?php echo $cart_count; ?></span>
-          </span>
-          <span class="d-inline px-lg-2 px-xl-3 hide-lg text-white">Kurv</span>
+  				<a href="<?php echo $cart_url; ?>">
+            <span class="position-relative" aria-label="Se kurv">
+              <svg width="21" height="23" viewBox="0 0 21 23" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6.434 6.967H3.306l-1.418 14.47h17.346L17.82 6.967h-3.124c.065.828.097 1.737.097 2.729h-1.5c0-1.02-.031-1.927-.093-2.729H7.93a35.797 35.797 0 00-.093 2.729h-1.5c0-.992.032-1.9.097-2.729zm.166-1.5C7.126 1.895 8.443.25 10.565.25s3.44 1.645 3.965 5.217h4.65l1.708 17.47H.234l1.712-17.47H6.6zm6.432 0c-.407-2.65-1.27-3.717-2.467-3.717-1.196 0-2.06 1.066-2.467 3.717h4.934z" fill="#ffffff">
+                </path>
+              </svg>
+              <span class="position-absolute start-50 top-0 badge rounded-circle text-white" style="background: #cea09f;"><?php echo $cart_count; ?></span>
+            </span>
+            <span class="d-inline px-lg-2 px-xl-3 hide-lg text-white">Kurv</span>
+  				</a>
         </div>
       </div>
     </div>
