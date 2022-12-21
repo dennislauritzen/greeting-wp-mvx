@@ -2001,22 +2001,49 @@ function greeting_load_calendar_dates( $available_gateways ) {
 ?>
 
    <script type="text/javascript">
-      jQuery(document).ready(function($) {
+	 // Validates that the input string is a valid date formatted as "mm/dd/yyyy"
+		 function isValidDate(dateString)
+		 {
+				// First check for the pattern
+				if(!/^\d{1,2}\-\d{1,2}\-\d{4}$/.test(dateString))
+						return false;
+
+				// Parse the date parts to integers
+				var parts = dateString.split("-");
+				var day = parseInt(parts[0], 10);
+				var month = parseInt(parts[1], 10);
+				var year = parseInt(parts[2], 10);
+
+				// Check the ranges of month and year
+				if(year < 1000 || year > 3000 || month == 0 || month > 12)
+						return false;
+
+				var monthLength = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ];
+
+				// Adjust for leap years
+				if(year % 400 == 0 || (year % 100 != 0 && year % 4 == 0))
+						monthLength[1] = 29;
+
+				// Check the range of the day
+				return day > 0 && day <= monthLength[month - 1];
+		 };
+
+			jQuery(document).ready(function($) {
         $('#datepicker').click(function() {
 		  	var customMinDateVal = $('#vendorDeliverDay').val();
 		  	var customMinDateValInt = parseInt(customMinDateVal);
 		  	let vendorDropOffTimeVal = $('#vendorDropOffTimeId').val();
 		  	let d = new Date();
 		  	let hour = d.getHours();
-			if(hour > vendorDropOffTimeVal){
-				var customMinDateVal = customMinDateValInt+1;
-			} else {
-				customMinDateVal = $('#vendorDeliverDay').val();
-			}
-			// var vendorClosedDayArray = $('#vendorClosedDayId').val();
-			var vendorClosedDayArray = <?php echo $dates_json; ?>;
+				if(hour > vendorDropOffTimeVal){
+					var customMinDateVal = customMinDateValInt+1;
+				} else {
+					customMinDateVal = $('#vendorDeliverDay').val();
+				}
+				// var vendorClosedDayArray = $('#vendorClosedDayId').val();
+				var vendorClosedDayArray = <?php echo $dates_json; ?>;
 
-			$('#datepicker').datepicker({
+			jQuery('#datepicker').datepicker({
 				dateFormat: 'dd-mm-yy',
 				// minDate: -1,
 				minDate: new Date(),
@@ -2026,7 +2053,18 @@ function greeting_load_calendar_dates( $available_gateways ) {
 				beforeShowDay: function(date){
 					var string = jQuery.datepicker.formatDate('dd-mm-yy', date);
 					return [ vendorClosedDayArray.indexOf(string) == -1 ];
-				}
+				},
+				onClose: function(date, datepicker){
+					const par_elm = jQuery(this).closest('.form-row');
+
+					if (!isValidDate(date) || date == '') {
+						par_elm.addClass('has-error');
+					} else {
+						par_elm.removeClass('has-error').addClass('woocommerce-validated');
+						jQuery("#datepicker_field label.error").css('display','none');
+					}
+				},
+				errorPlacement: function(error, element) { }
 			}).datepicker( "show" );
          });
       });
@@ -3112,7 +3150,7 @@ function greeting_echo_date_picker(  ) {
 			'type'          => 'text',
 			'class'         => array('form-row-wide'),
 			'id'            => 'datepicker',
-			'required'      => true,
+			'required'			=> true,
 			'label'         => __('Hvornår skal gaven leveres?'),
 			'placeholder'   => __('Vælg dato hvor gaven skal leveres'),
 			'custom_attributes' => array('readonly' => 'readonly')
@@ -4246,31 +4284,31 @@ function shop_order_display_callback( $post ) {
 
 		 <script type="text/javascript">
 				jQuery(document).ready(function($) {
-					$('#datepicker').click(function() {
-					var customMinDateVal = <?php echo $vendor_delivery_day_required; ?>;
-					var customMinDateValInt = parseInt(customMinDateVal);
-					var today = '';
-					var vendorDropOffTimeVal = '<?php echo $vendor_drop_off_time; ?>';
-					let d = new Date();
-					var hour = d.getHours()+':'+d.getMinutes();
-				// var vendorClosedDayArray = $('#vendorClosedDayId').val();
-				//var vendorClosedDayArray = '<?php echo $dates_json; ?>';
-				var vendorClosedDayArray = '';
+					jQuery('#datepicker').click(function() {
+						var customMinDateVal = <?php echo $vendor_delivery_day_required; ?>;
+						var customMinDateValInt = parseInt(customMinDateVal);
+						var today = '';
+						var vendorDropOffTimeVal = '<?php echo $vendor_drop_off_time; ?>';
+						let d = new Date();
+						var hour = d.getHours()+':'+d.getMinutes();
+						// var vendorClosedDayArray = $('#vendorClosedDayId').val();
+						//var vendorClosedDayArray = '<?php echo $dates_json; ?>';
+						var vendorClosedDayArray = '';
 
-				$('#datepicker').datepicker({
-					dateFormat: 'dd-mm-yy',
-					// minDate: -1,
-					minDate: new Date(),
-					// maxDate: "+1M +10D"
-					maxDate: "+58D",
-					firstDay: 1,
-					// closed on specific date
-					beforeShowDay: function(date){
-						var string = jQuery.datepicker.formatDate('dd-mm-yy', date);
-						return [ vendorClosedDayArray.indexOf(string) == -1 ];
-					}
-				}).datepicker( "show" );
-					 });
+						jQuery('#datepicker').datepicker({
+							dateFormat: 'dd-mm-yy',
+							// minDate: -1,
+							minDate: new Date(),
+							// maxDate: "+1M +10D"
+							maxDate: "+58D",
+							firstDay: 1,
+							// closed on specific date
+							beforeShowDay: function(date){
+								var string = jQuery.datepicker.formatDate('dd-mm-yy', date);
+								return [ vendorClosedDayArray.indexOf(string) == -1 ];
+							}
+						}).datepicker( "show" );
+					});
 				});
 		 </script>
 		 <?php
