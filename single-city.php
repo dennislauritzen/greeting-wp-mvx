@@ -86,7 +86,7 @@ foreach($vendor_arr as $v){
   }
 }
 // The maximum dropoff time today - for filtering.
-$DropOffTimes = max($DropOffTimes);
+$DropOffTimes = (count($DropOffTimes) > 0) ? max($DropOffTimes) : 0;
 
 
 // pass to backend
@@ -107,7 +107,7 @@ jQuery(document).ready(function(){
   <div class="container">
     <div class="row">
       <div class="col-12">
-        <h1 class="d-block my-0 my-xs-3 my-sm-2 my-md-2 mt-lg-4 pt-lg-1 mb-lg-3">Find butikker & bestil gavehilsner til levering i <?php the_title();?></h1>
+        <h1 class="d-block my-0 my-xs-3 my-sm-2 my-md-2 mt-lg-4 pt-lg-1 mb-lg-3">Find butikker med gavehilsner i <?php the_title();?></h1>
       </div>
     </div>
 
@@ -229,7 +229,6 @@ jQuery(document).ready(function(){
             $date_today->modify('+1 day');
           }
           $dates[8] = 'Vis alle';
-
 
           ?>
           <h5 class="text-uppercase mb-2">
