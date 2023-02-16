@@ -37,7 +37,9 @@ get_header('green', array('city' => $cityName, 'postalcode' => $cityPostalcode))
 
 // get user meta query
 $sql = "SELECT
-          u.ID
+          u.ID,
+          (SELECT umm.meta_value from {$wpdb->prefix}usermeta umm WHERE umm.meta_key ='vendor_drop_off_time' AND umm.user_id = u.ID) as dropoff_time,
+          (SELECT umm.meta_value from {$wpdb->prefix}usermeta umm WHERE umm.meta_key ='vendor_require_delivery_day' AND umm.user_id = u.ID) as require_delivery_day
         FROM
         	{$wpdb->prefix}users u
         LEFT JOIN
@@ -55,23 +57,36 @@ $sql = "SELECT
           and
           (um5.meta_key = 'wp_capabilities' AND um5.meta_value LIKE %s)
         ORDER BY
-        	CASE u.ID
+        	(SELECT um3.meta_value FROM {$wpdb->prefix}usermeta um3 WHERE um3.user_id = u.ID AND um3.meta_key = 'delivery_type') DESC,
+          CASE u.ID
         		WHEN 38 THEN 0
         		WHEN 76 THEN 0
                 ELSE 1
-        	END DESC,
-        	(SELECT um3.meta_value FROM {$wpdb->prefix}usermeta um3 WHERE um3.user_id = u.ID AND um3.meta_key = 'delivery_type') DESC";
+        	END DESC";
 $vendor_query = $wpdb->prepare($sql, '%'.$cityPostalcode.'%', '%dc_vendor%');
 $vendor_arr = $wpdb->get_results($vendor_query);
 
 $UserIdArrayForCityPostalcode = array();
+$DropOffTimes = array();
 foreach($vendor_arr as $v){
   if(isset($v->data)){
     $UserIdArrayForCityPostalcode[] = $v->data->ID;
+    $days = $v->data->require_delivery_day;
+    $hours = $v->data->dropoff_time;
+    if($days == 0){
+      $DropOffTimes[] = (int) strstr($hours,':',true);
+    }
   } else {
     $UserIdArrayForCityPostalcode[] = $v->ID;
+    $days = $v->require_delivery_day;
+    $hours = $v->dropoff_time;
+    if($days == 0){
+      $DropOffTimes[] = (int) strstr($hours,':',true);
+    }
   }
 }
+// The maximum dropoff time today - for filtering.
+$DropOffTimes = max($DropOffTimes);
 
 
 // pass to backend
@@ -92,7 +107,7 @@ jQuery(document).ready(function(){
   <div class="container">
     <div class="row">
       <div class="col-12">
-        <h1 class="d-block my-0 my-xs-3 my-sm-2 my-md-2 mt-lg-4 pt-lg-1 mb-lg-3">Find gavehilsner til <?php the_title();?></h1>
+        <h1 class="d-block my-0 my-xs-3 my-sm-2 my-md-2 mt-lg-4 pt-lg-1 mb-lg-3">Find butikker & bestil gavehilsner til levering i <?php the_title();?></h1>
       </div>
     </div>
 
@@ -168,7 +183,6 @@ jQuery(document).ready(function(){
         </div>
         <div class="collapse d-lg-block accordion-collapse " id="colFilter">
 
-
           <?php
           $productPriceArray = array(); // for price filter
           $categoryTermListArray = array(); // for cat term filter
@@ -203,7 +217,55 @@ jQuery(document).ready(function(){
               }
           }
 
+          /**
+           * ---------------------
+           * Delivery date filter
+           * ---------------------
+          **/
+          $dates = array();
+          $date_today = new DateTime('now');
+          for($i=0;$i<7;$i++){
+            $dates[$i] = strtolower($date_today->format('d. M'));
+            $date_today->modify('+1 day');
+          }
+          $dates[8] = 'Vis alle';
 
+
+          ?>
+          <h5 class="text-uppercase mb-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#ffc107" class="bi bi-calendar" viewBox="0 0 16 16">
+              <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+            </svg>&nbsp;
+            Hvornår skal gaven leveres?
+          </h5>
+          <div class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
+          <?php
+          foreach($dates as $k => $v){
+            $closed_for_today = 0;
+            if($k == 0 && $DropOffTimes <= date("H")){
+              $closed_for_today = 1;
+            }
+          ?>
+          <label class="" for="filter_delivery_date_<?php echo $k; ?>" style="cursor: pointer; display: inline-block; padding: 5px 10px; border: 1px solid <?php echo ($closed_for_today == 1 ? '#c0c0c0' : '#000000'); ?>; margin: 6px 5px 5px 0;">
+            <input type="radio" name="filter_del_days_city" class="form-check-input filter-on-city-page" id="filter_delivery_date_<?php echo $k; ?>" value="<?php echo $k; ?>" <?php echo ($closed_for_today == 1 ? 'disabled="disabled" ' : ''); ?> <?php echo ($k == 8 ? 'checked="checked"' : ''); ?>>
+            <span style="color: <?php echo ($closed_for_today == 1 ? '#c0c0c0' : '#000000'); ?>;">
+              <?php echo $v; ?>
+            </span>
+          </label>
+          <!--<div class="form-check">
+              <input type="checkbox" name="filter_del_day" class="form-check-input filter-on-city-page" id="filter_delivery_day_<?php echo $k; ?>" checked="checked" value="<?php echo $k; ?>">
+              <label class="form-check-label" for="filter_delivery_day_<?php echo $k; ?>">
+                <?php echo $v; ?>
+              </label>
+          </div>-->
+          <?php
+          }
+          ?>
+          </div>
+
+
+
+          <?
           /**
            * ---------------------
            * Delivery type filter
@@ -218,13 +280,13 @@ jQuery(document).ready(function(){
           </h5>
           <ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
 
-          <div class="form-check">
+          <div class="form-check form-switch">
               <input type="checkbox" name="filter_del_city" class="form-check-input filter-on-city-page" id="filter_delivery_1" checked="checked" value="1">
               <label class="form-check-label" for="filter_delivery_1">
                 Personlig levering fra lokal butik
               </label>
           </div>
-          <div class="form-check">
+          <div class="form-check form-switch">
               <input type="checkbox" name="filter_del_city" class="form-check-input filter-on-city-page" id="filter_delivery_0" checked="checked" value="0">
               <label class="form-check-label" for="filter_delivery_0">
                 Forsendelse med fragtfirma
@@ -265,8 +327,8 @@ jQuery(document).ready(function(){
           $productCategories = get_terms($categoryArgs);
 
           foreach($productCategories as $category){ ?>
-            <div class="form-check">
-                <input type="checkbox" name="filter_catocca_city" class="form-check-input filter-on-city-page" id="filter_cat<?php echo $category->term_id; ?>" value="<?php echo $category->term_id; ?>">
+            <div class="form-check" style="overflow: visible;">
+                <input type="checkbox" role="switch" name="filter_catocca_city" class="form-check-input filter-on-city-page" id="filter_cat<?php echo $category->term_id; ?>" value="<?php echo $category->term_id; ?>">
                 <label for="filter_cat<?php echo $category->term_id; ?>" class="form-check-label">
                   <?php echo $category->name; ?>
                 </label>
@@ -317,8 +379,6 @@ jQuery(document).ready(function(){
 
           <!-- price filter filter-->
           <?php
-
-
           // for price filter
           $minProductPrice;
           $maxProductPrice;
@@ -334,7 +394,10 @@ jQuery(document).ready(function(){
           else {
             $minProductPrice = 0;
             $maxProductPrice = max($productPriceArray);
+            $topProductPrice = (max($productPriceArray) > 600) ? '600' : max($productPriceArray);
           }
+
+          $priceIntArray = range($minProductPrice, $topProductPrice, 100);
 
           $start_val = $minProductPrice;
           $end_val = $maxProductPrice;
@@ -358,44 +421,34 @@ jQuery(document).ready(function(){
             </svg>&nbsp;
             Pris
           </h5>
-          <form>
-            <div id="slideInput" class="my-3">
-              <div class="row">
-                <div class="col-2 col-xs-2 col-sm-2 col-md-2 col-lg-4 col-xl-3">
-                  <input type="text" id="slideStartPoint" class="form-control price-field" data-index="0" value="<?php echo $start_val;?>" readonly/>
-                </div>
-                <div class="col-2 offset-8 col-xs-2 col-sm-2 offset-xs-8 offset-sm-8 col-md-2 offset-md-8 col-lg-4 offset-lg-4 col-xl-3 offset-xl-6">
-                  <input type="text" id="slideEndPoint" class="form-control price-field" data-index="1" value="<?php echo ceil($end_val);?>" readonly/>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-12">
-                  <div class="px-3 px-lg-2 pt-3 pt-lg-2 pt-xl-2 pb-4">
-                    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/css/bootstrap-slider.min.css">
-                    <style type="text/css">
-                    .slider.slider-horizontal{
-                      width:100%;
-                    }
-                    .slider .slider-handle {
-                      background-color: #446a6b;
-                      background-image: none;
-                    }
-                    </style>
-                    <input
-                      id="sliderPrice"
-                      type="text"
-                      class="form-range py-3"
-                      value="array"
-                      data-slider-min="0"
-                      data-slider-max="<?php echo ceil($maxProductPrice); ?>"
-                      data-slider-step="1"
-                      data-slider-tooltip="hide"
-                      data-slider-value="[<?php echo $start_val; ?>,<?php echo ceil($end_val); ?>]"/>
-                  </div>
-                </div>
+
+          <div class="row">
+            <div class="col-12">
+              <input type="hidden" name="filter_del_price_default" value="0-<?php echo $maxProductPrice; ?>">
+              <div class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
+              <?php
+              foreach($priceIntArray as $k => $v){
+                $start = $v;
+                $end = (isset($priceIntArray[$k+1]) ? $priceIntArray[$k+1] : '+');
+                if($end == '+'){
+                  $label = $start.$end;
+                  $value = $start.'-'.$maxProductPrice;
+                } else {
+                  $label = $start.'-'.$end;
+                  $value = $label;
+                }
+              ?>
+
+              <label class="" for="filter_price_<?php echo $k; ?>" style="cursor: pointer; display: inline-block; padding: 5px 10px; border: 1px solid #000000; margin: 6px 5px 5px 0;">
+                <input type="radio" name="filter_del_price" class="form-check-input filter-on-city-page" id="filter_price_<?php echo $k; ?>" value="<?php echo $value; ?>">
+                <?php echo $label; ?> kr.
+              </label>
+              <?php
+              }
+              ?>
               </div>
             </div>
-          </form>
+          </div>
 
         </div> <!-- #colFilter -->
       </div>
@@ -412,7 +465,7 @@ jQuery(document).ready(function(){
             </div>
             <div id="filterdel_dummy_1" class="badge rounded-pill border-yellow py-2 px-2 me-1 my-1 my-lg-0 my-xl-0 text-dark dynamic-filters">
                 Personlig levering fra lokal butik
-              <button type="button" class="btn-close filter-btn-delete" data-filter-id="1" data-label="Personligleveringfralokalbutik"
+              <button type="button" class="btn-close filter-btn-delete" data-filter-id="0" data-label="Personligleveringfralokalbutik"
               data-filter-remove="filter_delivery_1" onclick="removeFilterBadgeCity('Personligleveringfralokalbutik', 'filterfilter_delivery_1', 'filter_delivery_1', true);"></button>
             </div>
             <a href="<?php echo home_url(); ?>"class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 text-dark">
@@ -699,36 +752,18 @@ jQuery(document).ready(function(){
 
 <?php get_footer( ); ?>
 
-<script src="//code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
-<link rel="stylesheet" type="text/css" href="//code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css">
-
-<script type="text/javascript">
-  // Set the slider.
-  var slider = new Slider('#sliderPrice', {
-    'tooltip_split': true
-  });
-  slider.on("slideStop", function(sliderValue){
-    var val = slider.getValue();
-    var min_val = val[0];
-    var max_val = val[1];
-    document.getElementById("slideStartPoint").value = min_val;
-    document.getElementById("slideEndPoint").value = max_val;
-  });
-</script>
 <script type="text/javascript">
   // Start the jQuery
   jQuery(document).ready(function($) {
     document.getElementById('filterdel_dummy_0').outerHTML = "";
     document.getElementById('filterdel_dummy_1').outerHTML = "";
-    setFilterBadgeCity('Personlig levering fra lokal butik', 'filterfilter_delivery_0', 'filter_delivery_0');
-    setFilterBadgeCity('Forsendelse med fragtfirma', 'filterfilter_delivery_1', 'filter_delivery_1');
+    setFilterBadgeCity('Personlig levering fra lokal butik', 'filterfilter_delivery_1', 'filter_delivery_1');
+    setFilterBadgeCity('Forsendelse med fragtfirma', 'filterfilter_delivery_0', 'filter_delivery_0');
 
     var ajaxurl = "<?php echo admin_url('admin-ajax.php');?>";
     var catOccaDeliveryIdArray = [];
     var inputPriceRangeArray = [];
     var deliveryIdArray = [];
-    var priceSliderMin = jQuery("#sliderPrice").data("slider-min");
-    var priceSliderMax = jQuery("#sliderPrice").data("slider-max");
     // $('#cityPageReset').hide();
 
     var url_string = window.location.href; //window.location.href
@@ -762,17 +797,13 @@ jQuery(document).ready(function(){
       inputPriceRangeArray = price_url_val.split(",");
 
       var priceRangeMinVal = 0;
-      var priceRangeMaxVal = priceSliderMax;
-      if(inputPriceRangeArray[0] >= priceSliderMin &&  !isNaN(parseFloat(inputPriceRangeArray[0])) && isFinite(inputPriceRangeArray[0])){
+      var priceRangeMaxVal = inputPriceRangeArray[1];
+      if( !isNaN(parseFloat(inputPriceRangeArray[0])) && isFinite(inputPriceRangeArray[0])){
         priceRangeMinVal = inputPriceRangeArray[0];
       }
-      if(inputPriceRangeArray[1] <= priceSliderMax &&  !isNaN(parseFloat(inputPriceRangeArray[1])) && isFinite(inputPriceRangeArray[1])){
+      if(!isNaN(parseFloat(inputPriceRangeArray[1])) && isFinite(inputPriceRangeArray[1])){
         priceRangeMaxVal = inputPriceRangeArray[1];
       }
-
-      jQuery("#sliderPrice").data('data-slider-value','['+priceRangeMinVal+','+priceRangeMaxVal+']');
-      document.getElementById("slideStartPoint").value = priceRangeMinVal;
-      document.getElementById("slideEndPoint").value =  priceRangeMaxVal;
     }
 
     if(deliveryIdArray.length > 0 && catOccaDeliveryIdArray.length > 0 && inputPriceRangeArray.length > 0){
@@ -781,6 +812,12 @@ jQuery(document).ready(function(){
 
     jQuery(".filter-on-city-page").click(function(){
       update();
+
+      if(this.type == "radio"){
+        var id = this.id;
+        var id2 = id.replace(/[0-9]+/, "");
+        jQuery("div[id*='"+id2+"']").remove();
+      }
 
       if(this.checked){
         setFilterBadgeCity(
@@ -796,9 +833,7 @@ jQuery(document).ready(function(){
           false
         );
       }
-    });
-    slider.on("slideStop", function(sliderValue){
-      update();
+
     });
 
     function update(){
@@ -808,6 +843,9 @@ jQuery(document).ready(function(){
       deliveryIdArray = [];
       inputPriceRangeArray = [];
 
+      // Chosen delivery date
+      var delDate = $('input[name=filter_del_days_city]:checked').val();
+
       $("input:checkbox[name=filter_catocca_city]:checked").each(function(){
         catOccaIdArray.push($(this).val());
       });
@@ -815,23 +853,19 @@ jQuery(document).ready(function(){
         deliveryIdArray.push($(this).val());
       });
 
-      var sliderValMin = jQuery("#sliderPrice").data("slider-min");
-      var sliderValMax = jQuery("#sliderPrice").data("slider-max");
-      inputPriceRangeArray = [
-        document.getElementById("slideStartPoint").value,
-        document.getElementById("slideEndPoint").value
-      ];
-      var priceChange = 0;
-      if(sliderValMin < document.getElementById("slideStartPoint").value || sliderValMax > document.getElementById("slideEndPoint").value){
-        priceChange = 1;
+      if($('input[name=filter_del_price]').is(':checked')){
+        var inputPriceRange = $('input[name=filter_del_price]:checked').val().split("-");
+      } else {
+        var inputPriceRange = $('input[name=filter_del_price_default]').val().split("-");
       }
 
       var data = {
         'action': 'catOccaDeliveryAction',
         cityDefaultUserIdAsString: jQuery("#cityDefaultUserIdAsString").val(),
+        delDate: delDate,
         catOccaIdArray: catOccaIdArray,
         deliveryIdArray: deliveryIdArray,
-        inputPriceRangeArray: inputPriceRangeArray,
+        inputPriceRangeArray: inputPriceRange,
         cityName: cityName,
         postalCode: postalCode
       };
@@ -850,7 +884,7 @@ jQuery(document).ready(function(){
           jQuery('#noVendorFound').hide();
         }
 
-        var state = { 'd': deliveryIdArray, 'c': catOccaIdArray, 'p': inputPriceRangeArray }
+        var state = { 'd': deliveryIdArray, 'c': catOccaIdArray, 'p': inputPriceRange }
         var url = '';
         if(deliveryIdArray.length > 0){
           if(url){ 	url += '&'; }
@@ -861,9 +895,9 @@ jQuery(document).ready(function(){
           url += 'c='+catOccaIdArray;
         }
 
-        if(inputPriceRangeArray.length > 0 && (inputPriceRangeArray[0] > sliderValMin || inputPriceRangeArray[1] < sliderValMax)){
+        if(inputPriceRange.length > 0){
           if(url){ 	url += '&'; }
-          url += 'price='+inputPriceRangeArray;
+          url += 'price='+inputPriceRange;
         }
         if(url.length > 0){
           url = '?'+url;
@@ -889,22 +923,23 @@ jQuery(document).ready(function(){
       elmbtn.type = 'button';
       elmbtn.classList.add('btn-close', 'filter-btn-delete', 'ms-1');
       elmbtn.dataset.filterId = id;
-      elmbtn.dataset.label = label.replace(/ /g,'');
+      var useableLabel = label.replace(/ /g,'').replace(/(?:\r\n|\r|\n)/g,'').replace(/\./g,'');
+      elmbtn.dataset.label = useableLabel;
 
-
-      elmbtn.onclick = function(){removeFilterBadgeCity('"'+label.replace(/ /g,'')+'"', id, dataRemove, true);};
+      elmbtn.onclick = function(){removeFilterBadgeCity('"'+useableLabel+'"', id, dataRemove, true);};
       elmbtn.dataset.filterRemove = dataRemove;
       elm.appendChild(elmbtn);
 
       jQuery('div.filter-list').prepend(elm);
     }
     function removeFilterBadgeCity(label, id, dataRemove, updateVendors){
+
+      jQuery('#filter'+dataRemove).remove();
       if(updateVendors === true){
         var elmId = dataRemove;
         document.getElementById(elmId).checked = false;
         update();
       }
-      jQuery('#filter'+dataRemove).remove();
     }
 
     // reset filter
@@ -932,10 +967,10 @@ jQuery(document).ready(function(){
   // Add remove loading class on body element based on Ajax request status
   jQuery(document).on({
     ajaxStart: function(){
-      jQuery("div").addClass("loading");
+      //jQuery("div").addClass("loading");
     },
     ajaxStop: function(){
-      jQuery("div").removeClass("loading");
+      //jQuery("div").removeClass("loading");
     }
   });
 </script>

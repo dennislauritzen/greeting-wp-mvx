@@ -380,7 +380,8 @@
 	}
 	.filter ul {
 		font-family: 'Inter', sans-serif;
-		font-size: 12px;
+		font-size: 13px;
+		overflow: visible;
 	}
 	.filter span.price-filter-text {
 		font-size: 11px;

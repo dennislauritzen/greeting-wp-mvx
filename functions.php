@@ -951,10 +951,28 @@ function catOccaDeliveryAction() {
 
 	// category & occasion filter data
 	$catOccaDeliveryIdArray = $_POST['catOccaIdArray'];
+
+	// delivery date
+	$deliveryDate = (int) $_POST['delDate'];
+	if(empty($deliveryDate) && $deliveryDate !== 0){
+		$deliveryDate = 8;
+	} else if(!is_numeric($deliveryDate) || $deliveryDate < 0){
+		$deliveryDate = 0;
+	}
+
+	// Calculate Selected Date
+	$filteredDate = new DateTime();
+	$filteredDate->modify('+'.$deliveryDate.' days');
+	$selectedDate = $filteredDate->format('d-m-Y');
+	$selectedDay = $filteredDate->format('N');
+
 	// delivery filter data
 	$deliveryIdArray = $_POST['deliveryIdArray'];
 
 	$postal_code = $_POST['postalCode'];
+
+	// declare array for store user ID get from occasion
+	$userIdArrayGetFromDelDate = array();
 
 	// declare array for store user ID get from occasion
 	$userIdArrayGetFromCatOcca = array();
@@ -1000,6 +1018,69 @@ function catOccaDeliveryAction() {
 		$userIdArrayGetFromCatOcca = array_intersect($defaultUserArray, $userIdArrayGetFromCatOcca);
 		$defaultUserArray = $userIdArrayGetFromCatOcca;
 	}
+
+	////////////////////////
+	// FILTER: Delivery DATE
+	// Prepare the statement for delivery array
+	if($deliveryDate >= 0 && $deliveryDate < 8){
+		$args = array(
+			'role' => 'dc_vendor',
+			'meta_query' => array(
+						'key' => 'vendor_require_delivery_day',
+						'value' => $deliveryDate,
+						'compare' => '<=',
+						'type' => 'NUMERIC'
+				)
+		);
+
+		// (v) @todo: Move cut-off time out of the query and into PHP.
+		// (v) @todo: Make sure the store is not closed on the given date!!!! Make a PHP check.
+
+		$usersByDelDateFilter = new WP_User_Query( $args	);
+		$delDateArr = $usersByDelDateFilter->get_results();
+
+		foreach($delDateArr as $v){
+			$dropoff_time 		= get_field('vendor_drop_off_time','user_'.$v->ID);
+			$delDate 					= get_field('vendor_require_delivery_day','user_'.$v->ID);
+			$delClosedDates		= get_field('vendor_closed_day','user_'.$v->ID);
+			$delWeekDays			= get_field('openning','user_'.$v->ID);
+
+			$open_iso_days = array();
+			foreach($delWeekDays as $key => $val){
+				$open_iso_days[] = $val['value'];
+			}
+
+			$open_this_day = (in_array($selectedDay, $open_iso_days) ? 1 : 0);
+			#var_dump($open_this_day);
+
+			// Check if the store is closed this specific date.
+			$closedDatesArr		= array_map('trim', explode(",",$delClosedDates));
+			$closedThisDate 	= 0;
+			if(in_array($selectedDate, $closedDatesArr)){
+				$closedThisDate = 1;
+			}
+
+			if($deliveryDate < $delDate){
+				// Can't delivery on selected date.
+			} else if($deliveryDate == $delDate && $dropoff_time < date("H")){
+				// Can't deliver on selected date because time has passed cutoff.
+			} else {
+				// Can deliver, woohoo.
+				if($closedThisDate == 0 && $open_this_day == 1){
+					array_push($userIdArrayGetFromDelDate, (string) $v->ID);
+				}
+			}
+		}
+
+		// Remove all the stores that doesnt match from default array
+		// Normally we would check if the userIdArray is empty, but not here,
+		// instead we check if the date-filter is set - if it is and the userID-array
+		// is empty, then there is no stores left.
+		// if(!empty($userIdArrayGetFromDelDate)){
+		$userIdArrayGetFromDelDate = array_intersect($defaultUserArray, $userIdArrayGetFromDelDate);
+		$defaultUserArray = $userIdArrayGetFromDelDate;
+	}
+
 	////////////////////////
 	// FILTER: Delivery
 	// Prepare the statement for delivery array

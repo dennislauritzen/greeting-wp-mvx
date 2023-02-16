@@ -107,12 +107,12 @@ $sql = "SELECT
           and
           (um5.meta_key = 'wp_capabilities' AND um5.meta_value LIKE %s)
         ORDER BY
+          (SELECT um3.meta_value FROM {$wpdb->prefix}usermeta um3 WHERE um3.user_id = u.ID AND um3.meta_key = 'delivery_type') DESC,
           CASE u.ID
-            WHEN 38 THEN 0
-            WHEN 76 THEN 0
+        		WHEN 38 THEN 0
+        		WHEN 76 THEN 0
                 ELSE 1
-          END DESC,
-          (SELECT um3.meta_value FROM {$wpdb->prefix}usermeta um3 WHERE um3.user_id = u.ID AND um3.meta_key = 'delivery_type') DESC
+        	END DESC
 ";
 
 $sql_prepare = $wpdb->prepare($sql, $where);
@@ -459,13 +459,16 @@ $defaultUserString = implode(",", $defaultUserArray);
         <h1 class="d-none d-lg-block d-xl-block my-3 my-xs-3 my-sm-3 my-md-3 my-lg-0 my-xl-0 mb-lg-4 mb-xl-4"><?php the_title();?></h1>
         <div class="applied-filters row mt-xs-0 mt-sm-0 mt-md-0 mt-2 mb-4 lh-lg">
           <div class="col-12 filter-list">
-            <div id="filterfilter_cat0" class="badge rounded-pill border-yellow py-2 px-2 me-1 my-1 my-lg-0 my-xl-0 text-dark dynamic-filters">
+            <div id="filterdel_dummy_0" class="badge rounded-pill border-yellow py-2 px-2 me-1 my-1 my-lg-0 my-xl-0 text-dark dynamic-filters">
                 Forsendelse med fragtfirma
-              <button type="button" class="btn-close filter-btn-delete" data-filter-id="0" data-label="Forsendelsemedfragtfirma" data-filter-remove="filter_cat0"></button>
+              <button type="button" class="btn-close filter-btn-delete"
+              data-filter-id="0" data-label="Forsendelsemedfragtfirma"
+              data-filter-remove="filter_delivery_0" onclick="removeFilterBadgeCity('Forsendelsemedfragtfirma', 'filterfilter_delivery_0', 'filter_delivery_0', true);"></button>
             </div>
-            <div id="filterfilter_cat1" class="badge rounded-pill border-yellow py-2 px-2 me-1 my-1 my-lg-0 my-xl-0 text-dark dynamic-filters">
+            <div id="filterdel_dummy_1" class="badge rounded-pill border-yellow py-2 px-2 me-1 my-1 my-lg-0 my-xl-0 text-dark dynamic-filters">
                 Personlig levering fra lokal butik
-              <button type="button" class="btn-close filter-btn-delete" data-filter-id="1" data-label="Personligleveringfralokalbutik" data-filter-remove="filter_cat1"></button>
+              <button type="button" class="btn-close filter-btn-delete" data-filter-id="0" data-label="Personligleveringfralokalbutik"
+              data-filter-remove="filter_delivery_1" onclick="removeFilterBadgeCity('Personligleveringfralokalbutik', 'filterfilter_delivery_1', 'filter_delivery_1', true);"></button>
             </div>
             <a href="<?php echo home_url(); ?>"class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 text-dark">
               <?php echo the_title(); ?>
@@ -478,6 +481,8 @@ $defaultUserString = implode(",", $defaultUserArray);
             </a>
           </div>
         </div>
+
+
 
         <div id="defaultStore">
       <?php
@@ -809,6 +814,11 @@ $defaultUserString = implode(",", $defaultUserArray);
 <script type="text/javascript">
   // Start the jQuery
   jQuery(document).ready(function($) {
+    document.getElementById('filterdel_dummy_0').outerHTML = "";
+    document.getElementById('filterdel_dummy_1').outerHTML = "";
+    setFilterBadgeCity('Personlig levering fra lokal butik', 'filterfilter_delivery_1', 'filter_delivery_1');
+    setFilterBadgeCity('Forsendelse med fragtfirma', 'filterfilter_delivery_0', 'filter_delivery_0');
+
     var ajaxurl = "<?php echo admin_url('admin-ajax.php');?>";
     var filterOccasionCategoryArray = [];
     var inputPriceRangeArray = [];
@@ -988,15 +998,17 @@ $defaultUserString = implode(",", $defaultUserArray);
     function setFilterBadgeCity(label, id, dataRemove){
       var elm = document.createElement('div');
       elm.id = 'filter'+dataRemove;
-      elm.classList.add('badge', 'rounded-pill', 'border-yellow', 'py-2', 'px-2', 'me-1', 'my-1', 'my-lg-0', 'my-xl-0', 'text-dark', 'dynamic-filters');
+      elm.classList.add('badge', 'rounded-pill', 'border-yellow', 'py-2', 'pe-2', 'my-1', 'my-lg-0', 'my-xl-0', 'me-1', 'text-dark', 'dynamic-filters');
       elm.href = '#';
       elm.innerHTML = label;
 
       elmbtn = document.createElement('button');
       elmbtn.type = 'button';
-      elmbtn.classList.add('btn-close', 'filter-btn-delete');
+      elmbtn.classList.add('btn-close', 'filter-btn-delete', 'ms-1');
       elmbtn.dataset.filterId = id;
       elmbtn.dataset.label = label.replace(/ /g,'');
+
+
       elmbtn.onclick = function(){removeFilterBadgeCity('"'+label.replace(/ /g,'')+'"', id, dataRemove, true);};
       elmbtn.dataset.filterRemove = dataRemove;
       elm.appendChild(elmbtn);
@@ -1006,7 +1018,6 @@ $defaultUserString = implode(",", $defaultUserArray);
     function removeFilterBadgeCity(label, id, dataRemove, updateVendors){
       if(updateVendors === true){
         var elmId = dataRemove;
-        console.log(elmId+' '+dataRemove);
         document.getElementById(elmId).checked = false;
         update();
       }
