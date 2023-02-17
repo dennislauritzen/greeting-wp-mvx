@@ -107,7 +107,7 @@ jQuery(document).ready(function(){
   <div class="container">
     <div class="row">
       <div class="col-12">
-        <h1 class="d-block my-0 my-xs-3 my-sm-2 my-md-2 mt-lg-4 pt-lg-1 mb-lg-3">Find butikker med gavehilsner i <?php the_title();?></h1>
+        <h1 class="d-block my-0 my-xs-3 my-sm-2 my-md-2 mt-3 mt-lg-4 pt-lg-1 mb-lg-3">Find butikker med gavehilsner i <?php the_title();?></h1>
       </div>
     </div>
 
@@ -245,12 +245,14 @@ jQuery(document).ready(function(){
               $closed_for_today = 1;
             }
           ?>
-          <label class="" for="filter_delivery_date_<?php echo $k; ?>" style="cursor: pointer; display: inline-block; padding: 5px 10px; border: 1px solid <?php echo ($closed_for_today == 1 ? '#c0c0c0' : '#000000'); ?>; margin: 6px 5px 5px 0;">
-            <input type="radio" name="filter_del_days_city" class="form-check-input filter-on-city-page" id="filter_delivery_date_<?php echo $k; ?>" value="<?php echo $k; ?>" <?php echo ($closed_for_today == 1 ? 'disabled="disabled" ' : ''); ?> <?php echo ($k == 8 ? 'checked="checked"' : ''); ?>>
-            <span style="color: <?php echo ($closed_for_today == 1 ? '#c0c0c0' : '#000000'); ?>;">
-              <?php echo $v; ?>
-            </span>
-          </label>
+          <div class="rounded border-0 rounded-pill bg-light" style="display: inline-block; margin: 5px 5px 4px 0; font-size: 13px;">
+            <label class="" for="filter_delivery_date_<?php echo $k; ?>" style="cursor: pointer; padding: 6px 10px; text-transform: <?php echo ($closed_for_today == 1 ? 'strikethrough;' : ';'); ?>;">
+                <input type="radio" name="filter_del_days_city" class="form-check-input filter-on-city-page" id="filter_delivery_date_<?php echo $k; ?>" value="<?php echo $k; ?>" <?php echo ($closed_for_today == 1 ? 'disabled="disabled" ' : ''); ?> <?php echo ($k == 8 ? 'checked="checked"' : ''); ?>>
+                <span style="color: <?php echo ($closed_for_today == 1 ? '#c0c0c0' : '#000000'); ?>;">
+                  <?php echo $v; ?>
+                </span>
+              </label>
+          </div>
           <!--<div class="form-check">
               <input type="checkbox" name="filter_del_day" class="form-check-input filter-on-city-page" id="filter_delivery_day_<?php echo $k; ?>" checked="checked" value="<?php echo $k; ?>">
               <label class="form-check-label" for="filter_delivery_day_<?php echo $k; ?>">
@@ -376,9 +378,13 @@ jQuery(document).ready(function(){
           ?>
           </ul>
 
-          <!-- price filter filter-->
           <?php
-          // for price filter
+          /**
+           * ---------------------
+           * Price filter
+           * ---------------------
+          **/
+
           $minProductPrice;
           $maxProductPrice;
 
@@ -393,10 +399,10 @@ jQuery(document).ready(function(){
           else {
             $minProductPrice = 0;
             $maxProductPrice = max($productPriceArray);
-            $topProductPrice = (max($productPriceArray) > 600) ? '600' : max($productPriceArray);
+            $topProductPrice = (max($productPriceArray) > 1000) ? '1000' : max($productPriceArray);
           }
 
-          $priceIntArray = range($minProductPrice, $topProductPrice, 100);
+          $priceIntArray = range($minProductPrice, $topProductPrice, 250);
 
           $start_val = $minProductPrice;
           $end_val = $maxProductPrice;
@@ -430,18 +436,23 @@ jQuery(document).ready(function(){
                 $start = $v;
                 $end = (isset($priceIntArray[$k+1]) ? $priceIntArray[$k+1] : '+');
                 if($end == '+'){
-                  $label = $start.$end;
+                  $label = 'Over '.$start;
                   $value = $start.'-'.$maxProductPrice;
                 } else {
-                  $label = $start.'-'.$end;
-                  $value = $label;
+                  if($start == "0"){
+                    $label = 'Under '.$end;
+                  } else {
+                    $label = $start.'-'.$end;
+                  }
+                  $value = $start.'-'.$end;
                 }
               ?>
-
-              <label class="" for="filter_price_<?php echo $k; ?>" style="cursor: pointer; display: inline-block; padding: 5px 10px; border: 1px solid #000000; margin: 6px 5px 5px 0;">
-                <input type="radio" name="filter_del_price" class="form-check-input filter-on-city-page" id="filter_price_<?php echo $k; ?>" value="<?php echo $value; ?>">
-                <?php echo $label; ?> kr.
-              </label>
+              <div class="rounded border-0 rounded-pill bg-light" style="display: inline-block; margin: 5px 5px 4px 0; font-size: 13px;">
+                <label class="" for="filter_price_<?php echo $k; ?>" style="cursor: pointer; padding: 6px 10px;">
+                  <input type="radio" name="filter_del_price" class="form-check-input filter-on-city-page" id="filter_price_<?php echo $k; ?>" value="<?php echo $value; ?>">
+                  <?php echo $label; ?> kr.
+                </label>
+              </div>
               <?php
               }
               ?>
@@ -579,10 +590,64 @@ jQuery(document).ready(function(){
         </div>
       <?php } ?>
       </div>
-
       <!-- show filtered result here-->
       <div class="filteredStore row"></div>
 
+      </div>
+      <?php
+      if(!empty(the_content())){
+      ?>
+      <div class="">
+        <?php echo the_content(); ?>
+      </div>
+      <?php
+      }
+      ?>
+
+
+      <?php
+      $args = array(
+          'post_type' => 'landingpage',
+          'post_status' => 'publish',
+          'posts_per_page' => 15,
+          'meta_query' => array(
+            array(
+              'key' => 'postal_code_relation',
+              'value' => '"'.get_the_ID() .'"',
+              'compare' => 'LIKE'
+            )
+          ),
+          'orderby' => 'post_title',
+          'order' => 'ASC'
+      );
+      $posts = new WP_Query( $args );
+      $i = 1;
+      $count = count($posts->posts);
+      $cols = 3;
+      $countcols = $count / $cols;
+
+      if($count > 0){
+      ?>
+      <div class="row mb-3">
+        <h5>Er du på udkig efter noget specifikt? Find alle typer af gavehilsner i <?php echo $cityName; ?></h5>
+        <div class="col-4 mb-3">
+          <?php
+          foreach($posts->posts as $k => $v){
+            echo '<a href="'.get_permalink($v->ID).'">';
+            print $v->post_title;
+            echo '</a><br>';
+            if($i % $countcols == 0){
+              echo '</div>';
+              echo '<div class="col-4">';
+            }
+            $i++;
+          }
+          ?>
+        </div>
+      </div>
+      <?php
+      }
+      ?>
       </div>
     </div>
   </div>
