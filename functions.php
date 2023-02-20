@@ -4504,3 +4504,43 @@ function wc_form_field_args($args, $key, $value) {
 	}
   return $args;
 }
+
+function get_vendor_days_until_delivery($vendor_id){
+	if(empty($vendor_id)){
+		return;
+	}
+
+	$dropoff_time 		= get_field('vendor_drop_off_time','user_'.$vendor_id);
+	$dropoff_time			= substr($dropoff_time, 0, 2);
+	$delDate 					= get_field('vendor_require_delivery_day','user_'.$vendor_id);
+	$delClosedDates		= get_field('vendor_closed_day','user_'.$vendor_id);
+	$delWeekDays			= get_field('openning','user_'.$vendor_id);
+
+	// Check if the store is closed this specific date.
+	$closedDatesArr		= array_map('trim', explode(",",$delClosedDates));
+	$closedThisDate 	= (in_array(date('d-m-Y'), $closedDatesArr)) ? 1 : 0;
+
+	// Start calculation from 0 (= today)
+	$days_until_delivery = $delDate;
+
+	$open_iso_days = array();
+	foreach($delWeekDays as $key => $val){
+		$open_iso_days[] = $val['value'];
+	}
+
+	$open_this_day = (in_array(date('N'), $open_iso_days) ? 1 : 0);
+
+	if($open_this_day == 0){
+		$days_until_delivery++;
+	} else {
+		if($closedThisDate == 1){
+			$days_until_delivery++;
+		} else {
+			if($dropoff_time < date('H')){
+				$days_until_delivery++;
+			}
+		}
+	}
+
+	return $days_until_delivery;
+}

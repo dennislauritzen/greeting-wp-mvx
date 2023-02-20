@@ -420,10 +420,16 @@
 	div.store div.card div.price_hold {
 		font-size: 13px;
 	}
+
+	div.store div.card  span.bagde {
+		transition: none !important;
+		transform: none !important;
+		border-size: 1px !important;
+	}
 	.store {
 		transition: all .15s ease-in-out;
 	}
-	.store:hover {
+	.store:hover:not(div > span.badge) {
 		transform: scale(1.015);
 	}
 	@media (max-width: 768px){

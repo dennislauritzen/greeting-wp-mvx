@@ -18,18 +18,6 @@ $template_class = get_wcmp_vendor_settings('wcmp_vendor_shop_template', 'vendor'
 $template_class = apply_filters('can_vendor_edit_shop_template', false) && get_user_meta($vendor_id, '_shop_template', true) ? get_user_meta($vendor_id, '_shop_template', true) : $template_class;
 $vendor_hide_description = apply_filters('wcmp_vendor_store_header_hide_description', get_user_meta($vendor_id, '_vendor_hide_description', true), $vendor->id);
 
-$vendor_fb_profile = get_user_meta($vendor_id, '_vendor_fb_profile', true);
-$vendor_twitter_profile = get_user_meta($vendor_id, '_vendor_twitter_profile', true);
-$vendor_linkdin_profile = get_user_meta($vendor_id, '_vendor_linkdin_profile', true);
-$vendor_google_plus_profile = get_user_meta($vendor_id, '_vendor_google_plus_profile', true);
-$vendor_youtube = get_user_meta($vendor_id, '_vendor_youtube', true);
-$vendor_instagram = get_user_meta($vendor_id, '_vendor_instagram', true);
-// Follow code
-$wcmp_customer_follow_vendor = get_user_meta( get_current_user_id(), 'wcmp_customer_follow_vendor', true ) ? get_user_meta( get_current_user_id(), 'wcmp_customer_follow_vendor', true ) : array();
-$vendor_lists = !empty($wcmp_customer_follow_vendor) ? wp_list_pluck( $wcmp_customer_follow_vendor, 'user_id' ) : array();
-$follow_status = in_array($vendor_id, $vendor_lists) ? __( 'Unfollow', 'dc-woocommerce-multi-vendor' ) : __( 'Follow', 'dc-woocommerce-multi-vendor' );
-$follow_status_key = in_array($vendor_id, $vendor_lists) ? 'Unfollow' : 'Follow';
-
 // Generate location
 $vendor_address = !empty(get_user_meta($vendor_id, '_vendor_address_1', true)) ? get_user_meta($vendor_id, '_vendor_address_1', true) : '';
 $vendor_postal = !empty(get_user_meta($vendor_id, '_vendor_postcode', true)) ? get_user_meta($vendor_id, '_vendor_postcode', true) : '';
