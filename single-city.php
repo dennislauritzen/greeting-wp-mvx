@@ -649,7 +649,7 @@ jQuery(document).ready(function(){
         }
         ?>
 
-            <div class="col-6 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4 store">
+            <div class="col-12 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4 store">
               <div class="card shadow border-0 mb-3">
                 <img src="<?php echo $banner; ?>" class="card-img-top" alt="...">
                 <div class="card-body">
@@ -698,7 +698,7 @@ jQuery(document).ready(function(){
                     <span class="align-middle" style="font-size: 11px;">
                       <?php echo $location; ?>
                     </span>
-                  </div>
+                  </div>-
                   <?php
                   ///////////////////////////
                   // Get product categories

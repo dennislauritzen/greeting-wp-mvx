@@ -30,7 +30,7 @@ if($args['cityName']){
 }
 
 ?>
-<div class="col-6 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4 store">
+<div class="col-12 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4 store">
   <div class="card shadow border-0 mb-3">
     <img src="<?php echo $banner; ?>" class="card-img-top" alt="<?php echo esc_html($button_text); ?>">
     <div class="card-body">
