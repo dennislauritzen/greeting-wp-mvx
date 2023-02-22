@@ -35,7 +35,7 @@ if($args['cityName']){
 }
 
 ?>
-<div class="col-12 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4 d-flex align-items-stretch store">
+<div class="col-12 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4 mb-2 d-flex align-items-stretch store">
   <div class="card shadow border-0 mb-3">
     <img src="<?php echo $banner; ?>" class="card-img-top" alt="<?php echo esc_html($button_text); ?>">
     <div class="card-body d-flex flex-column">
@@ -46,9 +46,9 @@ if($args['cityName']){
         <?php
         if($delivery_type == 0){
         ?>
-          <span class="badge text-dark border border-dark text-dark fw-light shadow-none ">Levering med GLS / DAO</span>
-          <span class="badge text-dark border border-dark text-dark fw-light shadow-none ">Levering til døren</span>
-          <span class="badge text-dark border border-dark text-dark fw-light shadow-none ">Hurtig levering (2-3 dage)</span>
+          <span class="badge text-dark border border-dark text-dark fw-light shadow-none "><?php echo get_field('tag_label_freight_company', 'option'); ?></span>
+          <span class="badge text-dark border border-dark text-dark fw-light shadow-none "><?php echo get_field('tag_label_home_delivery', 'option'); ?></span>
+          <span class="badge text-dark border border-dark text-dark fw-light shadow-none "><?php echo get_field('tag_label_fast_delivery', 'option'); ?></span>
         <?php
         } else {
           ///////////////////////////
@@ -124,7 +124,8 @@ if($args['cityName']){
       <a
       href="<?php echo esc_url($vendor->get_permalink()); ?>"
       class="cta stretched-link rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-3 px-md-4 mt-auto align-self-start">
-        Se alle gaver<span class="d-none d-md-inline"></span>
+        <?php echo get_field('cta_store_label', 'option'); ?>
+        <span class="d-none d-md-inline"></span>
       </a>
     </div>
     <div class="card-footer">

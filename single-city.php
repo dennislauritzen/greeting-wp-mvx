@@ -36,30 +36,35 @@ get_header('green', array('city' => $cityName, 'postalcode' => $cityPostalcode))
 
 
 // get user meta query
-$sql = "SELECT u.ID, umm1.meta_value AS dropoff_time, umm2.meta_value AS require_delivery_day
-        FROM {$wpdb->prefix}users u
-        LEFT JOIN {$wpdb->prefix}usermeta umm1 ON u.ID = umm1.user_id AND umm1.meta_key = 'vendor_drop_off_time'
-        LEFT JOIN {$wpdb->prefix}usermeta umm2 ON u.ID = umm2.user_id AND umm2.meta_key = 'vendor_require_delivery_day'
-        WHERE EXISTS (
-            SELECT 1
-            FROM {$wpdb->prefix}usermeta um
-            WHERE um.user_id = u.ID AND um.meta_key = 'delivery_zips' AND um.meta_value LIKE %s
-        )
-        AND NOT EXISTS (
-            SELECT 1
-            FROM {$wpdb->prefix}usermeta um2
-            WHERE um2.user_id = u.ID AND um2.meta_key = 'vendor_turn_off'
-        )
-        AND EXISTS (
-            SELECT 1
-            FROM {$wpdb->prefix}usermeta um5
-            WHERE um5.user_id = u.ID AND um5.meta_key = 'wp_capabilities' AND um5.meta_value LIKE %s
-        )
-        ORDER BY CASE u.ID
-            WHEN 38 THEN 0
-            WHEN 76 THEN 0
-            ELSE 1
-        END DESC, umm2.meta_value ASC, umm2.meta_value DESC
+$sql = "SELECT u.ID, umm1.meta_value AS dropoff_time, umm2.meta_value AS require_delivery_day, umm3.meta_value AS delivery_type
+          FROM {$wpdb->prefix}users u
+          LEFT JOIN {$wpdb->prefix}usermeta umm1 ON u.ID = umm1.user_id AND umm1.meta_key = 'vendor_drop_off_time'
+          LEFT JOIN {$wpdb->prefix}usermeta umm2 ON u.ID = umm2.user_id AND umm2.meta_key = 'vendor_require_delivery_day'
+          LEFT JOIN {$wpdb->prefix}usermeta umm3 ON u.ID = umm3.user_id AND umm3.meta_key = 'delivery_type'
+          WHERE EXISTS (
+              SELECT 1
+              FROM {$wpdb->prefix}usermeta um
+              WHERE um.user_id = u.ID AND um.meta_key = 'delivery_zips' AND um.meta_value LIKE %s
+          )
+          AND NOT EXISTS (
+              SELECT 1
+              FROM {$wpdb->prefix}usermeta um2
+              WHERE um2.user_id = u.ID AND um2.meta_key = 'vendor_turn_off'
+          )
+          AND EXISTS (
+              SELECT 1
+              FROM {$wpdb->prefix}usermeta um5
+              WHERE um5.user_id = u.ID AND um5.meta_key = 'wp_capabilities' AND um5.meta_value LIKE %s
+          )
+          ORDER BY
+          umm3.meta_value DESC,
+          CASE u.ID
+              WHEN 38 THEN 0
+              WHEN 76 THEN 0
+              ELSE 1
+          END DESC,
+          umm2.meta_value ASC,
+          umm2.meta_value DESC
         	";
 $vendor_query = $wpdb->prepare($sql, '%'.$cityPostalcode.'%', '%dc_vendor%');
 $vendor_arr = $wpdb->get_results($vendor_query);
@@ -674,7 +679,7 @@ jQuery(document).ready(function(){
 
       </div>
       <div class="loadingHeartBeat row" style="display: none;">
-        <div class="loadingcard col-6 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4 store">
+        <div class="loadingcard col-12 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4 store">
           <div class="card  shadow border-0 mb-3">
             <div class="image animated-background "></div>
             <div class="card-body">
@@ -689,7 +694,7 @@ jQuery(document).ready(function(){
             </div>
           </div>
         </div>
-        <div class="loadingcard col-6 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4 store">
+        <div class="loadingcard col-12 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4 store">
           <div class="card  shadow border-0 mb-3">
             <div class="image animated-background "></div>
             <div class="card-body">
@@ -704,7 +709,7 @@ jQuery(document).ready(function(){
             </div>
           </div>
         </div>
-        <div class="loadingcard col-6 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4 store">
+        <div class="loadingcard col-12 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4 store">
           <div class="card  shadow border-0 mb-3">
             <div class="image animated-background "></div>
             <div class="card-body">
@@ -719,7 +724,7 @@ jQuery(document).ready(function(){
             </div>
           </div>
         </div>
-        <div class="loadingcard col-6 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4 store">
+        <div class="loadingcard col-12 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4 store">
           <div class="card  shadow border-0 mb-3">
             <div class="image animated-background "></div>
             <div class="card-body">
@@ -734,7 +739,7 @@ jQuery(document).ready(function(){
             </div>
           </div>
         </div>
-        <div class="loadingcard col-6 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4 store">
+        <div class="loadingcard col-12 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4 store">
           <div class="card  shadow border-0 mb-3">
             <div class="image animated-background "></div>
             <div class="card-body">
@@ -749,7 +754,7 @@ jQuery(document).ready(function(){
             </div>
           </div>
         </div>
-        <div class="loadingcard col-6 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4 store">
+        <div class="loadingcard col-12 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4 store">
           <div class="card  shadow border-0 mb-3">
             <div class="image animated-background "></div>
             <div class="card-body">
