@@ -782,46 +782,48 @@ jQuery(document).ready(function(){
 
 
       <?php
-      $args = array(
-          'post_type' => 'landingpage',
-          'post_status' => 'publish',
-          'posts_per_page' => 15,
-          'meta_query' => array(
-            array(
-              'key' => 'postal_code_relation',
-              'value' => '"'.get_the_ID() .'"',
-              'compare' => 'LIKE'
-            )
-          ),
-          'orderby' => 'post_title',
-          'order' => 'ASC'
-      );
-      $posts = new WP_Query( $args );
-      $i = 1;
-      $count = count($posts->posts);
-      $cols = 3;
-      $countcols = $count / $cols;
+      if(get_field('show_landingpage_links_on_city_page', 'option') == 1){
+        $args = array(
+            'post_type' => 'landingpage',
+            'post_status' => 'publish',
+            'posts_per_page' => 15,
+            'meta_query' => array(
+              array(
+                'key' => 'postal_code_relation',
+                'value' => '"'.get_the_ID() .'"',
+                'compare' => 'LIKE'
+              )
+            ),
+            'orderby' => 'post_title',
+            'order' => 'ASC'
+        );
+        $posts = new WP_Query( $args );
+        $i = 1;
+        $count = count($posts->posts);
+        $cols = 3;
+        $countcols = $count / $cols;
 
-      if($count > 0){
-      ?>
-      <div class="row mb-3">
-        <h5 style="font-family: 'Inter', sans-serif;">Er du på udkig efter noget specifikt? Find alle typer af gavehilsner i <?php echo $cityName; ?></h5>
-        <div class="col-12 col-md-6 col-lg-4 mb-3" style="overflow-wrap: break-word;">
-          <?php
-          foreach($posts->posts as $k => $v){
-            echo '<a href="'.get_permalink($v->ID).'">';
-            print $v->post_title;
-            echo '</a><br>';
-            if($i % $countcols == 0){
-              echo '</div>';
-              echo '<div class="col-12 col-md-6 col-lg-4 mb-3"  style="overflow-wrap: break-word;">';
+        if($count > 0){
+        ?>
+        <div class="row mb-3">
+          <h5 style="font-family: 'Inter', sans-serif;">Er du på udkig efter noget specifikt? Find alle typer af gavehilsner i <?php echo $cityName; ?></h5>
+          <div class="col-12 col-md-6 col-lg-4 mb-3" style="overflow-wrap: break-word;">
+            <?php
+            foreach($posts->posts as $k => $v){
+              echo '<a href="'.get_permalink($v->ID).'">';
+              print $v->post_title;
+              echo '</a><br>';
+              if($i % $countcols == 0){
+                echo '</div>';
+                echo '<div class="col-12 col-md-6 col-lg-4 mb-3"  style="overflow-wrap: break-word;">';
+              }
+              $i++;
             }
-            $i++;
-          }
-          ?>
+            ?>
+          </div>
         </div>
-      </div>
-      <?php
+        <?php
+        }
       }
       ?>
       </div>
