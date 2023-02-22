@@ -6,8 +6,13 @@ if($args['vendor']){
   // $vendor = get_wcmp_vendor($user);
   // $image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
   $image = $vendor->get_image('image') ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
-  $banner = $vendor->get_image('banner') ? $vendor->get_image('banner', array(400, 200)) : '';
+  $banner = $vendor->get_image('banner') ? $vendor->get_image('banner', 'woocommerce_single') : 'https://www.greeting.dk/wp-content/uploads/2022/05/pexels-maria-orlova-4947386-1-scaled.jpg';
 
+  // The delivery type of the stores
+  $delivery_type = get_field('delivery_type','user_'.$vendor->id);
+  $delivery_type = (!empty($delivery_type['0']['value']) ? $delivery_type['0']['value'] : 0);
+
+  // Header text.
   $button_text = apply_filters('wcmp_vendor_lists_single_button_text', $vendor->page_title);
 
   // Generate location
@@ -30,19 +35,56 @@ if($args['cityName']){
 }
 
 ?>
-<div class="col-12 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4 store">
+<div class="col-12 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4 d-flex align-items-stretch store">
   <div class="card shadow border-0 mb-3">
     <img src="<?php echo $banner; ?>" class="card-img-top" alt="<?php echo esc_html($button_text); ?>">
-    <div class="card-body">
+    <div class="card-body d-flex flex-column">
       <a href="<?php echo esc_url($vendor->get_permalink()); ?>" class="text-dark">
         <h5 class="card-title"><?php echo esc_html($button_text); ?></h5>
       </a>
       <div>
-        <span class="badge text-dark border border-dark fw-light shadow-none ">Blomsterbutik</span>
-        <span class="badge text-dark border border-dark text-dark fw-light shadow-none ">Kan levere i dag</span>
-        <span class="badge text-dark border border-dark text-dark  fw-light shadow-none ">Lokal butik</span>
+        <?php
+        if($delivery_type == 0){
+        ?>
+          <span class="badge text-dark border border-dark text-dark fw-light shadow-none ">Levering med GLS / DAO</span>
+          <span class="badge text-dark border border-dark text-dark fw-light shadow-none ">Levering til døren</span>
+          <span class="badge text-dark border border-dark text-dark fw-light shadow-none ">Hurtig levering (2-3 dage)</span>
+        <?php
+        } else {
+          ///////////////////////////
+          // Days until delivery
+          $delivery_days 		= get_vendor_days_until_delivery($vendor_id);
+
+          if($delivery_days == 0){
+            ?>
+            <span class="badge text-dark border border-dark text-dark fw-light shadow-none ">Kan levere i dag</span>
+            <?php
+          } else if($delivery_days == 1){
+            ?>
+            <span class="badge text-dark border border-dark text-dark fw-light shadow-none ">Kan levere i morgen</span>
+            <?php
+          } else if($delivery_days == 2){
+            ?>
+            <span class="badge text-dark border border-dark text-dark fw-light shadow-none ">Kan levere i overmorgen</span>
+            <?php
+          }
+          ?>
+
+          <?php
+          ///////////////////////////
+          // STORE TYPE TAG
+          $store_type = get_field('store_type','user_'.$vendor_id);
+          if(!empty($store_type)){
+            foreach($store_type as $k => $v){
+            ?>
+              <span class="badge text-dark border border-dark fw-light shadow-none "><?php echo $v['label']; ?></span>
+            <?php
+            } // endforeach store_type
+          } // endif $store_type
+        }
+        ?>
       </div>
-      <div>
+      <div class="m-0 mb-1 p-0">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#e1e1e1" class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
           <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
         </svg>
@@ -50,6 +92,12 @@ if($args['cityName']){
           <?php echo $location; ?>
         </span>
       </div>
+      <?php
+      ///////////////////////////
+      // Get product categories
+      //
+
+      ?>
       <!--<div>
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#e1e1e1" class="bi bi-tags" viewBox="0 0 16 16">
           <path d="M3 2v4.586l7 7L14.586 9l-7-7H3zM2 2a1 1 0 0 1 1-1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 2 6.586V2z"/>
@@ -59,10 +107,12 @@ if($args['cityName']){
           Blomster, vin,
         </span>
       </div>-->
+
       <p class="card-text">
         <?php
         $numwords = 25;
-        $word_arr = explode(" ", $vendor->description);
+        $description = wp_strip_all_tags($vendor->description);
+        $word_arr = explode(" ", $description);
         $description = implode(" ", array_slice( $word_arr, 0, $numwords) );
         echo $description;
         if(count($word_arr) > $numwords){
@@ -71,7 +121,9 @@ if($args['cityName']){
       </p>
 
       <!--<p class="lh-sm" style="font-size: 13px !important;">Butikken har flere forskellige gavehilsner, du kan vælge i mellem.</p>-->
-      <a href="<?php echo esc_url($vendor->get_permalink()); ?>" class="cta stretched-link rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-3 px-md-4">
+      <a
+      href="<?php echo esc_url($vendor->get_permalink()); ?>"
+      class="cta stretched-link rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-3 px-md-4 mt-auto align-self-start">
         Se alle gaver<span class="d-none d-md-inline"></span>
       </a>
     </div>
@@ -79,8 +131,6 @@ if($args['cityName']){
       <small class="text-muted">
         <div style="col-12">
           <?php
-          $delivery_type = get_field('delivery_type','user_'.$vendor->id);
-          $delivery_type = (!empty($delivery_type['0']['value']) ? $delivery_type['0']['value'] : '');
           if($delivery_type == 1){
           ?>
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bicycle" viewBox="0 0 16 16">
@@ -102,7 +152,10 @@ if($args['cityName']){
             <path d="M9 7a1 1 0 0 1 1-1h5v2h-5a1 1 0 0 1-1-1zM1 9h4a1 1 0 0 1 0 2H1V9z"/>
             <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
           </svg>
-          Leverer mandag-fredag
+          <?php
+            $opening = get_field('openning', 'user_'.$vendor_id);
+            echo get_del_days_text($opening, $delivery_type);
+          ?>
         </div>
       </small>
     </div>

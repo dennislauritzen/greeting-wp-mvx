@@ -13,11 +13,10 @@ $cityName = get_post_meta($postId, 'city', true);
 
 $checkout_postalcode = WC()->customer->get_shipping_postcode();
 if($cityPostalcode != $checkout_postalcode){
-  //print 'postnumre afviger';
-
-  #var_dump($woocommerce);
+  #print 'postnumre afviger';
   $woocommerce->cart->empty_cart();
 }
+
 
 // Get header designs.
 get_header();
@@ -27,7 +26,6 @@ get_header('green', array('city' => $cityName, 'postalcode' => $cityPostalcode))
 <?php
 /**
 * @author Dennis Lauritzen
-* @todo Slider for the occassion&category filter-cards.
 *
 */
  ?>
@@ -35,38 +33,37 @@ get_header('green', array('city' => $cityName, 'postalcode' => $cityPostalcode))
 <main id="main" class="container"<?php if ( isset( $navbar_position ) && 'fixed_top' === $navbar_position ) : echo ' style="padding-top: 100px;"'; elseif ( isset( $navbar_position ) && 'fixed_bottom' === $navbar_position ) : echo ' style="padding-bottom: 100px;"'; endif; ?>>
 <?php
 
+
+
 // get user meta query
-$sql = "SELECT
-          u.ID,
-          (SELECT umm.meta_value FROM {$wpdb->prefix}usermeta umm WHERE umm.meta_key ='vendor_drop_off_time' AND umm.user_id = u.ID) as dropoff_time,
-          (SELECT umm.meta_value FROM {$wpdb->prefix}usermeta umm WHERE umm.meta_key ='vendor_require_delivery_day' AND umm.user_id = u.ID) as require_delivery_day
-        FROM
-        	{$wpdb->prefix}users u
-        LEFT JOIN
-        	{$wpdb->prefix}usermeta um
-        	ON
-            um.user_id = u.ID
-        LEFT JOIN
-          {$wpdb->prefix}usermeta um5
-          ON
-            u.ID = um5.user_id
-        WHERE
-        	(um.meta_key = 'delivery_zips' AND um.meta_value LIKE %s)
-          AND
-          NOT EXISTS (SELECT um2.meta_value FROM {$wpdb->prefix}usermeta um2 WHERE um2.user_id = u.ID AND um2.meta_key = 'vendor_turn_off')
-          and
-          (um5.meta_key = 'wp_capabilities' AND um5.meta_value LIKE %s)
-        ORDER BY
-        	(SELECT um3.meta_value FROM {$wpdb->prefix}usermeta um3 WHERE um3.user_id = u.ID AND um3.meta_key = 'delivery_type') DESC,
-          (SELECT umm2.meta_value FROM {$wpdb->prefix}usermeta umm2 WHERE umm2.meta_key ='vendor_require_delivery_day' AND umm2.user_id = u.ID) ASC,
-          (SELECT umm2.meta_value FROM {$wpdb->prefix}usermeta umm2 WHERE umm2.meta_key ='vendor_require_delivery_day' AND umm2.user_id = u.ID) DESC,
-          CASE u.ID
-        		WHEN 38 THEN 0
-        		WHEN 76 THEN 0
-                ELSE 1
-        	END DESC";
+$sql = "SELECT u.ID, umm1.meta_value AS dropoff_time, umm2.meta_value AS require_delivery_day
+        FROM {$wpdb->prefix}users u
+        LEFT JOIN {$wpdb->prefix}usermeta umm1 ON u.ID = umm1.user_id AND umm1.meta_key = 'vendor_drop_off_time'
+        LEFT JOIN {$wpdb->prefix}usermeta umm2 ON u.ID = umm2.user_id AND umm2.meta_key = 'vendor_require_delivery_day'
+        WHERE EXISTS (
+            SELECT 1
+            FROM {$wpdb->prefix}usermeta um
+            WHERE um.user_id = u.ID AND um.meta_key = 'delivery_zips' AND um.meta_value LIKE %s
+        )
+        AND NOT EXISTS (
+            SELECT 1
+            FROM {$wpdb->prefix}usermeta um2
+            WHERE um2.user_id = u.ID AND um2.meta_key = 'vendor_turn_off'
+        )
+        AND EXISTS (
+            SELECT 1
+            FROM {$wpdb->prefix}usermeta um5
+            WHERE um5.user_id = u.ID AND um5.meta_key = 'wp_capabilities' AND um5.meta_value LIKE %s
+        )
+        ORDER BY CASE u.ID
+            WHEN 38 THEN 0
+            WHEN 76 THEN 0
+            ELSE 1
+        END DESC, umm2.meta_value ASC, umm2.meta_value DESC
+        	";
 $vendor_query = $wpdb->prepare($sql, '%'.$cityPostalcode.'%', '%dc_vendor%');
 $vendor_arr = $wpdb->get_results($vendor_query);
+
 
 $UserIdArrayForCityPostalcode = array();
 $DropOffTimes = array();
@@ -87,15 +84,13 @@ foreach($vendor_arr as $v){
     }
   }
 }
+
 // The maximum dropoff time today - for filtering.
 $DropOffTimes = (count($DropOffTimes) > 0) ? max($DropOffTimes) : 0;
 
-
 // pass to backend
-$cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
+$cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode);
 
-
-<?php
   /////////////////////////
   // Data for the filtering.
   // This data is used for the filters and for the stores.
@@ -107,32 +102,64 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode); ?>
 
   // for price filter
 
+  // Get all vendor product IDs
+  $vendorProductIds = array();
+
   foreach ($UserIdArrayForCityPostalcode as $vendorId) {
       $vendor = get_wcmp_vendor($vendorId);
-      // Denne fejler i seneste version.
-      $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
-      foreach ($vendorProducts as $productId) {
-          // for price filter begin
-          $singleProduct = wc_get_product( $productId );
-          array_push($productPriceArray, $singleProduct->get_price()); // for price filter
-          // for price filter end
+      $vendorProductIds = array_merge($vendorProductIds, $vendor->get_products(array('fields' => 'ids')));
+  }
+  $vendorProductIds = array_unique($vendorProductIds);
 
-          // for cat terms filter
-          $categoryTermList = wp_get_post_terms($productId, 'product_cat', array('fields' => 'ids'));
-          foreach($categoryTermList as $catTerm){
-            if($catTerm != '15' && $catTerm != '16'){
-              array_push($categoryTermListArray, $catTerm);
-            }
-          }
-          // --
+  // Use a custom SQL query to fetch the prices of those products
+  $where = array();
+  foreach($vendorProductIds as $pv){
+    if(is_numeric($pv)){
+      $where[] = $pv;
+    }
+  }
 
-          // for occassions
-          $occasionTermList = wp_get_post_terms($productId, 'occasion', array('fields' => 'ids'));
-          foreach($occasionTermList as $occasionTerm){
-            array_push($occasionTermListArray, $occasionTerm);
+  $prices = $wpdb->prepare("
+      SELECT meta_value
+      FROM {$wpdb->postmeta}
+      WHERE meta_key = '_price'
+      AND post_id IN (".implode(', ', array_fill(0, count($vendorProductIds), '%s')).")
+  ", $where);
+
+  $prices = $wpdb->get_results($prices);
+  // Convert the results to an array of prices
+  $priceArray = array();
+  foreach ($prices as $price) {
+      $priceArray[] = $price->meta_value;
+  }
+
+  // Use min and max to get the minimum and maximum prices
+  $minPrice = min($priceArray);
+  $maxPrice = max($priceArray);
+
+  // Use array_push to add the prices to the $productPriceArray
+  array_push($productPriceArray, $minPrice, $maxPrice);
+
+  // Use get_the_terms to fetch all the terms for all products belonging to the vendors
+  $terms = wp_get_object_terms($vendorProductIds, array('product_cat', 'occasion'));
+
+  $categoryTermListArray = array();
+  $occasionTermListArray = array();
+
+  if ($terms && !is_wp_error($terms)) {
+      foreach ($terms as $term) {
+          if ($term->taxonomy === 'product_cat') {
+              if ($term->term_id != 15 && $term->term_id != 16) {
+                  $categoryTermListArray[] = $term->term_id;
+              }
+          } else if ($term->taxonomy === 'occasion') {
+              $occasionTermListArray[] = $term->term_id;
           }
       }
   }
+
+  $categoryTermListArray = array_unique($categoryTermListArray);
+  $occasionTermListArray = array_unique($occasionTermListArray);
 ?>
 
 
@@ -157,7 +184,6 @@ jQuery(document).ready(function(){
         background-position: 468px 0
     }
 }
-
 .animated-background {
     animation-duration: 1.25s;
     animation-fill-mode: forwards;
@@ -171,18 +197,15 @@ jQuery(document).ready(function(){
     position: relative;
 }
 
-
 .image {
   height: 150px;
   width: 100%;
   margin: 0px;
   @extend .animated-background;
 }
-
 .text {
   margin-left: 20px
 }
-
 .text-line-heading {
   height: 22px;
   width: 50%;
@@ -217,6 +240,7 @@ jQuery(document).ready(function(){
 
 <input type="hidden" id="cityDefaultUserIdAsString" value="<?php echo $cityDefaultUserIdAsString;?>">
 <input type="hidden" id="postalCode" value="<?php echo $cityPostalcode; ?>">
+<input type="hidden" id="cityName" value="<?php echo $cityName; ?>">
 <section id="citycontent" class="row">
   <div class="container">
     <div class="row">
@@ -245,7 +269,10 @@ jQuery(document).ready(function(){
     WHERE
       tt.taxonomy IN ('occasion','product_cat')
     ORDER BY
-		  featured DESC,
+      CASE featured
+        WHEN 1 THEN 1
+        ELSE 0
+      END DESC,
       t.Name ASC
     ");
     $placeHolderImage = wc_placeholder_img_src();
@@ -256,7 +283,25 @@ jQuery(document).ready(function(){
     if(count($occasion_featured_list) > 0){
     ?>
     <div class="mt-2 mt-xs-2 mt-sm-0 mb-4" id="topoccassions">
-      <h3 style="font-family: Inter; font-size: 17px;">Kategorier</h3>
+      <div class="d-flex align-items-center mb-1">
+        <h3 class="mt-1" style="font-family: Inter; font-size: 17px;">Kategorier</h3>
+        <div class="button-cont ms-auto">
+          <button id="backButton" type="button" class="btn btn-light rounded-circle">
+            <div class="align-items-center justify-content-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#1B4949" stroke-width="10" class="bi bi-chevron-left align-middle" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" stroke-width="10" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+              </svg>
+            </div>
+          </button>
+          <button id="forwardButton" type="button" class="btn btn-light rounded-circle">
+            <div class="align-items-center justify-content-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#1B4949" stroke-width="10" class="bi bi-chevron-left align-middle"  viewBox="0 0 16 16">
+                <path fill-rule="evenodd" stroke-width="10" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+              </svg>
+            </div>
+          </button>
+        </div>
+      </div>
       <style type="text/css">
         .card-img-top {
           min-height: 175px !important;
@@ -265,11 +310,12 @@ jQuery(document).ready(function(){
           width: 0px
         }
       </style>
-      <div class="d-flex flex-row flex-nowrap catrownoscroll p-1" style="overflow-x: auto; scroll-snap-type: x mandatory !important; ">
+
+      <div class="d-flex flex-row flex-nowrap catrownoscroll p-1" id="catrowscroll" data-snap-slider="occasions" style="overflow-x: auto; scroll-snap-type: x mandatory !important; scroll-behavior: smooth;">
         <?php
         foreach($occasion_featured_list as $occasion){
           if(in_array($occasion->term_id, $occasionTermListArray) || in_array($occasion->term_id, $categoryTermListArray)){
-              // Only show a card, if the cat/occasion is actually present in stores.
+            // Only show a card, if the cat/occasion is actually present in stores.
             $category_or_occasion = ($occasion->taxonomy == 'product_cat') ? 'cat' : 'occ_';
 
             $occasionImageUrl = '';
@@ -279,7 +325,7 @@ jQuery(document).ready(function(){
               $occasionImageUrl = wp_get_attachment_image($placeHolderImage, 'vendor-product-box-size', false, array('class' => 'card-img-top ratio-4by3', 'alt' => $occasion->name));
             }
           ?>
-          <div class="col-6 col-sm-6 col-md-4 col-lg-2 py-0 my-0 pe-2" style="scroll-snap-align: start;">
+          <div class="col-6 col-sm-6 col-md-4 col-lg-2 py-0 my-0 pe-2 card_outer" style="scroll-snap-align: start;">
             <div class="card border-0 shadow-sm">
               <a href="<?php echo get_permalink().'?c='.$occasion->term_id; ?>" data-elm-id="<?php echo $category_or_occasion.$occasion->term_id; ?>" class="top-category-occasion-list stretched-link text-dark">
                 <?php echo $occasionImageUrl;?>
@@ -340,7 +386,7 @@ jQuery(document).ready(function(){
       <div class="modal-dialog modal-fullscreen-lg-down modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalToggleLabel">Filtrér</h5>
+            <h5 class="modal-title" id="exampleModalToggleLabel" style="font-family: Inter,sans-serif; font-size: 15px;">Filtrér</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
@@ -360,7 +406,7 @@ jQuery(document).ready(function(){
             $dates[8] = 'Vis alle';
 
             ?>
-            <h5 class="text-uppercase mb-2">
+            <h5 class="text-uppercase mb-2" style="font-family: Inter,sans-serif; font-size: 15px;">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#ffc107" class="bi bi-calendar" viewBox="0 0 16 16">
                 <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
               </svg>&nbsp;
@@ -401,10 +447,12 @@ jQuery(document).ready(function(){
             if(count($productPriceArray) == 0){
               $minProductPrice = 0;
               $maxProductPrice = 0;
+              $topProductPrice = (max($productPriceArray) > 1000) ? '1000' : max($productPriceArray);
             }
             elseif(min($productPriceArray) == max($productPriceArray)){
               $minProductPrice = 0;
               $maxProductPrice = max($productPriceArray);
+              $topProductPrice = (max($productPriceArray) > 1000) ? '1000' : max($productPriceArray);
             }
             else {
               $minProductPrice = 0;
@@ -427,7 +475,7 @@ jQuery(document).ready(function(){
             }
             ?>
 
-            <h5 class="text-uppercase mb-2">
+            <h5 class="text-uppercase mb-2" style="font-family: Inter,sans-serif; font-size: 15px;">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#ffc107" class="bi bi-cash-coin" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M11 15a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm5-4a5 5 0 1 1-10 0 5 5 0 0 1 10 0z"/>
                 <path d="M9.438 11.944c.047.596.518 1.06 1.363 1.116v.44h.375v-.443c.875-.061 1.386-.529 1.386-1.207 0-.618-.39-.936-1.09-1.1l-.296-.07v-1.2c.376.043.614.248.671.532h.658c-.047-.575-.54-1.024-1.329-1.073V8.5h-.375v.45c-.747.073-1.255.522-1.255 1.158 0 .562.378.92 1.007 1.066l.248.061v1.272c-.384-.058-.639-.27-.696-.563h-.668zm1.36-1.354c-.369-.085-.569-.26-.569-.522 0-.294.216-.514.572-.578v1.1h-.003zm.432.746c.449.104.655.272.655.569 0 .339-.257.571-.709.614v-1.195l.054.012z"/>
@@ -477,7 +525,7 @@ jQuery(document).ready(function(){
              * ---------------------
             **/
             ?>
-            <h5 class="text-uppercase mb-2">
+            <h5 class="text-uppercase mb-2" style="font-family: Inter,sans-serif; font-size: 15px;">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#ffc107" class="bi bi-star-fill" viewBox="0 0 16 16">
                 <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
               </svg>&nbsp;
@@ -508,7 +556,7 @@ jQuery(document).ready(function(){
              * ---------------------
             **/
             ?>
-            <h5 class="text-uppercase mb-2">
+            <h5 class="text-uppercase mb-2" style="font-family: Inter,sans-serif; font-size: 15px;">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#ffc107" class="bi bi-balloon-heart" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="m8 2.42-.717-.737c-1.13-1.161-3.243-.777-4.01.72-.35.685-.451 1.707.236 3.062C4.16 6.753 5.52 8.32 8 10.042c2.479-1.723 3.839-3.29 4.491-4.577.687-1.355.587-2.377.236-3.061-.767-1.498-2.88-1.882-4.01-.721L8 2.42Zm-.49 8.5c-10.78-7.44-3-13.155.359-10.063.045.041.089.084.132.129.043-.045.087-.088.132-.129 3.36-3.092 11.137 2.624.357 10.063l.235.468a.25.25 0 1 1-.448.224l-.008-.017c.008.11.02.202.037.29.054.27.161.488.419 1.003.288.578.235 1.15.076 1.629-.157.469-.422.867-.588 1.115l-.004.007a.25.25 0 1 1-.416-.278c.168-.252.4-.6.533-1.003.133-.396.163-.824-.049-1.246l-.013-.028c-.24-.48-.38-.758-.448-1.102a3.177 3.177 0 0 1-.052-.45l-.04.08a.25.25 0 1 1-.447-.224l.235-.468ZM6.013 2.06c-.649-.18-1.483.083-1.85.798-.131.258-.245.689-.08 1.335.063.244.414.198.487-.043.21-.697.627-1.447 1.359-1.692.217-.073.304-.337.084-.398Z"/>
               </svg>
@@ -550,7 +598,7 @@ jQuery(document).ready(function(){
              * ---------------------
             **/
             ?>
-            <h5 class="text-uppercase mb-2">
+            <h5 class="text-uppercase mb-2" style="font-family: Inter,sans-serif; font-size: 15px;">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#ffc107" class="bi bi-calendar3-event" viewBox="0 0 16 16">
                 <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857V3.857z"/>
                 <path d="M12 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
@@ -621,154 +669,6 @@ jQuery(document).ready(function(){
         </div>
       </div>
     </div>
-
-
-      <div id="defaultStore">
-        <!-- test start-->
-        <div class="row">
-      <?php
-      foreach ($UserIdArrayForCityPostalcode as $user) {
-        $vendor = get_wcmp_vendor($user);
-        $vendor_id = $vendor->get_id();
-        $image = $vendor->get_image('image') ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
-        $banner = $vendor->get_image('banner') ? $vendor->get_image('banner', array(400, 200)) : 'https://www.greeting.dk/wp-content/uploads/2022/05/pexels-maria-orlova-4947386-1-scaled.jpg';
-
-        // Generate location
-        $vendor_address = !empty(get_user_meta($vendor_id, '_vendor_address_1', true)) ? get_user_meta($vendor_id, '_vendor_address_1', true) : '';
-        $vendor_postal = !empty(get_user_meta($vendor_id, '_vendor_postcode', true)) ? get_user_meta($vendor_id, '_vendor_postcode', true) : '';
-        $vendor_city = !empty(get_user_meta($vendor_id, '_vendor_city', true)) ? get_user_meta($vendor_id, '_vendor_city', true) : '';
-        $location = '';
-        if(!empty($vendor_address)){
-          $location .= $vendor_address.', ';
-        }
-        if(!empty($vendor_postal)){
-          $location .= $vendor_postal.' ';
-        }
-        if(!empty($vendor_city)){
-          $location .= $vendor_city.' ';
-        }
-        ?>
-
-            <div class="col-12 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4 store">
-              <div class="card shadow border-0 mb-3">
-                <img src="<?php echo $banner; ?>" class="card-img-top" alt="...">
-                <div class="card-body">
-                  <?php $button_text = apply_filters('wcmp_vendor_lists_single_button_text', $vendor->page_title); ?>
-                  <a href="<?php echo esc_url($vendor->get_permalink()); ?>" class="text-dark">
-                    <h5 class="card-title"><?php echo esc_html($button_text); ?></h5>
-                  </a>
-                  <div>
-                    <?php
-                    ///////////////////////////
-                    // Days until delivery
-                    $delivery_days 		= get_vendor_days_until_delivery($vendor_id);
-
-                    if($delivery_days == 0){
-                      ?>
-                      <span class="badge text-dark border border-dark text-dark fw-light shadow-none ">Kan levere i dag</span>
-                      <?php
-                    } else if($delivery_days == 1){
-                      ?>
-                      <span class="badge text-dark border border-dark text-dark fw-light shadow-none ">Kan levere i morgen</span>
-                      <?php
-                    } else if($delivery_days == 2){
-                      ?>
-                      <span class="badge text-dark border border-dark text-dark fw-light shadow-none ">Kan levere i overmorgen</span>
-                      <?php
-                    }
-                    ?>
-
-                    <?php
-                    ///////////////////////////
-                    // STORE TYPE TAG
-                    $store_type = get_field('store_type','user_'.$vendor_id);
-                    if(!empty($store_type)){
-                      foreach($store_type as $k => $v){
-                      ?>
-                        <span class="badge text-dark border border-dark fw-light shadow-none "><?php echo $v['label']; ?></span>
-                      <?php
-                      } // endforeach store_type
-                    } // endif $store_type
-                    ?>
-                  </div>
-                  <div class="m-0 mb-1 p-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#e1e1e1" class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
-                      <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
-                    </svg>
-                    <span class="align-middle" style="font-size: 11px;">
-                      <?php echo $location; ?>
-                    </span>
-                  </div>-
-                  <?php
-                  ///////////////////////////
-                  // Get product categories
-                  //
-
-                  ?>
-                  <!--<div>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#e1e1e1" class="bi bi-tags" viewBox="0 0 16 16">
-                      <path d="M3 2v4.586l7 7L14.586 9l-7-7H3zM2 2a1 1 0 0 1 1-1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 2 6.586V2z"/>
-                      <path d="M5.5 5a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm0 1a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM1 7.086a1 1 0 0 0 .293.707L8.75 15.25l-.043.043a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 0 7.586V3a1 1 0 0 1 1-1v5.086z"/>
-                    </svg>
-                    <span class="align-middle" style="font-size: 11px;">
-                      Blomster, vin,
-                    </span>
-                  </div>-->
-
-
-
-                  <p class="card-text">
-                    <?php
-                    $numwords = 25;
-                    $word_arr = explode(" ", $vendor->description);
-                    $description = implode(" ", array_slice( $word_arr, 0, $numwords) );
-                    echo $description;
-                    if(count($word_arr) > $numwords){
-                      echo '...';
-                    }?>
-                  </p>
-
-                  <!--<p class="lh-sm" style="font-size: 13px !important;">Butikken har flere forskellige gavehilsner, du kan vælge i mellem.</p>-->
-                  <a href="<?php echo esc_url($vendor->get_permalink()); ?>" class="cta stretched-link rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-3 px-md-4">
-                    Se alle gaver<span class="d-none d-md-inline"></span>
-                  </a>
-                </div>
-                <div class="card-footer">
-                  <small class="text-muted">
-                    <div style="col-12">
-                      <?php
-                      $delivery_type = get_field('delivery_type','user_'.$vendor->id);
-                      $delivery_type = (!empty($delivery_type['0']['value']) ? $delivery_type['0']['value'] : '');
-                      if($delivery_type == 1){
-                      ?>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bicycle" viewBox="0 0 16 16">
-                        <path d="M4 4.5a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1v.5h4.14l.386-1.158A.5.5 0 0 1 11 4h1a.5.5 0 0 1 0 1h-.64l-.311.935.807 1.29a3 3 0 1 1-.848.53l-.508-.812-2.076 3.322A.5.5 0 0 1 8 10.5H5.959a3 3 0 1 1-1.815-3.274L5 5.856V5h-.5a.5.5 0 0 1-.5-.5zm1.5 2.443-.508.814c.5.444.85 1.054.967 1.743h1.139L5.5 6.943zM8 9.057 9.598 6.5H6.402L8 9.057zM4.937 9.5a1.997 1.997 0 0 0-.487-.877l-.548.877h1.035zM3.603 8.092A2 2 0 1 0 4.937 10.5H3a.5.5 0 0 1-.424-.765l1.027-1.643zm7.947.53a2 2 0 1 0 .848-.53l1.026 1.643a.5.5 0 1 1-.848.53L11.55 8.623z"/>
-                      </svg> Personlig levering i <?php print the_title(); ?>
-                      <?php
-                      } else if($delivery_type == 0) {
-                      ?>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-truck" viewBox="0 0 16 16">
-                        <path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h9A1.5 1.5 0 0 1 12 3.5V5h1.02a1.5 1.5 0 0 1 1.17.563l1.481 1.85a1.5 1.5 0 0 1 .329.938V10.5a1.5 1.5 0 0 1-1.5 1.5H14a2 2 0 1 1-4 0H5a2 2 0 1 1-3.998-.085A1.5 1.5 0 0 1 0 10.5v-7zm1.294 7.456A1.999 1.999 0 0 1 4.732 11h5.536a2.01 2.01 0 0 1 .732-.732V3.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .294.456zM12 10a2 2 0 0 1 1.732 1h.768a.5.5 0 0 0 .5-.5V8.35a.5.5 0 0 0-.11-.312l-1.48-1.85A.5.5 0 0 0 13.02 6H12v4zm-9 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm9 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
-                      </svg>
-                        Sender med fragtfirma til <?php print the_title(); ?>
-                      <?php
-                      }
-                      ?>
-                      <input type="hidden" id="cityName" value="<?php echo the_title();?>">
-                      <span style="width: 15px;">&nbsp;&nbsp;</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar-range" viewBox="0 0 16 16">
-                        <path d="M9 7a1 1 0 0 1 1-1h5v2h-5a1 1 0 0 1-1-1zM1 9h4a1 1 0 0 1 0 2H1V9z"/>
-                        <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
-                      </svg>
-                      Leverer mandag-fredag
-                    </div>
-                  </small>
-                </div>
-              </div>
-            </div>
-      <?php } ?>
-        </div>
-      </div>
       <!-- show filtered result here-->
       <div class="filteredStore row"></div>
 
@@ -900,8 +800,8 @@ jQuery(document).ready(function(){
       if($count > 0){
       ?>
       <div class="row mb-3">
-        <h5>Er du på udkig efter noget specifikt? Find alle typer af gavehilsner i <?php echo $cityName; ?></h5>
-        <div class="col-4 mb-3">
+        <h5 style="font-family: 'Inter', sans-serif;">Er du på udkig efter noget specifikt? Find alle typer af gavehilsner i <?php echo $cityName; ?></h5>
+        <div class="col-12 col-md-6 col-lg-4 mb-3" style="overflow-wrap: break-word;">
           <?php
           foreach($posts->posts as $k => $v){
             echo '<a href="'.get_permalink($v->ID).'">';
@@ -909,7 +809,7 @@ jQuery(document).ready(function(){
             echo '</a><br>';
             if($i % $countcols == 0){
               echo '</div>';
-              echo '<div class="col-4">';
+              echo '<div class="col-12 col-md-6 col-lg-4 mb-3"  style="overflow-wrap: break-word;">';
             }
             $i++;
           }
@@ -1092,8 +992,9 @@ jQuery(document).ready(function(){
 <script type="text/javascript">
   // Start the jQuery
   jQuery(document).ready(function($) {
-    document.getElementById('filterdel_dummy_0').outerHTML = "";
-    document.getElementById('filterdel_dummy_1').outerHTML = "";
+    $('#filterdel_dummy_0, #filterdel_dummy_1').remove();
+
+    // Set delivery filters
     setFilterBadgeCity('Personlig levering fra lokal butik', 'filterfilter_delivery_1', 'filter_delivery_1');
     setFilterBadgeCity('Forsendelse med fragtfirma', 'filterfilter_delivery_0', 'filter_delivery_0');
 
@@ -1101,60 +1002,53 @@ jQuery(document).ready(function(){
     var catOccaDeliveryIdArray = [];
     var inputPriceRangeArray = [];
     var deliveryIdArray = [];
-    // $('#cityPageReset').hide();
 
-    var url_string = window.location.href; //window.location.href
-    var url = new URL(url_string);
+    // Get URL parameters
+     var url = new URL(window.location.href);
+     var deliveryIdArray = url.searchParams.get("d")?.split(",");
+     var catOccaDeliveryIdArray = url.searchParams.get("c")?.split(",");
+     var inputPriceRangeArray = url.searchParams.get("price")?.split(",");
 
-    var del_url_val = url.searchParams.get("d");
-    var cat_url_val = url.searchParams.get("c");
-    var price_url_val = url.searchParams.get("price");
+     // Check delivery filters
+     if (deliveryIdArray) {
+       deliveryIdArray.forEach(function(id) {
+         $('#filter_delivery_' + id).prop('checked', true);
+       });
+     }
 
-    if(del_url_val){
-      deliveryIdArray = del_url_val.split(",");
+     // Check category and occasion filters
+     if (catOccaDeliveryIdArray) {
+       catOccaDeliveryIdArray.forEach(function(id) {
+         var input = $('#filter_cat' + id + ', #filter_occ_' + id);
+         if (input.length) {
+           input.prop('checked', true);
+         }
+       });
+     }
 
-      jQuery.each( deliveryIdArray, function(i,v){
-        if(	$("input#filter_delivery_"+v).length){
-          $("input#filter_delivery_"+v).prop('checked',true);
-        }
-      });
-    }
-    if(cat_url_val){
-      catOccaDeliveryIdArray = cat_url_val.split(",");
+     // Set price range filter
+     if (inputPriceRangeArray) {
+       var priceRangeMinVal = inputPriceRangeArray[0] || 0;
+       var priceRangeMaxVal = inputPriceRangeArray[1];
+       if (priceRangeMaxVal) {
+         priceRangeMaxVal = parseFloat(priceRangeMaxVal);
+       }
+     }
 
-      jQuery.each( catOccaDeliveryIdArray, function(i,v){
-        if(	$("input#filter_cat"+v).length){
-          $("input#filter_cat"+v).prop('checked',true);
-        } else if($("input#filter_occ_"+v).length) {
-          $("input#filter_occ_"+v).prop('checked',true);
-        }
-      });
-    }
-    if(price_url_val){
-      inputPriceRangeArray = price_url_val.split(",");
-
-      var priceRangeMinVal = 0;
-      var priceRangeMaxVal = inputPriceRangeArray[1];
-      if( !isNaN(parseFloat(inputPriceRangeArray[0])) && isFinite(inputPriceRangeArray[0])){
-        priceRangeMinVal = inputPriceRangeArray[0];
-      }
-      if(!isNaN(parseFloat(inputPriceRangeArray[1])) && isFinite(inputPriceRangeArray[1])){
-        priceRangeMaxVal = inputPriceRangeArray[1];
-      }
-    }
-
-    if(deliveryIdArray.length > 0 && catOccaDeliveryIdArray.length > 0 && inputPriceRangeArray.length > 0){
+    // Update filters if all are selected
+    if (deliveryIdArray?.length && catOccaDeliveryIdArray?.length && inputPriceRangeArray?.length) {
       update();
     }
 
-    jQuery('a.top-category-occasion-list').click(function(event) {
-        event.preventDefault();
-        var elmId = this.getAttribute("data-elm-id");
-        $("#filter_" + elmId).click();
+    // Handle category and occasion filter clicks
+    $('a.top-category-occasion-list').click(function(event) {
+      event.preventDefault();
+      var elmId = this.getAttribute("data-elm-id");
+      $('#filter_' + elmId).click();
 
-        $([document.documentElement, document.body]).animate({
-          scrollTop: $("h2").offset().top
-        }, 0);
+      $('html, body').animate({
+        scrollTop: $('h2').offset().top
+      }, 0);
     });
 
     jQuery(".filter-on-city-page").click(function(){
@@ -1186,6 +1080,7 @@ jQuery(document).ready(function(){
 
     });
 
+    update();
     function update(){
       var cityName = $('#cityName').val();
       var postalCode = $('#postalCode').val();
@@ -1326,16 +1221,25 @@ jQuery(document).ready(function(){
       jQuery('#defaultStore').show();
       jQuery('.filteredStore').hide();
     });
-  });
 
+    // Select the container element
+    const container = jQuery('#catrowscroll');
+    const card_cont = jQuery('#catrowscroll div.card_outer:first-child');
 
-  // Add remove loading class on body element based on Ajax request status
-  jQuery(document).on({
-    ajaxStart: function(){
-      //jQuery("div").addClass("loading");
-    },
-    ajaxStop: function(){
-      //jQuery("div").removeClass("loading");
-    }
+    // Define the number of cards to scroll based on screen size
+    const numCardsToScroll = jQuery(window).width() >= 992 ? 3 : 2;
+
+    // Add click event listeners to the buttons
+    jQuery("#forwardButton").click(function(){
+      container.animate({
+        scrollLeft: '+=' + (card_cont.outerWidth(true)-1) * numCardsToScroll
+      }, '2');
+    });
+
+    jQuery("#backButton").click(function(){
+      container.animate({
+        scrollLeft: '-=' + (card_cont.outerWidth(true)-1) * numCardsToScroll
+      }, '2');
+    });
   });
 </script>

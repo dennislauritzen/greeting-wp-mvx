@@ -626,6 +626,11 @@ if( function_exists('acf_add_options_page') ) {
 		'menu_title'	=> 'Howdy-block',
 		'parent_slug'	=> 'theme-general-settings',
 	));
+	acf_add_options_sub_page(array(
+		'page_title' 	=> 'Theme Block: City Page',
+		'menu_title'	=> 'City Page',
+		'parent_slug'	=> 'theme-general-settings',
+	));
 }
 
 
@@ -945,6 +950,8 @@ function greeting_save_product_cat_meta( $post_id ) {
  * city filter
  */
 function catOccaDeliveryAction() {
+	global $wpdb;
+
 	// default user array come from front end
 	$cityDefaultUserIdAsString = $_POST['cityDefaultUserIdAsString'];
 	$defaultUserArray = explode(",", $cityDefaultUserIdAsString);
@@ -980,8 +987,6 @@ function catOccaDeliveryAction() {
 	// declare array for store user ID got from delivery type
 	$userIdArrayGetFromDelivery = array();
 
-
-	global $wpdb;
 	// Prepare the where and where-placeholders for term_id (cat and occassion ID's).
 	$where = array();
 	$placeholder_arr = array_fill(0, count($catOccaDeliveryIdArray), '%s');
@@ -992,6 +997,34 @@ function catOccaDeliveryAction() {
 				$where[] = $catOccaDeliveryId;
 			}
 		}
+
+		$args = array(
+	    'post_type' => 'product',
+	    'post_status' => 'publish',
+	    'fields' => 'all',
+	    'tax_query' => array(
+	        'relation' => 'OR',
+	        array(
+	            'taxonomy' => 'occasion',
+	            'field' => 'term_id',
+	            'terms' => $where,
+	            'operator' => 'IN'
+	        ),
+	        array(
+	            'taxonomy' => 'product_cat',
+	            'field' => 'term_id',
+	            'terms' => $where,
+	            'operator' => 'IN'
+	        )
+	    ),
+	    'author__not_in' => array(0),
+	    'orderby' => 'author',
+	    'order' => 'ASC',
+	    'posts_per_page' => -1,
+		);
+		#$query = new WP_Query($args);
+		#$authors = array_unique(wp_list_pluck($query->posts, 'post_author'));
+
 
 		$sql = "SELECT
 			p.post_author
@@ -1012,6 +1045,7 @@ function catOccaDeliveryAction() {
 		foreach($storeUserCatOccaResults as $product){
 			array_push($userIdArrayGetFromCatOcca, $product->post_author);
 		}
+
 	}
 	// Remove all the stores that doesnt match from default array
 	if(!empty($userIdArrayGetFromCatOcca)){
@@ -1124,24 +1158,24 @@ function catOccaDeliveryAction() {
 	$inputPriceRangeArray = $_POST['inputPriceRangeArray'];
 	$inputMinPrice = (int) $inputPriceRangeArray[0];
 	$inputMaxPrice = (int) $inputPriceRangeArray[1];
-	$query = array(
-		'post_status' => 'publish',
-		'post_type' => 'product',
-		'meta_query' => array(
-			array(
-				'key' => '_price',
-				// 'value' => array(302, 380),
-				'value' => array($inputMinPrice, $inputMaxPrice),
-				// 'value' => $inputPriceRangeArray,
-				'compare' => 'BETWEEN',
-				'type' => 'NUMERIC'
-			)
-		),
-		'posts_per_page' => -1
+
+	$author_ids = $wpdb->get_col(
+	    $wpdb->prepare(
+	        "
+	        SELECT DISTINCT p.post_author
+	        FROM {$wpdb->prefix}posts p
+	        INNER JOIN {$wpdb->prefix}postmeta pm ON p.ID = pm.post_id
+	        WHERE p.post_type = 'product'
+	        AND p.post_status = 'publish'
+	        AND pm.meta_key = '_price'
+	        AND pm.meta_value BETWEEN %d AND %d
+	        ",
+	        $inputMinPrice,
+	        $inputMaxPrice
+	    )
 	);
 
-	$productQuery = new WP_Query($query);
-	$userIdArrayGetFromPriceFilter = array_unique(wp_list_pluck( $productQuery->posts, 'post_author' ));
+	$userIdArrayGetFromPriceFilter = array_unique($author_ids);
 
 	// Remove all the stores that doesnt match from default array
 	if(!empty($userIdArrayGetFromPriceFilter)){
@@ -1155,16 +1189,26 @@ function catOccaDeliveryAction() {
 	// $userIdArrayGetFromDelivery
 	// $userIdArrayGetFromPriceFilter
 
-
 	$return_arr = $defaultUserArray;
 
+	//Variable holding the boolean controlling if it is the first freight store.
+	$first = 0;
 	if(!empty($return_arr)){
 		foreach ($return_arr as $filteredUser) {
 			$vendor_int = (int) $filteredUser;
 
 			$vendor = get_wcmp_vendor($vendor_int);
-
 			$cityName = $_POST['cityName'];
+
+			// Get the delivery type for the vendor so we know if it is local or freight.
+			// The delivery type of the store
+		  $delivery_type = get_field('delivery_type','user_'.$vendor->id);
+		  $delivery_type = (!empty($delivery_type['0']['value']) ? $delivery_type['0']['value'] : 0);
+
+			if($delivery_type == 0 && $first == 0){
+				get_template_part('template-parts/vendor-freight-heading', null, array('cityName' => $cityName));
+				$first = 1;
+			}
 			// call the template with pass $vendor variable
 			get_template_part('dc-product-vendor/vendor-loop', null, array('vendor' => $vendor, 'cityName' => $cityName));
 		}
@@ -1530,29 +1574,19 @@ function categoryPageFilterAction() {
 	$filteredCatOccaDeliveryArrayUnique = array_unique($filteredCatOccaDeliveryArray);
 
 
-	if(count($filteredCatOccaDeliveryArrayUnique) > 0 ){ ?>
-
-		<?php
+	if(count($filteredCatOccaDeliveryArrayUnique) > 0 ){
 		foreach ($filteredCatOccaDeliveryArrayUnique as $filteredUser) {
-
 			$vendor = get_wcmp_vendor($filteredUser);
 
 			// call the template with pass $vendor variable
 			get_template_part('template-parts/vendor-loop', null, array('vendor' => $vendor));
-
-			?>
-
-		<?php
 		}
-		?>
-
-	<?php }  { ?>
-
+	} else { ?>
 	<div>
 		<p id="noVendorFound" style="margin-top: 50px; margin-bottom: 35px; padding: 15px 10px; background-color: #f8f8f8;">No vendors were found matching your selection.</p>
 	</div>
-
-	<?php }
+	<?php
+	}
 
 	wp_die();
 }
@@ -3860,7 +3894,7 @@ function styling_admin_order_list() {
     global $pagenow, $post;
 
     if( $pagenow != 'edit.php') return; // Exit
-    if( get_post_type($post->ID) != 'shop_order' ) return; // Exit
+    if( is_object($post) && get_post_type($post->ID) != 'shop_order' ) return; // Exit
 
 		// HERE we set your custom status
     $order_status = 'Order Mail Open'; // <==== HERE
@@ -4451,6 +4485,11 @@ add_filter('max_srcset_image_width', 'disable_wp_responsive_images');
 add_image_size( 'vendor-product-box-size', 240, 240 );
 
 /**
+ * Creating custom sizing for the images in the store view box.
+ */
+add_image_size( 'vendor-topbanner-size', 400, 200 );
+
+/**
  * Remove the JetPack admin header notice.
  */
 add_action('admin_head', 'custom_admin_head');
@@ -4511,7 +4550,7 @@ function get_vendor_days_until_delivery($vendor_id){
 	}
 
 	$dropoff_time 		= get_field('vendor_drop_off_time','user_'.$vendor_id);
-	$dropoff_time			= substr($dropoff_time, 0, 2);
+	$dropoff_time			= (int) substr($dropoff_time, 0, 2);
 	$delDate 					= get_field('vendor_require_delivery_day','user_'.$vendor_id);
 	$delClosedDates		= get_field('vendor_closed_day','user_'.$vendor_id);
 	$delWeekDays			= get_field('openning','user_'.$vendor_id);
@@ -4543,4 +4582,84 @@ function get_vendor_days_until_delivery($vendor_id){
 	}
 
 	return $days_until_delivery;
+}
+
+function build_intervals($items, $is_contiguous, $make_interval) {
+		$intervals = array();
+		$end   = false;
+		if(is_array($items) || is_object($items)){
+			foreach ($items as $item) {
+					if (false === $end) {
+							$begin = (int) $item;
+							$end   = (int) $item;
+							continue;
+					}
+					if ($is_contiguous($end, $item)) {
+							$end = (int) $item;
+							continue;
+					}
+					$intervals[] = $make_interval($begin, $end);
+					$begin = (int) $item;
+					$end   = (int) $item;
+			}
+		}
+		if (false !== $end) {
+				$intervals[] = $make_interval($begin, $end);
+		}
+		return $intervals;
+}
+
+function get_del_days_text($opening, $del_type = '1', $long_or_short_text = 0){
+	$open_iso_days = array();
+	$open_label_days = array();
+	foreach($opening as $k => $v){
+		$open_iso_days[] = (int) $v['value'];
+		$open_label_days[$v['value']] = $v['label'];
+	}
+
+	$str = '';
+	$interv = array();
+	if(!empty($open_iso_days) && is_array($open_iso_days)){
+		$interv = build_intervals($open_iso_days, function($a, $b) { return ($b - $a) <= 1; }, function($a, $b) { return $a."..".$b; });
+	} else {
+		$str .= 'Leveringsdage er ukendte';
+		if($long_or_short_text == 1){
+			$str .= 'Butikkens'.strtolower($str);
+		}
+	}
+	$i = 1;
+
+	if(!empty($opening) && !empty($interv) && count($interv) > 0){
+		if($del_type == "1"){
+			$str .= 'Leverer ';
+		} else if($del_type == "0"){
+			$str .= 'Afsender ';
+		}
+		if($long_or_short_text == 1){
+			$str = "Butikken ".strtolower($str);
+		}
+
+		foreach($interv as $v){
+			$val = explode('..',$v);
+			if(!empty($val)){
+				$start = isset($open_label_days[$val[0]])? $open_label_days[$val[0]] : '';
+				if($val[0] != $val[1])
+				{
+					$end = isset($open_label_days[$val[1]]) ? $open_label_days[$val[1]] : '';
+					if(!empty($start) && !empty($end)){
+						$str .=  strtolower($start."-".$end);
+					}
+				} else {
+					$str .=  strtolower($start);
+				}
+				if(count($interv) > 1){
+					if(count($interv)-1 == $i){ $str .=  " og "; }
+					else if(count($interv) > $i) { $str .=  ', ';}
+				}
+			}
+			$i++;
+		}
+	}
+
+	return $str;
 }

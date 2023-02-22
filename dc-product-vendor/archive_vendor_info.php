@@ -524,76 +524,8 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
               <path d="M10.828.122A.5.5 0 0 1 11 .5V1h.5A1.5 1.5 0 0 1 13 2.5V15h1.5a.5.5 0 0 1 0 1h-13a.5.5 0 0 1 0-1H3V1.5a.5.5 0 0 1 .43-.495l7-1a.5.5 0 0 1 .398.117zM11.5 2H11v13h1V2.5a.5.5 0 0 0-.5-.5zM4 1.934V15h6V1.077l-6 .857z"/>
             </svg>
             <?php
-            function build_intervals($items, $is_contiguous, $make_interval) {
-                  $intervals = array();
-                  $end   = false;
-                  if(is_array($items) || is_object($items)){
-                    foreach ($items as $item) {
-                        if (false === $end) {
-                            $begin = (int) $item;
-                            $end   = (int) $item;
-                            continue;
-                        }
-                        if ($is_contiguous($end, $item)) {
-                            $end = (int) $item;
-                            continue;
-                        }
-                        $intervals[] = $make_interval($begin, $end);
-                        $begin = (int) $item;
-                        $end   = (int) $item;
-                    }
-                  }
-                  if (false !== $end) {
-                      $intervals[] = $make_interval($begin, $end);
-                  }
-                  return $intervals;
-              }
-
               $opening = get_field('openning', 'user_'.$vendor_id);
-              $open_iso_days = array();
-              $open_label_days = array();
-              foreach($opening as $k => $v){
-                $open_iso_days[] = (int) $v['value'];
-                $open_label_days[$v['value']] = $v['label'];
-              }
-
-              $interv = array();
-              if(!empty($open_iso_days) && is_array($open_iso_days)){
-                $interv = build_intervals($open_iso_days, function($a, $b) { return ($b - $a) <= 1; }, function($a, $b) { return $a."..".$b; });
-              } else {
-                print 'Butikkens leveringsdage er ukendte';
-              }
-              $i = 1;
-
-              if(!empty($opening) && !empty($interv) && count($interv) > 0){
-
-                if($del_value == "1"){
-                  echo 'Butikken leverer ';
-                } else if($del_value == "0"){
-                  echo 'Butikken afsender ';
-                }
-
-                foreach($interv as $v){
-                  $val = explode('..',$v);
-                  if(!empty($val)){
-                    $start = isset($open_label_days[$val[0]])? $open_label_days[$val[0]] : '';
-                    if($val[0] != $val[1])
-                    {
-                      $end = isset($open_label_days[$val[1]]) ? $open_label_days[$val[1]] : '';
-                      if(!empty($start) && !empty($end)){
-                        print strtolower($start."-".$end);
-                      }
-                    } else {
-                      print strtolower($start);
-                    }
-                    if(count($interv) > 1){
-                      if(count($interv)-1 == $i){ print " og "; }
-                      else if(count($interv) > $i) { print ', ';}
-                    }
-                  }
-                  $i++;
-                }
-              }
+              echo get_del_days_text($opening, $del_value, 1);
             ?>
           </div>
           <div class="col-lg-3 d-lg-inline pt-1 pt-lg-0 opening-row" style="display: none;">
