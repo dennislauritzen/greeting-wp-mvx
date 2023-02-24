@@ -3271,75 +3271,10 @@ function greeting_echo_date_picker(  ) {
 			'custom_attributes' => array('readonly' => 'readonly')
 		), WC()->checkout->get_value( 'delivery_date' ) );
 
-		// Build intervals.
+		// Build intervals & delivery days.
 		$opening = get_field('openning', 'user_'.$vendor_id);
-		$open_iso_days = array();
-		$open_label_days = array();
-		foreach($opening as $k => $v){
-			$open_iso_days[] = (int) $v['value'];
-			$open_label_days[$v['value']] = $v['label'];
-		}
-
-		function build_intervals($items, $is_contiguous, $make_interval) {
-				$intervals = array();
-				$end   = false;
-				if(is_array($items) || is_object($items)){
-					foreach ($items as $item) {
-							if (false === $end) {
-									$begin = (int) $item;
-									$end   = (int) $item;
-									continue;
-							}
-							if ($is_contiguous($end, $item)) {
-									$end = (int) $item;
-									continue;
-							}
-							$intervals[] = $make_interval($begin, $end);
-							$begin = (int) $item;
-							$end   = (int) $item;
-					}
-				}
-				if (false !== $end) {
-						$intervals[] = $make_interval($begin, $end);
-				}
-				return $intervals;
-		}
-
-		$interv = array();
-		if(!empty($open_iso_days) && is_array($open_iso_days)){
-			$interv = build_intervals($open_iso_days, function($a, $b) { return ($b - $a) <= 1; }, function($a, $b) { return $a."..".$b; });
-		} else {
-			print 'Butikkens leveringsdage er ukendte';
-		}
-		$i = 1;
-
-		if(!empty($opening) && !empty($interv) && count($interv) > 0){
-			if($del_value == "1"){
-				echo '<p>Butikken kan levere gaver ';
-			} else if($del_value == "0"){
-				echo '<p>Butikken afsender gaver ';
-			}
-
-			foreach($interv as $v){
-				$val = explode('..',$v);
-				if(!empty($val)){
-					$start = isset($open_label_days[$val[0]])? $open_label_days[$val[0]] : '';
-					if($val[0] != $val[1]){
-						$end = isset($open_label_days[$val[1]]) ? $open_label_days[$val[1]] : '';
-						if(!empty($start) && !empty($end)){
-							print strtolower($start."-".$end);
-						}
-					} else {
-						print strtolower($start);
-					}
-					if(count($interv) > 1){
-						if(count($interv)-1 == $i){ print " og "; }
-						else if(count($interv) > $i) { print ', ';}
-					}
-				}
-				$i++;
-			}
-		}
+		$del_days = get_del_days_text($opening, $del_value, 1);
+		echo $del_days;
 		echo '.</p>';
 
 		echo '<div id="show-if-shipping">';
@@ -3645,6 +3580,7 @@ function get_close_stores(){
   $results = $query->get_results();
 
 	$store_arr = array();
+
 	foreach($results as $k => $v){
 		$vendor = get_user_meta($v->ID);
 		$vendor_page_slug = get_wcmp_vendor($v->ID);
@@ -3652,17 +3588,20 @@ function get_close_stores(){
 		$image = (!empty($vendor['_vendor_profile_image'])? $vendor['_vendor_profile_image'][0] : '');
 		$banner = (!empty($vendor['_vendor_banner'])? $vendor['_vendor_banner'][0] : '');
 
-		$vendor_banner = (!empty(wp_get_attachment_image_src($banner)) ? wp_get_attachment_image_src($banner, 'medium')[0] : $uploadDirBaseUrl.'/woocommerce-placeholder-300x300.png');
-		$vendor_picture = (!empty(wp_get_attachment_image_src($image)) ? wp_get_attachment_image_src($image, 'medium')[0] : $uploadDirBaseUrl.'/woocommerce-placeholder-300x300.png');
+		#$vendor_banner = (isset(wp_get_attachment_image_src($banner)) ? wp_get_attachment_image_src($banner, 'medium')[0] : $uploadDirBaseUrl.'/woocommerce-placeholder-300x300.png');
+		#$vendor_picture = (isset(wp_get_attachment_image_src($image)) ? wp_get_attachment_image_src($image, 'medium')[0] : $uploadDirBaseUrl.'/woocommerce-placeholder-300x300.png');
+		$vendor_banner = isset($vendor['_vendor_profile_image']) ? $vendor['_vendor_profile_image'][0] : '';
+		$vendor_picture = isset($vendor['_vendor_banner']) ? $vendor['_vendor_banner'][0] : '';
 		#$vendor_url = get_permalink();
 		#$vendor_desc = get_user_meta();
 
-		$description2 = (!empty($vendor['_vendor_description'][0]) ? $vendor['_vendor_description'][0] : '');
+		#$description2 = (!empty($vendor['_vendor_description'][0]) ? $vendor['_vendor_description'][0] : '');
+		$description2 = isset($vendor['_vendor_description'][0]) ? $vendor['_vendor_description'][0] : '';
 
-		if(strlen(wp_strip_all_tags($description2)) >= '98'){
-			$description = substr(wp_strip_all_tags($description2), 0, 95).'...';
-		} else {
+		if (strlen(wp_strip_all_tags($description2)) < 98) {
 			$description = $description2;
+		} else {
+			$description = substr(wp_strip_all_tags($description2), 0, 95) . '...';
 		}
 
 		$store = array(

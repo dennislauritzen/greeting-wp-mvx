@@ -149,8 +149,6 @@ get_header();
 
 
 
-
-
 <section id="howitworks" class="bg-light-grey py-3">
   <div class="container text-center py-5 my-4">
     <div class="row">
@@ -254,6 +252,7 @@ get_header();
 </section>
 
 <script type="text/javascript">
+
 jQuery(document).ready(function(){
   var ip = '';
   jQuery.get('https://ipapi.co/postal/', function(ip_data){
@@ -361,6 +360,7 @@ jQuery(document).ready(function(){
 
 
 <?php
+
 if (have_rows('frontpage_full_width_boxes', $this_post_id) ){
   while( have_rows('frontpage_full_width_boxes', $this_post_id)) : the_row();
     $image = get_sub_field('image');
@@ -446,6 +446,7 @@ if (have_rows('frontpage_full_width_boxes', $this_post_id) ){
     <?php
   endwhile;
 }
+
 ?>
 
 <section id="didyouknow" class="bg-light-grey pb-4">

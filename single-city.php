@@ -352,36 +352,33 @@ jQuery(document).ready(function(){
     } // end count.
     ?>
 
+
     <div class="col-12 py-0 my-4 mb-3">
       <h5 style="font-family: Inter;">Filtrér butikker - og find den helt rigtige gave</h5>
-      <a class="btn border-teal text-green mb-1" id="filterModalBtn" data-bs-toggle="modal" href="#filterModal" role="button">
+      <a class="btn border-teal text-green mb-1 modalBtn" id="filterModalDelDateBtn" data-bs-toggle="modal" data-cd-open="deliveryDates" href="#filterModal" role="button">
         &#128197;
-        &nbsp;
-        Vælg leveringsdato
+        &nbsp;Vælg leveringsdato
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
           <path d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
         </svg>
       </a>
-      <a class="btn border-teal text-green mb-1" id="filterModalBtn" data-bs-toggle="modal" href="#filterModal" role="button">
+      <a class="btn border-teal text-green mb-1 modalBtn" id="filterModalOccasionBtn" data-bs-toggle="modal" data-cd-open="occasionFilter" href="#filterModal" role="button">
         &#127874;
-        &nbsp
-        Vælg anledning
+        &nbsp;Vælg anledning
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
         <path d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
       </svg>
       </a>
-      <a class="btn border-teal text-green mb-1" id="filterModalBtn" data-bs-toggle="modal" href="#filterModal" role="button">
+      <a class="btn border-teal text-green mb-1 modalBtn" id="filterModalCategoryBtn" data-bs-toggle="modal" data-cd-open="categoryFilter"  href="#filterModal" role="button">
         &#128144;
-        &nbsp;
-        Vælg kategori
+        &nbsp;Vælg kategori
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down" viewBox="0 0 16 16">
           <path d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
         </svg>
       </a>
-      <a class="btn border-teal text-green mb-1" id="filterModalBtn" data-bs-toggle="modal" href="#filterModal" role="button">
+      <a class="btn border-teal text-green mb-1 modalBtn" id="filterModalPriceBtn" data-bs-toggle="modal" data-cd-open="priceFilter" href="#filterModal" role="button">
         &#128176;
-        &nbsp;
-        Pris
+        &nbsp;Pris
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down" viewBox="0 0 16 16">
           <path d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
         </svg>
@@ -392,6 +389,7 @@ jQuery(document).ready(function(){
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalToggleLabel" style="font-family: Inter,sans-serif; font-size: 15px;">Filtrér</h5>
+            <button type="button" class="btn-check" data-bs-dismiss="modal" aria-label="Approve"></button>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
@@ -411,13 +409,29 @@ jQuery(document).ready(function(){
             $dates[8] = 'Vis alle';
 
             ?>
-            <h5 class="text-uppercase mb-2" style="font-family: Inter,sans-serif; font-size: 15px;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#ffc107" class="bi bi-calendar" viewBox="0 0 16 16">
-                <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
-              </svg>&nbsp;
-              Hvornår skal gaven leveres?
-            </h5>
-            <div class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
+            <style type="text/css">
+            .collapse-btn {
+              position: relative;
+            }
+            .collapse-btn:before {
+              position: absolute;
+              content: "+";
+              font-size: 18px;
+              right: 25px;
+              top: -5px;
+              font-weight: bold;
+              color: #000000;
+              }
+              .collapse-btn[aria-expanded="true"]:before {
+              content: "-";
+            }
+            </style>
+            <a data-bs-toggle="collapse" href="#deliveryDates" class="collapse-btn mb-3" role="button" aria-expanded="false" aria-controls="deliveryDates">
+              <h5 class="text-uppercase text-dark pb-2" style="font-family: Inter,sans-serif; font-size: 15px;">
+                &#128197;&nbsp;Hvornår skal gaven leveres?
+              </h5>
+            </a>
+            <div class="dropdown rounded-3 list-unstyled overflow-hidden mb-4 collapse" id="deliveryDates">
             <?php
             foreach($dates as $k => $v){
               $closed_for_today = 0;
@@ -480,17 +494,13 @@ jQuery(document).ready(function(){
             }
             ?>
 
-            <h5 class="text-uppercase mb-2" style="font-family: Inter,sans-serif; font-size: 15px;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#ffc107" class="bi bi-cash-coin" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M11 15a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm5-4a5 5 0 1 1-10 0 5 5 0 0 1 10 0z"/>
-                <path d="M9.438 11.944c.047.596.518 1.06 1.363 1.116v.44h.375v-.443c.875-.061 1.386-.529 1.386-1.207 0-.618-.39-.936-1.09-1.1l-.296-.07v-1.2c.376.043.614.248.671.532h.658c-.047-.575-.54-1.024-1.329-1.073V8.5h-.375v.45c-.747.073-1.255.522-1.255 1.158 0 .562.378.92 1.007 1.066l.248.061v1.272c-.384-.058-.639-.27-.696-.563h-.668zm1.36-1.354c-.369-.085-.569-.26-.569-.522 0-.294.216-.514.572-.578v1.1h-.003zm.432.746c.449.104.655.272.655.569 0 .339-.257.571-.709.614v-1.195l.054.012z"/>
-                <path d="M1 0a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h4.083c.058-.344.145-.678.258-1H3a2 2 0 0 0-2-2V3a2 2 0 0 0 2-2h10a2 2 0 0 0 2 2v3.528c.38.34.717.728 1 1.154V1a1 1 0 0 0-1-1H1z"/>
-                <path d="M9.998 5.083 10 5a2 2 0 1 0-3.132 1.65 5.982 5.982 0 0 1 3.13-1.567z"/>
-              </svg>&nbsp;
-              Pris
-            </h5>
+            <a data-bs-toggle="collapse" href="#priceFilter" class="collapse-btn mb-3" role="button" aria-expanded="false" aria-controls="priceFilter">
+              <h5 class="text-uppercase text-dark pb-2" style="font-family: Inter,sans-serif; font-size: 15px;">
+                &#128176;&nbsp;Pris
+              </h5>
+            </a>
 
-            <div class="row">
+            <div class="row  collapse" id="priceFilter">
               <div class="col-12">
                 <input type="hidden" name="filter_del_price_default" value="0-<?php echo $maxProductPrice; ?>">
                 <div class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
@@ -530,13 +540,12 @@ jQuery(document).ready(function(){
              * ---------------------
             **/
             ?>
-            <h5 class="text-uppercase mb-2" style="font-family: Inter,sans-serif; font-size: 15px;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#ffc107" class="bi bi-star-fill" viewBox="0 0 16 16">
-                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
-              </svg>&nbsp;
-              Levering
-            </h5>
-            <ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
+            <a data-bs-toggle="collapse" href="#delTypeFilter" class="collapse-btn mb-3" role="button" aria-expanded="false" aria-controls="delTypeFilter">
+              <h5 class="text-uppercase text-dark pb-2" style="font-family: Inter,sans-serif; font-size: 15px;">
+                &#128757;&nbsp;Levering
+              </h5>
+            </a>
+            <ul class="dropdown rounded-3 list-unstyled overflow-hidden collapse mb-4" id="delTypeFilter">
 
             <div class="form-check form-switch">
                 <input type="checkbox" name="filter_del_city" class="form-check-input filter-on-city-page" id="filter_delivery_1" checked="checked" value="1">
@@ -561,13 +570,13 @@ jQuery(document).ready(function(){
              * ---------------------
             **/
             ?>
-            <h5 class="text-uppercase mb-2" style="font-family: Inter,sans-serif; font-size: 15px;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#ffc107" class="bi bi-balloon-heart" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="m8 2.42-.717-.737c-1.13-1.161-3.243-.777-4.01.72-.35.685-.451 1.707.236 3.062C4.16 6.753 5.52 8.32 8 10.042c2.479-1.723 3.839-3.29 4.491-4.577.687-1.355.587-2.377.236-3.061-.767-1.498-2.88-1.882-4.01-.721L8 2.42Zm-.49 8.5c-10.78-7.44-3-13.155.359-10.063.045.041.089.084.132.129.043-.045.087-.088.132-.129 3.36-3.092 11.137 2.624.357 10.063l.235.468a.25.25 0 1 1-.448.224l-.008-.017c.008.11.02.202.037.29.054.27.161.488.419 1.003.288.578.235 1.15.076 1.629-.157.469-.422.867-.588 1.115l-.004.007a.25.25 0 1 1-.416-.278c.168-.252.4-.6.533-1.003.133-.396.163-.824-.049-1.246l-.013-.028c-.24-.48-.38-.758-.448-1.102a3.177 3.177 0 0 1-.052-.45l-.04.08a.25.25 0 1 1-.447-.224l.235-.468ZM6.013 2.06c-.649-.18-1.483.083-1.85.798-.131.258-.245.689-.08 1.335.063.244.414.198.487-.043.21-.697.627-1.447 1.359-1.692.217-.073.304-.337.084-.398Z"/>
-              </svg>
-              Kategori
-            </h5>
-            <ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
+            <a data-bs-toggle="collapse" href="#categoryFilter" class="collapse-btn mb-3" role="button" aria-expanded="false" aria-controls="categoryFilter">
+              <h5 class="text-uppercase text-dark pb-2" style="font-family: Inter,sans-serif; font-size: 15px;">
+                &#128144;&nbsp;Kategori
+              </h5>
+            </a>
+
+            <ul class="dropdown rounded-3 list-unstyled overflow-hidden collapse mb-4" id="categoryFilter">
 
             <?php
             // search users for get filtered category
@@ -603,14 +612,12 @@ jQuery(document).ready(function(){
              * ---------------------
             **/
             ?>
-            <h5 class="text-uppercase mb-2" style="font-family: Inter,sans-serif; font-size: 15px;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#ffc107" class="bi bi-calendar3-event" viewBox="0 0 16 16">
-                <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857V3.857z"/>
-                <path d="M12 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
-              </svg>&nbsp;
-              Anledning
-            </h5>
-            <ul class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
+            <a data-bs-toggle="collapse" href="#occasionFilter" class="collapse-btn mb-3" role="button" aria-expanded="false" aria-controls="occasionFilter">
+              <h5 class="text-uppercase text-dark pb-2" style="font-family: Inter,sans-serif; font-size: 15px;">
+                &#127874;&nbsp;Anledning
+              </h5>
+            </a>
+            <ul class="dropdown rounded-3 list-unstyled overflow-hidden collapse mb-4" id="occasionFilter">
             <?php
             // Occassion
 
@@ -1247,6 +1254,13 @@ jQuery(document).ready(function(){
       container.animate({
         scrollLeft: '-=' + (card_cont.outerWidth(true)-1) * numCardsToScroll
       }, '2');
+    });
+
+    jQuery(".modalBtn").click(function(){
+      var uncollapseItem = jQuery(this).data('cd-open');
+
+      jQuery('.collapse.show').removeClass('show');
+      jQuery('#'+uncollapseItem).addClass('show');
     });
   });
 </script>
