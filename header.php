@@ -627,9 +627,12 @@
 	  </style>
 
 		<div class="bg-pink small text-uppercase">
+			<!-- TrustBox script -->
+			<script type="text/javascript" src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
+			<!-- End TrustBox script -->
 	    <div class="topbar d-block d-lg-none d-xl-none">
 				<ul>
-		      <li>&#10003; Gaver fra lokale, danske butikker</li>
+		      <li><?php echo trim(get_field('header_usp1', 'options')); ?></li>
 		      <li>
 						<div
 						class="nav trustpilot-widget"
@@ -640,17 +643,14 @@
 						<a href="https://dk.trustpilot.com/review/greeting.dk" target="_blank" rel="noopener">Trustpilot</a>
 						</div>
 					</li>
-		      <li>&#10003; 100+ danske butikker</li>
-		      <li>&#10003; Mere end 2.000 produkter</li>
+		      <li><?php echo trim(get_field('header_usp3', 'options')); ?></li>
+		      <li><?php echo trim(get_field('header_usp4', 'options')); ?></li>
 		    </ul>
 	    </div>
 	    <div class="container-xxl d-none d-lg-block d-xl-block text-center">
 				<div class="row">
-					<div class="col-4 py-2">&#10003; Gaver fra lokale, danske butikker</div>
+					<div class="col-4 py-2"><?php echo trim(get_field('header_usp1', 'options')); ?></div>
 		      <div class="col-3 py-2">
-						<!-- TrustBox script -->
-						<script type="text/javascript" src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
-						<!-- End TrustBox script -->
 						<div
 						class="nav trustpilot-widget"
 						style="text-align: center; overflow-x: visible; width: 100%;"
@@ -660,8 +660,8 @@
 						<a href="https://dk.trustpilot.com/review/greeting.dk" target="_blank" rel="noopener">Trustpilot</a>
 						</div>
 					</div>
-		      <div class="col-3 py-2">&#10003; 100+ danske butikker</div>
-		      <div class="col-2 py-2">&#10003; 2.000+ produkter</div>
+		      <div class="col-3 py-2"><?php echo trim(get_field('header_usp3', 'options')); ?></div>
+		      <div class="col-2 py-2"><?php echo trim(get_field('header_usp4', 'options')); ?></div>
 				</div>
 	    </div>
 	  </div>

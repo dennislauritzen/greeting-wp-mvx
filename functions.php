@@ -631,6 +631,16 @@ if( function_exists('acf_add_options_page') ) {
 		'menu_title'	=> 'City Page',
 		'parent_slug'	=> 'theme-general-settings',
 	));
+	acf_add_options_sub_page(array(
+		'page_title' 	=> 'Theme Block: Did You Know',
+		'menu_title'	=> 'Vidste Du At-block',
+		'parent_slug'	=> 'theme-general-settings',
+	));
+	acf_add_options_sub_page(array(
+		'page_title' 	=> 'Header: USPs',
+		'menu_title'	=> 'Header: USPer',
+		'parent_slug'	=> 'theme-general-settings',
+	));
 }
 
 
