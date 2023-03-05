@@ -107,7 +107,7 @@ get_header();
                       <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
                     </svg>
                   </button>
-                  <ul id="datafetch_wrapper" class="d-none list-group position-relative recommandations position-absolute list-unstyled rounded w-75 bg-white" style="top: 57px; ">
+                  <ul id="datafetch_wrapper" class="d-inline list-group position-relative recommandations position-absolute list-unstyled rounded w-75 bg-white" style="top: 57px; ">
                   </ul>
                   </div>
                 </form>
@@ -120,31 +120,13 @@ get_header();
       </div>
     </div>
 </section>
-<section id="pressmentions" class="pressmentions">
-  <div class="container">
-    <div class="row py-5">
-      <div class="col-12 col-md-3 pb-3 pb-md-0 d-flex align-items-center text-center">
-        <div class="w-100 align-middle" style="font-family: 'Inter',sans-serif;">Greeting.dk har været nævnt i</div>
-      </div>
-      <div class="col-12 col-md-9">
-        <div class="row d-flex align-items-center pb-3 pb-md-0">
-          <div class="col-6 col-md-3 align-middle">
-            <img class="w-75 align-middle" src="https://www.greeting.dk/wp-content/uploads/2022/08/jyllands-posten-logo.png">
-          </div>
-          <div class="col-6 col-md-3 align-middle pb-3 pb-md-0">
-            <img class="w-75 align-middle" src="https://www.greeting.dk/wp-content/uploads/2022/08/finans-logo.png">
-          </div>
-          <div class="col-6 col-md-3 align-middle pb-3 pb-md-0">
-            <img class="w-75 align-middle" src="https://www.greeting.dk/wp-content/uploads/2022/08/migogodense-logo.png">
-          </div>
-          <div class="col-6 col-md-3 align-middle pb-3 pb-md-0">
-            <img class="w-75 align-middle" src="https://www.greeting.dk/wp-content/uploads/2022/08/hsfo-logo.png">
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+
+
+<?php
+
+get_template_part('template-parts/inc/blocks/press-mentions');
+
+?>
 
 
 
@@ -241,11 +223,18 @@ get_header();
 
 
 
-<section id="inspiration" class="inspirationstores" style="display: none;">
+<section id="inspiration" style="display: none;">
   <div class="container">
-    <div class="store_container row my-4 py-5">
-      <div clsas="col-12">
+    <div class="store_container row my-4 pt-5">
+      <div class="col-12">
         <h4 class="h1 pb-5 mb-3 text-center">📍 Bliv inspireret i lækre butikker nær dig</h4>
+      </div>
+    </div>
+    <div class="row pb-5">
+      <div class="col-12">
+        <div class="loadedcontent row">
+
+        </div>
       </div>
     </div>
   </div>
@@ -298,29 +287,8 @@ jQuery(document).ready(function(){
           }
         },
         success: function(data) {
-          data_arr = jQuery.parseJSON(data);
-
-          if(data_arr.length > 0){
-            jQuery.each(data_arr, function(k, v) {
-              var banner = v.banner;
-              var name = v.store_name;
-              var description = v.description;
-              var link = v.link;
-
-              var div_elm = jQuery("<div>", {"class": "col-12 pb-3 pb-lg-0 pb-xl-0 col-sm-6 col-lg-3"});
-              var card_elm = jQuery("<div>",{"class": "card"});
-              var card_img = jQuery("<img>",{"class": "card-img-top", "src": banner, "alt": name})
-              var card_body = jQuery("<div>",{"class": "card-body"});
-              var card_title = jQuery("<div>",{"class": "card-title"}).text(name);
-              var card_text = jQuery("<p>",{"class": "card-text"}).text(description);
-              var card_link = jQuery("<a>",{"class": "rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link", "href": link}).text('Gå til butik');
-
-              card_body.append(card_title).append(card_text).append(card_link);
-              card_elm.append(card_img).append(card_body);
-              div_elm.append(card_elm);
-
-              jQuery("#inspiration div.store_container").append(div_elm);
-            });
+          if(data){
+            jQuery("#inspiration div.loadedcontent").html(data);
             jQuery("#inspiration").css('display','block');
           }
         }

@@ -1,3 +1,38 @@
+<?php
+global $WCMp;
+
+$cart_count = WC()->cart->cart_contents_count; // Set variable for cart item count
+$cart_url = wc_get_cart_url();  // Set Cart URL
+
+/**
+ * Handle all vendor information
+ * For product pages top.
+ */
+
+global $product;
+$product_id = $product->get_id();
+$product_meta = get_post($product_id);
+$vendor_id = $product_meta->post_author;
+$vendor = get_wcmp_vendor($vendor_id);
+
+$vendor2 = get_user_meta($vendor_id);
+$banner = (!empty($vendor2['_vendor_banner'])? $vendor2['_vendor_banner'][0] : '');
+$vendor_banner = (!empty(wp_get_attachment_image_src($banner)) ? wp_get_attachment_image_src($banner, 'full')[0] : '');
+
+$cart_count = WC()->cart->cart_contents_count; // Set variable for cart item count
+$cart_url = wc_get_cart_url();  // Set Cart URL
+
+$del_type = '';
+$del_value = '';
+if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
+  $delivery_type = get_field('delivery_type', 'user_'.$vendor->id)[0];
+
+  $del_value = (empty($delivery_type['label']) ? $delivery_type : $delivery_type['value']);
+  $del_type = (empty($delivery_type['label']) ? $delivery_type : $delivery_type['label']);
+}
+
+ ?>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Merriweather:wght@300;400;700;900&family=Roboto+Slab:wght@100;200;300;400;500;600;700;800;900&family=Rubik:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -27,6 +62,7 @@
       font-size: 40px;
     }
   }
+
 
   #top {
     border-top: 3px solid #446a6b;
@@ -72,6 +108,18 @@
     transform: scale(1.015);
     box-shadow: 0 .5rem .75rem rgba(150,150,150, .175);
   }
+  div.card h6.card-title {
+    font-family: 'Rubik','Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  div.card p.price,
+  div.card bdi,
+  div.card div.price_hold {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+  }
 
 
   .top-search-btn {
@@ -86,6 +134,15 @@
   .top-search-input {
     padding-left: 30px;
   }
+
+  /**
+   * Remove the rounded corners on top line
+   */
+	@media (max-width: 575px) {
+		.rounded.storebar {
+			border-radius: 0px !important;
+		}
+	}
 
 	#product h1 {
 		font-family: 'Rubik','Inter',sans-serif;
@@ -134,7 +191,7 @@
 
 
 	/*
-  * section#hotitworks
+  * section#howitworks
   * How it works section
   * --
   */
@@ -282,50 +339,7 @@
 	}
 </style>
 
-
-<?php
-
-
-$cart_count = WC()->cart->cart_contents_count; // Set variable for cart item count
-$cart_url = wc_get_cart_url();  // Set Cart URL
-
-/**
- * Handle all vendor information
- * For product pages top.
- */
-
- global $product;
- global $WCMp;
- $product_id = $product->get_id();
- $product_meta = get_post($product_id);
- $vendor_id = $product_meta->post_author;
- $vendor = get_wcmp_vendor($vendor_id);
-
- $vendor2 = get_user_meta($vendor_id);
- $banner = (!empty($vendor2['_vendor_banner'])? $vendor2['_vendor_banner'][0] : '');
- $vendor_banner = (!empty(wp_get_attachment_image_src($banner)) ? wp_get_attachment_image_src($banner, 'full')[0] : '');
-
- $cart_count = WC()->cart->cart_contents_count; // Set variable for cart item count
- $cart_url = wc_get_cart_url();  // Set Cart URL
-
- $del_type = '';
- $del_value = '';
- if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
-   $delivery_type = get_field('delivery_type', 'user_'.$vendor->id)[0];
-
-   if(empty($delivery_type['label'])){
-     $del_value = $delivery_type;
-     $del_type = $delivery_type;
-   } else {
-     $del_value = $delivery_type['value'];
-     $del_type = $delivery_type['label'];
-   }
- }
-
- ?>
-
-
- <section id="top" class="pt-1" style="min-height: 300px; background-size: cover; background-position: center center; background-image: linear-gradient(rgba(0, 0, 0, 0.35),rgba(0, 0, 0, 0.35)),url('<?php echo (empty($vendor_banner) ? 'https://www.greeting.dk/wp-content/uploads/2022/04/pexels-furkanfdemir-6309844-1-scaled.jpg' : esc_url($vendor_banner)); ?>');">
+ <section id="top" class="pt-1" style="min-height: 275px; background-size: cover; background-position: center center; background-image: linear-gradient(rgba(0, 0, 0, 0.35),rgba(0, 0, 0, 0.35)),url('<?php echo (empty($vendor_banner) ? 'https://www.greeting.dk/wp-content/uploads/2022/04/pexels-furkanfdemir-6309844-1-scaled.jpg' : esc_url($vendor_banner)); ?>');">
   <div class="container py-4">
     <div class="row">
 			<div class="d-flex pb-3 pb-lg-0 pb-xl-0 position-relative justify-content-center justify-content-lg-start justify-content-xl-start col-md-12 col-lg-3">
@@ -433,7 +447,15 @@ $cart_url = wc_get_cart_url();  // Set Cart URL
   <div class="container d-flex align-items-end" style="height: inherit; min-height: inherit;">
     <div class="row">
 			<div class="col-12 m-0 p-0">
-        <h2 class="text-white m-0 p-0"><?php echo ucfirst(esc_html($vendor->page_title)); ?></h2>
+        <?php
+        $term = get_queried_object();
+
+        if($term->taxonomy == 'dc_vendor_shop'){
+        ?>
+          <h1 class="text-white fs-1 m-0 p-0"><?php echo ucfirst(esc_html($vendor->page_title)); ?></h1>
+        <?php } else { ?>
+          <h2 class="text-white fs-1 m-0 p-0"><?php echo ucfirst(esc_html($vendor->page_title)); ?></h2>
+        <?php } ?>
       </div>
       <div class="col-12 ">
         <div class="rating pb-2">
@@ -480,18 +502,28 @@ $cart_url = wc_get_cart_url();  // Set Cart URL
 <section class="sticky-top mt-n3 mb-5" style="margin-top: -25px;">
   <div class="container">
     <div class="row">
-      <div class="col-12 rounded bg-white py-3 shadow-sm">
+      <div class="col-12 rounded storebar bg-white py-3 shadow-sm">
         <div class="row align-items-center">
           <div class="d-flex col-md-12 col-lg-3 align-items-center">
-            <div class="col-9 col-lg-12">
+            <div class="col-8 col-md-6 col-lg-12 align-items-center">
               <?php
       					$image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
       				?>
-              <a href="<?php echo $vendor->get_permalink(); ?>" class="text-dark">
-                <img class="img-fuid pe-1" style="max-height:75px;"
-                  src="<?php echo esc_attr($image); ?>">
-                <?php echo ucfirst(esc_html($vendor->page_title)); ?>
-              </a>
+              <div class="d-flex align-items-center">
+                <div class="w-25 float-start">
+                  <a href="<?php echo $vendor->get_permalink(); ?>" class="text-dark">
+                    <img class="img-fuid pe-1" style="max-height:75px;"
+                    src="<?php echo esc_attr($image); ?>">
+                  </a>
+                </div>
+                <div class="w-75">
+                  <a href="<?php echo $vendor->get_permalink(); ?>" class="text-dark">
+                    <?php echo ucfirst(esc_html($vendor->page_title)); ?>
+                  </a>
+                  <br>
+                  <a href="#" class="text-dark text-decoration-underline" style="font-size: 13px;" data-bs-toggle="modal" data-bs-target="#storeDescriptionModal">Læs mere om butikken</a>
+                </div>
+              </div>
             </div>
             <div class="d-lg-none col-3 col-lg-0">
               <button type="button" id="toggleOpening" class="d-lg-none btn btn-primary bg-teal border-0 py-2 px-1 px-sm-4" style="font-size:12px;">
@@ -654,3 +686,191 @@ $cart_url = wc_get_cart_url();  // Set Cart URL
     </div>
   </div>
 </section>
+
+
+<!-- Modal -->
+<div class="modal fade" id="storeDescriptionModal" tabindex="-1" aria-labelledby="storeDescriptionModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="storeDescriptionModalLabel" style="font-family: 'Inter',sans-serif;">
+          <?php echo ucfirst(esc_html($vendor->page_title)); ?>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <?php
+        $image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
+
+        $description = get_user_meta($vendor_id, '_vendor_description', true);
+        ?>
+        <div>
+          <?php
+          if(!empty($banner)){
+          ?>
+          <img src="<?php echo $vendor_banner; ?>">
+          <?php
+          }
+          ?>
+          <p>
+            <b>Adresse</b>
+            <br>
+            <?php echo $location; ?>
+          </p>
+          <h6 class="pt-2" style="font-family: 'Inter';">Beskrivelse af butikken</h6>
+          <?php echo wp_kses_post(htmlspecialchars_decode( wpautop( $description ), ENT_QUOTES )); ?>
+
+          <p>
+            <b>Åbningsdage:</b>
+            <br>
+            <?php
+              $opening = get_field('openning', 'user_'.$vendor->id);
+              $open_iso_days = array();
+              $open_label_days = array();
+              foreach($opening as $k => $v){
+                $open_iso_days[] = (int) $v['value'];
+                $open_label_days[$v['value']] = $v['label'];
+              }
+
+              if( !function_exists('build_intervals')){
+              	function build_intervals($items, $is_contiguous, $make_interval) {
+              			$intervals = array();
+              			$end   = false;
+              			if(is_array($items) || is_object($items)){
+              				foreach ($items as $item) {
+              						if (false === $end) {
+              								$begin = (int) $item;
+              								$end   = (int) $item;
+              								continue;
+              						}
+              						if ($is_contiguous($end, $item)) {
+              								$end = (int) $item;
+              								continue;
+              						}
+              						$intervals[] = $make_interval($begin, $end);
+              						$begin = (int) $item;
+              						$end   = (int) $item;
+              				}
+              			}
+              			if (false !== $end) {
+              					$intervals[] = $make_interval($begin, $end);
+              			}
+              			return $intervals;
+              	}
+              }
+
+              $interv = array();
+              if(!empty($open_iso_days) && is_array($open_iso_days)){
+                $interv = build_intervals($open_iso_days, function($a, $b) { return ($b - $a) <= 1; }, function($a, $b) { return $a."..".$b; });
+              } else {
+                print 'Butikkens leveringsdage er ukendte';
+              }
+              $i = 1;
+
+              if(!empty($opening) && !empty($interv) && count($interv) > 0){
+
+                if($del_value == "1"){
+                  echo 'Butikken leverer ';
+                } else if($del_value == "0"){
+                  echo 'Butikken afsender ';
+                }
+
+                foreach($interv as $v){
+                  $val = explode('..',$v);
+                  if(!empty($val)){
+                    $start = isset($open_label_days[$val[0]])? $open_label_days[$val[0]] : '';
+                    if($val[0] != $val[1])
+                    {
+                      $end = isset($open_label_days[$val[1]]) ? $open_label_days[$val[1]] : '';
+                      if(!empty($start) && !empty($end)){
+                        print strtolower($start."-".$end);
+                      }
+                    } else {
+                      print strtolower($start);
+                    }
+                    if(count($interv) > 1){
+                      if(count($interv)-1 == $i){ print " og "; }
+                      else if(count($interv) > $i) { print ', ';}
+                    }
+                  }
+                  $i++;
+                }
+              }
+            ?>
+          </p>
+
+          <p><b>Leveringsinformation</b>:
+
+
+            <br>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-door-open" viewBox="0 0 16 16">
+              <path d="M8.5 10c-.276 0-.5-.448-.5-1s.224-1 .5-1 .5.448.5 1-.224 1-.5 1z"/>
+              <path d="M10.828.122A.5.5 0 0 1 11 .5V1h.5A1.5 1.5 0 0 1 13 2.5V15h1.5a.5.5 0 0 1 0 1h-13a.5.5 0 0 1 0-1H3V1.5a.5.5 0 0 1 .43-.495l7-1a.5.5 0 0 1 .398.117zM11.5 2H11v13h1V2.5a.5.5 0 0 0-.5-.5zM4 1.934V15h6V1.077l-6 .857z"/>
+            </svg>
+            <?php
+            if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
+              if($del_value == "1"){
+                echo 'Personlig levering til døren';
+              } else if($del_value == "0"){
+                echo 'Forsendelse med fragtfirma (2-3 hverdages transporttid)';
+              }
+            } else {
+              echo 'Butikkens leveringstype er ukendt.';
+            }
+            ?>
+
+
+
+            <br>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-door-open" viewBox="0 0 16 16">
+              <path d="M8.5 10c-.276 0-.5-.448-.5-1s.224-1 .5-1 .5.448.5 1-.224 1-.5 1z"/>
+              <path d="M10.828.122A.5.5 0 0 1 11 .5V1h.5A1.5 1.5 0 0 1 13 2.5V15h1.5a.5.5 0 0 1 0 1h-13a.5.5 0 0 1 0-1H3V1.5a.5.5 0 0 1 .43-.495l7-1a.5.5 0 0 1 .398.117zM11.5 2H11v13h1V2.5a.5.5 0 0 0-.5-.5zM4 1.934V15h6V1.077l-6 .857z"/>
+            </svg>
+            Bestil inden kl.
+              <?php
+              $drop_off_time = (!empty(get_field('vendor_drop_off_time', 'user_'.$vendor->id)) ? get_field('vendor_drop_off_time', 'user_'.$vendor->id) : '11');
+              if(strpos($drop_off_time,':') === false && strpos($drop_off_time,'.') === false){
+                $drop_off_time = $drop_off_time.':00';
+              } else {
+                $drop_off_time = str_replace(array(':','.'),array(':',':'),$drop_off_time);
+              }
+              echo $drop_off_time;
+              ?>
+            for
+
+            <?php
+            if($del_value == "1"){
+              echo ' levering ';
+            } else if($del_value == "0"){
+              echo ' forsendelse ';
+            }
+            ?>
+
+            <?php
+              if(get_field('vendor_require_delivery_day', 'user_'.$vendor->id) == 0)
+              {
+                echo ' i dag';
+              }
+                else if(get_field('vendor_require_delivery_day', 'user_'.$vendor->id) == 1)
+              {
+                echo ' i morgen';
+              } else {
+                if(!empty(get_field('vendor_require_delivery_day', 'user_'.$vendor->id))){
+                  echo ' om '.get_field('vendor_require_delivery_day', 'user_'.$vendor->id)." hverdage";
+                } else {
+                  echo 'om 2 hverdage';
+                }
+              }
+            ?>
+          </p>
+        </div>
+        <?php
+
+        ?>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Luk</button>
+      </div>
+    </div>
+  </div>
+</div>

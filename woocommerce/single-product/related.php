@@ -22,12 +22,32 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 if ( $related_products ) :
 
-global $product;
+global $WCMp, $product;
+
 $product_id = $product->get_id();
 $product_meta = get_post($product_id);
 $vendor_id = $product_meta->post_author;
 $vendor = get_wcmp_vendor($vendor_id);
+
+if(!is_object($vendor)){
+  return;
+}
+
+$del_type = '';
+$del_value = '';
+if(!empty(get_field('delivery_type', 'user_'.$vendor_id))){
+  $delivery_type = get_field('delivery_type', 'user_'.$vendor_id)[0];
+
+  if(empty($delivery_type['label'])){
+    $del_value = $delivery_type;
+    $del_type = $delivery_type;
+  } else {
+    $del_value = $delivery_type['value'];
+    $del_type = $delivery_type['label'];
+  }
+}
 unset($product);
+
 $vendorProducts = $vendor->get_products(array('fields' => 'all', 'posts_per_page' => 3));
 
 ?>

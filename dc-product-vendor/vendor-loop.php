@@ -1,5 +1,13 @@
 <?php
 
+global $WCMp;
+
+if(isset($args['cityName'])){
+  $cityName = $args['cityName'];
+}
+if(isset($args['postalCode'])){
+  $postalCode = $args['postalCode'];
+}
 if($args['vendor']){
   $vendor = $args['vendor'];
   $vendor_id = $vendor->id;
@@ -29,10 +37,9 @@ if($args['vendor']){
   if(!empty($vendor_city)){
     $location .= $vendor_city.' ';
   }
+  $location = (in_array($vendor_id, array(38,76)) ? str_replace(array('{{city_name}}','{{postalcode}}'),array($cityName,$postalCode), get_field('adress_text_for_greeting_stores', 'option')) : $location);
 }
-if($args['cityName']){
-  $cityName = $args['cityName'];
-}
+
 
 ?>
 <div class="col-12 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4 mb-2 d-flex align-items-stretch store">
@@ -117,7 +124,7 @@ if($args['cityName']){
         echo $description;
         if(count($word_arr) > $numwords){
           echo '...';
-        }?>
+        }?>&nbsp;
       </p>
 
       <!--<p class="lh-sm" style="font-size: 13px !important;">Butikken har flere forskellige gavehilsner, du kan vælge i mellem.</p>-->

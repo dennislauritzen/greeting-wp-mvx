@@ -167,99 +167,6 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor_id))){
         } // end if
         ?>
 				<?php
-        // --- CLOSED DATES --- Dennis.
-        function groupDates($input) {
-          $arr = explode(",", $input);
-          foreach($arr as $k => $v){
-            $arr[$k] = strtotime(trim($v));
-          }
-          sort($arr);
-          $expected = -1;
-          foreach ($arr as $date) {
-            if ($date == $expected) {
-              array_splice($range, 1, 1, date("d-m-Y",$date));
-            } else {
-              unset($range);
-              $range = [date("d-m-Y",$date)];
-              $ranges[] = &$range;
-            }
-            $expected = strtotime(date("d-m-Y",$date) . ' + 1 day');
-          }
-
-          foreach ($ranges as $entry) {
-            $result[] = $entry;
-          }
-          return $result;
-        }
-
-        function rephraseDate($weekday, $date, $month, $year){
-          switch($weekday){
-            case '1':
-              $weekday_str = 'mandag';
-              break;
-            case '2':
-              $weekday_str = 'tirsdag';
-              break;
-            case '3':
-              $weekday_str = 'onsdag';
-              break;
-            case '4':
-              $weekday_str = 'torsdag';
-              break;
-            case '5':
-              $weekday_str = 'fredag';
-              break;
-            case '6':
-              $weekday_str = 'lørdag';
-              break;
-            case '7':
-              $weekday_str = 'søndag';
-              break;
-          }
-
-          switch($month){
-            case '1':
-              $month_str = 'januar';
-              break;
-            case '2':
-              $month_str = 'februar';
-              break;
-            case '3':
-              $month_str = 'marts';
-              break;
-            case '4':
-              $month_str = 'april';
-              break;
-            case '5':
-              $month_str = 'maj';
-              break;
-            case '6':
-              $month_str = 'juni';
-              break;
-            case '7':
-              $month_str = 'juli';
-              break;
-            case '8':
-              $month_str = 'august';
-              break;
-            case '9':
-              $month_str = 'september';
-              break;
-            case '10':
-              $month_str = 'oktober';
-              break;
-            case '11':
-              $month_str = 'november';
-              break;
-            case '12':
-              $month_str = 'december';
-              break;
-          }
-          $year_str = ($year != date("Y") ? $year : '');
-
-          return $weekday_str." d. ".$date.". ".$month_str. " ". $year_str;
-        }
-
         // Get the date string and run the functions.
         $closed_dates = get_field('vendor_closed_day', 'user_'.$vendor_id);
 				$dates = explode(",",$closed_dates);
@@ -270,12 +177,12 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor_id))){
 
         if(count($result) > 0 && !empty($closed_dates))
         {
-          print '<p>Bemærk dog at butikken ikke leverer på følgende dage:</p>';
-
           $today = date("U");
-
+          $str = '';
           foreach($result as $v){
-            if(strtotime($v[0]) > $today || strtotime($v[1]) > $today){
+            if(
+              strtotime($v[0]) > $today ||
+              (isset($v[1]) && strtotime($v[1]) > $today)){
               // Rephrase the dato for readable dates.
               $start = rephraseDate(
                 date("N", strtotime($v[0])),
@@ -293,14 +200,18 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor_id))){
               }
 
               // Print the dates
-              print '<li>';
-              print $start;
+              $str .= '<li>';
+              $str .= $start;
               if(count($v) > 1){
-                print ' til ';
-                print $end;
+                $str .= ' til ';
+                $str .= $end;
               }
-              print '</li>';
+              $str .= '</li>';
             }
+          }
+
+          if(!empty($str)){
+            print '<p>Bemærk dog at butikken ikke leverer på følgende dage:</p>'.$str;
           }
         }
 				// --- END of CLOSED DATES --- Dennis.

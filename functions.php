@@ -773,10 +773,18 @@ function ajax_fetch() { ?>
 			});
 
 			/*Do the search with delay 500ms*/
-			jQuery('#front_Search-new_ucsa').keyup(delay(500, function (e) {
+			var $searchInput = jQuery('#front_Search-new_ucsa');
+			var $dataFetchWrapper = jQuery('#datafetch_wrapper');
+			var xhr; // declare the xhr variable outside the AJAX function
+
+			$searchInput.keyup(delay(400, function (e) {
 				var text = jQuery(this).val();
 
-				jQuery.ajax({
+				if (xhr) {
+		       xhr.abort(); // abort the previous request if it's still in progress
+		    }
+
+				xhr = jQuery.ajax({
 					url: '<?php echo admin_url('admin-ajax.php'); ?>',
 					type: 'post',
 					data: { action: 'data_fetch', keyword: text },
@@ -786,15 +794,48 @@ function ajax_fetch() { ?>
 						}
 					},
 					success: function(data) {
-						jQuery('#datafetch_wrapper').html( data );
+						$dataFetchWrapper.data('loading','0');
+
+						$dataFetchWrapper.html( data );
 						if(jQuery('input[name="keyword"]').val().length > 0){
-							jQuery('#datafetch_wrapper').removeClass('d-none').addClass('d-inline');
+							$dataFetchWrapper.removeClass('d-none').addClass('d-inline');
 						} else {
-							jQuery('#datafetch_wrapper').addClass('d-none').removeClass('d-inline');
+							$dataFetchWrapper.addClass('d-none').removeClass('d-inline');
 						}
 					}
 				});
-			})); // keyup + delay
+			}));  // keyup + delay
+
+
+			$searchInput.on("input", function(){
+			  var text = jQuery(this).val();
+			  var str_text = "Søger efter by/postnummer der matcher '"+text+"'...";
+			  var loading = $dataFetchWrapper.data('loading');
+
+				if (xhr) {
+		       xhr.abort(); // abort the previous request if it's still in progress
+		    }
+
+			  if(loading !== '1'){
+			    if(text.length > 0){
+			      $dataFetchWrapper.html('');
+			      var $loadingElm = jQuery("<li>", {"class": "recomms list-group-item py-2 px-1 bg-white"});
+			      var $div = jQuery('<div/>');
+			      var $loader = jQuery('<div/>').addClass('loader float-start d-block pe-1 align-middle').removeClass('d-none');
+			      var $loaderDiv = $div.clone().addClass('ms-2 align-middle').html($loader);
+			      var $textElm = jQuery('<span/>').addClass('loadingText').text(str_text);
+			      var $textDiv = $div.clone().addClass('loaderText').html($textElm);
+
+			      $dataFetchWrapper.removeClass('d-none').addClass('d-inline');
+			      $dataFetchWrapper.html($loadingElm.append($loaderDiv, $textDiv));
+			    }
+			  } else {
+			    $dataFetchWrapper.find('span.loadingText').text(str_text);
+			  }
+
+			  search_input_val = text;
+			  $dataFetchWrapper.data('loading', '1');
+			});
 	}); // jquery ready
 	</script>
 <?php
@@ -1075,9 +1116,9 @@ function catOccaDeliveryAction() {
 
 		foreach($delDateArr as $v){
 			$dropoff_time 		= get_field('vendor_drop_off_time','user_'.$v->ID);
-			$delDate 					= get_field('vendor_require_delivery_day','user_'.$v->ID);
+			$delDate 			= get_field('vendor_require_delivery_day','user_'.$v->ID);
 			$delClosedDates		= get_field('vendor_closed_day','user_'.$v->ID);
-			$delWeekDays			= get_field('openning','user_'.$v->ID);
+			$delWeekDays	    = get_field('openning','user_'.$v->ID);
 
 			$open_iso_days = array();
 			foreach($delWeekDays as $key => $val){
@@ -1603,8 +1644,8 @@ if(!is_cart() && !is_checkout()){
 if(!is_cart() && !is_checkout()){
 	add_action( 'wp_footer', 'vendStoreActionJavascript' );
 }
-function vendStoreActionJavascript() { ?>
-	<?php
+function vendStoreActionJavascript() {
+
 }
 
 function productFilterAction() {
@@ -1692,7 +1733,7 @@ function productFilterAction() {
 
 	<div>
 		<p id="noProductFound" style="margin-top: 50px; margin-bottom: 35px; padding: 15px 10px; background-color: #f8f8f8;">
-			No products were found matching your selection.
+			Der blev desværre ikke fundet nogle produkter, der matchede dine filtre.
 		</p>
 	</div>
 
@@ -1792,7 +1833,7 @@ use Dompdf\Dompdf; // reference the Dompdf namespace
 // add the action
 # add_action( 'woocommerce_thankyou', 'call_order_status_completed', 10, 1);
 // define woocommerce_order_status_completed callback function
-function call_order_status_completed( $array ) {
+function call_order_status_completed($array, $product_id) {
 
 	$latestOrderId = getLastOrderId(); // Last order ID
 	$order_hash = hash('md4','gree_ting_dk#!4r1242142fgriejgfto'.$latestOrderId.$latestOrderId);
@@ -1833,10 +1874,10 @@ function call_order_status_completed( $array ) {
 
 	//$orderData = $order->get_data(); // Get the order data in an array
 
-  // qr code begin
-  $codeContents = site_url().'/shop-order-status/?order_id='.$latestOrderId.'&oh='.$order_hash.'&sshh='.$order_hash2;
-	$qrcode = 'https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl='.$codeContents;
-	// qr code end
+    // qr code begin
+    $codeContents = site_url().'/shop-order-status/?order_id='.$latestOrderId.'&oh='.$order_hash.'&sshh='.$order_hash2;
+    $qrcode = 'https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl='.$codeContents;
+    // qr code end
 
 	// The tracking URL for tracking opening from the store.
 	$codeContents2 = site_url().'/be-shop-ot/?order_id='.$latestOrderId.'&oh='.$order_hash.'&sshh='.$order_hash2;
@@ -1848,7 +1889,7 @@ function call_order_status_completed( $array ) {
 		// Get the product object
 		$product = $item->get_product();
 		// Get the product Id
-		$productId = $product->get_id();
+        $product_id = $product->get_id();
 
 		$product_meta = get_post($product_id);
 		$vendor_id = $product_meta->post_author;
@@ -3030,27 +3071,63 @@ function get_vendor_delivery_days_required($vendor_id){
 }
 
 function get_vendor_closed_dates($vendor_id){
-	global $wpdb;
-	// get vendor closed day
-	$vendorClosedDayRow = $wpdb->get_row( "
-		SELECT * FROM {$wpdb->prefix}usermeta
-		WHERE user_id = $vendor_id
-		AND meta_key = 'vendor_closed_day'
-	" );
+    // Get the closed days / dates for the vendor.
+    $vendorClosedDay = get_user_meta($vendor_id, 'vendor_drop_off_time', true);
 
-	return $vendorClosedDayRow->meta_value;
+    return $vendorClosedDay;
 }
 
-function get_vendor_dropoff_time($vendor_id){
-	global $wpdb;
-	// get vendor drop off time
-	$vendorDropOffTimeRow = $wpdb->get_row( "
-		SELECT * FROM {$wpdb->prefix}usermeta
-		WHERE user_id = $vendor_id
-		AND meta_key = 'vendor_drop_off_time'
-	" );
+/**
+ * Function for getting the dropoff time for a specific vendor.
+ *
+ * @param $vendor_id
+ * @param $type
+ * @return string
+ */
+function get_vendor_dropoff_time($vendor_id, $type = 'weekday'){
+    // Get the dropoff time metavalue for the vendor.
+    $vendorDropOffTime = ($type == 'weekend' ? get_user_meta($vendor_id, 'vendor_drop_off_time_weekend', true) : get_user_meta($vendor_id, 'vendor_drop_off_time', true));
 
-	return $vendorDropOffTimeRow->meta_value;
+    if(strpos($vendorDropOffTime,':') === false && strpos($vendorDropOffTime,'.') === false){
+        $vendorDropOffTime = $vendorDropOffTime.':00';
+    } else {
+        $vendorDropOffTime = str_replace(array(':','.'),array(':',':'),$vendorDropOffTime);
+    }
+
+    return $vendorDropOffTime;
+}
+
+/**
+ * @param $vendor_id
+ * @param $return_type
+ * @return string|array
+ */
+function get_vendor_delivery_type($vendor_id, $return_type = 'type'){
+    // Get delivery type.
+    $del_type = '';
+    $del_value = '';
+
+    $delivery = get_field('delivery_type', 'user_'.$vendor_id);
+
+    if(!empty($delivery)){
+        $delivery_type = $delivery[0];
+
+        if(empty($delivery_type['label'])){
+            $del_value = $delivery_type;
+            $del_type = $delivery_type;
+        } else {
+            $del_value = $delivery_type['value'];
+            $del_type = $delivery_type['label'];
+        }
+    }
+
+    if($return_type == 'type'){
+        return $del_type;
+    } else if($return_type == 'value'){
+        return $del_value;
+    } else {
+        return array('value' => $del_value, 'type' => $del_type);
+    }
 }
 
 
@@ -3064,46 +3141,32 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 	global $wpdb;
 
 	// Explicitly set arrays used in the formula.
-	$closed_days_date = array();
 	$open_days = array();
 	$dates = array();
 
 	// Get the time the store has chosen as their "cut-off" / drop-off for next order.
 	$vendorDropOffTime = get_vendor_dropoff_time($vendor_id);
-	# Check if the field contains full time or just first 2 numbers
-	if(strpos($vendorDropOffTime,':') === false && strpos($vendorDropOffTime,'.') === false){
-		$vendorDropOffTime = $vendorDropOffTime.':00';
-	} else {
-		$vendorDropOffTime = str_replace(array(':','.'),array(':',':'),$vendorDropOffTime);
-	}
+    $vendorDropOffTimeWeekend = get_vendor_dropoff_time($vendor_id, 'weekend');
 
-	$vendorDeliverDayReq = get_vendor_delivery_days_required($vendor_id);
+    // Get the number of days required for delivery by the vendor
+    $vendorDeliveryDayReq = get_vendor_delivery_days_required($vendor_id);
 
 	// @todo - Dennis update according to latest updates in closing day-field.
-	// open close days begin
-	// Generate an array of all days ISO.
+	// open close days begin. Generate an array of all days ISO.
 	$default_days = ['1','2','3','4','5','6','7'];
 
 	// Get the opening days string/array from the database and handle it.
-	$openning_days = get_user_meta($vendor_id, 'openning', true); // true for not array return
-	if(is_array($openning_days)){
-		$closed_days = array_diff($default_days, $openning_days);
-	} else {
-		$closed_days = $default_days;
-	}
+	$opening_days = get_user_meta($vendor_id, 'openning', true); // true for not array return
+    $closed_days = (is_array($opening_days) ? array_diff($default_days, $opening_days) : $closed_days);
 
 	// Global closed dates (when Greeting.dk is totally closed).
 	$global_closed_dates = array( '24-12-2022', '25-12-2022',	'31-12-2022', '01-01-2023');
 
 	// Explicitly set todays timezone and date, since there is some problems with this if not set explicitly.
-	// The $today variable is the date to check (check if it should be open.)
+	// Define today's timezone and date.
 	$timezone = new DateTimeZone('Europe/Copenhagen');
-
-	// Define today and now
-	# $today is used for incrementing in the for loop.
-	# $now is used for getting the time right now.
-	$today = new DateTime('now', $timezone);
-	$now = new DateTime('now', $timezone);
+	$today = new DateTime('now', $timezone); # $today is used for incrementing in the for loop.
+	$now = new DateTime('now', $timezone); # $now is used for getting the time right now.
 
 	// Get the explicitly defined closed DATES from admin (e.g. if one store is closed on a specific date)
 	// Loop through the closed dates from admin.
@@ -3122,10 +3185,10 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 		}
 	}
 
-	// Generate array of all open days next 60 days.
-	$open_num = 0;
+	// Generate array of all open days for the next 60 days.
+    ## Todo here: We need to make this so it can handle the weekend days.
+	$vendorDeliveryDayRequiredCalculated = ($now->format('H:i') > $vendorDropOffTime) ? $vendorDeliveryDayReq+1 : $vendorDeliveryDayReq;
 	$closed_num = 0;
-	$vendorDeliveryDayRequiredCalculated = ($now->format('H:i') > $vendorDropOffTime) ? $vendorDeliverDayReq+1 : $vendorDeliverDayReq;
 
 	for($i=0;$i<60;$i++){
 		if(in_array($today->format('N'), $closed_days)){
@@ -3143,6 +3206,7 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 			$closed_num++;
 		} else {
 			if($i >= $vendorDeliveryDayRequiredCalculated){
+                // The date is open, since it is later than the required dates.
 				$dates[] = $today->format($date_format);
 			} else {
 				$closed_days_date[] = $today->format($date_format);
@@ -3152,11 +3216,8 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 		$today->modify('+1 day');
 	}
 
-	if($open_close == 'close'){
-		return $closed_days_date;
-	} else {
-		return $dates;
-	}
+	// Return either the closed days or the open days, depending on the $open_close parameter.
+	return $open_close == 'close' ? $closed_days_date : $dates;
 }
 
 function estimateDeliveryDate($days = 1, $cut_off = 15, $iso_opening_days = array(1,2,3,4,5,6,7), $format = 'U')
@@ -3210,7 +3271,7 @@ function estimateDeliveryDate($days = 1, $cut_off = 15, $iso_opening_days = arra
  * order date begin
  */
 # add_action( 'woocommerce_review_order_before_payment', 'greeting_echo_date_picker' );
-function greeting_echo_date_picker(  ) {
+function greeting_echo_date_picker( ) {
 	$storeProductId = '';
 	// Get $product object from Cart object
 	$cart = WC()->cart->get_cart();
@@ -3224,31 +3285,13 @@ function greeting_echo_date_picker(  ) {
 	$vendor_id = get_post_field( 'post_author', $storeProductId );
 
 	// Get delivery type.
-	$del_type = '';
-	$del_value = '';
-	if(!empty(get_field('delivery_type', 'user_'.$vendor_id))){
-	  $delivery_type = get_field('delivery_type', 'user_'.$vendor_id)[0];
-
-	  if(empty($delivery_type['label'])){
-	    $del_value = $delivery_type;
-	    $del_type = $delivery_type;
-	  } else {
-	    $del_value = $delivery_type['value'];
-	    $del_type = $delivery_type['label'];
-	  }
-	}
+    $del_value = get_vendor_delivery_type($vendor_id, 'value');
 
 	// Get delivery day requirement, cut-off-time for orders and the closed dates.
 	$vendorDeliverDayReq = get_vendor_delivery_days_required($vendor_id);
 	$vendorDropOffTime = get_vendor_dropoff_time($vendor_id);
-	if(strpos($vendorDropOffTime,':') === false && strpos($vendorDropOffTime,'.')){
-		$vendorDropOffTime = $vendorDropOffTime.':00';
-	} else {
-		$vendorDropOffTime = str_replace(array(':','.'),array(':',':'),$vendorDropOffTime);
-	}
 
 	$closed_dates_arr = explode(",",get_vendor_closed_dates($vendor_id));
-
 
 	if($del_value == '0'){
 		echo '<h3 class="pt-4">Leveringsdato</h3>';
@@ -3263,12 +3306,12 @@ function greeting_echo_date_picker(  ) {
 		echo '</script>';
 		woocommerce_form_field( 'delivery_date', array(
 			'type'          => 'text',
-			'class'         => array('form-row-wide'),
+			'class'         => array('form-row-wide', 'notranslate'),
 			'id'            => 'datepicker',
 			'required'			=> true,
 			'label'         => __('Hvornår skal gaven leveres?'),
 			'placeholder'   => __('Vælg dato hvor gaven skal leveres'),
-			'custom_attributes' => array('readonly' => 'readonly')
+			'custom_attributes' => array('readonly' => 'readonly', 'translate' => 'no')
 		), WC()->checkout->get_value( 'delivery_date' ) );
 
 		// Build intervals & delivery days.
@@ -3500,7 +3543,7 @@ function handle_price_range_query_var( $query, $query_vars ) {
  * @return string
  */
 function get_client_ip() {
-		$ipaddress = $_SERVER['HTTP_CF_CONNECTING_IP'] ?: $_SERVER['REMOTE_ADDR'];
+		$ipaddress = isset($_SERVER['HTTP_CF_CONNECTING_IP']) ? $_SERVER['HTTP_CF_CONNECTING_IP'] : $_SERVER['REMOTE_ADDR'];
 
 		if(home_url() == 'http://greeting'){
 			$ipaddress = '212.10.115.191';
@@ -3560,7 +3603,7 @@ function get_close_stores(){
     'orderby' => 'meta_value',
     'meta_key' => 'delivery_zips',
     'order' => 'DESC',
-    'number' => 4,
+    'number' => 3,
     'meta_query' => array(
       'relation' => 'AND',
       array(
@@ -3582,40 +3625,12 @@ function get_close_stores(){
 	$store_arr = array();
 
 	foreach($results as $k => $v){
+
 		$vendor = get_user_meta($v->ID);
 		$vendor_page_slug = get_wcmp_vendor($v->ID);
-
-		$image = (!empty($vendor['_vendor_profile_image'])? $vendor['_vendor_profile_image'][0] : '');
-		$banner = (!empty($vendor['_vendor_banner'])? $vendor['_vendor_banner'][0] : '');
-
-		#$vendor_banner = (isset(wp_get_attachment_image_src($banner)) ? wp_get_attachment_image_src($banner, 'medium')[0] : $uploadDirBaseUrl.'/woocommerce-placeholder-300x300.png');
-		#$vendor_picture = (isset(wp_get_attachment_image_src($image)) ? wp_get_attachment_image_src($image, 'medium')[0] : $uploadDirBaseUrl.'/woocommerce-placeholder-300x300.png');
-		$vendor_banner = isset($vendor['_vendor_profile_image']) ? $vendor['_vendor_profile_image'][0] : '';
-		$vendor_picture = isset($vendor['_vendor_banner']) ? $vendor['_vendor_banner'][0] : '';
-		#$vendor_url = get_permalink();
-		#$vendor_desc = get_user_meta();
-
-		#$description2 = (!empty($vendor['_vendor_description'][0]) ? $vendor['_vendor_description'][0] : '');
-		$description2 = isset($vendor['_vendor_description'][0]) ? $vendor['_vendor_description'][0] : '';
-
-		if (strlen(wp_strip_all_tags($description2)) < 98) {
-			$description = $description2;
-		} else {
-			$description = substr(wp_strip_all_tags($description2), 0, 95) . '...';
-		}
-
-		$store = array(
-			'store_name' => $vendor['nickname']['0'],
-			'description' => $description,
-			'link' => $vendor_page_slug->get_permalink(),
-			'image' => $vendor_picture,
-			'banner' => $vendor_banner
-		);
-
-		$store_arr[] = $store;
+		// call the template with pass $vendor variable
+		get_template_part('dc-product-vendor/vendor-loop', null, array('vendor' => $vendor_page_slug, 'cityName' => $cityName, 'postalCode' => $postal_code));
 	}
-
-	print json_encode($store_arr);
 
 	wp_die();
 }
@@ -4601,4 +4616,39 @@ function get_del_days_text($opening, $del_type = '1', $long_or_short_text = 0){
 	}
 
 	return $str;
+}
+
+function groupDates($input) {
+	$arr = explode(",", $input);
+	foreach($arr as $k => $v){
+		$arr[$k] = strtotime(trim($v));
+	}
+	sort($arr);
+	$expected = -1;
+	foreach ($arr as $date) {
+		if ($date == $expected) {
+			array_splice($range, 1, 1, date("d-m-Y",$date));
+		} else {
+			unset($range);
+			$range = [date("d-m-Y",$date)];
+			$ranges[] = &$range;
+		}
+		$expected = strtotime(date("d-m-Y",$date) . ' + 1 day');
+	}
+
+	foreach ($ranges as $entry) {
+		$result[] = $entry;
+	}
+	return $result;
+}
+
+function rephraseDate($weekday, $date, $month, $year) {
+	$weekdays = ['mandag', 'tirsdag', 'onsdag', 'torsdag', 'fredag', 'lørdag', 'søndag'];
+	$months = ['januar', 'februar', 'marts', 'april', 'maj', 'juni', 'juli', 'august', 'september', 'oktober', 'november', 'december'];
+
+	$weekday_str = $weekdays[$weekday - 1];
+	$month_str = $months[$month - 1];
+	$year_str = ($year != date("Y") ? $year : '');
+
+	return $weekday_str." d. ".$date.". ".$month_str. " ". $year_str;
 }

@@ -17,7 +17,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-global $product;
+global $product, $WCMp;
 
 
 
@@ -57,22 +57,51 @@ global $product;
           ?>
         </div>
         <div class="col-md-12 col-lg-6">
-              <?php
-                  /**
-                   * Hook: woocommerce_single_product_summary.
-                   *
-                   * @hooked woocommerce_template_single_title - 5
-                   * @hooked woocommerce_template_single_excerpt - 6
-                   * @hooked rigid_product_sale_countdown - 7
-                   * @hooked woocommerce_template_single_rating - 10
-                   * @hooked woocommerce_template_single_price - 10
-                   * @hooked woocommerce_template_single_add_to_cart - 30
-                   * @hooked woocommerce_template_single_meta - 40
-                   * @hooked woocommerce_template_single_sharing - 50
-                   * @hooked WC_Structured_Data::generate_product_data() - 60
-                   */
-                  do_action( 'woocommerce_single_product_summary' );
-              ?>
+            <?php
+                /**
+                 * Hook: woocommerce_single_product_summary.
+                 *
+                 * @hooked woocommerce_template_single_title - 5
+                 * @hooked woocommerce_template_single_excerpt - 6
+                 * @hooked rigid_product_sale_countdown - 7
+                 * @hooked woocommerce_template_single_rating - 10
+                 * @hooked woocommerce_template_single_price - 10
+                 * @hooked woocommerce_template_single_add_to_cart - 30
+                 * @hooked woocommerce_template_single_meta - 40
+                 * @hooked woocommerce_template_single_sharing - 50
+                 * @hooked WC_Structured_Data::generate_product_data() - 60
+                 */
+                do_action( 'woocommerce_single_product_summary' );
+            ?>
+            <div class="col-12 bg-light-grey">
+              <div class="container py-3">
+                <div class="row">
+                  <div class="col-12 py-1">
+                    <strong><small>Fordele, når du handler på Greeting.dk</small></strong>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-12 py-1">
+                    <small>✍️ Du får altid håndskrevet kort med din personlige hilsen.</small>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-12 py-1">
+                    <small>🚲 Varen leveres direkte til din modtager på den dag du vælger under købsprocessen.</small>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-12 py-1">
+                    <small>🏷️ Du betaler 59,- for levering - lige til din modtagers dør.</small>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-12 py-1">
+                    <small>🤝 Du støtter en fysisk, dansk butik med dit køb.</small>
+                  </div>
+                </div>
+              </div>
+            </div>
         </div>
       </div><!-- .row -->
 	</div><!-- closing div of content-holder -->

@@ -89,12 +89,17 @@ $cart_url = wc_get_cart_url();  // Set Cart URL
                 var city = window.localStorage.getItem('city');
                 var pc_link = window.localStorage.getItem('city_link');
 
-                if(postalcode && city){
-                  document.getElementById('front_Search-new_ucsa').value = postalcode+' '+city;
+                var input_val = jQuery('input[name="keyword"]').val();
+
+                if(!document.getElementById('front_Search-new_ucsa').value){
+                  if(postalcode && city){
+                    document.getElementById('front_Search-new_ucsa').value = postalcode+' '+city;
+                  }
                 }
                 if(pc_link){
                   document.getElementById('hidden__s_link').value = pc_link;
                 }
+
               });
             </script>
             <input type="text" name="keyword" class="top-search-input form-control rounded-pill border-0 py-2" id="front_Search-new_ucsa" value="<?php echo $val; ?>" placeholder="Indtast by eller postnr.">

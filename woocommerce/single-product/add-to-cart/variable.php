@@ -19,7 +19,8 @@ defined( 'ABSPATH' ) || exit;
 
 global $product;
 
-$attribute_keys  = array_keys( $attributes );
+$attributes = $product->get_variation_attributes();
+$attribute_keys = array_keys( $attributes );
 $variations_json = wp_json_encode( $available_variations );
 $variations_attr = function_exists( 'wc_esc_json' ) ? wc_esc_json( $variations_json ) : _wp_specialchars( $variations_json, ENT_QUOTES, 'UTF-8', true );
 
@@ -35,15 +36,16 @@ do_action( 'woocommerce_before_add_to_cart_form' ); ?>
 				<?php foreach ( $attributes as $attribute_name => $options ) : ?>
 					<div class="row">
 						<div class="label col-12 pb-1 fw-bold">
-							<label for="<?php echo esc_attr( sanitize_title( $attribute_name ) ); ?>"><?php echo wc_attribute_label( $attribute_name ); // WPCS: XSS ok. ?></label>
+							<label for="<?php echo esc_attr( sanitize_title( $attribute_name ) ); ?>">
+								<?php echo wc_attribute_label( $attribute_name ); // WPCS: XSS ok. ?>
+							</label>
 						</div>
 						<div class="value col-12">
 							<?php
-
 								wc_dropdown_variation_attribute_options(
 									array(
 										'options'   => $options,
-										'attribute' => $attribute_name,
+							 			'attribute' => $attribute_name,
 										'product'   => $product,
 										'class'			=> 'form-select form-select-lg mb-3'
 									)
