@@ -19,5 +19,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-// wc_get_template( 'archive-product.php' );
-wc_get_template( 'archive-product-to-vendorstore.php' );
+/**
+ *
+ * The variable for holding the delivery_zip.
+ *
+ */
+$delivery_zip_chosen = '';
+
+if(empty($delivery_zip_chosen) || $delivery_zip_chosen == ''){
+	wc_get_template( 'archive-product.php',
+		array(
+			'delivery_zip_chosen' => $delivery_zip_chosen
+		)
+	);
+} else {
+	wc_get_template( 'archive-product.php',
+		array(
+			'delivery_zip_chosen' => $delivery_zip_chosen
+		) );
+}
+
+
+# wc_get_template( 'archive-product-to-vendorstore.php' );

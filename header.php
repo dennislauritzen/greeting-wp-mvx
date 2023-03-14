@@ -8,8 +8,6 @@
 	<link rel='stylesheet' id='style-css' href='https://www.greeting.dk/wp-content/themes/greeting2/style.css?ver=3.0.4' media='all' />
 	<link rel='stylesheet' id='main-css' href='https://www.greeting.dk/wp-content/themes/greeting2/assets/css/main.css?ver=3.0.4' media='all' />
 
-	<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/bootstrap-slider.min.js" async></script>
-	<link rel="stylesheet preconnect" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/css/bootstrap-slider.min.css">
   <style type="text/css">
   .bg-pink {
     background: #F8F8F8;
@@ -322,11 +320,15 @@
 		border: 1px solid #58a2a2;
 	}
 
-	#citycontent h1 {
+	#citycontent h1,
+	#categorycontent h1,
+	#occasioncontent h1 {
 		padding-bottom: 15px;
 		position: relative;
 	}
-	#citycontent h1::before {
+	#citycontent h1::before,
+	#categorycontent h1::before,
+	#occasioncontent h1::before {
 		position: absolute;
 		background: linear-gradient(to right, #555555 75px, #ffffff 75px);
 		height: 3px;
@@ -336,17 +338,25 @@
 		left: 0;
 	}
 	#citycontent h1,
-	#citycontent h2 {
+	#citycontent h2,
+	#categorycontent h1,
+	#categorycontent h2,
+	#occasioncontent h1,
+	#occasioncontent h2 {
 		font-family: 'Rubik','Inter', sans-serif;
 		font-weight: 600;
 	}
 
-	#citycontent #topoccassions .card .card-img-top {
+	#citycontent #topoccassions .card .card-img-top,
+	#categorycontent #topoccassions .card .card-img-top,
+	#occasioncontent #topoccassions .card .card-img-top {
 		width: 100%;
 		height: 10vw;
 		object-fit: cover;
 	}
-	#citycontent #topoccassions .card h5.card-title {
+	#citycontent #topoccassions .card h5.card-title,
+	#categorycontent #topoccassions .card h5.card-title,
+	#occasioncontent #topoccassions .card h5.card-title {
 		font-family: 'Inter',sans-serif;
 		font-size: 14px;
 	}
@@ -457,7 +467,7 @@
 	/*
 	* The loader
 	*/
-	.loader {
+	.greeting-loader {
 	  border: 4px solid #f3f3f3; /* Light grey */
 	  border-top: 4px solid #446a6b; /* Blue */
 	  border-radius: 50%;

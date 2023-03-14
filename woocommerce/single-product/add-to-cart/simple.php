@@ -31,7 +31,7 @@ if ( $product->is_in_stock() ) : ?>
 
 	<div class="woocommerce-simple-add-to-cart py-3">
 		<div class="row">
-			<div class="quantity col-12 col-sm-4">
+			<div class="quantity col-12 col-xs-12 col-sm-12 col-md-5">
 				<form class="cart" action="<?php echo esc_url( apply_filters( 'woocommerce_add_to_cart_form_action', $product->get_permalink() ) ); ?>" method="post" enctype='multipart/form-data'>
 					<?php do_action( 'woocommerce_before_add_to_cart_button' ); ?>
 
@@ -49,7 +49,7 @@ if ( $product->is_in_stock() ) : ?>
 					do_action( 'woocommerce_after_add_to_cart_quantity' );
 					?>
 			</div>
-			<div class="add-to-cart col-12 col-sm-8 mt-3 mt-sm-0">
+			<div class="add-to-cart col-12 col-xs-12 col-sm-12 col-md-7 mt-3 mt-sm-0">
 					<button type="submit" name="add-to-cart" value="<?php echo esc_attr( $product->get_id() ); ?>" class="py-3 py-sm-0 single_add_to_cart_button button alt w-100 h-100 bg-teal"><?php echo esc_html( $product->single_add_to_cart_text() ); ?></button>
 
 					<?php do_action( 'woocommerce_after_add_to_cart_button' ); ?>

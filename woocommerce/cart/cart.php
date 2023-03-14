@@ -146,13 +146,37 @@ do_action( 'woocommerce_before_cart' ); ?>
 	<div class="row">
 		<div class="col-12 col-lg-6 mb-5">
 			<?php if ( wc_coupons_enabled() ) { ?>
-				<div class="coupon input-group w-75 actions">
-					<label for="coupon_code" class="input-group-text"><?php esc_html_e( 'Coupon:', 'woocommerce' ); ?></label>
-					<input type="text" name="coupon_code" class="input-text form-control" id="coupon_code" value="" placeholder="<?php esc_attr_e( 'Coupon code', 'woocommerce' ); ?>" />
-					<button type="submit" class="button btn btn-secondary" name="apply_coupon" value="<?php esc_attr_e( 'Apply coupon', 'woocommerce' ); ?>"><?php esc_attr_e( 'Apply coupon', 'woocommerce' ); ?></button>
-					<?php do_action( 'woocommerce_cart_coupon' ); ?>
+				<div class="col-12 bg-light-grey p-3 actions">
+					<div class="row">
+						<div class="col-12">
+							<b><label for="coupon_code"><?php esc_html_e( 'Coupon:', 'woocommerce' ); ?></label></b>
+						</div>
+					</div>
+					<div class="row mt-2">
+						<div class="col-6 col-md-7">
+							<input type="text" name="coupon_code" class="input-text form-control" id="coupon_code" value="" placeholder="<?php esc_attr_e( 'Coupon code', 'woocommerce' ); ?>" />
+						</div>
+						<div class="col-6 col-md-5">
+							<button type="submit" class="button btn btn-secondary" name="apply_coupon" value="<?php esc_attr_e( 'Apply coupon', 'woocommerce' ); ?>"><?php esc_attr_e( 'Apply coupon', 'woocommerce' ); ?></button>
+							<?php do_action( 'woocommerce_cart_coupon' ); ?>
+						</div>
+					</div>
+					<br>
+
 				</div>
+				<!--<div class="coupon input-group w-100 ">
+				</div>-->
 			<?php } ?>
+			<div class="col-12">
+				<div class="row">
+					<div class="pt-4">
+						<img src="https://www.greeting.dk/wp-content/uploads/2022/12/visa-logo-05x.png" style="height: 18px;" class="pe-4">
+						<img src="https://www.greeting.dk/wp-content/uploads/2022/12/mastercard-logo-025x.png" style="height: 18px;" class="pe-4">
+						<img src="https://www.greeting.dk/wp-content/uploads/2022/12/mobilepay-logo-05x.png" style="height: 18px;" class="pe-4">
+						<img src="https://www.greeting.dk/wp-content/uploads/2022/12/320px-Apple_Pay_logo.svg_.png" style="height: 18px;">
+					</div>
+				</div>
+			</div>
 		</div>
 		<?php do_action( 'woocommerce_before_cart_collaterals' ); ?>
 		<?php

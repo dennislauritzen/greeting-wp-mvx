@@ -124,19 +124,25 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode);
     }
   }
 
-  $prices = $wpdb->prepare("
-      SELECT meta_value
-      FROM {$wpdb->postmeta}
-      WHERE meta_key = '_price'
-      AND post_id IN (".implode(', ', array_fill(0, count($vendorProductIds), '%s')).")
-  ", $where);
+  if(!empty($where)){
+    $prices = $wpdb->prepare("
+        SELECT meta_value
+        FROM {$wpdb->postmeta}
+        WHERE meta_key = '_price'
+        AND post_id IN (".implode(', ', array_fill(0, count($vendorProductIds), '%s')).")
+    ", $where);
+    $prices = $wpdb->get_results($prices);
 
-  $prices = $wpdb->get_results($prices);
-  // Convert the results to an array of prices
-  $priceArray = array();
-  foreach ($prices as $price) {
-      $priceArray[] = $price->meta_value;
+    // Convert the results to an array of prices
+    $priceArray = array();
+    foreach ($prices as $price) {
+        $priceArray[] = $price->meta_value;
+    }
+  } else {
+    $priceArray = array(0,2000);
   }
+
+
 
   // Use min and max to get the minimum and maximum prices
   $minPrice = min($priceArray);
@@ -615,107 +621,21 @@ document.addEventListener("DOMContentLoaded", function() {
     <div class="filteredStore row"></div>
 
     </div>
-      <div class="loadingHeartBeat row" style="display: none;">
-        <div class="loadingcard col-12 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4 store">
-          <div class="card  shadow border-0 mb-3">
-            <div class="image animated-background "></div>
-            <div class="card-body">
-              <div class="text-line-heading animated-background "></div>
-              <div class="text-line-30 animated-background "></div>
-              <div class="text-line-60 animated-background "></div>
-              <div class="text-line-100 animated-background "></div>
-              <div class="loading-cta animated-background "></div>
-            </div>
-            <div class="card-footer" style="font-size: 10px;">
-                &nbsp;
-            </div>
-          </div>
-        </div>
-        <div class="loadingcard col-12 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4 store">
-          <div class="card  shadow border-0 mb-3">
-            <div class="image animated-background "></div>
-            <div class="card-body">
-              <div class="text-line-heading animated-background "></div>
-              <div class="text-line-30 animated-background "></div>
-              <div class="text-line-60 animated-background "></div>
-              <div class="text-line-100 animated-background "></div>
-              <div class="loading-cta animated-background "></div>
-            </div>
-            <div class="card-footer" style="font-size: 10px;">
-                &nbsp;
-            </div>
-          </div>
-        </div>
-        <div class="loadingcard col-12 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4 store">
-          <div class="card  shadow border-0 mb-3">
-            <div class="image animated-background "></div>
-            <div class="card-body">
-              <div class="text-line-heading animated-background "></div>
-              <div class="text-line-30 animated-background "></div>
-              <div class="text-line-60 animated-background "></div>
-              <div class="text-line-100 animated-background "></div>
-              <div class="loading-cta animated-background "></div>
-            </div>
-            <div class="card-footer" style="font-size: 10px;">
-                &nbsp;
-            </div>
-          </div>
-        </div>
-        <div class="loadingcard col-12 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4 store">
-          <div class="card  shadow border-0 mb-3">
-            <div class="image animated-background "></div>
-            <div class="card-body">
-              <div class="text-line-heading animated-background "></div>
-              <div class="text-line-30 animated-background "></div>
-              <div class="text-line-60 animated-background "></div>
-              <div class="text-line-100 animated-background "></div>
-              <div class="loading-cta animated-background "></div>
-            </div>
-            <div class="card-footer" style="font-size: 10px;">
-                &nbsp;
-            </div>
-          </div>
-        </div>
-        <div class="loadingcard col-12 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4 store">
-          <div class="card  shadow border-0 mb-3">
-            <div class="image animated-background "></div>
-            <div class="card-body">
-              <div class="text-line-heading animated-background "></div>
-              <div class="text-line-30 animated-background "></div>
-              <div class="text-line-60 animated-background "></div>
-              <div class="text-line-100 animated-background "></div>
-              <div class="loading-cta animated-background "></div>
-            </div>
-            <div class="card-footer" style="font-size: 10px;">
-                &nbsp;
-            </div>
-          </div>
-        </div>
-        <div class="loadingcard col-12 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4 store">
-          <div class="card  shadow border-0 mb-3">
-            <div class="image animated-background "></div>
-            <div class="card-body">
-              <div class="text-line-heading animated-background "></div>
-              <div class="text-line-30 animated-background "></div>
-              <div class="text-line-60 animated-background "></div>
-              <div class="text-line-100 animated-background "></div>
-              <div class="loading-cta animated-background "></div>
-            </div>
-            <div class="card-footer" style="font-size: 10px;">
-                &nbsp;
-            </div>
-          </div>
-        </div>
-      </div>
-      <?php
-      if(!empty(the_content())){
-      ?>
-      <div class="">
-        <?php echo the_content(); ?>
-      </div>
-      <?php
-      }
-      ?>
+
+    <!-- Loading heartbeat START -->
+    <?php get_template_part('template-parts/inc/blocks/loading-heartbeat'); ?>
+    <!-- Loading heartbeat END -->
+
+
+    <?php
+    if(!empty(the_content())){
+    ?>
+    <div class="">
+      <?php echo the_content(); ?>
+    </div>
+    <?php
+    }
+    ?>
 
 
       <?php
@@ -880,7 +800,6 @@ get_footer( );
 
       // Make the loading...
       jQuery('.loadingHeartBeat').show();
-      jQuery('#defaultStore').hide();
       jQuery('.filteredStore').hide();
 
       // Chosen delivery date
@@ -917,17 +836,14 @@ get_footer( );
         postalCode: postalCode
       };
       jQuery.post(ajaxurl, data, function(response) {
-        jQuery('#defaultStore').hide();
         jQuery('.filteredStore').show();
         jQuery('.filteredStore').html(response);
         jQuery('.loadingHeartBeat').hide();
 
         if(catOccaIdArray.length == 0 && deliveryIdArray.length == 0 && priceChange == 1){
-          jQuery('#defaultStore').show();
           jQuery('.filteredStore').hide();
           jQuery('#noVendorFound').hide();
         } else if(catOccaIdArray.length == 0 && deliveryIdArray.length == 0 && priceChange == 0){
-          jQuery('#defaultStore').show();
           jQuery('.filteredStore').hide();
           jQuery('#noVendorFound').hide();
         }

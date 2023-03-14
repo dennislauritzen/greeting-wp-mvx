@@ -331,61 +331,67 @@ jQuery(document).ready(function(){
 
 if (have_rows('frontpage_full_width_boxes', $this_post_id) ){
   while( have_rows('frontpage_full_width_boxes', $this_post_id)) : the_row();
-    $image = get_sub_field('image');
-    $heading = get_sub_field('heading');
-    $text = get_sub_field('text');
-    $icon = get_sub_field('icon');
-    $icon = (str_contains($icon, '<svg') ? $icon : '<span class="small">'.wp_strip_all_tags($icon).'</span>');
-    $cta_text = get_sub_field('cta_text');
-    $cta_link = get_sub_field('cta_link');
-    $left_or_right = get_sub_field('left_or_right');
-    $color = get_sub_field('color');
-    $bg_class = 'bg-teal';
-    $text_class = 'text-white';
-    $heading_text = 'text-rose';
-    $cta_bg = 'bg-white';
-    $cta_text_color = 'text-teal';
+      $image = get_sub_field('image');
+      $heading = get_sub_field('heading');
+      $text = get_sub_field('text');
+      $icon = get_sub_field('icon');
 
-    if($color == '0'){
-      // green with white text
+      // Wrap the icon in an <svg> tag if it isn't already.
+      $icon = (str_contains($icon, '<svg') ? $icon : '<span class="small">' . wp_strip_all_tags($icon) . '</span>');
+
+      // Get the sub fields
+      $cta_text = get_sub_field('cta_text');
+      $cta_link = get_sub_field('cta_link');
+      $left_or_right = get_sub_field('left_or_right');
+      $color = get_sub_field('color');
+
+      // Set default values for the background color, text color, heading text color, CTA background color, and CTA text color.
       $bg_class = 'bg-teal';
       $text_class = 'text-white';
-      $heading_text = 'text-white';
-    } else if($color == '1'){
-      // green with white text and pink heading
-      $bg_class = 'bg-teal';
-      $text_class = 'text-white';
-      $heading_text = 'text-pink';
-    } else if($color == '2'){
-      // light grey bg
-      $bg_class = 'bg-light-grey';
-      $text_class = 'text-teal';
-      $heading_text = 'text-teal';
-      $cta_bg = 'bg-teal';
-      $cta_text_color = 'text-white';
-    } else if($color == '3'){
-      // bg rose
-      $bg_class = 'bg-rose';
-      $text_class = 'text-dark';
-      $heading_text = 'text-dark';
-    } else if($color == '4'){
-      // bg rose with green heading
-      $bg_class = 'bg-rose';
-      $text_class = 'text-teal';
-      $heading_text = 'text-teal';
-    } else if($color == '5'){
-      // bg yellow green text
-      $bg_class = 'bg-yellow';
-      $text_class = 'text-teal';
-      $heading_text = 'text-teal';
-    } else if($color == '6'){
-      // bg white green text
-      $bg_class = 'bg-white';
-      $text_class = 'text-teal';
-      $heading_text = 'text-teal';
-      $cta_bg = 'bg-teal';
-      $cta_text_color = 'text-white';
-    }
+      $heading_text = 'text-rose';
+      $cta_bg = 'bg-white';
+      $cta_text_color = 'text-teal';
+
+      if($color == '0'){
+        // green with white text
+        $bg_class = 'bg-teal';
+        $text_class = 'text-white';
+        $heading_text = 'text-white';
+      } else if($color == '1'){
+        // green with white text and pink heading
+        $bg_class = 'bg-teal';
+        $text_class = 'text-white';
+        $heading_text = 'text-pink';
+      } else if($color == '2'){
+        // light grey bg
+        $bg_class = 'bg-light-grey';
+        $text_class = 'text-teal';
+        $heading_text = 'text-teal';
+        $cta_bg = 'bg-teal';
+        $cta_text_color = 'text-white';
+      } else if($color == '3'){
+        // bg rose
+        $bg_class = 'bg-rose';
+        $text_class = 'text-dark';
+        $heading_text = 'text-dark';
+      } else if($color == '4'){
+        // bg rose with green heading
+        $bg_class = 'bg-rose';
+        $text_class = 'text-teal';
+        $heading_text = 'text-teal';
+      } else if($color == '5'){
+        // bg yellow green text
+        $bg_class = 'bg-yellow';
+        $text_class = 'text-teal';
+        $heading_text = 'text-teal';
+      } else if($color == '6'){
+        // bg white green text
+        $bg_class = 'bg-white';
+        $text_class = 'text-teal';
+        $heading_text = 'text-teal';
+        $cta_bg = 'bg-teal';
+        $cta_text_color = 'text-white';
+      }
     ?>
 
     <section id="<?php echo strtolower(str_replace(array(' ','&nbsp;','.'), array('','',''), wp_strip_all_tags($heading))); ?>">

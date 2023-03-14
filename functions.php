@@ -782,71 +782,82 @@ function ajax_fetch() { ?>
 				return false;
 			});
 
-			/*Do the search with delay 500ms*/
-			var $searchInput = jQuery('#front_Search-new_ucsa');
-			var $dataFetchWrapper = jQuery('#datafetch_wrapper');
-			var xhr; // declare the xhr variable outside the AJAX function
+			function doSearch($searchInput, $dataFetchWrapper, url, action) {
+			  var xhr; // declare the xhr variable outside the AJAX function
 
-			$searchInput.keyup(delay(400, function (e) {
-				var text = jQuery(this).val();
+			  $searchInput.keyup(delay(400, function (e) {
+			    var text = jQuery(this).val();
 
-				if (xhr) {
-		       xhr.abort(); // abort the previous request if it's still in progress
-		    }
-
-				xhr = jQuery.ajax({
-					url: '<?php echo admin_url('admin-ajax.php'); ?>',
-					type: 'post',
-					data: { action: 'data_fetch', keyword: text },
-					beforeSend: function(){
-						if(currentRequest != null){
-							currentRequest.abort();
-						}
-					},
-					success: function(data) {
-						$dataFetchWrapper.data('loading','0');
-
-						$dataFetchWrapper.html( data );
-						if(jQuery('input[name="keyword"]').val().length > 0){
-							$dataFetchWrapper.removeClass('d-none').addClass('d-inline');
-						} else {
-							$dataFetchWrapper.addClass('d-none').removeClass('d-inline');
-						}
-					}
-				});
-			}));  // keyup + delay
-
-
-			$searchInput.on("input", function(){
-			  var text = jQuery(this).val();
-			  var str_text = "Søger efter by/postnummer der matcher '"+text+"'...";
-			  var loading = $dataFetchWrapper.data('loading');
-
-				if (xhr) {
-		       xhr.abort(); // abort the previous request if it's still in progress
-		    }
-
-			  if(loading !== '1'){
-			    if(text.length > 0){
-			      $dataFetchWrapper.html('');
-			      var $loadingElm = jQuery("<li>", {"class": "recomms list-group-item py-2 px-1 bg-white"});
-			      var $div = jQuery('<div/>');
-			      var $loader = jQuery('<div/>').addClass('loader float-start d-block pe-1 align-middle').removeClass('d-none');
-			      var $loaderDiv = $div.clone().addClass('ms-2 align-middle').html($loader);
-			      var $textElm = jQuery('<span/>').addClass('loadingText').text(str_text);
-			      var $textDiv = $div.clone().addClass('loaderText').html($textElm);
-
-			      $dataFetchWrapper.removeClass('d-none').addClass('d-inline');
-			      $dataFetchWrapper.html($loadingElm.append($loaderDiv, $textDiv));
+			    if (xhr) {
+			      xhr.abort(); // abort the previous request if it's still in progress
 			    }
-			  } else {
-			    $dataFetchWrapper.find('span.loadingText').text(str_text);
-			  }
 
-			  search_input_val = text;
-			  $dataFetchWrapper.data('loading', '1');
-			});
-	}); // jquery ready
+			    xhr = jQuery.ajax({
+			      url: url,
+			      type: 'post',
+			      data: { action: action, keyword: text },
+			      beforeSend: function(){
+			        if(currentRequest != null){
+
+			          currentRequest.abort();
+			        }
+			      },
+			      success: function(data) {
+
+			        $dataFetchWrapper.data('loading','0');
+
+			        $dataFetchWrapper.html(data);
+
+			        if(text !== '' || !text){
+			          $dataFetchWrapper.removeClass('d-none').addClass('d-inline');
+			        } else {
+			          $dataFetchWrapper.addClass('d-none').removeClass('d-inline');
+			        }
+
+			      }
+			    }).fail(function(){
+				    $dataFetchWrapper.addClass('d-none').removeClass('d-inline');
+				  });
+			  }));
+
+			  $searchInput.on("input", function(){
+			    var text = jQuery(this).val();
+			    var str_text = "Søger efter by/postnummer der matcher '"+text+"'...";
+			    var loading = $dataFetchWrapper.data('loading');
+
+			    if (xhr) {
+			      xhr.abort(); // abort the previous request if it's still in progress
+			    }
+
+			    if(loading !== '1'){
+			      if(text.length > 0){
+			        $dataFetchWrapper.html('');
+			        var $loadingElm = jQuery("<li>", {"class": "recomms list-group-item py-2 px-1 bg-white"});
+			        var $div = jQuery('<div/>');
+			        var $loader = jQuery('<div/>').addClass('greeting-loader float-start d-block pe-1 align-middle').removeClass('d-none');
+			        var $loaderDiv = $div.clone().addClass('ms-2 align-middle').html($loader);
+			        var $textElm = jQuery('<span/>').addClass('loadingText').text(str_text);
+			        var $textDiv = $div.clone().addClass('loaderText').html($textElm);
+
+			        $dataFetchWrapper.removeClass('d-none').addClass('d-inline');
+			        $dataFetchWrapper.html($loadingElm.append($loaderDiv, $textDiv));
+			      }
+			    } else {
+			      $dataFetchWrapper.find('span.loadingText').text(str_text);
+			    }
+
+			    search_input_val = text;
+			    $dataFetchWrapper.data('loading', '1');
+			  });
+			}
+
+			// Call the function for the first search input
+			doSearch(jQuery('#front_Search-new_ucsa'), jQuery('#datafetch_wrapper'), '<?php echo admin_url('admin-ajax.php'); ?>', 'data_fetch');
+
+			// Call the function for the second search input
+			doSearch(jQuery('.pc-form-content #front_Search-new_ucsa2'), jQuery('.pc-form-content #lp-datafetch_wrapper'), '<?php echo admin_url('admin-ajax.php'); ?>', 'catocca_landing_data_fetch');
+
+		}); // jquery ready
 	</script>
 <?php
 }
@@ -867,17 +878,16 @@ function data_fetch(){
 		LIMIT 5", '%'.trim($search_query).'%');
 	$landing_page_query = $wpdb->get_results($prepared_statement, OBJECT);
 
-	if (!empty($landing_page_query)) {?>
-        <?php
-        $array_count = count($landing_page_query);
-        $i = 0;
+	if (!empty($landing_page_query)) {
+      $array_count = count($landing_page_query);
+      $i = 0;
 
-        foreach ($landing_page_query as $key => $landing_page) {
-            ?>
-            <li class="recomms list-group-item py-2 px-4 <?php echo ($key==0) ? 'active' : '';?>" aria-current="true">
-                <a href="<?php print get_permalink( $landing_page->ID ) ;?>" class="recomms-link text-teal stretched-link"><?php echo ucfirst($landing_page->post_title);?></a>
-            </li>
-        <?php } ?>
+      foreach ($landing_page_query as $key => $landing_page) {
+          ?>
+          <li class="recomms list-group-item py-2 px-4 <?php echo ($key==0) ? 'active' : '';?>" aria-current="true">
+              <a href="<?php print get_permalink( $landing_page->ID ) ;?>" class="recomms-link text-teal stretched-link"><?php echo ucfirst($landing_page->post_title);?></a>
+          </li>
+      <?php } ?>
 	<?php
 	// If there is no match for the city, then do this...
 	} else {?>
@@ -890,110 +900,374 @@ function data_fetch(){
 
 
 /**
- * Add product category meta to landing page
+ * Function for getting the postal codes on Category and Occasion landing pages
+ * Only for getting the postal codes.
+ *
+ * @author Dennis Lauritzen
  */
+ add_action('wp_ajax_catocca_landing_data_fetch' , 'catocca_landing_data_fetch');
+ add_action('wp_ajax_nopriv_catocca_landing_data_fetch','catocca_landing_data_fetch');
 
+function catocca_landing_data_fetch(){
+	$search_query = esc_attr( $_POST['keyword'] );
 
-add_action( 'admin_menu', 'greeting_add_product_cat_metabox' );
+	global $wpdb;
 
-function greeting_add_product_cat_metabox() {
+	$prepared_statement_cat_occa = $wpdb->prepare("
+		SELECT *
+		FROM {$wpdb->prefix}posts
+		WHERE post_title LIKE %s
+		AND post_type = 'city'
+		LIMIT 5", '%'.trim($search_query).'%');
+	$query_cat_occa = $wpdb->get_results($prepared_statement_cat_occa, OBJECT);
 
-	add_meta_box(
-		'greeting_product_cat_metabox', // metabox ID
-		'Product Meta Box', // title
-		'greeting_product_cat_metabox_callback', // callback function
-		'landingpage', // post type or post types in array
-		'normal', // position (normal, side, advanced)
-		'default' // priority (default, low, high, core)
-	);
+	if (!empty($query_cat_occa)) {
+    $array_count = count($query_cat_occa);
+    $i = 0;
 
+    foreach ($query_cat_occa as $key => $cat_occa) {
+			$postal = get_post_meta($cat_occa->ID, 'postalcode', true);
+			$city = get_post_meta($cat_occa->ID, 'city', true);
+			$pc_link = get_permalink($cat_occa->ID);
+
+			//get_permalink( $landing_page->ID
+        ?>
+        <li class="lp-recomms list-group-item py-2 px-4 <?php echo ($key==0) ? 'active' : '';?>" aria-current="true">
+            <a
+							href="<?php echo $pc_link; ?>"
+							data-postal="<?php echo $postal; ?>"
+							data-city="<?php echo $city; ?>"
+							data-city-link="<?php echo $pc_link; ?>"
+							class="lp-recomms-link text-teal stretched-link">
+								<?php echo ucfirst($cat_occa->post_title);?>
+						</a>
+        </li>
+    <?php }
+
+	// If there is no match for the city, then do this...
+	} else {?>
+		<li class="list-group-item py-2 px-4" aria-current="true">
+			Der blev desværre ikke fundet nogle byer, der matcher søgekriterierne
+		</li>
+	<?php }
+	die();
 }
 
-function greeting_product_cat_metabox_callback( $post ) {
+/**
+ * Vendor filter on Category and Occasion landing pages
+ * Only for these 2 page types.
+ *
+ * @usedon archive-product.php and
+ * @author Dennis Lauritzen
+ */
+ /**
+  * Vendor filter on City Page
+  * city filter
+  */
+ function categoryAndOccasionVendorFilterAction() {
+ 	global $wpdb;
 
-	$vendor_category_id = get_post_meta( $post->ID, 'landingpage_category', true );
-	if($vendor_category_id){
-		$vendor_category_name = get_term( $vendor_category_id )->name;
+ 	// default user array come from front end
+ 	$cityDefaultUserIdAsString = $_POST['cityDefaultUserIdAsString'];
+ 	$defaultUserArray = explode(",", $cityDefaultUserIdAsString);
+
+ 	// category & occasion filter data
+ 	$catOccaDeliveryIdArray = $_POST['catOccaIdArray'];
+
+	// The default ID from the category / occasion (the "base" landing page cat / occa)
+	$defaultIdCatOcca = $_POST['defaultIdCatOcca'];
+
+ 	// delivery date
+ 	$deliveryDate = (int) $_POST['delDate'];
+ 	if(empty($deliveryDate) && $deliveryDate !== 0){
+ 		$deliveryDate = 8;
+ 	} else if(!is_numeric($deliveryDate) || $deliveryDate < 0){
+ 		$deliveryDate = 0;
+ 	}
+
+ 	// Calculate Selected Date
+ 	$filteredDate = new DateTime();
+ 	$filteredDate->modify('+'.$deliveryDate.' days');
+ 	$selectedDate = $filteredDate->format('d-m-Y');
+ 	$selectedDay = $filteredDate->format('N');
+
+ 	// delivery filter data
+ 	$deliveryIdArray = $_POST['deliveryIdArray'];
+
+ 	$postal_code = $_POST['postalCode'];
+
+	// declare array for store user ID get from occasion
+	$userIdArrayGetFromPostalCode = array();
+
+ 	// declare array for store user ID get from occasion
+ 	$userIdArrayGetFromDelDate = array();
+
+ 	// declare array for store user ID get from occasion
+ 	$userIdArrayGetFromCatOcca = array();
+
+ 	// declare array for store user ID got from delivery type
+ 	$userIdArrayGetFromDelivery = array();
+
+	////////////////////////
+	// FILTER: Category & Occasion
+ 	// Prepare the where and where-placeholders for term_id (cat and occassion ID's).
+ 	$where = array();
+ 	$placeholder_arr = array_fill(0, count($catOccaDeliveryIdArray), '%s');
+
+ 	if(!empty($catOccaDeliveryIdArray)){
+ 		foreach($catOccaDeliveryIdArray as $catOccaDeliveryId){
+ 			if(is_numeric($catOccaDeliveryId)){
+ 				$where[] = $catOccaDeliveryId;
+ 			}
+ 		}
+
+ 		$sql = "SELECT
+ 			p.post_author
+ 		FROM ".$wpdb->prefix."posts p
+ 		WHERE
+ 			p.ID IN (
+ 				SELECT
+ 					tm.object_id
+ 				FROM ".$wpdb->prefix."term_relationships tm
+ 				WHERE tm.term_taxonomy_id IN (".implode(", ",$placeholder_arr).")
+ 		  )
+ 			AND p.post_status = 'publish'
+ 		GROUP BY p.post_author";
+
+ 		$getStoreUserDataBasedOnProduct = $wpdb->prepare($sql, $where);
+ 		$storeUserCatOccaResults = $wpdb->get_results($getStoreUserDataBasedOnProduct);
+
+ 		foreach($storeUserCatOccaResults as $product){
+ 			array_push($userIdArrayGetFromCatOcca, $product->post_author);
+ 		}
+ 	}
+
+ 	// Remove all the stores that doesnt match from default array
+ 	if(!empty($userIdArrayGetFromCatOcca)){
+ 		$userIdArrayGetFromCatOcca = array_intersect($defaultUserArray, $userIdArrayGetFromCatOcca);
+ 		$defaultUserArray = $userIdArrayGetFromCatOcca;
+ 	}
+
+ 	////////////////////////
+ 	// FILTER: Delivery DATE
+ 	// Prepare the statement for delivery array
+ 	if($deliveryDate >= 0 && $deliveryDate < 8){
+ 		$args = array(
+ 			'role' => 'dc_vendor',
+ 			'meta_query' => array(
+ 						'key' => 'vendor_require_delivery_day',
+ 						'value' => $deliveryDate,
+ 						'compare' => '<=',
+ 						'type' => 'NUMERIC'
+ 				)
+ 		);
+
+ 		// (v) @todo: Move cut-off time out of the query and into PHP.
+ 		// (v) @todo: Make sure the store is not closed on the given date!!!! Make a PHP check.
+
+ 		$usersByDelDateFilter = new WP_User_Query( $args	);
+ 		$delDateArr = $usersByDelDateFilter->get_results();
+
+ 		foreach($delDateArr as $v){
+ 			$dropoff_time 		= get_field('vendor_drop_off_time','user_'.$v->ID);
+ 			$delDate 					= get_field('vendor_require_delivery_day','user_'.$v->ID);
+ 			$delClosedDates		= get_field('vendor_closed_day','user_'.$v->ID);
+ 			$delWeekDays	    = get_field('openning','user_'.$v->ID);
+
+ 			$open_iso_days = array();
+ 			foreach($delWeekDays as $key => $val){
+ 				$open_iso_days[] = $val['value'];
+ 			}
+
+ 			$open_this_day = (in_array($selectedDay, $open_iso_days) ? 1 : 0);
+ 			#var_dump($open_this_day);
+
+ 			// Check if the store is closed this specific date.
+ 			$closedDatesArr		= array_map('trim', explode(",",$delClosedDates));
+ 			$closedThisDate 	= 0;
+ 			if(in_array($selectedDate, $closedDatesArr)){
+ 				$closedThisDate = 1;
+ 			}
+
+ 			if($deliveryDate < $delDate){
+ 				// Can't delivery on selected date.
+ 			} else if($deliveryDate == $delDate && $dropoff_time < date("H")){
+ 				// Can't deliver on selected date because time has passed cutoff.
+ 			} else {
+ 				// Can deliver, woohoo.
+ 				if($closedThisDate == 0 && $open_this_day == 1){
+ 					array_push($userIdArrayGetFromDelDate, (string) $v->ID);
+ 				}
+ 			}
+ 		}
+
+ 		// Remove all the stores that doesnt match from default array
+ 		// Normally we would check if the userIdArray is empty, but not here,
+ 		// instead we check if the date-filter is set - if it is and the userID-array
+ 		// is empty, then there is no stores left.
+ 		// if(!empty($userIdArrayGetFromDelDate)){
+ 		$userIdArrayGetFromDelDate = array_intersect($defaultUserArray, $userIdArrayGetFromDelDate);
+ 		$defaultUserArray = $userIdArrayGetFromDelDate;
+ 	}
+
+	////////////////////////
+	// Filter Postal Code
+	//
+	$sql = "SELECT u.ID, umm1.meta_value AS dropoff_time, umm2.meta_value AS require_delivery_day, umm3.meta_value AS delivery_type
+	          FROM {$wpdb->prefix}users u
+	          LEFT JOIN {$wpdb->prefix}usermeta umm1 ON u.ID = umm1.user_id AND umm1.meta_key = 'vendor_drop_off_time'
+	          LEFT JOIN {$wpdb->prefix}usermeta umm2 ON u.ID = umm2.user_id AND umm2.meta_key = 'vendor_require_delivery_day'
+	          LEFT JOIN {$wpdb->prefix}usermeta umm3 ON u.ID = umm3.user_id AND umm3.meta_key = 'delivery_type'
+	          WHERE EXISTS (
+	              SELECT 1
+	              FROM {$wpdb->prefix}usermeta um
+	              WHERE um.user_id = u.ID AND um.meta_key = 'delivery_zips' AND um.meta_value LIKE %s
+	          )
+	          AND NOT EXISTS (
+	              SELECT 1
+	              FROM {$wpdb->prefix}usermeta um2
+	              WHERE um2.user_id = u.ID AND um2.meta_key = 'vendor_turn_off'
+	          )
+	          AND EXISTS (
+	              SELECT 1
+	              FROM {$wpdb->prefix}usermeta um5
+	              WHERE um5.user_id = u.ID AND um5.meta_key = 'wp_capabilities' AND um5.meta_value LIKE %s
+	          )
+	          ORDER BY
+	          umm3.meta_value DESC,
+	          CASE u.ID
+	              WHEN 38 THEN 0
+	              WHEN 76 THEN 0
+	              ELSE 1
+	          END DESC,
+	          umm2.meta_value ASC,
+	          umm2.meta_value DESC
+	        	";
+	$vendor_query = $wpdb->prepare($sql, '%'.$postal_code.'%', '%dc_vendor%');
+	$vendor_arr = $wpdb->get_results($vendor_query);
+
+	foreach($vendor_arr as $k => $v){
+		array_push($userIdArrayGetFromPostalCode, (string) $v->ID);
 	}
 
-	wp_nonce_field( 'somerandomstr', '_greetingcatnonce' );?>
-	<table class="form-table">
-		<tbody>
-			<tr>
-				<th><label for="landingpage_category">Landing Page Category</label></th>
-				<td>
-					<select id="landingpage_category" name="landingpage_category">
-						<?php if($vendor_category_name != '') { ?>
-						<option value="<?php echo $vendor_category_id;?>" selected><?php echo $vendor_category_name;?></option>
-						<?php }
-						else { ?>
-						<option value="" selected disabled>Select Category</option>
-						<?php }
-
-							$args = array(
-								'taxonomy'     => 'product_cat',
-								'orderby'      => 'name',
-								'show_count'   => 1, // 1 for yes, 0 for no
-								'pad_counts'   => 1, // 1 for yes, 0 for no
-								'title_li'     => '',
-								'hide_empty'   => 0
-						 );
-						$all_categories = get_categories( $args );
-						$all_categories_unique = array_unique( $all_categories, SORT_REGULAR );
-						foreach ($all_categories_unique as $cat) {
-							if($cat->name != $vendor_category_name) {?>
-								<option value="<?php echo $cat->term_id;?>"><?php echo $cat->name;?></option>
-						<?php } }?>
-					</select>
-				</td>
-			</tr>
-		</tbody>
-	</table>
-<?php
-}
-// save meta
-add_action( 'save_post', 'greeting_save_product_cat_meta', 10, 2 );
-
-function greeting_save_product_cat_meta( $post_id ) {
-
-	global $post;
-    if ( is_object( $post ) && isset( $post->post_type ) && $post->post_type != 'landingpage'){
-        return;
-    }
-    //if you get here then it's your post type so do your thing....
-
-	// nonce check
-	if ( ! isset( $_POST[ '_greetingcatnonce' ] ) || ! wp_verify_nonce( $_POST[ '_greetingcatnonce' ], 'somerandomstr' ) ) {
-		return $post_id;
-	}
-
-	// check current use permissions
-	$post_type = get_post_type_object( $post->post_type );
-
-	if ( ! current_user_can( $post_type->cap->edit_post, $post_id ) ) {
-		return $post_id;
-	}
-
-	// Do not save the data if autosave
-	if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) {
-		return $post_id;
-	}
-
-	// define your own post type here
-	if( $post->post_type != 'landingpage' ) {
-		return $post_id;
-	}
+	// Remove all the stores that doesnt match from default array
+ 	if(!empty($userIdArrayGetFromPostalCode)){
+ 		$userIdArrayGetFromPostalCode = array_intersect($defaultUserArray, $userIdArrayGetFromPostalCode);
+ 		$defaultUserArray = $userIdArrayGetFromPostalCode;
+ 	}
 
 
-	if( isset( $_POST[ 'landingpage_category' ] ) ) {
-		update_post_meta( $post_id, 'landingpage_category', sanitize_text_field( $_POST[ 'landingpage_category' ] ) );
-	} else {
-		delete_post_meta( $post_id, 'landingpage_category' );
-	}
+ 	////////////////////////
+ 	// FILTER: Delivery
+ 	// Prepare the statement for delivery array
+ 	$where = array();
+ 	$placeholder_arr = array_fill(0, count($deliveryIdArray), '%s');
 
-	return $post_id;
+ 	if(!empty($deliveryIdArray)){
+ 		$args = array(
+ 			'role' => 'dc_vendor',
+ 			'meta_query' => array(
+ 					'key' => 'delivery_type',
+ 					'value' => $deliveryIdArray,
+ 					'compare' => 'IN',
+ 					'type' => 'NUMERIC'
+ 				)
+ 		);
+ 		$usersByFilter = new WP_User_Query( $args	);
+ 		$deliveryArr = $usersByFilter->get_results($usersByFilter);
 
-}
+ 		foreach($deliveryArr as $v){
+ 			$delivery_type = get_field('delivery_type','user_'.$v->ID);
+
+ 			if(!empty($delivery_type)){
+ 				if(in_array($delivery_type[0]['value'],$deliveryIdArray) || (isset($delivery_type[1]['value']) && in_array($delivery_type[1]['value'],$deliveryIdArray) )  ){
+ 					array_push($userIdArrayGetFromDelivery, (string) $v->ID);
+ 				}
+ 			}
+ 		}
+ 	}
+ 	// Remove all the stores that doesnt match from default array
+ 	if(!empty($userIdArrayGetFromDelivery)){
+ 		$userIdArrayGetFromDelivery = array_intersect($defaultUserArray, $userIdArrayGetFromDelivery);
+ 		$defaultUserArray = $userIdArrayGetFromDelivery;
+ 	}
+
+ 	////////////////
+ 	// Filter: Price
+ 	// Location: City Page
+ 	// input price filter data come from front end
+ 	$userIdArrayGetFromPriceFilter = array();
+ 	$inputPriceRangeArray = $_POST['inputPriceRangeArray'];
+ 	$inputMinPrice = (int) $inputPriceRangeArray[0];
+ 	$inputMaxPrice = (int) $inputPriceRangeArray[1];
+
+ 	$author_ids = $wpdb->get_col(
+ 	    $wpdb->prepare(
+ 	        "
+ 	        SELECT DISTINCT p.post_author
+ 	        FROM {$wpdb->prefix}posts p
+ 	        INNER JOIN {$wpdb->prefix}postmeta pm ON p.ID = pm.post_id
+ 	        WHERE p.post_type = 'product'
+ 	        AND p.post_status = 'publish'
+ 	        AND pm.meta_key = '_price'
+ 	        AND pm.meta_value BETWEEN %d AND %d
+ 	        ",
+ 	        $inputMinPrice,
+ 	        $inputMaxPrice
+ 	    )
+ 	);
+
+ 	$userIdArrayGetFromPriceFilter = array_unique($author_ids);
+
+ 	// Remove all the stores that doesnt match from default array
+ 	if(!empty($userIdArrayGetFromPriceFilter)){
+ 		$userIdArrayGetFromPriceFilter = array_intersect($defaultUserArray, $userIdArrayGetFromPriceFilter);
+
+ 		$defaultUserArray = $userIdArrayGetFromPriceFilter;
+ 	}
+
+ 	// three array is
+ 	// $userIdArrayGetFromCatOcca
+ 	// $userIdArrayGetFromDelivery
+ 	// $userIdArrayGetFromPriceFilter
+
+ 	$return_arr = $defaultUserArray;
+
+ 	//Variable holding the boolean controlling if it is the first freight store.
+ 	$first = 0;
+ 	if(!empty($return_arr)){
+ 		foreach ($return_arr as $filteredUser) {
+ 			$vendor_int = (int) $filteredUser;
+
+ 			$vendor = get_wcmp_vendor($vendor_int);
+ 			$cityName = $_POST['cityName'];
+
+ 			// Get the delivery type for the vendor so we know if it is local or freight.
+ 			// The delivery type of the store
+ 		  $delivery_type = get_field('delivery_type','user_'.$vendor->id);
+
+ 		  $delivery_type = (!empty($delivery_type['0']['value']) ? $delivery_type['0']['value'] : 0);
+
+ 			if($delivery_type == 0 && $first == 0){
+ 				get_template_part('template-parts/vendor-freight-heading', null, array('cityName' => $cityName));
+ 				$first = 1;
+ 			}
+ 			// call the template with pass $vendor variable
+ 			get_template_part('dc-product-vendor/vendor-loop', null, array('vendor' => $vendor, 'cityName' => $cityName));
+ 		}
+ 	} else { ?>
+ 		<div>
+ 			<p id="noVendorFound" style="margin-top: 50px; margin-bottom: 35px; padding: 15px 10px; background-color: #f8f8f8;">
+ 				Der blev desværre ikke fundet nogle butikker, der matcher dine søgekriterier.
+ 			</p>
+ 		</div>
+ 	<?php
+ 	}
+ 	wp_die();
+ }
+ add_action( 'wp_ajax_categoryAndOccasionVendorFilterAction', 'categoryAndOccasionVendorFilterAction' );
+ add_action( 'wp_ajax_nopriv_categoryAndOccasionVendorFilterAction', 'categoryAndOccasionVendorFilterAction' );
+
 
 
 /**
@@ -1136,7 +1410,6 @@ function catOccaDeliveryAction() {
 			}
 
 			$open_this_day = (in_array($selectedDay, $open_iso_days) ? 1 : 0);
-			#var_dump($open_this_day);
 
 			// Check if the store is closed this specific date.
 			$closedDatesArr		= array_map('trim', explode(",",$delClosedDates));
@@ -2101,7 +2374,6 @@ function greeting_check_delivery_postcode( $fields, $errors ){
 			'posts_per_page' => '1'
 		);
 		$city = new WP_Query( $args );
-		#var_dump($city->posts[0]->post_title);
 
 		if($city && $city->posts && count($city->posts) > 0){
 			$errors->add( 'validation', '<p style="line-height:150%;">Beklager - den valgte butik kan ikke levere til '.$city->posts[0]->post_title.'. Du kan <a href="'.$vendor->get_permalink().'">gå til butikkens side</a> og se hvilke postnumre de leverer til eller <a href="'.get_permalink($city->posts[0]->ID).'">klikke her og se butikker der leverer i postnummer '.$city->posts[0]->post_title.'</a></p>' );

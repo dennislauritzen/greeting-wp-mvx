@@ -16,6 +16,7 @@ if ( have_posts() ) :
 			endif;
 		?>
 	</header>
+
 <?php
 	get_template_part( 'archive', 'loop' );
 else :
