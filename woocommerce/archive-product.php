@@ -28,7 +28,6 @@ $checkout_postalcode = WC()->customer->get_shipping_postcode();
 #  $woocommerce->cart->empty_cart();
 #}
 
-$time_1 = microtime(true)*1000;
 
 // Get header designs.
 get_header();
@@ -43,14 +42,12 @@ if (isset($cat->term_id)) {
 	$image = wp_get_attachment_url($thumbnail_id);
 }
 
-$time_2 = microtime(true)*1000;
 
 /**
  *
  * Data of the category
  *
  */
- $time_3 = microtime(true)*1000;
 $cat = $wp_query->get_queried_object();
 $category_id = $cat->term_id;
 $category_name = $cat->name;
@@ -65,7 +62,6 @@ if(!empty($category_name_plural)){
 }
 
 
-$time_4 = microtime(true)*1000;
 $args = array(
     'post_type' => 'product',
 		'posts_per_page' => -1,
@@ -84,7 +80,6 @@ $query = get_posts( $args );
 // Get an array of unique user IDs who are authors of the products in the query results
 $authors = array_unique( wp_list_pluck( $query, 'post_author' ) );
 
-$time_5 = microtime(true)*1000;
 // Get an array of user objects based on the unique user IDs
 $user_args = array(
 		'role' => 'dc_vendor',
@@ -197,9 +192,7 @@ $categoryDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode);
 ?>
 <input type="hidden" name="_hid_cat_id" id="_hid_cat_id" value="<?php echo $category_id; ?>">
 <input type="hidden" name="_hid_default_user_id" id="categoryDefaultUserIdAsString" value="<?php echo $categoryDefaultUserIdAsString; ?>">
-<?php
-$time_6 = microtime(true)*1000;
-?>
+
 <!-- Filter content -->
 <div id="categorycontent" class="container">
 	<div class="row">
@@ -1099,17 +1092,4 @@ get_footer( );
 		<!-- BOTTOM END -->
 
 <?php
-print '<p>'.$time_1.'</p>';
-
-print '<p>'.$time_2.'</p>';
-
-print '<p>'.$time_3.'</p>';
-
-print '<p>'.$time_4.'</p>';
-
-print '<p>'.$time_5.'</p>';
-
-print '<p>'.$time_6.'</p>';
-
-
 get_footer('shop');
