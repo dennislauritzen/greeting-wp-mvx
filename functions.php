@@ -708,7 +708,7 @@ function greeting_custom_taxonomy_occasion()  {
 	);
 	register_taxonomy( 'occasion', 'product', $args );
 }
-add_action( 'generate_rewrite_rules', 'register_product_rewrite_rules' );
+#add_action( 'generate_rewrite_rules', 'register_product_rewrite_rules' );
 function register_product_rewrite_rules( $wp_rewrite ) {
     $new_rules = array(
         'products/([^/]+)/?$' => 'index.php?product-category=' . $wp_rewrite->preg_index( 1 ), // 'products/any-character/'

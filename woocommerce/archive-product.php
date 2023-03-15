@@ -33,7 +33,7 @@ $checkout_postalcode = WC()->customer->get_shipping_postcode();
 get_header();
 get_header('green', array());
 
-$delivery_zip_chosen = ($args['delivery_zip_chosen'] ? $args['delivery_zip_chosen'] : '');
+$delivery_zip_chosen = (isset($args['delivery_zip_chosen']) ? $args['delivery_zip_chosen'] : '');
 
 global $wp_query;
 $cat = $wp_query->get_queried_object();

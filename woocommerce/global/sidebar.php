@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) {
 	exit; // Exit if accessed directly
 }
 
-$woocommerce_sidebar = rigid_get_option('woocommerce_sidebar');
+$woocommerce_sidebar = 'none';
 
 if ($woocommerce_sidebar && $woocommerce_sidebar != 'none' ) {
 	get_sidebar();

@@ -11,7 +11,6 @@
  * the readme will list any important changes.
  *
  * @see     https://docs.woocommerce.com/document/template-structure/
- * @author  WooThemes
  * @package WooCommerce\Templates
  * @version 3.3.0
  */
@@ -21,24 +20,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 ?>
-
-<form role="search" method="get" id="searchform" action="<?php echo esc_url(rigid_wpml_get_home_url()); ?>">
-	<div>
-		<input type="text" value="<?php echo esc_attr(get_search_query()); ?>" name="s" id="s" data-swplive="true" placeholder="<?php esc_attr_e('Search Products', 'rigid'); ?>" />
-		<?php
-		if ( rigid_get_option( 'filter_by_product_category' ) ) {
-			$rigid_categories_depth = 0;
-			if ( rigid_get_option( 'filter_by_product_category_top' ) ) {
-				$rigid_categories_depth = 1;
-			}
-			$rigid_categories_args = array(
-				'show_option_none' => esc_html__( 'All Categories', 'rigid' ),
-				'depth'            => $rigid_categories_depth
-			);
-			wc_product_dropdown_categories( $rigid_categories_args );
-		}
-        ?>
-        <input type="submit" id="searchsubmit" value="<?php esc_attr_e('Search Products', 'rigid') ?>" />
-		<input type="hidden" name="post_type" value="product" />
-	</div>
+<form role="search" method="get" class="woocommerce-product-search" action="<?php echo esc_url( home_url( '/' ) ); ?>">
+	<label class="screen-reader-text" for="woocommerce-product-search-field-<?php echo isset( $index ) ? absint( $index ) : 0; ?>"><?php esc_html_e( 'Search for:', 'woocommerce' ); ?></label>
+	<input type="search" id="woocommerce-product-search-field-<?php echo isset( $index ) ? absint( $index ) : 0; ?>" class="search-field" placeholder="<?php echo esc_attr__( 'Search products&hellip;', 'woocommerce' ); ?>" value="<?php echo get_search_query(); ?>" name="s" />
+	<button type="submit" value="<?php echo esc_attr_x( 'Search', 'submit button', 'woocommerce' ); ?>"><?php echo esc_html_x( 'Search', 'submit button', 'woocommerce' ); ?></button>
+	<input type="hidden" name="post_type" value="product" />
 </form>

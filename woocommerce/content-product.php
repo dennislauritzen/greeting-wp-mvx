@@ -33,7 +33,7 @@ $classes = array('prod_hold');
 	 *
 	 * @hooked woocommerce_template_loop_product_link_open - 10 - removed
 	 */
-    //Wdo_action('woocommerce_before_shop_loop_item'); ?>
+    //do_action('woocommerce_before_shop_loop_item'); ?>
 		<div class="col-6 col-md-3">
 			<div class="card mb-4 border-0">
 					<a href="<?php the_permalink(); ?>">
@@ -57,7 +57,7 @@ $classes = array('prod_hold');
 									<?php echo $product->get_name(); ?>
 								</a>
 							</h6>
-							<?
+							<?php
 								/**
 								 * Hook: woocommerce_after_shop_loop_item_title.
 								 *
@@ -65,7 +65,7 @@ $classes = array('prod_hold');
 								 * @hooked woocommerce_template_loop_price - 10 (removed by rigid)
 								 */
 
-								do_action('woocommerce_after_shop_loop_item_title'); ?>
+								#do_action('woocommerce_after_shop_loop_item_title'); ?>
 							<small><?php woocommerce_template_loop_price(); ?></small>
 					</div>
 			</div>

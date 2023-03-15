@@ -9,14 +9,20 @@ get_header();
 get_header('green');
 
 the_post();
+
+if(is_product_category()){
+	wc_get_template( 'taxonomy-product-cat.php' );
+} else {
+
+
 ?>
 <div class="container">
 	<div class="row">
 		<div class="col-12">
 			<div id="post-<?php the_ID(); ?>" <?php post_class( 'content' ); ?>>
-	            <?php if(!is_front_page()): ?>
+	      <?php if(!is_front_page()): ?>
 				<h1 class="entry-title"><?php the_title(); ?></h1>
-	            <?php endif; ?>
+	      <?php endif; ?>
 				<?php
 					the_content();
 
@@ -39,4 +45,6 @@ the_post();
 	</div><!-- /.row -->
 </div>
 <?php
+}
+
 get_footer();
