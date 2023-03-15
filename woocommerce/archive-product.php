@@ -52,9 +52,15 @@ if (isset($cat->term_id)) {
 $cat = $wp_query->get_queried_object();
 $category_id = $cat->term_id;
 $category_name = $cat->name;
+$category_name_plural = get_field('name_plural', 'category_'.$category_id);
 $category_slug = $cat->slug;
 $category_title = (empty(get_field('header_h1', 'category_'.$category_id)) ? get_the_title() : get_field('header_h1', 'category_'.$category_id));
-
+$category_subtitle = (!empty(get_field('header_top_h2', 'category_'.$category_id)) ? get_field('header_top_h2', 'occasion_'.$category_id) : 'Butikker, der kan levere gaver, som er '.strtolower(str_replace(array('sgave','gave'),array('',''),$category_name)) );
+$category_bottomtitle = (!empty(get_field('header_h2', 'category_'.$category_id)) ? get_field('header_h2', 'occasion_'.$category_id) : 'Skal du sende en gave i anledning af '.strtolower(str_replace(array('sgave','gave'),array('',''),$category_name)).'?');
+$filtering_title = 'Filtrér butikker';
+if(!empty($category_name_plural)){
+	$filtering_title .= ', der kan levere '.$category_name_plural;
+}
 
 $args = array(
     'post_type' => 'product',
@@ -316,7 +322,7 @@ $categoryDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode);
 		<!-- FILTER START -->
 		<div class="col-12 py-0 my-4 mb-3">
 			<h5 style="font-family: Inter;">
-				Filtrér blandt butikker, der kan levere <?php echo strtolower($category_name); ?> gaver
+				<?php echo $filtering_title; ?>
 			</h5>
 			<a class="btn border-teal text-green mb-1 modalBtn" id="filterModalDelDateBtn" data-bs-toggle="modal" data-cd-open="deliveryDates" href="#filterModal" role="button">
 				&#128197;
@@ -563,7 +569,7 @@ $categoryDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode);
 		<div class="row">
 			<div class="col-12 mb-2">
 				<h2 class="my-3 my-xs-3 my-sm-3 my-md-3 my-lg-2 my-xl-2 mt-lg-4 mt-xl-4">
-					<?php echo get_field('header_top_h2', 'category_'.$category_id); ?>
+					<?php echo $category_subtitle; ?>
 				</h2>
 				<div class="applied-filters row mt-xs-0 mt-sm-0 mt-md-0 mt-3 mb-0 lh-lg">
 					<div class="col-12 filter-list">
