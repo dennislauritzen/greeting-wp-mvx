@@ -15,6 +15,11 @@
  * @version     4.7.0
  */
 
+/**
+ * Former code:
+ * # wc_get_template( 'archive-product-to-vendorstore.php' );
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
@@ -36,8 +41,6 @@ if(empty($delivery_zip_chosen) || $delivery_zip_chosen == ''){
 	wc_get_template( 'archive-product.php',
 		array(
 			'delivery_zip_chosen' => $delivery_zip_chosen
-		) );
+		)
+	);
 }
-
-
-# wc_get_template( 'archive-product-to-vendorstore.php' );

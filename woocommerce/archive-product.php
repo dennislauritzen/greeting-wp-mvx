@@ -206,7 +206,7 @@ $categoryDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode);
 			 * @hooked woocommerce_breadcrumb - 20 - removed
 			 * @hooked WC_Structured_Data::generate_website_data() - 30
 			 */
-			do_action('woocommerce_before_main_content');
+			#do_action('woocommerce_before_main_content');
 			?>
 		</div>
 	</div>

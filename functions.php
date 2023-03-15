@@ -690,6 +690,7 @@ function greeting_custom_taxonomy_occasion()  {
 		'labels'                     => $labels,
 		'hierarchical'               => true,
 		'public'                     => true,
+		'rewrite'										 => array('slug' => 'anledning'),
 		'show_ui'                    => true,
 		'show_admin_column'          => true,
 		'show_in_nav_menus'          => true,
@@ -706,6 +707,17 @@ function greeting_custom_taxonomy_occasion()  {
         'read_post' => 'edit_posts' )
 	);
 	register_taxonomy( 'occasion', 'product', $args );
+}
+add_action( 'generate_rewrite_rules', 'register_product_rewrite_rules' );
+function register_product_rewrite_rules( $wp_rewrite ) {
+    $new_rules = array(
+        'products/([^/]+)/?$' => 'index.php?product-category=' . $wp_rewrite->preg_index( 1 ), // 'products/any-character/'
+        'products/([^/]+)/([^/]+)/?$' => 'index.php?post_type=sps-product&product-category=' . $wp_rewrite->preg_index( 1 ) . '&sps-product=' . $wp_rewrite->preg_index( 2 ), // 'products/any-character/post-slug/'
+        'products/([^/]+)/([^/]+)/page/(\d{1,})/?$' => 'index.php?post_type=sps-product&product-category=' . $wp_rewrite->preg_index( 1 ) . '&paged=' . $wp_rewrite->preg_index( 3 ), // match paginated results for a sub-category archive
+        'products/([^/]+)/([^/]+)/([^/]+)/?$' => 'index.php?post_type=sps-product&product-category=' . $wp_rewrite->preg_index( 2 ) . '&sps-product=' . $wp_rewrite->preg_index( 3 ), // 'products/any-character/sub-category/post-slug/'
+        'products/([^/]+)/([^/]+)/([^/]+)/([^/]+)/?$' => 'index.php?post_type=sps-product&product-category=' . $wp_rewrite->preg_index( 3 ) . '&sps-product=' . $wp_rewrite->preg_index( 4 ), // 'products/any-character/sub-category/sub-sub-category/post-slug/'
+    );
+    $wp_rewrite->rules = $new_rules + $wp_rewrite->rules;
 }
 //add_filter( 'wpseo_primary_term_taxonomies', '__return_false' );
 
@@ -4934,3 +4946,5 @@ function rephraseDate($weekday, $date, $month, $year) {
 
 	return $weekday_str." d. ".$date.". ".$month_str. " ". $year_str;
 }
+
+add_filter( 'xmlrpc_enabled', '__return_false' );
