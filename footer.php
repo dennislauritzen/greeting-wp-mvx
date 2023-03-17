@@ -34,7 +34,7 @@
               </svg>
 		        </div>
 		      </div>
-		      <div class="col-6 col-xs-6 col-sm-6 col-md-6 col-lg-3 col-xl-3">
+		      <div class="col-6 col-xs-6 col-sm-6 col-md-6 col-lg-2 col-xl-2">
 		        <h6 class="pb-3 text-uppercase">Udvalgte postnumre i Jylland</h6>
 		        <ul class="list-unstyled mb-0">
                     <li class="pb-1"><a href="<?php echo site_url(); ?>/c/6000-kolding/" class="text-white">6000 Kolding</a></li>
@@ -63,11 +63,10 @@
 		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/2200-koebenhavn-n/" class="text-white">2200 København N</a></li>
 		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/2300-koebenhavn-s/" class="text-white">2300 København S</a></li>
 		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/2400-koebenhavn-nv/" class="text-white">2400 København NV</a></li>
-
-                    <li class="pb-1"><a href="<?php echo site_url(); ?>/c/2700-broenshoej/" class="text-white">2700 Brønshøj</a></li>
-                    <li class="pb-1"><a href="<?php echo site_url(); ?>/c/2800-kongens-lyngby/" class="text-white">2800 Kgs. Lyngby</a></li>
-                    <li class="pb-1"><a href="<?php echo site_url(); ?>/c/3400-hilleroed" class="text-white">3400 Hillerød</a></li>
-                    <li class="pb-1"><a href="<?php echo site_url(); ?>/c/3500-vaerloese" class="text-white">3500 Værløse</a></li>
+              <li class="pb-1"><a href="<?php echo site_url(); ?>/c/2700-broenshoej/" class="text-white">2700 Brønshøj</a></li>
+              <li class="pb-1"><a href="<?php echo site_url(); ?>/c/2800-kongens-lyngby/" class="text-white">2800 Kgs. Lyngby</a></li>
+              <li class="pb-1"><a href="<?php echo site_url(); ?>/c/3400-hilleroed" class="text-white">3400 Hillerød</a></li>
+              <li class="pb-1"><a href="<?php echo site_url(); ?>/c/3500-vaerloese" class="text-white">3500 Værløse</a></li>
 		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/4000-roskilde" class="text-white">4000 Roskilde</a></li>
 		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/4600-koege" class="text-white">4600 Køge</a></li>
 		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/4700-naestved" class="text-white">4700 Næstved</a></li>
@@ -75,11 +74,44 @@
 		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/5250-odense-sv" class="text-white">5250 Odense SV</a></li>
 		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/5500-middelfart" class="text-white">5500 Middelfart</a></li>
 		          <li class="pb-1"><a href="<?php echo site_url(); ?>/c/5700-svendborg" class="text-white">5700 Svendborg</a></li>
-
 		        </ul>
 		      </div>
+		      <div class="col-6 col-xs-6 col-sm-6 col-md-6 col-lg-2 col-xl-2">
+						<h6 class=" mt-3 mt-lg-0 mt-xl-0 pb-3 text-uppercase">Anledninger</h6>
+						<?php
+						wp_nav_menu(
+							array(
+								'menu' => 'Footer Menu (Occasions)',
+								'theme_location' => 'footer-menu-occasions',
+								'container' => 'ul',
+								'menu_class' => 'list-unstyled mb-0',
+								'depth' => '1',
+    						'fallback_cb'    => false, // Do not fall back to wp_page_menu(),
+								'add_li_class' => 'pb-1',
+								'add_a_class' => 'text-white'
+							)
+						);
+						?>
+					</div>
+					<div class="col-6 col-xs-6 col-sm-6 col-md-6 col-lg-2 col-xl-2">
+						<h6 class=" mt-3 mt-lg-0 mt-xl-0 pb-3 text-uppercase">Kategorier</h6>
+						<?php
+						wp_nav_menu(
+							array(
+								'menu' => 'Footer Menu (Categories)',
+								'theme_location' => 'footer-menu-categories',
+								'container' => 'ul',
+								'menu_class' => 'list-unstyled mb-0',
+								'depth' => '1',
+    						'fallback_cb'    => false, // Do not fall back to wp_page_menu(),
+								'add_li_class' => 'pb-1',
+								'add_a_class' => 'text-white'
+							)
+						);
+						?>
+		      </div>
 		      <div class="col-6 col-xs-6 col-sm-6 col-md-6 col-lg-3 col-xl-3">
-		        <h6 class=" mt-3 mt-lg-0 mt-xl-0 pb-3 text-uppercase">Greeting.dk</h6>
+						<h6 class=" mt-3 mt-lg-0 mt-xl-0 pb-3 text-uppercase">Greeting.dk</h6>
 						<?php
 						wp_nav_menu(
 							array(
@@ -94,9 +126,7 @@
 							)
 						);
 						?>
-		      </div>
-		      <div class="col-6 col-xs-6 col-sm-6 col-md-6 col-lg-3 col-xl-3">
-		        <h6 class="mt-3 mt-lg-0 mt-xl-0"><?php echo get_field('greeting_info_footer_heading', 'options'); ?></h6>
+		        <h6 class="mt-3"><?php echo get_field('greeting_info_footer_heading', 'options'); ?></h6>
 		        <p><?php echo get_field('greeting_info_text', 'options'); ?></p>
 		        <p>
 		          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#1b4949" class="me-1 bi bi-envelope" viewBox="0 0 16 16">
