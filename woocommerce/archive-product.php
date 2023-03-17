@@ -881,12 +881,31 @@ get_footer( );
 			            var city = v.city;
 
 			            var div_elm = jQuery("<li>", {"class": "list-inline-item pb-1 me-0 ms-0 pe-1"});
-			            var card_link = jQuery("<a>",{"class": "btn btn-link rounded-pill pb-2 border-1 border-white text-white", "href": link}).text(postal+' '+city).css('font-size','15px');
-
+									var card_link = jQuery("<a>",{"class": "ip-recomms-link btn btn-link rounded-pill pb-2 border-1 border-white text-white",
+																								"href": "#",
+																								"data-postal": postal,
+																								"data-city": city,
+																								"data-city-link": link}).text(postal+' '+city).css('font-size','15px');
 			            div_elm.append(card_link);
 
-			            jQuery("ul#postalcodelist").append(div_elm);
+			            jQuery("ul#lp-postalcodelist").append(div_elm);
 			          });
+
+
+								// Check for clicks for setting postal codes
+								jQuery("a.ip-recomms-link,a.ip-recomms-link").on('click', function(event) {
+									event.preventDefault();
+
+									var this_link_postal = this.getAttribute("data-postal");
+									var this_link_city = this.getAttribute("data-city");
+									var this_link_citylink = this.getAttribute("data-city-link");
+
+									addToLocalStorage('postalcode', this_link_postal);
+									addToLocalStorage('city', this_link_city);
+									addToLocalStorage('city_link', this_link_citylink);
+
+									check_for_postalcode();
+								});
 			        }
 			      }
 			    });

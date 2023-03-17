@@ -688,338 +688,359 @@ get_template_part('template-parts/inc/blocks/learn-more');
 get_footer( );
 ?>
 
-		<script type="text/javascript">
-		  // Start the jQuery
-		  jQuery(document).ready(function($) {
-		    jQuery('#filterdel_dummy_0, #filterdel_dummy_1').remove();
+<script type="text/javascript">
+  // Start the jQuery
+  jQuery(document).ready(function($) {
+    jQuery('#filterdel_dummy_0, #filterdel_dummy_1').remove();
 
-				// Check for clicks for setting postal codes
-				jQuery("a.lp-recomms-link").on('click', function(event) {
-					event.preventDefault();
+		// Get IP data to get close postals.
+		var ip = '';
+	  jQuery.get('https://ipapi.co/postal/', function(ip_data){
+	    ip = ip_data;
 
-					var this_link_postal = this.getAttribute("data-postal");
-					var this_link_city = this.getAttribute("data-city");
-					var this_link_citylink = this.getAttribute("data-city-link");
+	    jQuery.ajax({
+	      url: '<?php echo admin_url('admin-ajax.php'); ?>',
+	      type: 'post',
+	      data: { action: 'get_featured_postal_codes', postal_code: ip },
+	      beforeSend: function(){
+	        if(ip == null){
+	          currentRequest.abort();
+	        }
+	      },
+	      success: function(data) {
+	        data_arr = jQuery.parseJSON(data);
 
-					addToLocalStorage('postalcode', this_link_postal);
-					addToLocalStorage('city', this_link_city);
-					addToLocalStorage('city_link', this_link_citylink);
+	        if(data_arr.length > 0){
+	          jQuery.each(data_arr, function(k, v) {
+	            var link = v.link;
+	            var postal = v.postal;
+	            var city = v.city;
 
-					check_for_postalcode();
-				});
+	            var div_elm = jQuery("<li>", {"class": "list-inline-item pb-1 me-0 ms-0 pe-1"});
+	            var card_link = jQuery("<a>",{"class": "ip-recomms-link btn btn-link rounded-pill pb-2 border-1 border-white text-white",
+																						"href": "#",
+																						"data-postal": postal,
+																						"data-city": city,
+																						"data-city-link": link}).text(postal+' '+city).css('font-size','15px');
 
-		    // Set delivery filters
-		    setFilterBadgeCity('Personlig levering fra lokal butik', 'filterfilter_delivery_1', 'filter_delivery_1');
-		    setFilterBadgeCity('Forsendelse med fragtfirma', 'filterfilter_delivery_0', 'filter_delivery_0');
+	            div_elm.append(card_link);
 
-		    var ajaxurl = "<?php echo admin_url('admin-ajax.php');?>";
-		    var catOccaDeliveryIdArray = [];
-		    var inputPriceRangeArray = [];
-		    var deliveryIdArray = [];
+	            jQuery("ul#lp-postalcodelist").append(div_elm);
+	          });
 
-		    // Get URL parameters
-				var url = new URL(window.location.href);
-				var deliveryIdArray = url.searchParams.get("d")?.split(",");
-				var catOccaDeliveryIdArray = url.searchParams.get("c")?.split(",");
-				var inputPriceRangeArray = url.searchParams.get("price")?.split(",");
+						// Check for clicks for setting postal codes
+						jQuery("a.ip-recomms-link,a.ip-recomms-link").on('click', function(event) {
+							event.preventDefault();
 
-		     // Check delivery filters
-		     if (deliveryIdArray) {
-		       deliveryIdArray.forEach(function(id) {
-		         jQuery('#filter_delivery_' + id).prop('checked', true);
-		       });
-		     }
+							var this_link_postal = this.getAttribute("data-postal");
+							var this_link_city = this.getAttribute("data-city");
+							var this_link_citylink = this.getAttribute("data-city-link");
 
-		     // Check category and occasion filters
-		     if (catOccaDeliveryIdArray) {
-		       catOccaDeliveryIdArray.forEach(function(id) {
-		         var input = jQuery('#filter_cat' + id + ', #filter_occ_' + id);
-		         if (input.length) {
-		           input.prop('checked', true);
-		         }
-		       });
-		     }
+							addToLocalStorage('postalcode', this_link_postal);
+							addToLocalStorage('city', this_link_city);
+							addToLocalStorage('city_link', this_link_citylink);
 
-		     // Set price range filter
-		     if (inputPriceRangeArray) {
-		       var priceRangeMinVal = inputPriceRangeArray[0] || 0;
-		       var priceRangeMaxVal = inputPriceRangeArray[1];
-		       if (priceRangeMaxVal) {
-		         priceRangeMaxVal = parseFloat(priceRangeMaxVal);
-		       }
-		     }
+							check_for_postalcode();
+						});
+	        }
+	      }
+	    });
+		});
 
-		    // Update filters if all are selected
-		    if (deliveryIdArray?.length && catOccaDeliveryIdArray?.length && inputPriceRangeArray?.length) {
-		      update();
-		    }
+		// Check for clicks for setting postal codes
+		jQuery("a.lp-recomms-link,a.ip-recomms-link").on('click', function(event) {
+			event.preventDefault();
 
-		    // Handle category and occasion filter clicks
-		    jQuery('a.top-category-occasion-list').click(function(event) {
-		      event.preventDefault();
-		      var elmId = this.getAttribute("data-elm-id");
-		      jQuery('#filter_' + elmId).click();
+			var this_link_postal = this.getAttribute("data-postal");
+			var this_link_city = this.getAttribute("data-city");
+			var this_link_citylink = this.getAttribute("data-city-link");
 
-		      jQuery('html, body').animate({
-		        scrollTop: jQuery('h2').offset().top
-		      }, 0);
-		    });
+			addToLocalStorage('postalcode', this_link_postal);
+			addToLocalStorage('city', this_link_city);
+			addToLocalStorage('city_link', this_link_citylink);
+
+			check_for_postalcode();
+		});
+
+    // Set delivery filters
+    setFilterBadgeCity('Personlig levering fra lokal butik', 'filterfilter_delivery_1', 'filter_delivery_1');
+    setFilterBadgeCity('Forsendelse med fragtfirma', 'filterfilter_delivery_0', 'filter_delivery_0');
+
+    var ajaxurl = "<?php echo admin_url('admin-ajax.php');?>";
+    var catOccaDeliveryIdArray = [];
+    var inputPriceRangeArray = [];
+    var deliveryIdArray = [];
+
+    // Get URL parameters
+		var url = new URL(window.location.href);
+		var deliveryIdArray = url.searchParams.get("d")?.split(",");
+		var catOccaDeliveryIdArray = url.searchParams.get("c")?.split(",");
+		var inputPriceRangeArray = url.searchParams.get("price")?.split(",");
+
+     // Check delivery filters
+     if (deliveryIdArray) {
+       deliveryIdArray.forEach(function(id) {
+         jQuery('#filter_delivery_' + id).prop('checked', true);
+       });
+     }
+
+     // Check category and occasion filters
+     if (catOccaDeliveryIdArray) {
+       catOccaDeliveryIdArray.forEach(function(id) {
+         var input = jQuery('#filter_cat' + id + ', #filter_occ_' + id);
+         if (input.length) {
+           input.prop('checked', true);
+         }
+       });
+     }
+
+     // Set price range filter
+     if (inputPriceRangeArray) {
+       var priceRangeMinVal = inputPriceRangeArray[0] || 0;
+       var priceRangeMaxVal = inputPriceRangeArray[1];
+       if (priceRangeMaxVal) {
+         priceRangeMaxVal = parseFloat(priceRangeMaxVal);
+       }
+     }
+
+    // Update filters if all are selected
+    if (deliveryIdArray?.length && catOccaDeliveryIdArray?.length && inputPriceRangeArray?.length) {
+      update();
+    }
+
+    // Handle category and occasion filter clicks
+    jQuery('a.top-category-occasion-list').click(function(event) {
+      event.preventDefault();
+      var elmId = this.getAttribute("data-elm-id");
+      jQuery('#filter_' + elmId).click();
+
+      jQuery('html, body').animate({
+        scrollTop: jQuery('h2').offset().top
+      }, 0);
+    });
 
 
 
-				// Get the stores.
-		    jQuery(".filter-on-city-page").click(function(){
-		      update();
+		// Get the stores.
+    jQuery(".filter-on-city-page").click(function(){
+      update();
 
-		      if(this.type == "radio"){
-		        var id = this.id;
-		        var id2 = id.replace(/[0-9]+/, "");
-		        jQuery("div[id*='"+id2+"']").remove();
-		      }
+      if(this.type == "radio"){
+        var id = this.id;
+        var id2 = id.replace(/[0-9]+/, "");
+        jQuery("div[id*='"+id2+"']").remove();
+      }
 
-		      if(this.checked){
-		        setFilterBadgeCity(
-		          jQuery('label[for='+this.id+']').text(),
-		          this.value,
-		          this.id
-		        );
-		      } else {
-		        if (this.id.includes("filter_delivery_date")){
-		          jQuery("input#filter_delivery_date_8").prop('checked',true);
-		        }
-		        removeFilterBadgeCity(
-		          jQuery('label[for='+this.id+']').text(),
-		          this.value,
-		          this.id,
-		          false
-		        );
-		      }
+      if(this.checked){
+        setFilterBadgeCity(
+          jQuery('label[for='+this.id+']').text(),
+          this.value,
+          this.id
+        );
+      } else {
+        if (this.id.includes("filter_delivery_date")){
+          jQuery("input#filter_delivery_date_8").prop('checked',true);
+        }
+        removeFilterBadgeCity(
+          jQuery('label[for='+this.id+']').text(),
+          this.value,
+          this.id,
+          false
+        );
+      }
 
-		    });
+    });
 
-				// Perform an update function call on initiazion
-		    update();
+		// Perform an update function call on initiazion
+    update();
 
 
-		    // reset filter
-		    jQuery('#cityPageReset').click(function(){
-		      jQuery("input:checkbox[name=filter_catocca_city]").removeAttr("checked");
-		      jQuery("input:checkbox[name=filter_del_city]").prop('checked',true);
-		      jQuery("input#filter_delivery_date_8").prop('checked',true);
-		      //catOccaDeliveryIdArray.length = 0;
+    // reset filter
+    jQuery('#cityPageReset').click(function(){
+      jQuery("input:checkbox[name=filter_catocca_city]").removeAttr("checked");
+      jQuery("input:checkbox[name=filter_del_city]").prop('checked',true);
+      jQuery("input#filter_delivery_date_8").prop('checked',true);
+      //catOccaDeliveryIdArray.length = 0;
 
-		      jQuery('div.filter-list div.dynamic-filters').remove();
+      jQuery('div.filter-list div.dynamic-filters').remove();
 
-		      setFilterBadgeCity('Personlig levering fra lokal butik', 'filterfilter_delivery_1', 'filter_delivery_1');
-		      setFilterBadgeCity('Forsendelse med fragtfirma', 'filterfilter_delivery_0', 'filter_delivery_0');
+      setFilterBadgeCity('Personlig levering fra lokal butik', 'filterfilter_delivery_1', 'filter_delivery_1');
+      setFilterBadgeCity('Forsendelse med fragtfirma', 'filterfilter_delivery_0', 'filter_delivery_0');
 
-		      //$(this).data('reset-to-default', '1');
+      //$(this).data('reset-to-default', '1');
 
-		      update();
-		    });
+      update();
+    });
 
-		    // Select the container element
-		    const container = jQuery('#catrowscroll');
-		    const card_cont = jQuery('#catrowscroll div.card_outer:first-child');
+    // Select the container element
+    const container = jQuery('#catrowscroll');
+    const card_cont = jQuery('#catrowscroll div.card_outer:first-child');
 
-		    // Define the number of cards to scroll based on screen size
-		    const numCardsToScroll = jQuery(window).width() >= 992 ? 3 : 2;
+    // Define the number of cards to scroll based on screen size
+    const numCardsToScroll = jQuery(window).width() >= 992 ? 3 : 2;
 
-		    // Add click event listeners to the buttons
-		    jQuery("#forwardButton").click(function(){
-		      container.animate({
-		        scrollLeft: '+=' + (card_cont.outerWidth(true)-1) * numCardsToScroll
-		      }, '2');
-		    });
+    // Add click event listeners to the buttons
+    jQuery("#forwardButton").click(function(){
+      container.animate({
+        scrollLeft: '+=' + (card_cont.outerWidth(true)-1) * numCardsToScroll
+      }, '2');
+    });
 
-		    jQuery("#backButton").click(function(){
-		      container.animate({
-		        scrollLeft: '-=' + (card_cont.outerWidth(true)-1) * numCardsToScroll
-		      }, '2');
-		    });
+    jQuery("#backButton").click(function(){
+      container.animate({
+        scrollLeft: '-=' + (card_cont.outerWidth(true)-1) * numCardsToScroll
+      }, '2');
+    });
 
-		    jQuery(".modalBtn").click(function(){
-		      var uncollapseItem = jQuery(this).data('cd-open');
+    jQuery(".modalBtn").click(function(){
+      var uncollapseItem = jQuery(this).data('cd-open');
 
-		      jQuery('.collapse.show').removeClass('show');
-		      jQuery('#'+uncollapseItem).addClass('show');
+      jQuery('.collapse.show').removeClass('show');
+      jQuery('#'+uncollapseItem).addClass('show');
 
-		      jQuery('div.modal-body a.collapse-btn').attr("aria-expanded","false");
-		      jQuery('*[aria-controls="'+uncollapseItem+'"]').attr("aria-expanded","true");
-		    });
+      jQuery('div.modal-body a.collapse-btn').attr("aria-expanded","false");
+      jQuery('*[aria-controls="'+uncollapseItem+'"]').attr("aria-expanded","true");
+    });
 
-				// Get IP data to get close postals.
-				var ip = '';
-			  jQuery.get('https://ipapi.co/postal/', function(ip_data){
-			    ip = ip_data;
 
-			    jQuery.ajax({
-			      url: '<?php echo admin_url('admin-ajax.php'); ?>',
-			      type: 'post',
-			      data: { action: 'get_featured_postal_codes', postal_code: ip },
-			      beforeSend: function(){
-			        if(ip == null){
-			          currentRequest.abort();
-			        }
-			      },
-			      success: function(data) {
-			        data_arr = jQuery.parseJSON(data);
+  });
+	// Filter badges on the vendor page.
+	function setFilterBadgeCity(label, id, dataRemove){
+		const elm = document.createElement('div');
+		elm.id = 'filter'+dataRemove;
+		elm.classList.add('badge', 'rounded-pill', 'border-yellow', 'py-2', 'pe-2', 'my-1', 'me-1', 'text-dark', 'dynamic-filters');
+		elm.href = '#';
+		elm.innerHTML = label;
 
-			        if(data_arr.length > 0){
-			          jQuery.each(data_arr, function(k, v) {
-			            var link = v.link;
-			            var postal = v.postal;
-			            var city = v.city;
+		const elmbtn = document.createElement('button');
+		elmbtn.type = 'button';
+		elmbtn.classList.add('btn-close', 'filter-btn-delete', 'ms-1');
+		elmbtn.dataset.filterId = id;
+		var useableLabel = label.replace(/ /g,'').replace(/(?:\r\n|\r|\n)/g,'').replace(/\./g,'');
+		elmbtn.dataset.label = useableLabel;
 
-			            var div_elm = jQuery("<li>", {"class": "list-inline-item pb-1 me-0 ms-0 pe-1"});
-			            var card_link = jQuery("<a>",{"class": "btn btn-link rounded-pill pb-2 border-1 border-white text-white", "href": link}).text(postal+' '+city).css('font-size','15px');
+		if(id !='filterpostalcode_id'){
+			elmbtn.onclick = function(){removeFilterBadgeCity('"'+useableLabel+'"', id, dataRemove, true);};
+		}
+		elmbtn.dataset.filterRemove = dataRemove;
+		elm.appendChild(elmbtn);
 
-			            div_elm.append(card_link);
+		jQuery('div.filter-list').prepend(elm);
+	}
+	function removeFilterBadgeCity(label, id, dataRemove, updateVendors){
+		jQuery('#filter'+dataRemove).remove();
 
-			            jQuery("ul#postalcodelist").append(div_elm);
-			          });
-			        }
-			      }
-			    });
-				});
-		  });
-			// Filter badges on the vendor page.
-			function setFilterBadgeCity(label, id, dataRemove){
-				const elm = document.createElement('div');
-				elm.id = 'filter'+dataRemove;
-				elm.classList.add('badge', 'rounded-pill', 'border-yellow', 'py-2', 'pe-2', 'my-1', 'me-1', 'text-dark', 'dynamic-filters');
-				elm.href = '#';
-				elm.innerHTML = label;
+		// Check if dataRemove is delivery date, then erase checks and check the defauls.
+		if (dataRemove.includes("filter_delivery_date")){
+			jQuery("input#filter_delivery_date_8").prop('checked',true);
+			jQuery('#'+dataRemove).prop('checked',false);
+		}
 
-				const elmbtn = document.createElement('button');
-				elmbtn.type = 'button';
-				elmbtn.classList.add('btn-close', 'filter-btn-delete', 'ms-1');
-				elmbtn.dataset.filterId = id;
-				var useableLabel = label.replace(/ /g,'').replace(/(?:\r\n|\r|\n)/g,'').replace(/\./g,'');
-				elmbtn.dataset.label = useableLabel;
+		if(updateVendors === true){
+			var elmId = dataRemove;
+			document.getElementById(elmId).checked = false;
+			update();
+		}
+	}
 
-				if(id !='filterpostalcode_id'){
-					elmbtn.onclick = function(){removeFilterBadgeCity('"'+useableLabel+'"', id, dataRemove, true);};
-				}
-				elmbtn.dataset.filterRemove = dataRemove;
-				elm.appendChild(elmbtn);
+	function update(){
+		var ajaxurl = "<?php echo admin_url('admin-ajax.php');?>";
 
-				jQuery('div.filter-list').prepend(elm);
-			}
-			function removeFilterBadgeCity(label, id, dataRemove, updateVendors){
-				jQuery('#filter'+dataRemove).remove();
+		var cityName = window.localStorage.getItem('city');
+		var postalCode = window.localStorage.getItem('postalcode');
 
-				// Check if dataRemove is delivery date, then erase checks and check the defauls.
-				if (dataRemove.includes("filter_delivery_date")){
-					jQuery("input#filter_delivery_date_8").prop('checked',true);
-					jQuery('#'+dataRemove).prop('checked',false);
-				}
+		if(!cityName || !postalCode){
+			return;
+		}
 
-				if(updateVendors === true){
-					var elmId = dataRemove;
-					document.getElementById(elmId).checked = false;
-					update();
-				}
-			}
+		var categoryId = jQuery("#_hid_cat_id").val();
+		catOccaIdArray = [];
+		deliveryIdArray = [];
+		inputPriceRangeArray = [];
 
-			function update(){
-				var ajaxurl = "<?php echo admin_url('admin-ajax.php');?>";
+		// Make the loading...
+		jQuery('.loadingHeartBeat').show();
+		jQuery('#defaultStore').hide();
+		jQuery('.filteredStore').hide();
 
-				var cityName = window.localStorage.getItem('city');
-				var postalCode = window.localStorage.getItem('postalcode');
+		// Chosen delivery date
+		var delDate = jQuery('input[name=filter_del_days_city]:checked').val();
 
-				if(!cityName || !postalCode){
-					return;
-				}
+		jQuery("input:checkbox[name=filter_catocca_city]:checked").each(function(){
+			catOccaIdArray.push(jQuery(this).val());
+		});
+		//catOccaIdArray.push(categoryId);
 
-				var categoryId = jQuery("#_hid_cat_id").val();
-				catOccaIdArray = [];
-				deliveryIdArray = [];
-				inputPriceRangeArray = [];
+    jQuery("input:checkbox[name=filter_del_city]:checked").each(function(){
+			deliveryIdArray.push(jQuery(this).val());
+		});
 
-				// Make the loading...
-				jQuery('.loadingHeartBeat').show();
-				jQuery('#defaultStore').hide();
+
+		if(jQuery('input[name=filter_del_price]').is(':checked')){
+			var pricearray = [];
+			jQuery("input:checkbox[name=filter_del_price]:checked").each(function(){
+				var price = jQuery(this).val().split("-");
+				pricearray.push(price[0]);
+				pricearray.push(price[1]);
+			});
+			var inputPriceRange = [Math.min.apply(Math,pricearray), Math.max.apply(Math,pricearray)];
+		} else {
+			var inputPriceRange = jQuery('input[name=filter_del_price_default]').val().split("-");
+		}
+
+		var data = {
+			'action': 'categoryAndOccasionVendorFilterAction',
+			cityDefaultUserIdAsString: jQuery("#categoryDefaultUserIdAsString").val(),
+			delDate: delDate,
+			catOccaIdArray: catOccaIdArray,
+			deliveryIdArray: deliveryIdArray,
+			inputPriceRangeArray: inputPriceRange,
+			cityName: cityName,
+			postalCode: postalCode
+		};
+		jQuery.post(ajaxurl, data, function(response) {
+			jQuery('#defaultStore').hide();
+			jQuery('.filteredStore').show();
+			jQuery('.filteredStore').html(response);
+			jQuery('.loadingHeartBeat').hide();
+
+			if(catOccaIdArray.length == 0 && deliveryIdArray.length == 0 && priceChange == 1){
+				jQuery('#defaultStore').show();
 				jQuery('.filteredStore').hide();
-
-				// Chosen delivery date
-				var delDate = jQuery('input[name=filter_del_days_city]:checked').val();
-
-				jQuery("input:checkbox[name=filter_catocca_city]:checked").each(function(){
-					catOccaIdArray.push(jQuery(this).val());
-				});
-				//catOccaIdArray.push(categoryId);
-
-        jQuery("input:checkbox[name=filter_del_city]:checked").each(function(){
-					deliveryIdArray.push(jQuery(this).val());
-				});
-
-
-				if(jQuery('input[name=filter_del_price]').is(':checked')){
-					var pricearray = [];
-					jQuery("input:checkbox[name=filter_del_price]:checked").each(function(){
-						var price = jQuery(this).val().split("-");
-						pricearray.push(price[0]);
-						pricearray.push(price[1]);
-					});
-					var inputPriceRange = [Math.min.apply(Math,pricearray), Math.max.apply(Math,pricearray)];
-				} else {
-					var inputPriceRange = jQuery('input[name=filter_del_price_default]').val().split("-");
-				}
-
-				var data = {
-					'action': 'categoryAndOccasionVendorFilterAction',
-					cityDefaultUserIdAsString: jQuery("#categoryDefaultUserIdAsString").val(),
-					delDate: delDate,
-					catOccaIdArray: catOccaIdArray,
-					deliveryIdArray: deliveryIdArray,
-					inputPriceRangeArray: inputPriceRange,
-					cityName: cityName,
-					postalCode: postalCode
-				};
-				jQuery.post(ajaxurl, data, function(response) {
-					jQuery('#defaultStore').hide();
-					jQuery('.filteredStore').show();
-					jQuery('.filteredStore').html(response);
-					jQuery('.loadingHeartBeat').hide();
-
-					if(catOccaIdArray.length == 0 && deliveryIdArray.length == 0 && priceChange == 1){
-						jQuery('#defaultStore').show();
-						jQuery('.filteredStore').hide();
-						jQuery('#noVendorFound').hide();
-					} else if(catOccaIdArray.length == 0 && deliveryIdArray.length == 0 && priceChange == 0){
-						jQuery('#defaultStore').show();
-						jQuery('.filteredStore').hide();
-						jQuery('#noVendorFound').hide();
-					}
-
-					var state = { 'd': deliveryIdArray, 'c': catOccaIdArray, 'p': inputPriceRange }
-					var url = '';
-					if(deliveryIdArray.length > 0){
-						if(url){ 	url += '&'; }
-						url += 'd='+deliveryIdArray;
-					}
-					if(catOccaIdArray.length > 0){
-						if(url){ 	url += '&'; }
-						url += 'c='+catOccaIdArray;
-					}
-
-					if(inputPriceRange.length > 0){
-						if(url){ 	url += '&'; }
-						url += 'price='+inputPriceRange;
-					}
-					if(url.length > 0){
-						url = '?'+url;
-					}
-
-					if(url){
-						history.pushState(state, '', url);
-					} else {
-						window.history.replaceState({}, '', location.pathname);
-					}
-				});
+				jQuery('#noVendorFound').hide();
+			} else if(catOccaIdArray.length == 0 && deliveryIdArray.length == 0 && priceChange == 0){
+				jQuery('#defaultStore').show();
+				jQuery('.filteredStore').hide();
+				jQuery('#noVendorFound').hide();
 			}
-		</script>
+
+			var state = { 'd': deliveryIdArray, 'c': catOccaIdArray, 'p': inputPriceRange }
+			var url = '';
+			if(deliveryIdArray.length > 0){
+				if(url){ 	url += '&'; }
+				url += 'd='+deliveryIdArray;
+			}
+			if(catOccaIdArray.length > 0){
+				if(url){ 	url += '&'; }
+				url += 'c='+catOccaIdArray;
+			}
+
+			if(inputPriceRange.length > 0){
+				if(url){ 	url += '&'; }
+				url += 'price='+inputPriceRange;
+			}
+			if(url.length > 0){
+				url = '?'+url;
+			}
+
+			if(url){
+				history.pushState(state, '', url);
+			} else {
+				window.history.replaceState({}, '', location.pathname);
+			}
+		});
+	}
+</script>
 		<!-- Loading and showing the content Javascript -->
 		<script type="text/javascript">
 		// @todo - listen to the localStorage - if there is a postalcode all ready, then lets just use that. Else show formula.

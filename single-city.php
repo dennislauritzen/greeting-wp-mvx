@@ -96,81 +96,81 @@ $DropOffTimes = (count($DropOffTimes) > 0) ? max($DropOffTimes) : 0;
 // pass to backend
 $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode);
 
-  /////////////////////////
-  // Data for the filtering.
-  // This data is used for the filters and for the stores.
-  // It is also used for the featuring of categories and occasions in the top.
+/////////////////////////
+// Data for the filtering.
+// This data is used for the filters and for the stores.
+// It is also used for the featuring of categories and occasions in the top.
 
-  $productPriceArray = array(); // for price filter
-  $categoryTermListArray = array(); // for cat term filter
-  $occasionTermListArray = array();
+$productPriceArray = array(); // for price filter
+$categoryTermListArray = array(); // for cat term filter
+$occasionTermListArray = array();
 
-  // for price filter
+// for price filter
 
-  // Get all vendor product IDs
-  $vendorProductIds = array();
+// Get all vendor product IDs
+$vendorProductIds = array();
 
-  foreach ($UserIdArrayForCityPostalcode as $vendorId) {
-      $vendor = get_wcmp_vendor($vendorId);
-      $vendorProductIds = array_merge($vendorProductIds, $vendor->get_products(array('fields' => 'ids')));
+foreach ($UserIdArrayForCityPostalcode as $vendorId) {
+    $vendor = get_wcmp_vendor($vendorId);
+    $vendorProductIds = array_merge($vendorProductIds, $vendor->get_products(array('fields' => 'ids')));
+}
+$vendorProductIds = array_unique($vendorProductIds);
+
+// Use a custom SQL query to fetch the prices of those products
+$where = array();
+foreach($vendorProductIds as $pv){
+  if(is_numeric($pv)){
+    $where[] = $pv;
   }
-  $vendorProductIds = array_unique($vendorProductIds);
+}
 
-  // Use a custom SQL query to fetch the prices of those products
-  $where = array();
-  foreach($vendorProductIds as $pv){
-    if(is_numeric($pv)){
-      $where[] = $pv;
+if(!empty($where)){
+  $prices = $wpdb->prepare("
+      SELECT meta_value
+      FROM {$wpdb->postmeta}
+      WHERE meta_key = '_price'
+      AND post_id IN (".implode(', ', array_fill(0, count($vendorProductIds), '%s')).")
+  ", $where);
+  $prices = $wpdb->get_results($prices);
+
+  // Convert the results to an array of prices
+  $priceArray = array();
+  foreach ($prices as $price) {
+      $priceArray[] = $price->meta_value;
+  }
+} else {
+  $priceArray = array(0,2000);
+}
+
+
+
+// Use min and max to get the minimum and maximum prices
+$minPrice = min($priceArray);
+$maxPrice = max($priceArray);
+
+// Use array_push to add the prices to the $productPriceArray
+array_push($productPriceArray, $minPrice, $maxPrice);
+
+// Use get_the_terms to fetch all the terms for all products belonging to the vendors
+$terms = wp_get_object_terms($vendorProductIds, array('product_cat', 'occasion'));
+
+$categoryTermListArray = array();
+$occasionTermListArray = array();
+
+if ($terms && !is_wp_error($terms)) {
+    foreach ($terms as $term) {
+        if ($term->taxonomy === 'product_cat') {
+            if ($term->term_id != 15 && $term->term_id != 16) {
+                $categoryTermListArray[] = $term->term_id;
+            }
+        } else if ($term->taxonomy === 'occasion') {
+            $occasionTermListArray[] = $term->term_id;
+        }
     }
-  }
+}
 
-  if(!empty($where)){
-    $prices = $wpdb->prepare("
-        SELECT meta_value
-        FROM {$wpdb->postmeta}
-        WHERE meta_key = '_price'
-        AND post_id IN (".implode(', ', array_fill(0, count($vendorProductIds), '%s')).")
-    ", $where);
-    $prices = $wpdb->get_results($prices);
-
-    // Convert the results to an array of prices
-    $priceArray = array();
-    foreach ($prices as $price) {
-        $priceArray[] = $price->meta_value;
-    }
-  } else {
-    $priceArray = array(0,2000);
-  }
-
-
-
-  // Use min and max to get the minimum and maximum prices
-  $minPrice = min($priceArray);
-  $maxPrice = max($priceArray);
-
-  // Use array_push to add the prices to the $productPriceArray
-  array_push($productPriceArray, $minPrice, $maxPrice);
-
-  // Use get_the_terms to fetch all the terms for all products belonging to the vendors
-  $terms = wp_get_object_terms($vendorProductIds, array('product_cat', 'occasion'));
-
-  $categoryTermListArray = array();
-  $occasionTermListArray = array();
-
-  if ($terms && !is_wp_error($terms)) {
-      foreach ($terms as $term) {
-          if ($term->taxonomy === 'product_cat') {
-              if ($term->term_id != 15 && $term->term_id != 16) {
-                  $categoryTermListArray[] = $term->term_id;
-              }
-          } else if ($term->taxonomy === 'occasion') {
-              $occasionTermListArray[] = $term->term_id;
-          }
-      }
-  }
-
-  $categoryTermListArray = array_unique($categoryTermListArray);
-  $occasionTermListArray = array_unique($occasionTermListArray);
+$categoryTermListArray = array_unique($categoryTermListArray);
+$occasionTermListArray = array_unique($occasionTermListArray);
 ?>
 
 
@@ -787,7 +787,6 @@ get_footer( );
           false
         );
       }
-
     });
 
     update();

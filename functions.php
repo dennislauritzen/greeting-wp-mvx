@@ -1265,7 +1265,7 @@ function catocca_landing_data_fetch(){
  				$first = 1;
  			}
  			// call the template with pass $vendor variable
- 			get_template_part('dc-product-vendor/vendor-loop', null, array('vendor' => $vendor, 'cityName' => $cityName));
+ 			get_template_part('template-parts/vendor-loop', null, array('vendor' => $vendor, 'cityName' => $cityName));
  		}
  	} else { ?>
  		<div>
@@ -1546,7 +1546,7 @@ function catOccaDeliveryAction() {
 				$first = 1;
 			}
 			// call the template with pass $vendor variable
-			get_template_part('dc-product-vendor/vendor-loop', null, array('vendor' => $vendor, 'cityName' => $cityName));
+			get_template_part('template-parts/vendor-loop', null, array('vendor' => $vendor, 'cityName' => $cityName));
 		}
 	} else { ?>
 		<div>
@@ -1575,10 +1575,30 @@ function lpFilterAction() {
 	// delivery filter data
 	$deliveryIdArray = $_POST['deliveryIdArray'];
 
+	// get the postal code array from post.
 	$postal_code = $_POST['postalArray'];
+
+	// get the delivery date from post
+	// delivery date
+	$deliveryDate = (int) $_POST['delDate'];
+	if(empty($deliveryDate) && $deliveryDate !== 0){
+		$deliveryDate = 8;
+	} else if(!is_numeric($deliveryDate) || $deliveryDate < 0){
+		$deliveryDate = 0;
+	}
+
+	// Calculate Selected Date
+	$filteredDate = new DateTime();
+	$filteredDate->modify('+'.$deliveryDate.' days');
+	$selectedDate = $filteredDate->format('d-m-Y');
+	$selectedDay = $filteredDate->format('N');
+
 
 	// declare array for store user ID get from occasion
 	$userIdArrayGetFromCatOcca = array();
+
+	// declare array holding store IDs that match delivery date.
+	$userIdArrayGetFromDelDate = array();
 
 	// declare array for store user ID got from delivery type
 	$userIdArrayGetFromDelivery = array();
@@ -1624,57 +1644,126 @@ function lpFilterAction() {
 	//////////////////////////
 	// FILTER: Postal Codes
 	// Prepare the statement for postal code array
-	$where = array();
-	$placeholder_arr = array_fill(0, count($postal_code), 'um.meta_value LIKE %s');
-	foreach($postal_code as $postcode){
-	  $where[] = '%'.$postcode.'%';
-	}
+	if(!empty($postal_code)){
+		$where = array();
+		$placeholder_arr = array_fill(0, count($postal_code), 'um.meta_value LIKE %s');
+		foreach($postal_code as $postcode){
+		  $where[] = '%'.$postcode.'%';
+		}
 
-	// Add the user role to the where array:
-	$where[] = '%dc_vendor%';
+		// Add the user role to the where array:
+		$where[] = '%dc_vendor%';
 
-	$sql = "SELECT
-	        	DISTINCT(u.ID)
-	        FROM
-	        	{$wpdb->prefix}users u
-	        LEFT JOIN
-	        	{$wpdb->prefix}usermeta um
-	            ON um.user_id = u.ID
-	        LEFT JOIN
-	          {$wpdb->prefix}usermeta um5
-	          ON
-	            u.ID = um5.user_id
-	        WHERE
-	      	(
-	          um.meta_key = 'delivery_zips'
-	          AND
-	      		(".implode(" OR ",$placeholder_arr).")
-	        )
-	        AND
-	          NOT EXISTS (SELECT um.meta_value FROM {$wpdb->prefix}usermeta um2 WHERE um2.user_id = u.ID AND um2.meta_key = 'vendor_turn_off')
-	        AND
-	          NOT EXISTS (SELECT um2.meta_value FROM {$wpdb->prefix}usermeta um2 WHERE um2.user_id = u.ID AND um2.meta_key = 'vendor_turn_off')
-	          and
-	          (um5.meta_key = 'wp_capabilities' AND um5.meta_value LIKE %s)
-	        ORDER BY
-	          CASE u.ID
-	            WHEN 38 THEN 0
-	            WHEN 76 THEN 0
-	                ELSE 1
-	          END DESC,
-	          (SELECT um3.meta_value FROM {$wpdb->prefix}usermeta um3 WHERE um3.user_id = u.ID AND um3.meta_key = 'delivery_type') DESC
-	";
+		$sql = "SELECT u.ID, umm1.meta_value AS dropoff_time, umm2.meta_value AS require_delivery_day, umm3.meta_value AS delivery_type
+		          FROM {$wpdb->prefix}users u
+		          LEFT JOIN {$wpdb->prefix}usermeta umm1 ON u.ID = umm1.user_id AND umm1.meta_key = 'vendor_drop_off_time'
+		          LEFT JOIN {$wpdb->prefix}usermeta umm2 ON u.ID = umm2.user_id AND umm2.meta_key = 'vendor_require_delivery_day'
+		          LEFT JOIN {$wpdb->prefix}usermeta umm3 ON u.ID = umm3.user_id AND umm3.meta_key = 'delivery_type'
+		          WHERE EXISTS (
+		              SELECT 1
+		              FROM {$wpdb->prefix}usermeta um
+		              WHERE um.user_id = u.ID AND um.meta_key = 'delivery_zips' AND (".implode(" OR ",$placeholder_arr).")
+		          )
+		          AND NOT EXISTS (
+		              SELECT 1
+		              FROM {$wpdb->prefix}usermeta um2
+		              WHERE um2.user_id = u.ID AND um2.meta_key = 'vendor_turn_off'
+		          )
+		          AND EXISTS (
+		              SELECT 1
+		              FROM {$wpdb->prefix}usermeta um5
+		              WHERE um5.user_id = u.ID AND um5.meta_key = 'wp_capabilities' AND um5.meta_value LIKE %s
+		          )
+		          ORDER BY
+		          umm3.meta_value DESC,
+		          CASE u.ID
+		              WHEN 38 THEN 0
+		              WHEN 76 THEN 0
+		              ELSE 1
+		          END DESC,
+		          umm2.meta_value ASC,
+		          umm2.meta_value DESC
+		";
 
-	$sql_prepare = $wpdb->prepare($sql, $where);
-	$users_from_postcode = wp_list_pluck( $wpdb->get_results($sql_prepare), 'ID' );
+		$sql_prepare = $wpdb->prepare($sql, $where);
+		$users_from_postcode = wp_list_pluck( $wpdb->get_results($sql_prepare), 'ID' );
 
-	// Remove all the stores that doesnt match from default array
-	if(!empty($users_from_postcode)){
-		$userIdArrayGetFromPostal = array_intersect($defaultUserArray, $users_from_postcode);
-		$defaultUserArray = $userIdArrayGetFromPostal;
+		// Remove all the stores that doesnt match from default array
+		if(!empty($users_from_postcode)){
+			$userIdArrayGetFromPostal = array_intersect($defaultUserArray, $users_from_postcode);
+			$defaultUserArray = $userIdArrayGetFromPostal;
+		}
 	}
 	// --
 	//////////////////////////
+
+
+	////////////////////////
+	// FILTER: Delivery DATE
+	// Prepare the statement for delivery array
+	if($deliveryDate >= 0 && $deliveryDate < 8){
+		$args = array(
+			'role' => 'dc_vendor',
+			'meta_query' => array(
+						'key' => 'vendor_require_delivery_day',
+						'value' => $deliveryDate,
+						'compare' => '<=',
+						'type' => 'NUMERIC'
+				)
+		);
+
+		// (v) @todo: Move cut-off time out of the query and into PHP.
+		// (v) @todo: Make sure the store is not closed on the given date!!!! Make a PHP check.
+
+		$usersByDelDateFilter = new WP_User_Query( $args	);
+		$delDateArr = $usersByDelDateFilter->get_results();
+
+		foreach($delDateArr as $v){
+			$dropoff_time 		= get_field('vendor_drop_off_time','user_'.$v->ID);
+			$delDate 					= (int) get_field('vendor_require_delivery_day','user_'.$v->ID);
+			$delClosedDates		= get_field('vendor_closed_day','user_'.$v->ID);
+			$delWeekDays	    = get_field('openning','user_'.$v->ID);
+
+			$open_iso_days = array();
+			foreach($delWeekDays as $key => $val){
+				$open_iso_days[] = $val['value'];
+			}
+
+			$open_this_day = (in_array($selectedDay, $open_iso_days) ? 1 : 0);
+
+			// Check if the store is closed this specific date.
+			$closedDatesArr		= array_map('trim', explode(",",$delClosedDates));
+			$closedThisDate 	= 0;
+			if(in_array($selectedDate, $closedDatesArr)){
+				$closedThisDate = 1;
+			}
+
+			#var_dump($delDate);
+
+			if($deliveryDate < $delDate){
+				// Can't delivery on selected date.
+				print "Vi er her";
+			} else if($deliveryDate == $delDate && $dropoff_time < date("H")){
+				// Can't deliver on selected date because time has passed cutoff.
+				print "Nej, vi er her";
+			} else {
+				// Can deliver, woohoo.
+				if($closedThisDate == 0 && $open_this_day == 1){
+					array_push($userIdArrayGetFromDelDate, (string) $v->ID);
+				}
+			}
+		}
+
+		var_dump($userIdArrayGetFromDelDate);
+
+		// Remove all the stores that doesnt match from default array
+		// Normally we would check if the userIdArray is empty, but not here,
+		// instead we check if the date-filter is set - if it is and the userID-array
+		// is empty, then there is no stores left.
+		// if(!empty($userIdArrayGetFromDelDate)){
+		$userIdArrayGetFromDelDate = array_intersect($defaultUserArray, $userIdArrayGetFromDelDate);
+		$defaultUserArray = $userIdArrayGetFromDelDate;
+	}
 
 
 	////////////////////////
@@ -1759,10 +1848,19 @@ function lpFilterAction() {
 			$vendor_int = (int) $filteredUser;
 
 			$vendor = get_wcmp_vendor($vendor_int);
-
 			$cityName = $_POST['cityName'];
+
+			// Get the delivery type for the vendor so we know if it is local or freight.
+			// The delivery type of the store
+		  $delivery_type = get_field('delivery_type','user_'.$vendor->id);
+		  $delivery_type = (!empty($delivery_type['0']['value']) ? $delivery_type['0']['value'] : 0);
+
+			if($delivery_type == 0 && $first == 0){
+				get_template_part('template-parts/vendor-freight-heading', null, array('cityName' => $cityName));
+				$first = 1;
+			}
 			// call the template with pass $vendor variable
-			get_template_part('dc-product-vendor/vendor-loop', null, array('vendor' => $vendor, 'cityName' => $cityName));
+			get_template_part('template-parts/vendor-loop', null, array('vendor' => $vendor, 'cityName' => $cityName));
 		}
 	} else { ?>
 		<div>
@@ -1779,61 +1877,11 @@ add_action( 'wp_ajax_nopriv_lpFilterAction', 'lpFilterAction' );
 
 
 /**
- * Vendor filter on Product Category Page
+ * Filtering on the category pages.
+ *
+ * @access public
+ * @author Dennis Lauritzen
  */
-//add_action( 'wp_footer', 'categoryPageActionJavascript' );
-function categoryPageActionJavascript() { ?>
-	<script type="text/javascript">
-
-		jQuery(document).ready(function($) {
-
-			var ajaxurl = "<?php echo admin_url('admin-ajax.php');?>";
-			var itemArrayForStoreFilter = [];
-			$('#resetAllCategoryPage').hide();
-
-			jQuery('.vendor_sort_categorypage_item').click(function(){
-				itemArrayForStoreFilter = [];
-				$("input:checkbox[name=type_categorypage]:checked").each(function(){
-					itemArrayForStoreFilter.push($(this).val());
-				});
-
-				var data = {'action': 'categoryPageFilterAction', categoryPageDefaultUserIdAsString: jQuery("#categoryPageDefaultUserIdAsString").val(), itemArrayForStoreFilter: itemArrayForStoreFilter};
-				jQuery.post(ajaxurl, data, function(response) {
-					jQuery('#vendorByDeliveryZipCategory').hide();
-					jQuery('#vendorAfterFilter').show();
-					$('#resetAllCategoryPage').show();
-					jQuery('#vendorAfterFilter').html(response);
-					if(itemArrayForStoreFilter.length == 0){
-						jQuery('#vendorByDeliveryZipCategory').show();
-						jQuery('#noVendorFound').hide();
-					}
-				});
-			});
-
-			// reset filter
-			$('#resetAllCategoryPage').click(function(){
-				var inputVal = $("input:checkbox[name=type_categorypage]").val();
-				// $("input:checkbox[name=type_categorypage]").removeAttr("checked");
-				$("input:checkbox[name=type_categorypage]").prop("checked", false)
-				itemArrayForStoreFilter.length = 0;
-				jQuery('#vendorByDeliveryZipCategory').show();
-				jQuery('#vendorAfterFilter').hide();
-				$('#resetAllCategoryPage').hide();
-			});
-		});
-
-		// Add remove loading class on body element based on Ajax request status
-		jQuery(document).on({
-			ajaxStart: function(){
-				jQuery("div").addClass("loading-custom");
-			},
-			ajaxStop: function(){
-				jQuery("div").removeClass("loading-custom");
-			}
-		});
-
-	</script><?php
-}
 
 function categoryPageFilterAction() {
 
@@ -3923,7 +3971,7 @@ function get_close_stores(){
 		$vendor = get_user_meta($v->ID);
 		$vendor_page_slug = get_wcmp_vendor($v->ID);
 		// call the template with pass $vendor variable
-		get_template_part('dc-product-vendor/vendor-loop', null, array('vendor' => $vendor_page_slug, 'cityName' => $cityName, 'postalCode' => $postal_code));
+		get_template_part('template-parts/vendor-loop', null, array('vendor' => $vendor_page_slug, 'cityName' => $cityName, 'postalCode' => $postal_code));
 	}
 
 	wp_die();
