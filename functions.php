@@ -1974,7 +1974,7 @@ function categoryPageFilterAction() {
 
 	wp_die();
 }
-if(!is_cart() && !is_checkout()){
+if(	false === is_cart() && false === !is_checkout()){
 	add_action( 'wp_ajax_categoryPageFilterAction', 'categoryPageFilterAction' );
 	add_action( 'wp_ajax_nopriv_categoryPageFilterAction', 'categoryPageFilterAction' );
 }
@@ -4475,9 +4475,9 @@ function custom_orders_list_column_content( $column, $post_id )
 						}
 					}
 				}
-				$del_type = get_field('delivery_type', 'user_'.$vendor_id);
+				$del_type = (get_field('delivery_type', 'user_'.$vendor_id) != '' ? get_field('delivery_type', 'user_'.$vendor_id) : array());
 
-				if($del_type[0]['value'] == '0')
+				if(is_array($del_type) && array_key_exists(0, $del_type) && $del_type[0]['value'] == '0')
 				{
 					// freight store
 					print '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-truck" viewBox="0 0 16 16">
@@ -4577,7 +4577,7 @@ function wcmp_admin_filter_by_vendor() {
 
 		 	asort($vendor_arr);
 			foreach($vendor_arr as $vendor => $value){
-				$checked = sanitize_text_field($_REQUEST['admin_order_vendor']);
+				$checked = isset($_REQUEST['admin_order_vendor']) ? sanitize_text_field($_REQUEST['admin_order_vendor']) : '';
 				$checked = ($checked == $vendor) ? ' selected="selected"' : '';
 				$admin_dd_html .= '<option value="'.$vendor.'"'.$checked.'>'.$value.'</option>';
 			}
