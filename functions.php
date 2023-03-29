@@ -668,7 +668,6 @@ add_action( 'admin_init', 'add_theme_caps');
 *
 **/
 add_action( 'init', 'greeting_custom_taxonomy_occasion', 0 );
-
 function greeting_custom_taxonomy_occasion()  {
 	$labels = array(
 		'name'                       => 'Occasions',
@@ -708,6 +707,7 @@ function greeting_custom_taxonomy_occasion()  {
 	);
 	register_taxonomy( 'occasion', 'product', $args );
 }
+
 #add_action( 'generate_rewrite_rules', 'register_product_rewrite_rules' );
 function register_product_rewrite_rules( $wp_rewrite ) {
     $new_rules = array(
@@ -720,6 +720,17 @@ function register_product_rewrite_rules( $wp_rewrite ) {
     $wp_rewrite->rules = $new_rules + $wp_rewrite->rules;
 }
 //add_filter( 'wpseo_primary_term_taxonomies', '__return_false' );
+
+/**
+ *
+ * Remove the pagination for product category pages and custom taxonomy 'Occasions'.
+ *
+ */
+add_filter( 'loop_shop_per_page', 'greeting_remove_pagination', 20 );
+function greeting_remove_pagination( $cols ) {
+	$cols = 99999999999;
+	return $cols;
+}
 
 /**
  *
