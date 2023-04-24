@@ -2228,10 +2228,10 @@ function call_order_status_completed($array, $product_id) {
 
 	//$orderData = $order->get_data(); // Get the order data in an array
 
-    // qr code begin
-    $codeContents = site_url().'/shop-order-status/?order_id='.$latestOrderId.'&oh='.$order_hash.'&sshh='.$order_hash2;
-    $qrcode = 'https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl='.$codeContents;
-    // qr code end
+  // qr code begin
+  $codeContents = site_url().'/shop-order-status/?order_id='.$latestOrderId.'&oh='.$order_hash.'&sshh='.$order_hash2;
+  $qrcode = 'https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl='.$codeContents;
+  // qr code end
 
 	// The tracking URL for tracking opening from the store.
 	$codeContents2 = site_url().'/be-shop-ot/?order_id='.$latestOrderId.'&oh='.$order_hash.'&sshh='.$order_hash2;
@@ -3499,10 +3499,10 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 
 	// Get the time the store has chosen as their "cut-off" / drop-off for next order.
 	$vendorDropOffTime = get_vendor_dropoff_time($vendor_id);
-    $vendorDropOffTimeWeekend = get_vendor_dropoff_time($vendor_id, 'weekend');
+  $vendorDropOffTimeWeekend = get_vendor_dropoff_time($vendor_id, 'weekend');
 
-    // Get the number of days required for delivery by the vendor
-    $vendorDeliveryDayReq = get_vendor_delivery_days_required($vendor_id);
+  // Get the number of days required for delivery by the vendor
+  $vendorDeliveryDayReq = get_vendor_delivery_days_required($vendor_id);
 
 	// @todo - Dennis update according to latest updates in closing day-field.
 	// open close days begin. Generate an array of all days ISO.
@@ -3635,10 +3635,11 @@ function greeting_echo_date_picker( ) {
 	}
 
 	// Get vendor ID.
-	$vendor_id = get_post_field( 'post_author', $storeProductId );
+	$product = get_post($storeProductId);
+	$vendor_id = (!empty($product->post_author) ? $product->post_author : get_post_field('post_author', $storeProductId));
 
 	// Get delivery type.
-    $del_value = get_vendor_delivery_type($vendor_id, 'value');
+  $del_value = get_vendor_delivery_type($vendor_id, 'value');
 
 	// Get delivery day requirement, cut-off-time for orders and the closed dates.
 	$vendorDeliverDayReq = get_vendor_delivery_days_required($vendor_id);
@@ -5007,3 +5008,54 @@ function rephraseDate($weekday, $date, $month, $year) {
 }
 
 add_filter( 'xmlrpc_enabled', '__return_false' );
+
+
+
+/**
+ * Register meta box(es).
+ */
+function greeting_change_vendor_show_meta() {
+	add_meta_box( 'meta-change-vendor', __( 'Change Vendor', 'textdomain' ), 'greeting_change_vendor_show_meta_callback', 'shop_order' );
+}
+add_action( 'add_meta_boxes', 'greeting_change_vendor_show_meta' );
+
+/**
+ * Meta box display callback.
+ *
+ * @param WP_Post $post Current post object.
+ */
+function greeting_change_vendor_show_meta_callback( $post ) {
+	// Display code/markup goes here. Don't forget to include nonces!
+	global $wpdb;
+
+	$args = array(
+		'fields' => 'all_with_meta',
+		'role' => 'dc_vendor'
+	);
+	$query = new WP_User_Query($args);
+	$stores = $query->get_results();
+	$current_store = get_post_meta($post->ID, '_vendor_id', true);
+
+	wp_nonce_field( 'greeting_vendor_change_metabox_action', 'greeting_vendor_change' );
+	echo '<select name="vendor_meta_name">';
+	foreach($stores as $k => $v){
+		$selected = ($current_store == $v->ID ? ' selected="selected"' : '');
+		$name = get_user_meta( $v->ID, '_vendor_page_title', true );
+		echo '<option value="'.$v->ID.'"'.$selected.'>'.$name.'</option>';
+	}
+	echo '</select>';
+}
+
+function greeting_change_vendor_show_meta_action( $post_id ) {
+  if( !isset( $_POST['vendor_meta_name'] ) || !wp_verify_nonce( $_POST['greeting_vendor_change'],'greeting_vendor_change_metabox_action') )
+		return;
+
+  if ( !current_user_can( 'manage_options', $post_id ))
+    return;
+
+  if ( isset($_POST['vendor_meta_name']) ) {
+    update_post_meta($post_id, '_vendor_id', sanitize_text_field( $_POST['vendor_meta_name']));
+  }
+
+}
+add_action('save_post', 'greeting_change_vendor_show_meta_action');
