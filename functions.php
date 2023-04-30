@@ -3513,7 +3513,7 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
     $closed_days = (is_array($opening_days) ? array_diff($default_days, $opening_days) : $closed_days);
 
 	// Global closed dates (when Greeting.dk is totally closed).
-	$global_closed_dates = array( '24-12-2022', '25-12-2022',	'31-12-2022', '01-01-2023');
+	$global_closed_dates = array( '24-12-2022', '25-12-2022',	'31-12-2022', '01-01-2023', '05-05-2023', '18-05-2023', '29-05-2023');
 
 	// Explicitly set todays timezone and date, since there is some problems with this if not set explicitly.
 	// Define today's timezone and date.
