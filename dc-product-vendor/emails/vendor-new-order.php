@@ -36,8 +36,8 @@ $qrcode = 'https://chart.googleapis.com/chart?chs=135x135&cht=qr&chl='.$codeCont
 </div>
 
 <?php
-  $main_order = get_post_parent( $order->get_id() );
-  $main_order_id = $main_order->ID;
+  $main_order = (empty(get_post_parent($order->get_id())) ? $order->get_id() : get_post_parent($order->get_id()) );
+  $main_order_id = (empty(get_post_parent($order->get_id())) ? $order->get_id() : $main_order->get_id() );
 ?>
 <p>Ordrenr.: #<?php echo $main_order_id; ?> (Sub-ordre ID: #<?php echo $order->get_id(); ?>)</p>
 <p><p><?php printf(esc_html__('A new order was received and marked as %s from %s. Their order is as follows:', 'dc-woocommerce-multi-vendor'), $order->get_status( 'edit' ), $order->get_billing_first_name() . ' ' . $order->get_billing_last_name()); ?></p></p>

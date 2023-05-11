@@ -5084,3 +5084,44 @@ function greeting_change_vendor_show_meta_action( $post_id ) {
 
 }
 add_action('save_post', 'greeting_change_vendor_show_meta_action');
+
+/**
+ * Add a custom action to order actions select box on edit order page.
+ * Only added for paid orders that haven't fired this action yet
+ *
+ * @param array $actions order actions array to display
+ * @return array - updated actions
+ */
+function greeting_wc_add_order_meta_box_action( $actions ) {
+	global $theorder;
+
+	// bail if the order has been paid for or this action has been run
+	if ( ! $theorder->is_paid() ) {
+		return $actions;
+	}
+
+	// add "mark printed" custom action
+	$actions['wc_custom_order_action'] = __( 'Gensend mail til butikken', 'greeting2' );
+	return $actions;
+}
+add_action( 'woocommerce_order_actions', 'greeting_wc_add_order_meta_box_action' );
+
+/**
+ * Add an order note when custom action is clicked
+ * Add a flag on the order to show it's been run
+ *
+ * @param \WC_Order $order
+ */
+function greeting_wc_process_order_meta_box_action( $order ) {
+	$mailer = WC()->mailer();
+	$mails = $mailer->get_emails();
+
+	if ( !empty( $mails ) ) {
+	    foreach ( $mails as $mail ) {
+	        if ( $mail->id == 'vendor_new_order' ) {
+	           $mail->trigger( $order->get_id() );
+	        }
+	     }
+	}
+}
+add_action( 'woocommerce_order_action_wc_custom_order_action', 'greeting_wc_process_order_meta_box_action' );
