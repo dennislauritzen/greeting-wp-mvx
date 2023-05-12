@@ -55,20 +55,9 @@ $qrcode = 'https://chart.googleapis.com/chart?chs=135x135&cht=qr&chl='.$codeCont
     </thead>
     <tbody>
         <?php
-        #$vendor->vendor_order_item_table($order, $vendor->term_id);
+        $vendor->vendor_order_item_table($order, $vendor->term_id, true);
+
         ?>
-        <?php
-            echo wc_get_email_order_items( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-                $order,
-                array(
-                    'show_sku'      => true,
-                    'show_image'    => true,
-                    'image_size'    => array( 32, 32 ),
-                    'plain_text'    => $plain_text,
-                    'sent_to_admin' => $sent_to_admin,
-                )
-            );
-            ?>
     </tbody>
 </table>
 <?php
