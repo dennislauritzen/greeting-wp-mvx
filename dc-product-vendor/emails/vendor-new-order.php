@@ -17,7 +17,7 @@ $vendor = get_wcmp_vendor(absint($vendor_id));
 do_action( 'woocommerce_email_header', $email_heading, $email );
 $text_align = is_rtl() ? 'right' : 'left';
 
-$parent_order_id = wp_get_post_parent_id($order->get_id());
+$parent_order_id = (empty(wp_get_post_parent_id($order->get_id())) ? $order->get_id() : wp_get_post_parent_id($order->get_id()));
 
 // The different number orders
 $latestOrderId = $parent_order_id; // Last order ID
