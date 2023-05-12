@@ -4336,6 +4336,22 @@ function wcmp_email_change_sold_by_text($html, $item, $args ){
 add_filter ( 'wcmp_display_vendor_message_to_buyer','__return_false');
 
 /**
+ * Add product image heading to e-mail new vendor order #mails #transactional
+ *
+ * @access public
+ * @author Dennis Lauritzen
+ * @return void
+ */
+add_action('wcmp_before_vendor_order_table_header', 'add_prod_img_heading_to_vendor_email', 10, 4);
+function add_prod_img_heading_to_vendor_email() {
+		$str = '<th scope="col" style="text-align: left; width: 10%; border: 1px solid #eee;">';
+		$str .= '';
+		$str .= '</th>';
+
+		echo wp_kses_post( $str  );
+}
+
+/**
  * Add product image to e-mail new vendor order #mails #transactional
  *
  * @access public
@@ -4346,7 +4362,11 @@ add_action('wcmp_before_vendor_order_item_table', 'add_prod_img_to_vendor_email'
 function add_prod_img_to_vendor_email($item, $order, $vendor_id, $is_ship) {
 		$product = wc_get_product( $item['product_id'] );
 		$wcmp_product_img = $product->get_image( array( 100, 100 ));
-		echo wp_kses_post( $wcmp_product_img  );
+		$str = '<td scope="col" style="width: 20%; text-align:left; border: 1px solid #eee;">';
+		$str .= $wcmp_product_img;
+		$str .= '</td>';
+
+		echo wp_kses_post( $str  );
 }
 
 /**

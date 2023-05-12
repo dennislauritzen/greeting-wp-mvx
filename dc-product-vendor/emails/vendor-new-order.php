@@ -47,9 +47,9 @@ $qrcode = 'https://chart.googleapis.com/chart?chs=135x135&cht=qr&chl='.$codeCont
     <thead>
         <tr>
             <?php do_action('wcmp_before_vendor_order_table_header', $order, $vendor->term_id); ?>
-            <th scope="col" style="text-align:<?php echo $text_align; ?>; border: 1px solid #eee;"><?php _e('Product', 'dc-woocommerce-multi-vendor'); ?></th>
-            <th scope="col" style="text-align:<?php echo $text_align; ?>; border: 1px solid #eee;"><?php _e('Quantity', 'dc-woocommerce-multi-vendor'); ?></th>
-            <th scope="col" style="text-align:<?php echo $text_align; ?>; border: 1px solid #eee;"><?php _e('Commission', 'dc-woocommerce-multi-vendor'); ?></th>
+            <th scope="col" style="text-align:<?php echo $text_align; ?>; width: 50%; border: 1px solid #eee;"><?php _e('Product', 'dc-woocommerce-multi-vendor'); ?></th>
+            <th scope="col" style="text-align:<?php echo $text_align; ?>; width: 15%; border: 1px solid #eee;"><?php _e('Quantity', 'dc-woocommerce-multi-vendor'); ?></th>
+            <th scope="col" style="text-align:<?php echo $text_align; ?>; width: 15%; border: 1px solid #eee;"><?php _e('Commission', 'dc-woocommerce-multi-vendor'); ?></th>
             <?php do_action('wcmp_after_vendor_order_table_header', $order, $vendor->term_id); ?>
         </tr>
     </thead>
@@ -62,18 +62,43 @@ $qrcode = 'https://chart.googleapis.com/chart?chs=135x135&cht=qr&chl='.$codeCont
 </table>
 <?php
 if (apply_filters('show_cust_order_calulations_field', true, $vendor->id)) {
+    $order_total = $order->get_total();
+    $order_ship_total = $order->get_shipping_total() + $order->get_shipping_tax();
+
+
+    $order_new_subtotal = $order_total - $order_ship_total;
+    $order_ship_new = 39;
+    $order_new_total = $order_new_subtotal + $order_ship_new;
     ?>
     <table cellspacing="0" cellpadding="6" style="width: 100%; border: 1px solid #eee;" border="1" bordercolor="#eee">
+      <tr>
+          <th scope="row" style="width: 70%; text-align:left; border: 1px solid #eee;">Fragt</th>
+          <td style="width: 30%; text-align:<?php echo $text_align; ?>; border: 1px solid #eee;"><?php echo $order_ship_new; ?>,- kr.</td>
+      </tr>
+      <tr>
+          <th scope="row" style="text-align:left; border: 1px solid #eee;">Varetotal (inkl. 25 % moms)</th>
+          <td style="text-align:<?php echo $text_align; ?>; border: 1px solid #eee;">
+            <?php echo $order_new_subtotal; ?> kr.<br>
+          </td>
+      </tr>
+      <tr>
+          <th scope="row" style="text-align:left; border: 1px solid #eee;">Ordretotal (inkl. 25 % moms)</th>
+          <td style="text-align:<?php echo $text_align; ?>; border: 1px solid #eee;">
+            <?php echo $order_new_total; ?> kr.
+          </td>
+      </tr>
         <?php
-        $totals = $vendor->wcmp_vendor_get_order_item_totals($order, $vendor->term_id);
-        if ($totals) {
-            foreach ($totals as $total_key => $total) {
-                ?><tr>
+        #$totals = $vendor->wcmp_vendor_get_order_item_totals($order, $vendor->term_id);
+        #if ($totals) {
+        #    foreach ($totals as $total_key => $total) {
+        ?>
+        <!--<tr>
                     <th scope="row" colspan="2" style="text-align:left; border: 1px solid #eee;"><?php echo $total['label']; ?></th>
                     <td style="text-align:<?php echo $text_align; ?>; border: 1px solid #eee;"><?php echo $total['value']; ?></td>
-                </tr><?php
-            }
-        }
+                </tr>-->
+        <?php
+        #    }
+        #}
         if ( $order->get_customer_note() ) {
             ?>
             <tr>
