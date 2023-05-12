@@ -5093,12 +5093,12 @@ add_action('save_post', 'greeting_change_vendor_show_meta_action');
  * @return array - updated actions
  */
 function greeting_wc_add_order_meta_box_action( $actions ) {
-	global $theorder;
+	#global $theorder;
 
 	// bail if the order has been paid for or this action has been run
-	if ( ! $theorder->is_paid() ) {
-		return $actions;
-	}
+	#if ( ! $theorder->is_paid() ) {
+	#	return $actions;
+	#}
 
 	// add "mark printed" custom action
 	$actions['wc_custom_order_action'] = __( 'Gensend mail til butikken', 'greeting2' );
