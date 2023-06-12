@@ -3185,6 +3185,7 @@ function change_variable_products_price_display( $price, $product ) {
  *	Change currency symbol for danish goods.
  *
  */
+add_filter('woocommerce_currency_symbol', 'greeting_change_dk_currency_symbol', 10, 2);
 function greeting_change_dk_currency_symbol( $currency_symbol, $currency ) {
     switch( $currency ) {
         // DKK til kr
@@ -3192,37 +3193,66 @@ function greeting_change_dk_currency_symbol( $currency_symbol, $currency ) {
     }
     return $currency_symbol;
 }
-add_filter('woocommerce_currency_symbol', 'greeting_change_dk_currency_symbol', 10, 2);
 
 
-add_filter( 'woocommerce_variation_option_name','display_price_in_variation_option_name');
-function display_price_in_variation_option_name( $term ) {
-    global $product;
+// Utility function to get the price of a variation from it's attribute value
+function get_the_variation_price_html( $product, $name, $term_slug ){
+    foreach ( $product->get_available_variations() as $variation ){
+        if($variation['attributes'][$name] == $term_slug ){
+            return strip_tags( $variation['price_html'] );
+        }
+    }
+}
 
-    if(empty($term)){ return $term;  }
-		if(empty($product->id)){ return $term; }
 
-    $product_id = (!empty($product->id) ? $product->id : '');
-    if ( empty( $product_id ) ) { return $term; }
+// Add the price  to the dropdown options items.
+add_filter( 'woocommerce_dropdown_variation_attribute_options_html', 'show_price_in_attribute_dropdown', 10, 2);
+function show_price_in_attribute_dropdown( $html, $args ) {
+    // Only if there is a unique variation attribute (one dropdown)
+    if( sizeof($args['product']->get_variation_attributes()) == 1 ) :
 
-    $variation_id = $product->get_children();
+    $options               = $args['options'];
+    $product               = $args['product'];
+    $attribute             = $args['attribute'];
+    $name                  = $args['name'] ? $args['name'] : 'attribute_' . sanitize_title( $attribute );
+    $id                    = $args['id'] ? $args['id'] : sanitize_title( $attribute );
+    $class                 = $args['class'];
+    $show_option_none      = $args['show_option_none'] ? true : false;
+    $show_option_none_text = $args['show_option_none'] ? $args['show_option_none'] : __( 'Choose an option', 'woocommerce' );
 
-    foreach ( $variation_id as $id ) {
-        $_product       = new WC_Product_Variation( $id );
-        $variation_data = $_product->get_variation_attributes();
+    if ( empty( $options ) && ! empty( $product ) && ! empty( $attribute ) ) {
+        $attributes = $product->get_variation_attributes();
+        $options    = $attributes[ $attribute ];
+    }
 
-        foreach ( $variation_data as $key => $data ) {
-            if ( $data == $term ) {
-							$html = ( $_product->get_stock_quantity() ) ? ' - ' . $_product->get_stock_quantity() : '';
-							$html .= $term . ' - ';
-              $html .= wp_kses( woocommerce_price( $_product->get_price() ), array() );
+    $html = '<select id="' . esc_attr( $id ) . '" class="' . esc_attr( $class ) . '" name="' . esc_attr( $name ) . '" data-attribute_name="attribute_' . esc_attr( sanitize_title( $attribute ) ) . '" data-show_option_none="' . ( $show_option_none ? 'yes' : 'no' ) . '">';
+    $html .= '<option value="">' . esc_html( $show_option_none_text ) . '</option>';
 
-              return $html;
+    if ( ! empty( $options ) ) {
+        if ( $product && taxonomy_exists( $attribute ) ) {
+            $terms = wc_get_product_terms( $product->get_id(), $attribute, array( 'fields' => 'all' ) );
+
+            foreach ( $terms as $term ) {
+                if ( in_array( $term->slug, $options ) ) {
+                    // Get and inserting the price
+                    $price_html = get_the_variation_price_html( $product, $name, $term->slug );
+                    $html .= '<option value="' . esc_attr( $term->slug ) . '" ' . selected( sanitize_title( $args['selected'] ), $term->slug, false ) . '>' . esc_html( apply_filters( 'woocommerce_variation_option_name', $term->name ) . ' (' . $price_html ) . ')</option>';
+                }
+            }
+        } else {
+            foreach ( $options as $option ) {
+                $selected = sanitize_title( $args['selected'] ) === $args['selected'] ? selected( $args['selected'], sanitize_title( $option ), false ) : selected( $args['selected'], $option, false );
+                // Get and inserting the price
+                $price_html = get_the_variation_price_html( $product, $name, $term->slug );
+                $html .= '<option value="' . esc_attr( $option ) . '" ' . $selected . '>' . esc_html( apply_filters( 'woocommerce_variation_option_name', $option ) . ' (' . $price_html ) . ')</option>';
             }
         }
     }
+    $html .= '</select>';
 
-    return $term;
+    endif;
+
+    return $html;
 }
 
 /**
