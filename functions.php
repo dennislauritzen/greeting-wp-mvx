@@ -1305,7 +1305,7 @@ function catOccaDeliveryAction() {
 	$defaultUserArray = explode(",", $cityDefaultUserIdAsString);
 
 	// category & occasion filter data
-	$catOccaDeliveryIdArray = $_POST['catOccaIdArray'];
+	$catOccaDeliveryIdArray = is_array($_POST['catOccaIdArray']) ? $_POST['catOccaIdArray'] : explode(",", $_POST['catOccaIdArray']);
 
 	// delivery date
 	$deliveryDate = (int) $_POST['delDate'];
@@ -2151,12 +2151,12 @@ function get_order_hashes($order_id){
 // Add your custom order status action button (for orders with "processing" status)
 add_filter( 'woocommerce_admin_order_actions', 'add_custom_order_status_actions_button', 100, 2 );
 function add_custom_order_status_actions_button( $actions, $order ) {
-		// Get Order ID (compatibility all WC versions)
-		$order_id = method_exists( $order, 'get_id' ) ? $order->get_id() : $order->id;
+    // Get Order ID (compatibility all WC versions)
+    $order_id = method_exists( $order, 'get_id' ) ? $order->get_id() : $order->id;
 
     // Display the button for all orders that have a 'processing' status
     if ( $order->has_status( array( 'processing', 'order-mail-open', 'order-seen', 'order-forwarded' ) ) ) {
-				// Set the action button
+        // Set the action button
         $actions['delivered'] = array(
             'url'       => wp_nonce_url( admin_url( 'admin-ajax.php?action=woocommerce_mark_order_status&status=delivered&order_id=' . $order_id ), 'woocommerce-mark-order-status' ),
             'name'      => __( 'Order Delivered', 'woocommerce' ),
@@ -2190,6 +2190,8 @@ function add_custom_order_status_actions_button_css() {
 
 /**
  * Email send to store owner
+ *
+ * @todo check for possible injection
  */
 // get last order id
 function getLastOrderId(){
