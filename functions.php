@@ -5147,3 +5147,14 @@ function greeting_wc_process_order_meta_box_action( $order ) {
 	}
 }
 add_action( 'woocommerce_order_action_wc_custom_order_action', 'greeting_wc_process_order_meta_box_action' );
+
+add_action( 'woocommerce_product_duplicate', 'greeting_duplicate_custom_taxonomies', 999, 2);
+
+function greeting_duplicate_custom_taxonomies( WC_Product $duplicate, WC_Product $product ) {
+    foreach ( [ 'occasion' ] as $taxonomy ) {
+        $terms = get_the_terms( $product->get_id(), $taxonomy );
+        if ( ! is_wp_error( $terms ) ) {
+            wp_set_object_terms( $duplicate->get_id(), wp_list_pluck( $terms, 'term_id' ), $taxonomy );
+        }
+    }
+}
