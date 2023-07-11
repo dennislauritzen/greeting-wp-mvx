@@ -19,8 +19,8 @@ defined( 'ABSPATH' ) || exit;
 
 ?>
 <?php do_action( 'woocommerce_before_cart_totals' ); ?>
-<div class="col-12 col-lg-6 cart_totals <?php echo ( WC()->customer->has_calculated_shipping() ) ? 'calculated_shipping' : ''; ?>">
-<h3><?php esc_html_e( 'Cart totals', 'woocommerce' ); ?></h3>
+<div class="col-12 col-lg-6 p-3 bg-light-grey cart_totals <?php echo ( WC()->customer->has_calculated_shipping() ) ? 'calculated_shipping' : ''; ?>">
+<h3 style="font-family: 'Rubik', 'Inter', Arial, sans-serif;"><?php esc_html_e( 'Cart totals', 'woocommerce' ); ?></h3>
 
 <div class="cart-subtotals cart-subtotal">
 	<div class="row cart-subtotal">
