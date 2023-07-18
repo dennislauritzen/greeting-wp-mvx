@@ -483,34 +483,47 @@ if (have_rows('frontpage_full_width_boxes', $this_post_id) ){
   </div>
 </section>
 
+<?php
+$frontpage_desc = get_field('front_description', $this_post_id);
+
+if(!empty($frontpage_desc)){
+?>
 <section>
+    <style type="text/css">
+        .fp-content-block h1,
+        .fp-content-block h2,
+        .fp-content-block h3,
+        .fp-content-block h4,
+        .fp-content-block h5,
+        .fp-content-block h6
+        {
+            font-family: 'Inter','MS Trebuchet', 'Rubik',sans-serif;
+        }
+        .fp-content-block h1 { font-size: 24px; }
+        .fp-content-block h2 { font-size: 23px; }
+        .fp-content-block h3 { font-size: 22px; }
+        .fp-content-block h4 { font-size: 20px; }
+        .fp-content-block h5 { font-size: 18px; }
+        .fp-content-block h6 { font-size: 16px; }
+
+        .fp-content-block p {
+            font-size: 14px;
+        }
+        .fp-content-block a {
+            color: #000000;
+            text-decoration: underline;
+        }
+    </style>
   <div class="container">
-    <div class="row">
+    <div class="row fp-content-block">
       <div class="col-8 offset-2">
-        <h2 style="font-family: 'Inter',sans-serif;font-size: 20px;">Send gavehilsner og en kærlig tanke fra lokale, danske specialbutikker</h2>
-        <p style="font-size: 14px;">I en verden, der bliver mere og mere digitaliseret, og hvor store internationale onlineforhandlere dominerer markedet, er der stadig en charme
-          og unikke kvaliteter ved at handle i lokale, danske specialbutikker. Disse butikker er ofte drevet af passionerede ejere, der har en dyb forståelse og
-          kærlighed til deres produkter. Når det kommer til at sende gavehilsner, er det værd at overveje at støtte de lokale specialbutikker og samtidig sprede en
-          kærlig tanke til modtageren.</p>
-        <p style="font-size: 14px;">Danmark er kendt for sin mangfoldighed af specialbutikker, der tilbyder alt fra kunsthåndværk, delikatesser, unikt design, bøger, blomster, og meget mere. Disse specialbutikker er ofte spredt rundt i de små gader og kvarterer i byerne, og de tilføjer en charmerende atmosfære til shoppingoplevelsen.</p>
-        <h3 style="font-family: 'Inter',sans-serif;font-size: 17px;">Danske specialbutikker - samlet til dig lige her</h3>
-        <p style="font-size: 14px;">At vælge at sende en gave fra en lokal specialbutik giver mulighed for at sende en personlig og unik gave, der skiller sig ud fra de traditionelle og masseproducerede gaver. Modtageren vil sætte pris på det ekstra skridt, der er taget for at vælge en gave, der er omhyggeligt udvalgt fra en specialbutik.</p>
-        <p style="font-size: 14px;">En af de store fordele ved at handle i lokale specialbutikker er det store udvalg af kvalitetsprodukter. I modsætning til store detailhandlere fokuserer specialbutikker på nøje udvalgte varer, der ofte er produceret af lokale kunstnere og producenter. Dette betyder, at hver enkelt genstand har en unik historie at fortælle.</p>
-        <p style="font-size: 14px;">Når du sender en gave fra en lokal specialbutik, sender du også en kærlig tanke til de lokale samfund. Disse specialbutikker spiller en vigtig rolle i at bevare den lokale kultur og skaber beskæftigelse for folk i området. Ved at støtte dem hjælper du med at bevare en del af Danmarks unikke identitet.</p>
-        <h3 style="font-family: 'Inter',sans-serif;font-size: 17px;">Din mulighed for at vælge en gave, der passer til netop din modtager</h3>
-        <p style="font-size: 14px;">En anden fordel ved at handle i lokale specialbutikker er den personlige service, du modtager. Butiksejerne og personalet er ofte passionerede omkring deres produkter og har stor viden om, hvad de tilbyder. De er glade for at dele deres ekspertise og hjælpe dig med at finde den perfekte gave til den pågældende person.</p>
-        <p style="font-size: 14px;">Det er ikke kun udvalget af produkter, der gør lokale specialbutikker til en attraktiv mulighed for gaveindkøb. Også selve shoppingoplevelsen er unik og mindeværdig. Mens store detailhandlere kan være hektiske og overvældende, er specialbutikker ofte mere afslappede og hyggelige. Du kan tage dig tid til at udforske butikken, tale med personalet og måske endda lære noget nyt om de produkter, de tilbyder.</p>
-        <h3 style="font-family: 'Inter',sans-serif;font-size: 17px;">De lokale butikker er hjertet - og limen - i de danske byer</h3>
-        <p style="font-size: 14px;">Mange lokale specialbutikker er også involveret i lokalsamfundet og deltager i forskellige aktiviteter og begivenheder. De kan arrangere workshops, udstillinger eller smagsprøver, der giver folk mulighed for at opleve deres produkter på en interaktiv måde. At deltage i sådanne arrangementer er ikke kun sjovt, men det giver også mulighed for at styrke båndene til dit lokale samfund.</p>
-        <p style="font-size: 14px;">Når du sender en gave fra en lokal specialbutik, viser du også din taknemmelighed for mangfoldigheden af små virksomheder i Danmark. Disse butikker er afgørende for at skabe en varieret detailhandel, hvor der er plads til forskellige kulturer og kreativitet. Ved at støtte dem bidrager du til at opretholde en levende og dynamisk forretningsverden.</p>
-        <h3 style="font-family: 'Inter',sans-serif;font-size: 17px;">Vi sørger for at håndskrive din hilsen - og levere direkte til din modtager</h3>
-        <p style="font-size: 14px;">Hvis du vil sende en gave til en, der elsker læsning, så tjek de små boghandlere, der ofte har et nøje udvalgt sortiment af bøger inden for forskellige genrer. Måske er modtageren interesseret i mode, design eller interiør - i så fald er der også specialbutikker, der tilbyder unikke produkter inden for disse områder.</p>
-        <p style="font-size: 14px;">Det er vigtigt at huske, at det ikke kun er selve gaven, der betyder noget, men også den omtanke og opmærksomhed, der ligger bag den. Når du vælger at sende en gave fra en lokal specialbutik, viser du, at du har tænkt over gaven og ønsker at give noget særligt og betydningsfuldt.</p>
-        <p style="font-size: 14px;">Så næste gang du har brug for at sende en gavehilsen, skal du overveje at gøre det fra en lokal specialbutik. Du støtter ikke kun lokale virksomheder, men du sender også en kærlig tanke til modtageren, der vil værdsætte den personlige og unikke gave. Danmark har en rigdom af fantastiske specialbutikker, der tilbyder en bred vifte af produkter, der passer til enhver smag. Giv en gave, der tæller, og sprede glæde og omtanke fra lokale butikker i hele landet.</p>
+        <?php echo $frontpage_desc; ?>
       </div>
     </div>
   </div>
 </section>
-
 <?php
+}
+
+
 get_footer();

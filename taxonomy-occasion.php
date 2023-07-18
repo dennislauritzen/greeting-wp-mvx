@@ -654,17 +654,44 @@ $occasionTermListArray = array();
 	</div><!-- .row end -->
 	<!-- Postal code search box START -->
 
-    <!-- Loading heartbeat START -->
+
+  <!-- Loading heartbeat START -->
 	<?php get_template_part('template-parts/inc/blocks/loading-heartbeat'); ?>
 	<!-- Loading heartbeat END -->
+
 
 	<!-- Category description -->
 	<?php
 	if( category_description($category_id) ){
 	?>
-	<div class="description row">
+    <style type="text/css">
+        .lp-content-block h1,
+        .lp-content-block h2,
+        .lp-content-block h3,
+        .lp-content-block h4,
+        .lp-content-block h5,
+        .lp-content-block h6
+        {
+            font-family: 'Inter','MS Trebuchet', 'Rubik',sans-serif;
+        }
+        .lp-content-block h1 { font-size: 24px; }
+        .lp-content-block h2 { font-size: 23px; }
+        .lp-content-block h3 { font-size: 22px; }
+        .lp-content-block h4 { font-size: 20px; }
+        .lp-content-block h5 { font-size: 18px; }
+        .lp-content-block h6 { font-size: 16px; }
+
+        .lp-content-block p {
+            font-size: 14px;
+        }
+        .lp-content-block a {
+            color: #000000;
+            text-decoration: underline;
+        }
+    </style>
+	<div class="description lp-content-block row">
 		<div class="col-12 mt-5">
-			<h2 style="font-family: 'MS Trebuchet', 'Rubik', 'Inter',sans-serif;">
+			<h2>
 				<?php echo $category_bottomtitle; ?>
 			</h2>
 			<?php echo category_description($category_id); ?>
