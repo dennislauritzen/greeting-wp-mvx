@@ -2808,7 +2808,7 @@ function custom_display_order_data_in_admin(){
 
 
 /**
- * Add a custom field (in an order) to the emails
+ * Add a custom field (in an order) to the emails-old
  *
  * @since v1.0
  * @author Dennis
@@ -5154,6 +5154,7 @@ function greeting_wc_add_order_meta_box_action( $actions ) {
 
 	// add "mark printed" custom action
 	$actions['wc_custom_order_action'] = __( 'Gensend mail til butikken', 'greeting2' );
+    $actions['wc_custom_order_action_test_mail'] = __( 'SEND TEST MAIL', 'greeting2' );
 	return $actions;
 }
 add_action( 'woocommerce_order_actions', 'greeting_wc_add_order_meta_box_action' );
@@ -5176,10 +5177,30 @@ function greeting_wc_process_order_meta_box_action( $order ) {
 	     }
 	}
 }
+add_action( 'woocommerce_order_action_wc_custom_order_action_test_mail', 'greeting_wc_process_order_meta_box_action_test_mail' );
+
+/**
+ * Add an order note when custom action is clicked
+ * Add a flag on the order to show it's been run
+ *
+ * @param \WC_Order $order
+ */
+function greeting_wc_process_order_meta_box_action_test_mail( $order ) {
+
+    ob_start();
+    get_template_part('page', 'new-email-template');
+    $content = ob_get_contents();
+    ob_end_clean();
+
+    $page = $content;
+
+    $headers = array("Content-Type: text/html; charset=UTF-8");
+    wp_mail("dennis@idemedia.dk", "test test", $page, "Content-Type: text/html; charset=UTF-8" );
+}
 add_action( 'woocommerce_order_action_wc_custom_order_action', 'greeting_wc_process_order_meta_box_action' );
 
-add_action( 'woocommerce_product_duplicate', 'greeting_duplicate_custom_taxonomies', 999, 2);
 
+add_action( 'woocommerce_product_duplicate', 'greeting_duplicate_custom_taxonomies', 999, 2);
 function greeting_duplicate_custom_taxonomies( WC_Product $duplicate, WC_Product $product ) {
     foreach ( [ 'occasion' ] as $taxonomy ) {
         $terms = get_the_terms( $product->get_id(), $taxonomy );

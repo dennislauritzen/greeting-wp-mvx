@@ -654,11 +654,9 @@ $occasionTermListArray = array();
 	</div><!-- .row end -->
 	<!-- Postal code search box START -->
 
-
-  <!-- Loading heartbeat START -->
+    <!-- Loading heartbeat START -->
 	<?php get_template_part('template-parts/inc/blocks/loading-heartbeat'); ?>
 	<!-- Loading heartbeat END -->
-
 
 	<!-- Category description -->
 	<?php

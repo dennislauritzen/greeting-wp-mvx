@@ -107,6 +107,25 @@ get_header('checkout');
 						}
 						?>
 						<br>til <?php echo $order->get_shipping_first_name().' '.$order->get_shipping_last_name(); ?>
+                        <br>
+                        <br>
+
+                        <?php $leave_gift_at_address = (get_post_meta( $order->get_id(), '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej'); ?>
+                        <?php _e('Må stilles på adressen:', 'woocommerce'); ?> <?php echo $leave_gift_at_address; ?>
+                        <br>
+                        <?php $leave_gift_at_neighbour = (get_post_meta( $order->get_id(), '_leave_gift_neighbour', true ) == "1" ? 'Ja' : 'Nej'); ?>
+                        <?php _e('Må gaven afleveres hos naboen:', 'woocommerce'); ?> <?php echo $leave_gift_at_neighbour; ?>
+
+                        <br><br>
+
+                        <?php $delivery_instructions = get_post_meta( $order->get_id(), '_delivery_instructions', true ); ?>
+                        <?php if(!empty($delivery_instructions)){ ?>
+                        <p class="text-end">
+                            <strong><?php _e('Leveringsinstruktioner', 'woocommerce'); ?></strong>
+                            <br>
+                            <?php echo $delivery_instructions; ?>
+                        </p>
+                        <?php } ?>
 					</p>
 				</div>
 				<div class="col-6 pt-2">

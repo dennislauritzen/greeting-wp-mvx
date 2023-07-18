@@ -545,7 +545,7 @@
 	  height: 25px;
 	  width: 20%;
 	  margin: 10px 0;
-	  @ .animated-background;
+	  @.animated-background;
 	}
 	</style>
 

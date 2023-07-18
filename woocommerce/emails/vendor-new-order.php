@@ -2,7 +2,7 @@
 /**
  * The template for displaying demo plugin content.
  *
- * Override this template by copying it to yourtheme/dc-product-vendor/emails/vendor-new-order.php
+ * Override this template by copying it to yourtheme/dc-product-vendor/emails-old/vendor-new-order.php
  *
  * @author 		WC Marketplace
  * @package 	dc-product-vendor/Templates

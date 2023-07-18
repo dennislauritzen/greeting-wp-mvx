@@ -2428,7 +2428,7 @@ function custom_display_order_data_in_admin(){
 
 
 /**
- * Add a custom field (in an order) to the emails
+ * Add a custom field (in an order) to the emails-old
  *
  * @since v1.0
  * @author Dennis
