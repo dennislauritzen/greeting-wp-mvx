@@ -19,8 +19,8 @@ defined( 'ABSPATH' ) || exit;
 
 ?>
 <?php do_action( 'woocommerce_before_cart_totals' ); ?>
-<div class="col-12 col-lg-6 cart_totals <?php echo ( WC()->customer->has_calculated_shipping() ) ? 'calculated_shipping' : ''; ?>">
-<h3><?php esc_html_e( 'Cart totals', 'woocommerce' ); ?></h3>
+<div class="col-12 col-lg-6 p-3 bg-light-grey cart_totals <?php echo ( WC()->customer->has_calculated_shipping() ) ? 'calculated_shipping' : ''; ?>">
+<h3 style="font-family: 'Rubik', 'Inter', Arial, sans-serif;"><?php esc_html_e( 'Cart totals', 'woocommerce' ); ?></h3>
 
 <div class="cart-subtotals cart-subtotal">
 	<div class="row cart-subtotal">
@@ -49,17 +49,46 @@ defined( 'ABSPATH' ) || exit;
 
 		<?php do_action( 'woocommerce_cart_totals_before_shipping' ); ?>
 
-		<?php wc_cart_totals_shipping_html(); ?>
+		<?php #wc_cart_totals_shipping_html(); ?>
+		<div class="row shipping cart-shipping">
+			<div class="col-4"><?php esc_html_e( 'Shipping', 'woocommerce' ); ?></div>
+			<div class="col-8" data-title="<?php esc_attr_e( 'Shipping', 'woocommerce' ); ?>">
+				<p class="text-end">
+					<?php #OLD: woocommerce_shipping_calculator(); ?>
+					<?php
+						foreach( WC()->session->get('shipping_for_package_0')['rates'] as $method_id => $rate ){
+						    if( WC()->session->get('chosen_shipping_methods')[0] == $method_id ){
+						        $rate_label = $rate->label; // The shipping method label name
+						        $rate_cost_excl_tax = floatval($rate->cost); // The cost excluding tax
+						        // The taxes cost
+						        $rate_taxes = 0;
+						        foreach ($rate->taxes as $rate_tax)
+						            $rate_taxes += floatval($rate_tax);
+						        // The cost including tax
+						        $rate_cost_incl_tax = $rate_cost_excl_tax + $rate_taxes;
+
+						?>
+						            <span class="totals"><?php echo WC()->cart->get_cart_shipping_total(); ?></span>
+						<?php
+						        break;
+						    }
+						}
+					?>
+				</p>
+			</div>
+		</div>
 
 		<?php do_action( 'woocommerce_cart_totals_after_shipping' ); ?>
 
 	<?php elseif ( WC()->cart->needs_shipping() && 'yes' === get_option( 'woocommerce_enable_shipping_calc' ) ) : ?>
 
 		<div class="row shipping">
-			<div class="col-4"><?php esc_html_e( 'Shipping', 'woocommerce' ); ?></div>
+			<div class="col-4">
+				<?php esc_html_e( 'Shipping', 'woocommerce' ); ?>
+			</div>
 			<div class="col-8" data-title="<?php esc_attr_e( 'Shipping', 'woocommerce' ); ?>">
 				<p class="text-end">
-					<?php woocommerce_shipping_calculator(); ?>
+					<?php #woocommerce_shipping_calculator(); ?>
 				</p>
 			</div>
 		</div>

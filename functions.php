@@ -637,6 +637,11 @@ if( function_exists('acf_add_options_page') ) {
 		'parent_slug'	=> 'theme-general-settings',
 	));
 	acf_add_options_sub_page(array(
+		'page_title' 	=> 'Theme Block: Customer Care',
+		'menu_title'	=> 'Kundeservice-block',
+		'parent_slug'	=> 'theme-general-settings',
+	));
+	acf_add_options_sub_page(array(
 		'page_title' 	=> 'Header: USPs',
 		'menu_title'	=> 'Header: USPer',
 		'parent_slug'	=> 'theme-general-settings',

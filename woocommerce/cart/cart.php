@@ -170,6 +170,7 @@ do_action( 'woocommerce_before_cart' ); ?>
 			<div class="col-12">
 				<div class="row">
 					<div class="pt-4">
+						<h6 class="pb-1" style="font-family: 'Rubik', 'Inter', sans-serif;">Vi accepterer</h6>
 						<img src="https://www.greeting.dk/wp-content/uploads/2022/12/visa-logo-05x.png" style="height: 18px;" class="pe-4">
 						<img src="https://www.greeting.dk/wp-content/uploads/2022/12/mastercard-logo-025x.png" style="height: 18px;" class="pe-4">
 						<img src="https://www.greeting.dk/wp-content/uploads/2022/12/mobilepay-logo-05x.png" style="height: 18px;" class="pe-4">
