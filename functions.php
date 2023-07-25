@@ -2215,184 +2215,6 @@ function getLastOrderId(){
 }
 
 // Action based on last order
-use Dompdf\Dompdf; // reference the Dompdf namespace
-// add the action
-# add_action( 'woocommerce_thankyou', 'call_order_status_completed', 10, 1);
-// define woocommerce_order_status_completed callback function
-function call_order_status_completed($array, $product_id) {
-
-	$latestOrderId = getLastOrderId(); // Last order ID
-	$order_hash = hash('md4','gree_ting_dk#!4r1242142fgriejgfto'.$latestOrderId.$latestOrderId);
-	$order_hash2 = hash('md4', 'vvkrne12onrtnFG_:____'.$latestOrderId);
-
-	$order = wc_get_order( $latestOrderId ); // Get an instance of the WC_Order oject
-
-	$orderCreatedDate =  $order->get_date_created();
-	$orderCreateDateFormat = date_format($orderCreatedDate ,"M d, Y");
-	$orderCurrency = $order->get_currency();
-	$orderSubTotal =  $order->get_subtotal();
-	$orderTotal =  $order->get_total();
-	$orderPaymentMethod =  $order->get_payment_method();
-	// billing details
-	$billingFirstName = $order->get_billing_first_name();
-	$billingLastName = $order->get_billing_last_name();
-	$billingCompany = $order->get_billing_company();
-	$billingAddress1 = $order->get_billing_address_1();
-	$billingAddress2 = $order->get_billing_address_2();
-	$billingCity = $order->get_billing_city();
-	$billingState = $order->get_billing_state();
-	$billingPostCode = $order->get_billing_postcode();
-	$billingCountry = $order->get_billing_country();
-	$billingEmail = $order->get_billing_email();
-	$billingPhone = $order->get_billing_phone();
-	// shipping details
-	$shippingFirstName = $order->get_shipping_first_name();
-	$shippingLastName = $order->get_shipping_last_name();
-	$shippingCompany = $order->get_shipping_company();
-	$shippingAddress1 = $order->get_shipping_address_1();
-	$shippingAddress2 = $order->get_shipping_address_2();
-	$shippingCity = $order->get_shipping_city();
-	$shippingState = $order->get_shipping_state();
-	$shippingPostCode = $order->get_shipping_postcode();
-	$shippingCountry = $order->get_shipping_country();
-	$shippingEmail = $order->get_shipping_email();
-	$shippingPhone = $order->get_shipping_phone();
-
-	//$orderData = $order->get_data(); // Get the order data in an array
-
-  // qr code begin
-  $codeContents = site_url().'/shop-order-status/?order_id='.$latestOrderId.'&oh='.$order_hash.'&sshh='.$order_hash2;
-  $qrcode = 'https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl='.$codeContents;
-  // qr code end
-
-	// The tracking URL for tracking opening from the store.
-	$codeContents2 = site_url().'/be-shop-ot/?order_id='.$latestOrderId.'&oh='.$order_hash.'&sshh='.$order_hash2;
-
-	$orderedStoreEmail = '';
-	$orderedVendorStoreName = '';
-	// Loop through order items
-	foreach ( $order->get_items() as $itemId => $item ) {
-		// Get the product object
-		$product = $item->get_product();
-		// Get the product Id
-        $product_id = $product->get_id();
-
-		$product_meta = get_post($product_id);
-		$vendor_id = $product_meta->post_author;
-		$orderProductVendor = get_wcmp_vendor($vendor_id);
-		$orderedVendorStoreName = (is_object($orderProductVendor) ? ucfirst(esc_html($orderProductVendor->user_data->data->display_name)) : '');
-		$orderedVendorStoreEmail = (is_object($orderProductVendor) ? ucfirst(esc_html($orderProductVendor->user_data->data->user_email)) : '');
-
-		if(!empty($orderedVendorStoreName)){
-			break;
-		}
-	} // end foreach
-
-		// send email
-	$body = '<div id="main-wrapper" style="max-width: 600px;margin-left:auto;margin-right:auto;border:1px solid #ddd;color: #333;">
-      <div id="top-header" style="background-color: purple;">
-          <h2 style="color: white; margin: 0px 30px; padding: 20px 0px;">Ny ordre fra Greeting.dk :)</h2>
-      </div>
-      <div id="body" style="background-color: white; padding: 30px;">
-					<a href="'.$codeContents.'">
-						<img src="'.$qrcode.'" alt=""/>
-						Markér ordre som leveret
-					</a>
-					<div style="margin-top: 20px;">
-						<img src="'.$codeContents2.'" alt="" width="1" height="1"/>
-					</div>
-          <p>Hej, '.$orderedVendorStoreName.'</p>
-          <p>Der er gået en ordre i gennem</p>
-          <p style="color: purple; font-size: 20px;">[Order #'.$latestOrderId.'] ('.$orderCreateDateFormat.')</p>
-          <table id="table" style="width:100%;color:#333;">
-              <thead>
-                <tr>
-                  <th style="border: 1px solid #ddd;text-align: center;">Produkt</th>
-                  <th style="border: 1px solid #ddd;text-align: center;">Antal</th>
-                  <th style="border: 1px solid #ddd;text-align: center;">Pris ('.$orderCurrency.')</th>
-                </tr>
-              </thead>
-              <tbody>';
-              foreach ( $order->get_items() as $item_id => $item ){
-                $body.='<tr>
-                  <td style="border: 1px solid #ddd;text-align: center;">'.$item->get_name().'</td>
-                  <td style="border: 1px solid #ddd;text-align: center;">'.$item->get_quantity().'</td>
-                  <td style="border: 1px solid #ddd;text-align: center;">'.$item->get_subtotal().'</td>
-                </tr>';
-              }
-               $body.='<tr>
-                  <td colspan="2" style="border: 1px solid #ddd;text-align: center;"><b>Subtotal</b></td>
-                  <td style="border: 1px solid #ddd;text-align: center;">'.$orderSubTotal.'</td>
-                </tr>
-                <tr>
-                  <td colspan="2" style="border: 1px solid #ddd;text-align: center;"><b>Total</b></td>
-                  <td style="border: 1px solid #ddd;text-align: center;">'.$orderTotal.'</td>
-                </tr>
-              </tbody>
-          </table>
-          <p style="color: purple; font-size: 20px;">Faktureringsadresse</p>
-          <div style="border: 1px solid #ddd; padding: 15px;">
-              <address>'
-                  .$billingFirstName.' '.$billingLastName.'<br>'
-                  .$billingCompany.'<br>'
-                  .$billingAddress1.'<br>'
-                  .$billingAddress2.'<br>'
-                  .$billingState.'<br>'
-                  .$billingCity.'<br>'
-                  .$billingCountry.'<br>'
-                  .$billingPhone.'<br>'
-                  .$billingEmail.'
-              </address>
-          </div>
-        <p style="color: purple; font-size: 20px;">Leveringsadresse</p>
-        <div style="border: 1px solid #ddd; padding: 15px;">
-            <address>'
-                .$shippingFirstName.' '.$shippingLastName.'<br>'
-                .$shippingCompany.'<br>'
-                .$shippingAddress1.'<br>'
-                .$shippingAddress2.'<br>'
-                .$shippingState.'<br>'
-                .$shippingCity.'<br>'
-                .$shippingCountry.'<br>'
-                .$shippingPhone.'<br>'
-                .$shippingEmail.'
-            </address>
-        </div>
-      </div>;
-  </div>';
-
-  // dompdf begin
-  #require_once 'dompdf/autoload.inc.php'; // include autoloader
-  #$dompdf = new Dompdf(); // instantiate and use the dompdf class
-#  $dompdf->loadHtml($body);
-	#$dompdf->setPaper('A4', 'landscape'); // (Optional) Setup the paper size and orientation
-	// Render the HTML as PDF
-  #$dompdf->render();
-  // $dompdf->stream(); // Output the generated PDF to Browser
-  //save the pdf file on the server
-  #$uploadpdf = wp_upload_dir();
-  #	$uploadpdf_dir = $uploadpdf['basedir'] .'/pdf-files/';
-		#  $permissions = 0755;
-  #$oldmask = umask(0);
-  #if (!is_dir($uploadpdf_dir)) mkdir($uploadpdf_dir, $permissions);
-  #$umask = umask($oldmask);
-  #$chmod = chmod($uploadpdf_dir, $permissions);
-  #file_put_contents($uploadpdf_dir.'/'.$latestOrderId.'.pdf', $dompdf->output());
-	// dompdf end
-
-	// attached pdf file begin
-	// $filename = $latestOrderId.'.pdf';
-  // $attachments = array( WP_CONTENT_DIR . '/uploads/pdf-files/'.$filename );
-  // attach pdf file end
-
-	$to = $orderedStoreEmail;
-	$subject = '👋🎁 Ny bestilling på Greeting.dk';
-	$attachments = '';
-	$headers = array('Content-Type: text/html; charset=UTF-8'); // To send HTML formatted mail, you also can specify the Content-Type HTTP header in the $headers parameter:
-	#wp_mail( $to, $subject, $body, $headers, $attachments );
-};
-
-
 // vendor attachment begin
 #add_filter( 'woocommerce_email_attachments', 'attach_pdf_to_email', 10, 3);
 function attach_pdf_to_email ( $attachments, $email_id , $order ) {
@@ -5159,7 +4981,7 @@ function greeting_wc_add_order_meta_box_action( $actions ) {
 
 	// add "mark printed" custom action
 	$actions['wc_custom_order_action'] = __( 'Gensend mail til butikken', 'greeting2' );
-    $actions['wc_custom_order_action_test_mail'] = __( 'SEND TEST MAIL', 'greeting2' );
+  $actions['wc_custom_order_action_test_mail'] = __( 'SEND TEST MAIL', 'greeting2' );
 	return $actions;
 }
 add_action( 'woocommerce_order_actions', 'greeting_wc_add_order_meta_box_action' );
@@ -5182,7 +5004,7 @@ function greeting_wc_process_order_meta_box_action( $order ) {
 	     }
 	}
 }
-add_action( 'woocommerce_order_action_wc_custom_order_action_test_mail', 'greeting_wc_process_order_meta_box_action_test_mail' );
+add_action( 'woocommerce_order_action_wc_custom_order_action', 'greeting_wc_process_order_meta_box_action' );
 
 /**
  * Add an order note when custom action is clicked
@@ -5191,20 +5013,39 @@ add_action( 'woocommerce_order_action_wc_custom_order_action_test_mail', 'greeti
  * @param \WC_Order $order
  */
 function greeting_wc_process_order_meta_box_action_test_mail( $order ) {
+	# Possible mail values:
+	# ----
+	# ARRAY: new_order, cancelled_order, failed_order, customer_on_hold_order, customer_processing_order, customer_completed_order, customer_refunded_order,
+	# customer_invoice, customer_note, customer_reset_password, customer_new_account, woocommerce_pensopay_payment_link, vendor_new_account, admin_new_vendor,
+	# approved_vendor_new_account, rejected_vendor_new_account, vendor_new_order, notify_shipped, admin_new_vendor_product, vendor_new_question, admin_new_question,
+	# customer_answer, admin_added_new_product_to_vendor, vendor_commissions_transaction, vendor_direct_bank, admin_widthdrawal_request, vendor_orders_stats_report,
+	# vendor_contact_widget_email, wcmp_send_report_abuse, vendor_new_announcement, customer_order_refund_request, admin_vendor_product_rejected,
+	# suspend_vendor_new_account, review_vendor_alert, vendor_followed, admin_change_order_status, admin_new_vendor_coupon
 
-    ob_start();
-    get_template_part('page', 'new-email-template');
-    $content = ob_get_contents();
-    ob_end_clean();
+	$mailer = WC()->mailer();
+	$mails = $mailer->get_emails();
 
-    $page = $content;
+	if ( !empty( $mails ) ) {
+			foreach ( $mails as $mail ) {
+					if ( $mail->id == 'customer_refunded_order' ) {
+						add_filter('woocommerce_new_order_email_allows_resend', '__return_true' );
+						#$mail->trigger( $order->get_id() );
+					}
+			 }
+	}
 
-    $headers = array("Content-Type: text/html; charset=UTF-8");
-    wp_mail("dennis@idemedia.dk", "test test", $page, "Content-Type: text/html; charset=UTF-8" );
+	$user_id = (empty(get_current_user_id()) ? wp_get_current_user()->ID : get_current_user_id() );
+	$mailer->customer_new_account($user_id);
+	exit;
 }
-add_action( 'woocommerce_order_action_wc_custom_order_action', 'greeting_wc_process_order_meta_box_action' );
+add_action( 'woocommerce_order_action_wc_custom_order_action_test_mail', 'greeting_wc_process_order_meta_box_action_test_mail' );
 
 
+/**
+ * Function for duplicating taxonomies when duplicating a product.
+ *
+ * @author Dennis Lauritzen
+*/
 add_action( 'woocommerce_product_duplicate', 'greeting_duplicate_custom_taxonomies', 999, 2);
 function greeting_duplicate_custom_taxonomies( WC_Product $duplicate, WC_Product $product ) {
     foreach ( [ 'occasion' ] as $taxonomy ) {
@@ -5213,4 +5054,19 @@ function greeting_duplicate_custom_taxonomies( WC_Product $duplicate, WC_Product
             wp_set_object_terms( $duplicate->get_id(), wp_list_pluck( $terms, 'term_id' ), $taxonomy );
         }
     }
+}
+
+/**
+ * Function for using order object to get Vendor ID.
+ *
+ *
+ */
+function greeting_get_vendor_id_from_order( $order ){
+	$vendor_id = 0;
+	foreach ($order->get_items() as $item_key => $item) {
+		$product = get_post($item['product_id']);
+		$vendor_id = $product->post_author;
+	}
+
+	return $vendor_id;
 }

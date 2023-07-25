@@ -1,8 +1,8 @@
 <?php
 /**
- * Customer completed order email
+ * Admin new order email
  *
- * This template can be overridden by copying it to yourtheme/woocommerce/emails-old/customer-completed-order.php.
+ * This template can be overridden by copying it to yourtheme/woocommerce/emails/admin-new-order.php.
  *
  * HOWEVER, on occasion WooCommerce will need to update template files and you
  * (the theme developer) will need to copy the new files to your theme to
@@ -11,7 +11,7 @@
  * the readme will list any important changes.
  *
  * @see https://docs.woocommerce.com/document/template-structure/
- * @package WooCommerce\Templates\Emails
+ * @package WooCommerce\Templates\Emails\HTML
  * @version 3.7.0
  */
 
@@ -30,10 +30,9 @@ $order_hash2 = hash('md4', 'vvkrne12onrtnFG_:____'.$latestOrderId);
 $vendor_id = greeting_get_vendor_id_from_order( $order );
 $vendor = get_wcmp_vendor(absint($vendor_id));
 
-/**
- * Get variables for use in the template
- */
-$shop_name = (is_object($vendor) ? ucfirst(esc_html($vendor->user_data->data->display_name)) : '');
+// Generate QR code.
+$codeContents = site_url().'/shop-order-status/?order_id='.$latestOrderId.'&oh='.$order_hash.'&sshh='.$order_hash2;
+$qrcode = 'https://chart.googleapis.com/chart?chs=135x135&cht=qr&chl='.$codeContents;
 
 // Calculate order IDs
 $main_order = (empty(get_post_parent($order->get_id())) ? $order->get_id() : get_post_parent($order->get_id()) );
@@ -41,36 +40,11 @@ $main_order_object = wc_get_order($main_order);
 $main_order_ID_str = ( empty($main_order_object->get_id())  ? $main_order->ID : $main_order_object->get_id() );
 $main_order_id = (empty(get_post_parent($order->get_id())) ? $order->get_id() : $main_order_ID_str );
 
-$additional_content = (!empty($additional_content) ? $additional_content : 'Vi har modtaget din bestilling - og den er videresendt til butikken, der sørger for, den bliver leveret til tiden. :)');
-
-// Delivery type
-$del_type = '';
-$del_value = '';
-if(!empty(get_field('delivery_type', 'user_'.$vendor_id))){
-  $delivery_type = get_field('delivery_type', 'user_'.$vendor_id)[0];
-
-  if(empty($delivery_type['label'])){
-    $del_value = $delivery_type;
-    $del_type = $delivery_type;
-  } else {
-    $del_value = $delivery_type['value'];
-    $del_type = $delivery_type['label'];
-  }
-}
-
 /*
  * @hooked WC_Emails::email_header() Output the email header
  */
 do_action( 'woocommerce_email_header', $email_heading, $email );
-?>
-
-<?php /* translators: %s: Customer first name */ ?>
-<!--<p><?php printf( esc_html__( 'Hi %s,', 'woocommerce' ), esc_html( $order->get_billing_first_name() ) ); ?></p>-->
-
-
-
-
-
+#do_action('woocommerce_email_before_order_table', $order, true, false, $email); ?>
 
 <!-- THE CONTENT -->
 <table width="100%" align="center" border="0" cellspacing="0" cellpadding="0" style="width: 100%; text-align: center; border-collapse: collapse;">
@@ -81,62 +55,33 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                     <td colspan="2" class="summary-heading" style="padding-bottom: 20px;">
                         <table width="100%" border="0"cellpadding="0" cellspacing="0" style="width: 100%; max-width: 800px; border-collapse: collapse;">
                             <tr>
-                                <td width="75%" style="width: 75%;">
-                                    <h1 style="margin-top: 25px;"><?php echo $email_heading; ?></h1>
-																		<small>
+                                <td width="85%" style="width: 85%;">
+                                    <!--<h1 style="margin-top: 35px;"><?php echo esc_html( $email_heading ); ?></h1>
+                                    <small style="padding-right: 7px;">
+																			<?php printf( esc_html__( 'You’ve received the following order from %s:', 'woocommerce' ), $order->get_formatted_billing_full_name() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                                    </small>-->
+                                    <h1 style="margin-top: 25px;">Vi har modtaget en ny bestilling på Greeting.dk</h1>
+                          					<small>
                                       <img width="15" height="15" src="https://s.w.org/images/core/emoji/14.0.0/72x72/2764.png" style="display: inline-block; width: 15px !important; max-width: 20px; height: 15px; max-height: 20px; font-size: 12px;">
-                                      &nbsp; <?php echo $additional_content; ?>
-                                   	</small>
+                                      &nbsp; Her har du informationerne - kun sendt til admins. Vi / butikken kan holde kunden opdateret her >
+                                     </small>
                                 </td>
-																<td width="25%" style="width: 25%">
-																		&nbsp;
-																</td>
+                                <td width="15%" style="width: 15%">
+                                    <div style="margin-top: 0px; float: right;">
+                                        <a href="<?php echo $codeContents; ?>">
+                                            <img src="<?php echo $qrcode; ?>" alt="" style="width:100%; max-width: 100px;"/><br>
+                                            <span style="font-size: 12px; line-height: 15px !important;">
+                                                Opdatér levering & informér kunde
+                                            </span>
+
+                                        </a>
+                                    </div>
+                                </td>
                             </tr>
                         </table>
+
                     </td>
                 </tr>
-								<tr>
-									<td colspan="2">
-										<?php
-										if($del_value == '1'){
-											// Personlig levering
-										?>
-										<p>Vi har nu leveret din gave til <?php print $order->get_shipping_first_name(); ?>.
-										<br>Vi er sikre på, at din hilsen har gjort en forskel!</p>
-
-										<p>Vi glæder os til at overraske en heldig modtager næste gang, du skal sende en gavehilsen til en der fortjener det.</p>
-										<?php
-										} else {
-											// Afsendelsesordrer
-										?>
-										<p>Din gavebestilling er sendt til <?php print $order->get_shipping_first_name(); ?>, og vi forventer derfor at <?php print $order->get_shipping_first_name(); ?> modtager
-										gaven meget snart
-										- eller måske endda allerede har modtaget den.</p>
-										<p>Derfor vil vi endnu engang sige tusind tak for din bestilling.</p>
-										<?php
-										}
-										?>
-
-										<p><b>De bedste hilsner</b><br>
-										<?php print $shop_name; ?> & Greeting.dk</p>
-
-										<br>
-
-										<h4 style="">★★★★★ Vil du hjælpe os? :)</h4>
-										<p style="font-size:14px;">
-											Kunne du tænke dig at hjælpe os ved at anmelde <a href="https://dk.trustpilot.com/review/greeting.dk">din oplevelse med Greeting.dk på TrustPilot</a>?
-										</p>
-
-										<p>Og hvis du har lyst, må du endelig følge med på vores <a href="https://www.instagram.com/greeting.dk/">Instagram</a>
-										og <a href="https://www.facebook.com/greeting.dk">Facebook</a></p>
-
-										<br><br>
-										<hr style="height: 1px; color: #cccccc;">
-										<br>
-										<h1>Din bestilling i detaljer</h1>
-										<br><br><br>
-									</td>
-								</tr>
                 <tr>
                     <td colspan="2">
                         <table width="100%" border="0" cellpadding="0" cellspacing="0" class="order-summary">
@@ -161,24 +106,28 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                                 <td valign="top" align="right" style="padding: 10px 0px 10px 0;">
                                     <strong style="text-transform: uppercase;">Ordrenr</strong>
                                     <br>
-                                    #<?php echo $main_order_id; ?> <!--(Sub-ordre nr.: #<?php echo $order->get_id(); ?>)-->
+                                    #<?php echo $main_order_id; ?> (Sub-ordre nr.: #<?php echo $order->get_id(); ?>)
                                 </td>
                             </tr>
                             <tr>
                                 <td valign="top" width="50%" style="width: 50%; padding: 10px 0 15px 0px;">
+                                    <?php $delivery_instructions = get_post_meta( $order->get_id(), '_delivery_instructions', true ); ?>
+                                    <?php if(!empty($delivery_instructions)){ ?>
+                                    <strong><?php _e('Leveringsinstruktioner', 'woocommerce'); ?></strong>
+                                    <br>
+                                    <?php echo $delivery_instructions; ?>
+                                    <br>
+                                    <br>
+                                    <?php } ?>
                                     <?php $leave_gift_at_address = (get_post_meta( $order->get_id(), '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej'); ?>
                                     <?php _e('Må stilles på adressen:', 'woocommerce'); ?> <?php echo $leave_gift_at_address; ?><br>
 
                                     <?php $leave_gift_at_neighbour = (get_post_meta( $order->get_id(), '_leave_gift_neighbour', true ) == "1" ? 'Ja' : 'Nej'); ?>
                                     <?php _e('Må gaven afleveres hos naboen:', 'woocommerce'); ?> <?php echo $leave_gift_at_neighbour; ?>
-																		<br><br>
-																		<?php $delivery_instructions = get_post_meta( $order->get_id(), '_delivery_instructions', true ); ?>
-                                    <strong><?php _e('Leveringsinstruktioner', 'woocommerce'); ?></strong>
-                                    <br>
-                                    <?php echo (!empty($delivery_instructions)) ? $delivery_instructions : 'Ingen særlige leveringsinstruktioner'; ?>
                                 </td>
-                                <td valign="top" align="right" width="50%" style="vertical-align: top; width: 50%; padding: 10px 0px 10px 0;">
+                                <td valign="top" align="right" width="50%" style="width: 50%; padding: 10px 0px 10px 0;">
                                     <strong style="text-transform: uppercase;">Hilsen til gavemodtager</strong>
+                                    <br>
                                     <p>
                                         <?php
                                         echo esc_html( get_post_meta($order->get_id(), '_greeting_message', true) ); ?>
@@ -188,13 +137,13 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                             <tr>
                                 <td valign="top" width="50%" style="width: 50%; padding: 10px 0 15px 0px;">
                                     <p>
+                                      <strong><?php _e('Afsenders telefonnummer:', 'woocommerce'); ?></strong><br>
+                                      <?php echo $order->get_billing_phone(); ?>
+                                    </p>
+                                    <p>
                                       <strong><?php _e('Modtagers telefonnummer:', 'woocommerce'); ?></strong>
                                       <br>
                                       <?php echo get_post_meta( $parent_order_id, '_receiver_phone', true ); ?>
-                                    </p>
-																		<p>
-                                      <strong><?php _e('Dit telefonnummer:', 'woocommerce'); ?></strong><br>
-                                      <?php echo $order->get_billing_phone(); ?>
                                     </p>
                                 </td>
                                 <td valign="top" align="right" width="50%" style="width: 50%; padding: 10px 0px 10px 0;">
@@ -208,7 +157,7 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                 </tr>
                 <tr>
                     <td colspan="2" class="order-heading">
-                        <h2>Din bestilling</h2>
+                        <h2>Kundens bestilling</h2>
                     </td>
                 </tr>
                 <tr>
@@ -297,7 +246,7 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                         </p>
                     </td>
                     <td valign="top" class="your-options-cell">
-                        <h3>Dine info</h3>
+                        <h3>Afsenders info</h3>
                         <p>
                             <?php echo '<span id="bill_fullname">'.$order->get_formatted_billing_full_name().'</span>'; ?>
                             <?php echo ($order->get_billing_company()) ? '<span id="bill_company"><br>'.$order->get_billing_company().'</span>' : ''; ?>
@@ -310,8 +259,8 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                             <?php echo ($order->get_billing_country()) ? '<br><span id="bill_country">'.WC()->countries->countries[$order->get_billing_country()].'</span>' : ''; ?>
 
 
-                            <?php echo ($order->get_billing_email()) ? '<br><br><span id="bill_email">Din mail: '.$order->get_billing_email().'</span>' : ''; ?>
-                            <?php echo ($order->get_billing_phone()) ? '<br><span id="bill_phone">Dit tlf.nr.: '.$order->get_billing_phone().'</span>' : ''; ?>
+                            <?php echo ($order->get_billing_email()) ? '<br><br><span id="bill_email">Afsenders mail: '.$order->get_billing_email().'</span>' : ''; ?>
+                            <?php echo ($order->get_billing_phone()) ? '<br><span id="bill_phone">Afsenders tlf.: '.$order->get_billing_phone().'</span>' : ''; ?>
                         </p>
                     </td>
                 </tr>
@@ -394,9 +343,10 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
 <!-- THE CONTENT END -->
 
 
+<?php do_action('wcmp_email_footer'); ?>
+
 <?php
 /*
  * @hooked WC_Emails::email_footer() Output the email footer
  */
 #do_action( 'woocommerce_email_footer', $email );
-do_action('wcmp_email_footer');

@@ -1,8 +1,8 @@
 <?php
 /**
- * Customer completed order email
+ * Customer refunded order email
  *
- * This template can be overridden by copying it to yourtheme/woocommerce/emails-old/customer-completed-order.php.
+ * This template can be overridden by copying it to yourtheme/woocommerce/emails/customer-refunded-order.php.
  *
  * HOWEVER, on occasion WooCommerce will need to update template files and you
  * (the theme developer) will need to copy the new files to your theme to
@@ -31,8 +31,8 @@ $vendor_id = greeting_get_vendor_id_from_order( $order );
 $vendor = get_wcmp_vendor(absint($vendor_id));
 
 /**
- * Get variables for use in the template
- */
+* Get variables for use in the template
+*/
 $shop_name = (is_object($vendor) ? ucfirst(esc_html($vendor->user_data->data->display_name)) : '');
 
 // Calculate order IDs
@@ -47,30 +47,23 @@ $additional_content = (!empty($additional_content) ? $additional_content : 'Vi h
 $del_type = '';
 $del_value = '';
 if(!empty(get_field('delivery_type', 'user_'.$vendor_id))){
-  $delivery_type = get_field('delivery_type', 'user_'.$vendor_id)[0];
+ $delivery_type = get_field('delivery_type', 'user_'.$vendor_id)[0];
 
-  if(empty($delivery_type['label'])){
-    $del_value = $delivery_type;
-    $del_type = $delivery_type;
-  } else {
-    $del_value = $delivery_type['value'];
-    $del_type = $delivery_type['label'];
-  }
+ if(empty($delivery_type['label'])){
+   $del_value = $delivery_type;
+   $del_type = $delivery_type;
+ } else {
+   $del_value = $delivery_type['value'];
+   $del_type = $delivery_type['label'];
+ }
 }
 
 /*
  * @hooked WC_Emails::email_header() Output the email header
  */
-do_action( 'woocommerce_email_header', $email_heading, $email );
-?>
+do_action( 'woocommerce_email_header', $email_heading, $email ); ?>
 
 <?php /* translators: %s: Customer first name */ ?>
-<!--<p><?php printf( esc_html__( 'Hi %s,', 'woocommerce' ), esc_html( $order->get_billing_first_name() ) ); ?></p>-->
-
-
-
-
-
 
 <!-- THE CONTENT -->
 <table width="100%" align="center" border="0" cellspacing="0" cellpadding="0" style="width: 100%; text-align: center; border-collapse: collapse;">
@@ -96,46 +89,43 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                     </td>
                 </tr>
 								<tr>
-									<td colspan="2">
-										<?php
-										if($del_value == '1'){
-											// Personlig levering
-										?>
-										<p>Vi har nu leveret din gave til <?php print $order->get_shipping_first_name(); ?>.
-										<br>Vi er sikre på, at din hilsen har gjort en forskel!</p>
-
-										<p>Vi glæder os til at overraske en heldig modtager næste gang, du skal sende en gavehilsen til en der fortjener det.</p>
-										<?php
-										} else {
-											// Afsendelsesordrer
-										?>
-										<p>Din gavebestilling er sendt til <?php print $order->get_shipping_first_name(); ?>, og vi forventer derfor at <?php print $order->get_shipping_first_name(); ?> modtager
-										gaven meget snart
-										- eller måske endda allerede har modtaget den.</p>
-										<p>Derfor vil vi endnu engang sige tusind tak for din bestilling.</p>
-										<?php
-										}
-										?>
-
-										<p><b>De bedste hilsner</b><br>
-										<?php print $shop_name; ?> & Greeting.dk</p>
-
-										<br>
-
-										<h4 style="">★★★★★ Vil du hjælpe os? :)</h4>
-										<p style="font-size:14px;">
-											Kunne du tænke dig at hjælpe os ved at anmelde <a href="https://dk.trustpilot.com/review/greeting.dk">din oplevelse med Greeting.dk på TrustPilot</a>?
-										</p>
-
-										<p>Og hvis du har lyst, må du endelig følge med på vores <a href="https://www.instagram.com/greeting.dk/">Instagram</a>
-										og <a href="https://www.facebook.com/greeting.dk">Facebook</a></p>
-
-										<br><br>
-										<hr style="height: 1px; color: #cccccc;">
-										<br>
-										<h1>Din bestilling i detaljer</h1>
-										<br><br><br>
-									</td>
+										<td colspan="2" class="summary-heading" style="padding-bottom: 20px;">
+												<table width="100%" border="0"cellpadding="0" cellspacing="0" style="width: 100%; max-width: 800px; border-collapse: collapse;">
+														<tr>
+																<td width="100%" style="width: 100%;">
+																		<p><?php printf( esc_html__( 'Hi %s,', 'woocommerce' ), esc_html( $order->get_billing_first_name() ) ); ?></p>
+																		<p>
+																			<?php
+																			if ( $partial_refund ) {
+																				/* translators: %s: Site title */
+																				printf( esc_html__( 'Your order on %s has been partially refunded. There are more details below for your reference:', 'woocommerce' ), wp_specialchars_decode( get_option( 'blogname' ), ENT_QUOTES ) ); // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+																			} else {
+																				/* translators: %s: Site title */
+																				printf( esc_html__( 'Your order on %s has been refunded. There are more details below for your reference:', 'woocommerce' ), wp_specialchars_decode( get_option( 'blogname' ), ENT_QUOTES ) ); // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+																			}
+																			?>
+																		</p>
+																</td>
+														</tr>
+												</table>
+										</td>
+								</tr>
+								<tr>
+										<td colspan="2" class="summary-heading" style="padding-bottom: 20px;">
+												<table width="100%" border="0"cellpadding="0" cellspacing="0" style="width: 100%; max-width: 800px; border-collapse: collapse;">
+														<tr>
+																<td width="100%" style="width: 100%;">
+																		<p>
+																			<br><br>
+																			<hr style="height: 1px; color: #cccccc;">
+																			<br>
+																			<h1>Din bestilling i detaljer</h1>
+																			<br><br><br>
+																		</p>
+																</td>
+														</tr>
+												</table>
+										</td>
 								</tr>
                 <tr>
                     <td colspan="2">
@@ -393,8 +383,8 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
 </table>
 <!-- THE CONTENT END -->
 
-
 <?php
+
 /*
  * @hooked WC_Emails::email_footer() Output the email footer
  */

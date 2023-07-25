@@ -8,10 +8,15 @@
  * @package 	dc-product-vendor/Templates
  * @version   	2.7.3
  */
- 
+
 global $WCMp;
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 ?>
+<!--[if gte mso 9]>
+    </td>
+  </tr>
+</table>
+<![endif]-->
 <table width="100%" id="greeting-footer" style="width: 100%;">
     <tr style="background-color: #4d696b;">
         <td align="center" style=" padding: 0 0 25px 0;">
@@ -35,7 +40,29 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
                 </tr>
                 <tr>
                     <td valign="top" class="left-col" width="50%" style="vertical-align: top; text-align: left;">
-                        <h4 class="" style="font-family: 'Rubik', 'Inter', 'Comic Sans', sans-serif; font-size: 20px; color: #1b4949;">Greeting.dk</h4>
+                        <h4 class="footer-heading" style="font-family: 'Rubik', 'Inter', sans-serif; font-size: 20px; color: #1b4949;">Greeting.dk</h4>
+                        <!--[if (gte mso 9)|(IE)]>
+                        <style type="text/css">
+                          li {
+                            display: list-item;
+                            list-style-item: none !important;
+                            list-style: none !important;
+                            margin: 0 0 0 -100px !important;
+                            padding: 0 0 0 -100px !important;
+                            color: #4d696b;
+                          }
+                          li a {
+                            color: #ffffff;
+                          }
+                          ul {
+                            margin: 0;
+                            padding: 0;
+                            list-style: none !important;
+                            list-style-type: none !important;
+                            mso-special-format: none;
+                          }
+                        </style>
+                        <![endif]-->
                         <?php
                         wp_nav_menu(
                             array(
@@ -52,7 +79,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
                         ?>
                     </td>
                     <td valign="top" class="right-col" width="50%"style="vertical-align: top; text-align: right;">
-                        <h4 class="" style="font-family: 'Rubik', 'Inter', 'Comic Sans', sans-serif; font-size: 20px; color: #1b4949;"><?php echo get_field('greeting_info_footer_heading', 'options'); ?></h4>
+                        <h4 class="" style="font-family: 'Rubik', 'Inter', sans-serif; font-size: 20px; color: #1b4949;">GAVEHILSNER FRA DANSKE<br>SPECIALBUTIKKER</h4>
                         <p style="color: #ffffff;">
                             <?php echo get_field('greeting_info_text', 'options'); ?>
                         </p>

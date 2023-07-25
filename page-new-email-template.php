@@ -9,13 +9,18 @@
 //	return;
 //}
 
-$order_id 		= 48991;//(isset($_GET['o']) ? $_GET['o'] : 0);
-$order_old_id 	= 48991;//(isset($_GET['order_id']) ? $_GET['order_id'] : 0);
+// If testing on Mac:
+#$order_id 		= 48991;//(isset($_GET['o']) ? $_GET['o'] : 0);
+#$order_old_id 	= 48991;//(isset($_GET['order_id']) ? $_GET['order_id'] : 0);
+
+// If testing on Windows:
+$order_id 		= 40254;//(isset($_GET['o']) ? $_GET['o'] : 0);
+$order_old_id 	= 40254;//(isset($_GET['order_id']) ? $_GET['order_id'] : 0);
 $order_key 		= (isset($_GET['key']) ? $_GET['key'] : '');
 
 $order_id_data = wc_get_order_id_by_order_key( $order_key );
-
 $order = wc_get_order( $order_id );
+
 $vendor_id = 0;
 
 // If someone changed something in the URL part
