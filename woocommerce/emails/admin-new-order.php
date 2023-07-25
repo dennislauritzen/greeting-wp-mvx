@@ -130,7 +130,7 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                                     <br>
                                     <p>
                                         <?php
-                                        echo esc_html( get_post_metamain_order_id, '_greeting_message', true) ); ?>
+                                        echo esc_html( get_post_meta($main_order_id, '_greeting_message', true)  ); ?>
                                     </p>
                                 </td>
                             </tr>
