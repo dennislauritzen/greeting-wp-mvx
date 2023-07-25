@@ -63,7 +63,7 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                                     <h1 style="margin-top: 25px;">Vi har modtaget en ny bestilling på Greeting.dk</h1>
                           					<small>
                                       <img width="15" height="15" src="https://s.w.org/images/core/emoji/14.0.0/72x72/2764.png" style="display: inline-block; width: 15px !important; max-width: 20px; height: 15px; max-height: 20px; font-size: 12px;">
-                                      &nbsp; Her har du informationerne - kun sendt til admins. Vi / butikken kan holde kunden opdateret her >
+                                      &nbsp; <?php echo $additional_content; ?>
                                      </small>
                                 </td>
                                 <td width="15%" style="width: 15%">
@@ -111,7 +111,7 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                             </tr>
                             <tr>
                                 <td valign="top" width="50%" style="width: 50%; padding: 10px 0 15px 0px;">
-                                    <?php $delivery_instructions = get_post_meta( $order->get_id(), '_delivery_instructions', true ); ?>
+                                    <?php $delivery_instructions = get_post_meta( $main_order_id, '_delivery_instructions', true ); ?>
                                     <?php if(!empty($delivery_instructions)){ ?>
                                     <strong><?php _e('Leveringsinstruktioner', 'woocommerce'); ?></strong>
                                     <br>
@@ -119,10 +119,10 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                                     <br>
                                     <br>
                                     <?php } ?>
-                                    <?php $leave_gift_at_address = (get_post_meta( $order->get_id(), '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej'); ?>
+                                    <?php $leave_gift_at_address = (get_post_meta( $main_order_id, '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej'); ?>
                                     <?php _e('Må stilles på adressen:', 'woocommerce'); ?> <?php echo $leave_gift_at_address; ?><br>
 
-                                    <?php $leave_gift_at_neighbour = (get_post_meta( $order->get_id(), '_leave_gift_neighbour', true ) == "1" ? 'Ja' : 'Nej'); ?>
+                                    <?php $leave_gift_at_neighbour = (get_post_meta( $main_order_id, '_leave_gift_neighbour', true ) == "1" ? 'Ja' : 'Nej'); ?>
                                     <?php _e('Må gaven afleveres hos naboen:', 'woocommerce'); ?> <?php echo $leave_gift_at_neighbour; ?>
                                 </td>
                                 <td valign="top" align="right" width="50%" style="width: 50%; padding: 10px 0px 10px 0;">
@@ -130,7 +130,7 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                                     <br>
                                     <p>
                                         <?php
-                                        echo esc_html( get_post_meta($order->get_id(), '_greeting_message', true) ); ?>
+                                        echo esc_html( get_post_metamain_order_id, '_greeting_message', true) ); ?>
                                     </p>
                                 </td>
                             </tr>
@@ -143,7 +143,7 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                                     <p>
                                       <strong><?php _e('Modtagers telefonnummer:', 'woocommerce'); ?></strong>
                                       <br>
-                                      <?php echo get_post_meta( $parent_order_id, '_receiver_phone', true ); ?>
+                                      <?php echo get_post_meta( $main_order_id, '_receiver_phone', true ); ?>
                                     </p>
                                 </td>
                                 <td valign="top" align="right" width="50%" style="width: 50%; padding: 10px 0px 10px 0;">
