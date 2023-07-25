@@ -1000,7 +1000,7 @@ function catocca_landing_data_fetch(){
  	$defaultUserArray = explode(",", $cityDefaultUserIdAsString);
 
  	// category & occasion filter data
- 	$catOccaDeliveryIdArray = $_POST['catOccaIdArray'];
+ 	$catOccaDeliveryIdArray = is_array($_POST['catOccaIdArray']) ? $_POST['catOccaIdArray'] : explode(",", $_POST['catOccaIdArray']);
 
 	// The default ID from the category / occasion (the "base" landing page cat / occa)
 	$defaultIdCatOcca = $_POST['defaultIdCatOcca'];
@@ -1040,7 +1040,7 @@ function catocca_landing_data_fetch(){
 	// FILTER: Category & Occasion
  	// Prepare the where and where-placeholders for term_id (cat and occassion ID's).
  	$where = array();
- 	$placeholder_arr = array_fill(0, count($catOccaDeliveryIdArray), '%s');
+ 	$placeholder_arr = (is_countable($catOccaDeliveryIdArray) ? array_fill(0, count($catOccaDeliveryIdArray), '%s') : array());
 
  	if(!empty($catOccaDeliveryIdArray)){
  		foreach($catOccaDeliveryIdArray as $catOccaDeliveryId){
@@ -1342,7 +1342,7 @@ function catOccaDeliveryAction() {
 
 	// Prepare the where and where-placeholders for term_id (cat and occassion ID's).
 	$where = array();
-	$placeholder_arr = array_fill(0, count($catOccaDeliveryIdArray), '%s');
+	$placeholder_arr = (is_countable($catOccaDeliveryIdArray) ? array_fill(0, count($catOccaDeliveryIdArray), '%s') : array());
 
 	if(!empty($catOccaDeliveryIdArray)){
 		foreach($catOccaDeliveryIdArray as $catOccaDeliveryId){
@@ -1587,7 +1587,8 @@ function lpFilterAction() {
 	$defaultUserArray = explode(",", $cityDefaultUserIdAsString);
 
 	// category & occasion filter data
-	$catOccaDeliveryIdArray = $_POST['occCatIdArray'];
+	$catOccaDeliveryIdArray = is_array($_POST['catOccaIdArray']) ? $_POST['catOccaIdArray'] : explode(",", $_POST['catOccaIdArray']);
+
 	// delivery filter data
 	$deliveryIdArray = $_POST['deliveryIdArray'];
 
@@ -1622,7 +1623,7 @@ function lpFilterAction() {
 	global $wpdb;
 	// Prepare the where and where-placeholders for term_id (cat and occassion ID's).
 	$where = array();
-	$placeholder_arr = array_fill(0, count($catOccaDeliveryIdArray), '%s');
+	$placeholder_arr = (is_countable($catOccaDeliveryIdArray) ? array_fill(0, count($catOccaDeliveryIdArray), '%s') : array());
 
 	if(!empty($catOccaDeliveryIdArray)){
 		foreach($catOccaDeliveryIdArray as $catOccaDeliveryId){
