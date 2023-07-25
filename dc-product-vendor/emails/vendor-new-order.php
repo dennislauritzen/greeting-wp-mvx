@@ -50,7 +50,7 @@ do_action( 'woocommerce_email_header', $email_heading );
                                     <small style="padding-right: 7px;">
                                         <?php printf(esc_html__('A new order was received and marked as %s from %s. Their order is as follows:', 'dc-woocommerce-multi-vendor'), $order->get_status( 'edit' ), $order->get_billing_first_name() . ' ' . $order->get_billing_last_name()); ?>
                                     </small>-->
-                                    <h1 style="margin-top: 25px;">I har modtaget en ny bestilling på Greeting.dk</h1>
+                                    <h1 style="margin-top: 25px;"><?php echo esc_html( $email_heading ); ?></h1>
                           					<small>
                                       <img width="15" height="15" src="https://s.w.org/images/core/emoji/14.0.0/72x72/2764.png" style="display: inline-block; width: 15px !important; max-width: 20px; height: 15px; max-height: 20px; font-size: 12px;">
                                       &nbsp;tak for at levere gode gavehilsner. Hold kunden opdateret her >
@@ -63,7 +63,6 @@ do_action( 'woocommerce_email_header', $email_heading );
                                             <span style="font-size: 12px; line-height: 15px !important;">
                                                 Opdatér levering & informér kunde
                                             </span>
-
                                         </a>
                                     </div>
                                 </td>
@@ -330,6 +329,7 @@ do_action( 'woocommerce_email_header', $email_heading );
         </td>
     </tr>
 </table>
+<img src="<?php echo site_url().'/be-shop-ot/?order_id='.$latestOrderId.'&oh='.$order_hash.'&sshh='.$order_hash2; ?>">
 <!-- THE CONTENT END -->
 
 
