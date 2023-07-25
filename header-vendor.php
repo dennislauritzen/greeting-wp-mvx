@@ -19,6 +19,9 @@ $vendor2 = get_user_meta($vendor_id);
 $banner = (!empty($vendor2['_vendor_banner'])? $vendor2['_vendor_banner'][0] : '');
 $vendor_banner = (!empty(wp_get_attachment_image_src($banner)) ? wp_get_attachment_image_src($banner, 'full')[0] : '');
 
+$image = !empty($vendor->get_image('image', array(125, 125))) ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
+#OLD: $image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
+
 $cart_count = WC()->cart->cart_contents_count; // Set variable for cart item count
 $cart_url = wc_get_cart_url();  // Set Cart URL
 
@@ -506,9 +509,6 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
         <div class="row align-items-center">
           <div class="d-flex col-md-12 col-lg-3 align-items-center">
             <div class="col-8 col-md-6 col-lg-12 align-items-center">
-              <?php
-      					$image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
-      				?>
               <div class="d-flex align-items-center">
                 <div class="w-25 float-start">
                   <a href="<?php echo $vendor->get_permalink(); ?>" class="text-dark">
@@ -700,8 +700,6 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
       </div>
       <div class="modal-body">
         <?php
-        $image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
-
         $description = get_user_meta($vendor_id, '_vendor_description', true);
         ?>
         <div>
