@@ -851,13 +851,12 @@ get_footer(); ?>
     var deliveryIdArray = [];
     var postalArray = [];
 
-    var url_string = window.location.href; //window.location.href
-    var url = new URL(url_string);
-
+    // Get URL parameters
+    var url = new URL(window.location.href);
     var deliveryIdArray = url.searchParams.get("d")?.split(",");
     var catOccaIdArray = url.searchParams.get("c")?.split(",");
-    var postalcode_url_val = url.searchParams.get("pc")?.split(",");
     var inputPriceRangeArray = url.searchParams.get("price")?.split(",");
+    var postalcode_url_val = url.searchParams.get("pc")?.split(",");
 
     if(deliveryIdArray && postalArray && catOccaIdArray && inputPriceRangeArray &&
       deliveryIdArray.length > 0 && postalArray.length > 0 && catOccaIdArray.length > 0 && inputPriceRangeArray.length > 0){
@@ -910,7 +909,7 @@ get_footer(); ?>
      }
 
     // Update filters if all are selected
-    if (deliveryIdArray?.length && catOccaDeliveryIdArray?.length && inputPriceRangeArray?.length) {
+    if (deliveryIdArray?.length && catOccaIdArray?.length && inputPriceRangeArray?.length) {
      update();
     }
 
@@ -1080,7 +1079,7 @@ get_footer(); ?>
       $("input:checkbox[name=filter_catocca_city]").removeAttr("checked");
       $("input:checkbox[name=filter_del_city]").prop('checked',true);
       $("input#filter_delivery_date_8").prop('checked',true);
-      //catOccaDeliveryIdArray.length = 0;
+      //catOccaIdArray.length = 0;
 
       $('div.filter-list div.dynamic-filters').remove();
 
