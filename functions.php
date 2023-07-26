@@ -1346,7 +1346,7 @@ function catOccaDeliveryAction() {
 	$where = array();
 	$placeholder_arr = (is_countable($catOccaDeliveryIdArray) ? array_fill(0, count($catOccaDeliveryIdArray), '%s') : array());
 
-	if(!empty($catOccaDeliveryIdArray) && is_array($placeholder_arr) && !empty($placeholder_arr)){
+	if(!empty($catOccaDeliveryIdArray) && count($catOccaDeliveryIdArray) > 0 && is_array($placeholder_arr) && !empty($placeholder_arr)){
 		foreach($catOccaDeliveryIdArray as $catOccaDeliveryId){
 			if(is_numeric($catOccaDeliveryId)){
 				$where[] = $catOccaDeliveryId;
@@ -1393,17 +1393,13 @@ function catOccaDeliveryAction() {
 		  )
 			AND p.post_status = 'publish'
 		GROUP BY p.post_author";
-var_dump($where);
+
 		$getStoreUserDataBasedOnProduct = $wpdb->prepare($sql, $where);
-		$wpdb->show_errors(true);
 		$storeUserCatOccaResults = $wpdb->get_results($getStoreUserDataBasedOnProduct);
-		$wpdb->print_error();
-		var_dump($storeUserCatOccaResults);
 
 		foreach($storeUserCatOccaResults as $product){
 			array_push($userIdArrayGetFromCatOcca, $product->post_author);
 		}
-		var_dump($userIdArrayGetFromCatOcca);
 	}
 	// Remove all the stores that doesnt match from default array
 	if(!empty($userIdArrayGetFromCatOcca)){
