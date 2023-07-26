@@ -1311,6 +1311,7 @@ function catOccaDeliveryAction() {
 	$defaultUserArray = explode(",", $cityDefaultUserIdAsString);
 
 	// category & occasion filter data
+	var_dump($_POST['catOccaIdArray']);
 	$catOccaArray = is_array($_POST['catOccaIdArray']) ? $_POST['catOccaIdArray'] : explode(",", $_POST['catOccaIdArray']);
 	$catOccaDeliveryIdArray = is_array($catOccaArray) ? $catOccaArray : array();
 
