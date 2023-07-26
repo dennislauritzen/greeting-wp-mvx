@@ -2657,7 +2657,6 @@ function custom_display_order_data_in_admin(){
  * @author Dennis
  */
 add_filter( 'woocommerce_email_order_meta_fields', 'custom_woocommerce_email_order_meta_fields', 10, 3 );
-
 function custom_woocommerce_email_order_meta_fields( $fields, $sent_to_admin, $order ) {
 		$del_date = get_post_meta( $order->get_id(), '_delivery_date', true );
     $delivery_date = (!empty($del_date) ? $del_date : 'Hurtigst muligt');
@@ -3279,7 +3278,6 @@ function greeting_echo_receiver_info( ) {
 		</style>
 		';
 
-
 		woocommerce_form_field( 'leave_gift_address', array(
 			'type'				=> 'checkbox',
 			'id'					=> 'deliveryLeaveGiftAddress',
@@ -3308,8 +3306,8 @@ function greeting_echo_receiver_info( ) {
 			'type'				=> 'textarea',
 			'id'					=> 'deliveryInstructions',
 			'class'				=> array('form-row-wide'),
-			'label'				=> __('Leveringsinstruktioner', 'greeting2'),
-			'placeholder'	=> __('Har du særlige instruktioner til leveringen? Eks. en dørkode, særlige forhold på leveringsadressen, en dato hvor gaven må åbnes eller lignende? Notér dem her :)', 'greeting2')
+			'label'				=> __('Særlig besked til butikken vedr. gaven eller leveringen', 'greeting2'),
+			'placeholder'	=> __('Notér her hvis du har særlige ønsker til din gave/levering. Det kunne eks. være særlige blomster i buketten, ønske til indhold i en kurv - eller en dørkode på leveringsadressen el.lign. :)', 'greeting2')
 		), WC()->checkout->get_value( 'delivery_instructions' ) );
 
 	// Insert the delivery date area
