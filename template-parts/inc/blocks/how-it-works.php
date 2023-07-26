@@ -77,7 +77,7 @@
             <p>Gaven leveres til din modtager</p>
           </li>
         </ul>
-        <a class="bg-teal btn rounded-pill text-white my-2 py-2 px-4" href="https://greeting.dk/saadan-fungerer-det/" target="">Læs mere</a>
+        <a class="bg-teal btn rounded-pill text-white my-2 py-2 px-4" href="https://greeting.dk/saadan-fungerer-det/" title="Læs mere om konceptet bag Greeting.dk" target="">Læs mere</a>
       </div>
     </div>
   </div>

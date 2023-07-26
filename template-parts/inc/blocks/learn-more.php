@@ -10,7 +10,7 @@
           <div class="card-body">
             <h5 class="card-title"><?php echo get_field('howdy_block1_header', 'options'); ?></h5>
             <p class="card-text"><?php echo get_field('howdy_block1_text', 'options'); ?></p>
-            <a href="<?php echo get_field('howdy_block1_link', 'options'); ?>" class="rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link">
+            <a href="<?php echo get_field('howdy_block1_link', 'options'); ?>" title="<?php echo get_field('howdy_block1_button_cta', 'options'); ?>" class="rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link">
               <?php echo get_field('howdy_block1_button_cta', 'options'); ?>
             </a>
           </div>
@@ -22,7 +22,7 @@
           <div class="card-body">
             <h5 class="card-title"><?php echo get_field('howdy_block2_header', 'options'); ?></h5>
             <p class="card-text"><?php echo get_field('howdy_block2_text', 'options'); ?></p>
-            <a href="<?php echo get_field('howdy_block2_link', 'options'); ?>" class="rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link">
+            <a href="<?php echo get_field('howdy_block2_link', 'options'); ?>" title="<?php echo get_field('howdy_block2_button_cta', 'options'); ?>" class="rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link">
               <?php echo get_field('howdy_block2_button_cta', 'options'); ?>
             </a>
           </div>
@@ -34,7 +34,7 @@
           <div class="card-body">
             <h5 class="card-title"><?php echo get_field('howdy_block3_header', 'options'); ?></h5>
             <p class="card-text"><?php echo get_field('howdy_block3_text', 'options'); ?></p>
-            <a href="<?php echo get_field('howdy_block3_link', 'options'); ?>" class="rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link">
+            <a href="<?php echo get_field('howdy_block3_link', 'options'); ?>" title="<?php echo get_field('howdy_block3_button_cta', 'options'); ?>" class="rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-4 stretched-link">
               <?php echo get_field('howdy_block3_button_cta', 'options'); ?>
             </a>
           </div>
