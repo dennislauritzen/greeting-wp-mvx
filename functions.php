@@ -1312,7 +1312,7 @@ function catOccaDeliveryAction() {
 
 	// category & occasion filter data
 	var_dump($_POST['catOccaIdArray']);
-	$catOccaArray = is_array($_POST['catOccaIdArray']) ? $_POST['catOccaIdArray'] : explode(",", $_POST['catOccaIdArray']);
+	$catOccaArray = is_array($_POST['catOccaIdArray']) ? $_POST['catOccaIdArray'] : (empty($_POST['catOccaIdArray']) ? array() : explode(',', $_POST['catOccaIdArray']));
 	var_dump($catOccaArray);
 	$catOccaDeliveryIdArray = is_array($catOccaArray) ? $catOccaArray : array();
 var_dump($catOccaDeliveryIdArray);
