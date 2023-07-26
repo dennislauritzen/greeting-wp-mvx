@@ -7,16 +7,16 @@
       <div class="col-12">
         <div class="row justify-content-md-center d-flex align-items-center pb-3 pb-md-0">
           <div class="col-md-2 align-middle">
-            <img class="w-75 align-middle" alt="Jyllands Posten" src="https://www.greeting.dk/wp-content/uploads/2022/08/jyllands-posten-logo.png">
+            <img class="w-75 align-middle" alt="Jyllands Posten" src="https://www.greeting.dk/wp-content/uploads/2023/07/jp-logo-scaled-e1690382971264.webp">
           </div>
           <div class="col-md-2 align-middle pb-3 pb-md-0">
-            <img class="w-75 align-middle" alt="Finans" src="https://www.greeting.dk/wp-content/uploads/2022/08/finans-logo.png">
+            <img class="w-75 align-middle" alt="Finans" src="https://www.greeting.dk/wp-content/uploads/2023/07/finans-logo-e1690382963202.webp">
           </div>
           <div class="col-md-2 align-middle pb-3 pb-md-0">
-            <img class="w-75 align-middle" alt="Mig og Odense" src="https://www.greeting.dk/wp-content/uploads/2022/08/migogodense-logo.png">
+            <img class="w-75 align-middle" alt="Mig og Odense" src="https://www.greeting.dk/wp-content/uploads/2023/07/migogodense-logo-e1690382953285.webp">
           </div>
           <div class="col-md-2 align-middle pb-3 pb-md-0">
-            <img class="w-75 align-middle" alt="Horsens Folkeblad" src="https://www.greeting.dk/wp-content/uploads/2022/08/hsfo-logo.png">
+            <img class="w-75 align-middle" alt="Horsens Folkeblad" src="https://www.greeting.dk/wp-content/uploads/2023/07/hsfo-logo.webp">
           </div>
         </div>
       </div>
@@ -30,22 +30,22 @@
           <div class="carousel-inner">
             <div class="carousel-item active" data-bs-interval="2000">
               <div class="d-flex justify-content-center">
-                <img style="height: 30px !important;" alt="Jyllands Posten" src="https://www.greeting.dk/wp-content/uploads/2022/08/jyllands-posten-logo.png">
+                <img style="height: 30px !important; width:275px;" alt="Jyllands Posten" src="https://www.greeting.dk/wp-content/uploads/2023/07/jp-logo-scaled-e1690382971264.webp">
               </div>
             </div>
             <div class="carousel-item align-middle" data-bs-interval="2000">
               <div class="d-flex justify-content-center">
-              <img style="height: 30px !important;" alt="Finans" src="https://www.greeting.dk/wp-content/uploads/2022/08/finans-logo.png">
+              <img style="height: 30px !important; width:156px;" alt="Finans" src="https://www.greeting.dk/wp-content/uploads/2023/07/finans-logo-e1690382963202.webp">
               </div>
             </div>
             <div class="carousel-item align-middle" data-bs-interval="2000">
               <div class="d-flex justify-content-center">
-                <img style="height: 30px !important;" alt="Mig og Odense" src="https://www.greeting.dk/wp-content/uploads/2022/08/migogodense-logo.png">
+                <img style="height: 30px !important; width:149px;" alt="Mig og Odense" src="https://www.greeting.dk/wp-content/uploads/2023/07/migogodense-logo-e1690382953285.webp">
               </div>
             </div>
             <div class="carousel-item align-middle" data-bs-interval="2000">
               <div class="d-flex justify-content-center">
-                <img style="height: 30px !important;" alt="Horsens Folkeblad" src="https://www.greeting.dk/wp-content/uploads/2022/08/hsfo-logo.png">
+                <img style="height: 30px !important; width: 300px;" alt="Horsens Folkeblad" src="https://www.greeting.dk/wp-content/uploads/2023/07/hsfo-logo.webp">
               </div>
             </div>
           </div>
