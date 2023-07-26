@@ -1393,7 +1393,7 @@ function catOccaDeliveryAction() {
 		  )
 			AND p.post_status = 'publish'
 		GROUP BY p.post_author";
-
+var_dump($where);
 		$getStoreUserDataBasedOnProduct = $wpdb->prepare($sql, $where);
 		$wpdb->show_errors(true);
 		$storeUserCatOccaResults = $wpdb->get_results($getStoreUserDataBasedOnProduct);
