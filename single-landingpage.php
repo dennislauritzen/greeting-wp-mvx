@@ -958,9 +958,9 @@ get_footer(); ?>
     function update(){
       var cityName = $('#cityName').val();
       var postalCode = $('#postalCode').val();
-      var catOccaIdArray = [];
-      var deliveryIdArray = [];
-      var inputPriceRangeArray = [];
+      catOccaIdArray = [];
+      deliveryIdArray = [];
+      inputPriceRangeArray = [];
 
       // Make the loading...
       jQuery('.loadingHeartBeat').show();
