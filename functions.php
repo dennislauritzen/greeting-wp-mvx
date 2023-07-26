@@ -1396,29 +1396,6 @@ function catOccaDeliveryAction() {
 
 		$getStoreUserDataBasedOnProduct = $wpdb->prepare($sql, $where);
 		$storeUserCatOccaResults = $wpdb->get_results($getStoreUserDataBasedOnProduct);
-		var_dump($storeUserCatOccaResults);
-		$args = array(
-		    'fields'         => 'ids', // Retrieve only post IDs to optimize the query.
-		    'post_type'      => 'post',
-		    'post_status'    => 'publish',
-		    'tax_query'      => array(
-		        'relation' => 'AND', // Fetch posts that have term relationships in both taxonomies.
-		        array(
-		            'taxonomy' => 'taxonomy1', // Replace 'taxonomy1' with the first taxonomy slug.
-		            'terms'    => $placeholder_arr1,
-		        ),
-		        array(
-		            'taxonomy' => 'taxonomy2', // Replace 'taxonomy2' with the second taxonomy slug.
-		            'terms'    => $placeholder_arr2,
-		        ),
-		    ),
-		);
-
-		$query = new WP_Query( $args );
-
-		// Fetch the results (post authors' IDs).
-		$storeUserCatOccaResults = $query->posts;
-		var_dump($storeUserCatOccaResults);
 
 		foreach($storeUserCatOccaResults as $product){
 			array_push($userIdArrayGetFromCatOcca, $product->post_author);
