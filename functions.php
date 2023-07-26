@@ -1345,13 +1345,14 @@ function catOccaDeliveryAction() {
 	// Prepare the where and where-placeholders for term_id (cat and occassion ID's).
 	$where = array();
 	$placeholder_arr = (is_countable($catOccaDeliveryIdArray) ? array_fill(0, count($catOccaDeliveryIdArray), '%s') : array());
-
+	var_dump($catOccaDeliveryIdArray);
 	if(!empty($catOccaDeliveryIdArray) && count($catOccaDeliveryIdArray) > 0 && is_array($placeholder_arr) && !empty($placeholder_arr)){
 		foreach($catOccaDeliveryIdArray as $catOccaDeliveryId){
 			if(is_numeric($catOccaDeliveryId)){
 				$where[] = $catOccaDeliveryId;
 			}
 		}
+		var_dump($catOccaDeliveryIdArray);
 
 		$args = array(
 	    'post_type' => 'product',
