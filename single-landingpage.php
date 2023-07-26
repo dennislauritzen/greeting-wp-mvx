@@ -345,7 +345,7 @@ $occasionTermListArray = array_unique($occasionTermListArray);
         ?>
         <div class="col-6 col-sm-6 col-md-4 col-lg-2 py-0 my-0 pe-2 card_outer" style="scroll-snap-align: start;">
           <div class="card border-0 shadow-sm">
-            <a href="<?php echo get_permalink().'?c='.$occasion->term_id; ?>" data-elm-id="<?php echo $category_or_occasion.$occasion->term_id; ?>" class="top-category-occasion-list stretched-link text-dark">
+            <a href="<?php echo get_permalink().'?c='.$occasion->term_id; ?>" rel="nofollow" data-elm-id="<?php echo $category_or_occasion.$occasion->term_id; ?>" class="top-category-occasion-list stretched-link text-dark">
               <?php echo $occasionImageUrl;?>
               <div class="card-body">
                 <h5 class="card-title">
