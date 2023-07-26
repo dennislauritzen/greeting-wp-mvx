@@ -1713,6 +1713,7 @@ function lpFilterAction() {
 			$defaultUserArray = $userIdArrayGetFromPostal;
 		}
 	}
+	var_dump($defaultUserArray);
 	// --
 	//////////////////////////
 
@@ -1783,6 +1784,7 @@ function lpFilterAction() {
 		$userIdArrayGetFromDelDate = array_intersect($defaultUserArray, $userIdArrayGetFromDelDate);
 		$defaultUserArray = $userIdArrayGetFromDelDate;
 	}
+	var_dump($defaultUserArray);
 
 
 	////////////////////////
@@ -1819,6 +1821,7 @@ function lpFilterAction() {
 		$userIdArrayGetFromDelivery = array_intersect($defaultUserArray, $userIdArrayGetFromDelivery);
 		$defaultUserArray = $userIdArrayGetFromDelivery;
 	}
+	var_dump($defaultUserArray);
 
 	////////////////
 	// Filter: Price
@@ -1853,12 +1856,13 @@ function lpFilterAction() {
 
 		$defaultUserArray = $userIdArrayGetFromPriceFilter;
 	}
+	var_dump($defaultUserArray);
 
 	// three array is
+	// $userIdArrayGetFromPostal
 	// $userIdArrayGetFromCatOcca
 	// $userIdArrayGetFromDelivery
 	// $userIdArrayGetFromPriceFilter
-
 
 	$return_arr = $defaultUserArray;
 
