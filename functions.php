@@ -1396,11 +1396,12 @@ function catOccaDeliveryAction() {
 
 		$getStoreUserDataBasedOnProduct = $wpdb->prepare($sql, $where);
 		$storeUserCatOccaResults = $wpdb->get_results($getStoreUserDataBasedOnProduct);
-
+		var_dump($storeUserCatOccaResults);
+		
 		foreach($storeUserCatOccaResults as $product){
 			array_push($userIdArrayGetFromCatOcca, $product->post_author);
 		}
-
+		var_dump($userIdArrayGetFromCatOcca);
 	}
 	// Remove all the stores that doesnt match from default array
 	if(!empty($userIdArrayGetFromCatOcca)){
