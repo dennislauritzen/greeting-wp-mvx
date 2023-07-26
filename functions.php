@@ -1395,9 +1395,10 @@ function catOccaDeliveryAction() {
 		GROUP BY p.post_author";
 
 		$getStoreUserDataBasedOnProduct = $wpdb->prepare($sql, $where);
+		$wpdb->show_errors(true);
 		$storeUserCatOccaResults = $wpdb->get_results($getStoreUserDataBasedOnProduct);
 		var_dump($storeUserCatOccaResults);
-		
+
 		foreach($storeUserCatOccaResults as $product){
 			array_push($userIdArrayGetFromCatOcca, $product->post_author);
 		}
