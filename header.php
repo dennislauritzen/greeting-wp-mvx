@@ -561,12 +561,12 @@
 	height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 	<!-- End LOCAL TM (noscript) -->
 	<meta name="google-site-verification" content="IzMcch4GbZsuyDXUn9Ar4A0kpVHugadljONNzrSZh3I" />
-  <link rel="preload" href="https://fonts.googleapis.com">
+  <!--<link rel="preload" href="https://fonts.googleapis.com">
   <link rel="preload" href="https://fonts.gstatic.com" crossorigin>
 	<link rel="preload" as="style" rel="preload" onload="this.onload=null;this.rel='stylesheet'" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Rubik:wght@300;400;500;600;700;800;900&display=swap">
 	<noscript>
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Rubik:wght@300;400;500;600;700;800;900&display=swap">
-	</noscript>
+	</noscript>-->
 </head>
 
 <?php
@@ -641,7 +641,7 @@
 
 		<div class="bg-pink small text-uppercase">
 			<!-- TrustBox script -->
-			<script type="text/javascript" src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
+			<script type="text/javascript" src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" defer async></script>
 			<!-- End TrustBox script -->
 	    <div class="topbar d-block d-lg-none d-xl-none">
 				<ul>
