@@ -4,8 +4,8 @@ $heading_template_freight = get_field('heading_template_freight_stores', 'option
 $heading_dummy_template = get_field('heading_template_dummy_freight_stores', 'option');
 $text_template = get_field('text_template_freight_stores', 'option');
 
-$cityName = ($args['cityName'] ? $args['cityName'] : '');
-$postalCode = ($args['postalcode'] ? $args['cityName'] : '');
+$cityName = (isset($args['cityName']) ? $args['cityName'] : '');
+$postalCode = (isset($args['postalCode']) ? $args['postalCode'] : '');
 
 $heading = (!empty($heading_template_freight) ? str_replace('{{city_name}}', $cityName, $heading_template_freight) : $heading_dummy_template);
 $heading = (!empty($heading_template_freight) ? str_replace('{{postalcode}}', $postalCode, $heading) : $heading_dummy_template);

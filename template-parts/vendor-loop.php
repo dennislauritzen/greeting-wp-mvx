@@ -2,12 +2,11 @@
 
 global $WCMp;
 
-if(isset($args['cityName'])){
-  $cityName = $args['cityName'];
-}
-if(isset($args['postalCode'])){
-  $postalCode = $args['postalCode'];
-}
+
+$cityName = (isset($args['cityName']) ? $args['cityName'] : '');
+$postalCode = (isset($args['postalCode']) ? $args['postalCode'] : '');
+
+
 if($args['vendor']){
   $vendor = $args['vendor'];
   $vendor_id = $vendor->id;
