@@ -68,6 +68,7 @@ $placeholder_arr = array_fill(0, count($postcodes), 'um.meta_value LIKE %s');
 foreach($postcodes as $postcode){
   $where[] = '%'.$postcode.'%';
 }
+#53,38,43,65,39,68,44,60,50
 
 // Add the user role to the where array:
 $where[] = '%dc_vendor%';
@@ -992,7 +993,7 @@ get_footer(); ?>
         cityName: cityName,
         landingPageDefaultUserIdAsString: jQuery("#landingPageDefaultUserIdAsString").val(),
         delDate: delDate,
-        occCatIdArray: catOccaIdArray,
+        catOccaIdArray: catOccaIdArray,
         postalArray: postalArray, // this should probably be the raw postal instead of the ID og the post
         deliveryIdArray: deliveryIdArray,
         inputPriceRangeArray: inputPriceRangeArray

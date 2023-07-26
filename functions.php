@@ -1592,10 +1592,10 @@ function lpFilterAction() {
 	$catOccaDeliveryIdArray = is_array($catOccaArray) ? $catOccaArray : array();
 
 	// delivery filter data
-	$deliveryIdArray = $_POST['deliveryIdArray'];
+	$deliveryIdArray = empty($_POST['deliveryIdArray']) ? array() : $_POST['deliveryIdArray'];
 
 	// get the postal code array from post.
-	$postal_code = $_POST['postalArray'];
+	$postal_code = empty($_POST['postalArray']) ? array() : $_POST['postalArray'];
 
 	// get the delivery date from post
 	// delivery date
