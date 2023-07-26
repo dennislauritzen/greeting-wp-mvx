@@ -1397,6 +1397,7 @@ function catOccaDeliveryAction() {
 		$getStoreUserDataBasedOnProduct = $wpdb->prepare($sql, $where);
 		$wpdb->show_errors(true);
 		$storeUserCatOccaResults = $wpdb->get_results($getStoreUserDataBasedOnProduct);
+		$wpdb->print_error();
 		var_dump($storeUserCatOccaResults);
 
 		foreach($storeUserCatOccaResults as $product){
