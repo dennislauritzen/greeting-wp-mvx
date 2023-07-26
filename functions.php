@@ -1000,7 +1000,7 @@ function catocca_landing_data_fetch(){
  	$defaultUserArray = explode(",", $cityDefaultUserIdAsString);
 
  	// category & occasion filter data
-	$catOccaArray = is_array($_POST['catOccaIdArray']) ? $_POST['catOccaIdArray'] : explode(",", $_POST['catOccaIdArray']);
+	$catOccaArray = is_array($_POST['catOccaIdArray']) ? $_POST['catOccaIdArray'] : (empty($_POST['catOccaIdArray']) ? array() : explode(',', $_POST['catOccaIdArray']));
 	$catOccaDeliveryIdArray = is_array($catOccaArray) ? $catOccaArray : array();
 
 	// The default ID from the category / occasion (the "base" landing page cat / occa)
@@ -1043,7 +1043,7 @@ function catocca_landing_data_fetch(){
  	$where = array();
  	$placeholder_arr = (is_countable($catOccaDeliveryIdArray) ? array_fill(0, count($catOccaDeliveryIdArray), '%s') : array());
 
- 	if(!empty($catOccaDeliveryIdArray)){
+ 	if(!empty($catOccaDeliveryIdArray) && is_array($placeholder_arr) && !empty($placeholder_arr)){
  		foreach($catOccaDeliveryIdArray as $catOccaDeliveryId){
  			if(is_numeric($catOccaDeliveryId)){
  				$where[] = $catOccaDeliveryId;
@@ -1311,11 +1311,9 @@ function catOccaDeliveryAction() {
 	$defaultUserArray = explode(",", $cityDefaultUserIdAsString);
 
 	// category & occasion filter data
-	var_dump($_POST['catOccaIdArray']);
 	$catOccaArray = is_array($_POST['catOccaIdArray']) ? $_POST['catOccaIdArray'] : (empty($_POST['catOccaIdArray']) ? array() : explode(',', $_POST['catOccaIdArray']));
-	var_dump($catOccaArray);
 	$catOccaDeliveryIdArray = is_array($catOccaArray) ? $catOccaArray : array();
-var_dump($catOccaDeliveryIdArray);
+
 	// delivery date
 	$deliveryDate = (int) $_POST['delDate'];
 	if(empty($deliveryDate) && $deliveryDate !== 0){
@@ -1347,14 +1345,13 @@ var_dump($catOccaDeliveryIdArray);
 	// Prepare the where and where-placeholders for term_id (cat and occassion ID's).
 	$where = array();
 	$placeholder_arr = (is_countable($catOccaDeliveryIdArray) ? array_fill(0, count($catOccaDeliveryIdArray), '%s') : array());
-	var_dump($catOccaDeliveryIdArray);
-	if(!empty($catOccaDeliveryIdArray) && count($catOccaDeliveryIdArray) > 0 && is_array($placeholder_arr) && !empty($placeholder_arr)){
+
+	if(!empty($catOccaDeliveryIdArray) && is_array($placeholder_arr) && !empty($placeholder_arr)){
 		foreach($catOccaDeliveryIdArray as $catOccaDeliveryId){
 			if(is_numeric($catOccaDeliveryId)){
 				$where[] = $catOccaDeliveryId;
 			}
 		}
-		var_dump($catOccaDeliveryIdArray);
 
 		$args = array(
 	    'post_type' => 'product',
@@ -1591,7 +1588,7 @@ function lpFilterAction() {
 	$defaultUserArray = explode(",", $cityDefaultUserIdAsString);
 
 	// category & occasion filter data
-	$catOccaArray = is_array($_POST['catOccaIdArray']) ? $_POST['catOccaIdArray'] : explode(",", $_POST['catOccaIdArray']);
+	$catOccaArray = is_array($_POST['catOccaIdArray']) ? $_POST['catOccaIdArray'] : (empty($_POST['catOccaIdArray']) ? array() : explode(',', $_POST['catOccaIdArray']));
 	$catOccaDeliveryIdArray = is_array($catOccaArray) ? $catOccaArray : array();
 
 	// delivery filter data
@@ -1630,7 +1627,7 @@ function lpFilterAction() {
 	$where = array();
 	$placeholder_arr = (is_countable($catOccaDeliveryIdArray) ? array_fill(0, count($catOccaDeliveryIdArray), '%s') : array());
 
-	if(!empty($catOccaDeliveryIdArray)){
+	if(!empty($catOccaDeliveryIdArray) && is_array($placeholder_arr) && !empty($placeholder_arr)){
 		foreach($catOccaDeliveryIdArray as $catOccaDeliveryId){
 			if(is_numeric($catOccaDeliveryId)){
 				$where[] = $catOccaDeliveryId;
@@ -1776,7 +1773,7 @@ function lpFilterAction() {
 			}
 		}
 
-		var_dump($userIdArrayGetFromDelDate);
+		#var_dump($userIdArrayGetFromDelDate);
 
 		// Remove all the stores that doesnt match from default array
 		// Normally we would check if the userIdArray is empty, but not here,
