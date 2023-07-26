@@ -910,8 +910,8 @@ get_footer(); ?>
      }
 
     // Update filters if all are selected
-    if (deliveryIdArray?.length && catOccaIdArray?.length && inputPriceRangeArray?.length) {
-      update();
+    if (deliveryIdArray?.length && catOccaDeliveryIdArray?.length && inputPriceRangeArray?.length) {
+     update();
     }
 
     // Handle category and occasion filter clicks
@@ -958,9 +958,9 @@ get_footer(); ?>
     function update(){
       var cityName = $('#cityName').val();
       var postalCode = $('#postalCode').val();
-      catOccaIdArray = [];
-      deliveryIdArray = [];
-      inputPriceRangeArray = [];
+      var catOccaIdArray = [];
+      var deliveryIdArray = [];
+      var inputPriceRangeArray = [];
 
       // Make the loading...
       jQuery('.loadingHeartBeat').show();
@@ -996,7 +996,7 @@ get_footer(); ?>
         catOccaIdArray: catOccaIdArray,
         postalArray: postalArray, // this should probably be the raw postal instead of the ID og the post
         deliveryIdArray: deliveryIdArray,
-        inputPriceRangeArray: inputPriceRangeArray
+        inputPriceRangeArray: inputPriceRange
       };
       jQuery.post(ajaxurl, data, function(response) {
         jQuery('.filteredStore').show();

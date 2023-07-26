@@ -1713,7 +1713,6 @@ function lpFilterAction() {
 			$defaultUserArray = $userIdArrayGetFromPostal;
 		}
 	}
-	var_dump($defaultUserArray);
 	// --
 	//////////////////////////
 
@@ -1784,7 +1783,6 @@ function lpFilterAction() {
 		$userIdArrayGetFromDelDate = array_intersect($defaultUserArray, $userIdArrayGetFromDelDate);
 		$defaultUserArray = $userIdArrayGetFromDelDate;
 	}
-	var_dump($defaultUserArray);
 
 
 	////////////////////////
@@ -1821,7 +1819,6 @@ function lpFilterAction() {
 		$userIdArrayGetFromDelivery = array_intersect($defaultUserArray, $userIdArrayGetFromDelivery);
 		$defaultUserArray = $userIdArrayGetFromDelivery;
 	}
-	var_dump($defaultUserArray);
 
 	////////////////
 	// Filter: Price
@@ -1831,24 +1828,24 @@ function lpFilterAction() {
 	$inputPriceRangeArray = $_POST['inputPriceRangeArray'];
 	$inputMinPrice = (int) $inputPriceRangeArray[0];
 	$inputMaxPrice = (int) $inputPriceRangeArray[1];
-	$query = array(
-		'post_status' => 'publish',
-		'post_type' => 'product',
-		'meta_query' => array(
-			array(
-				'key' => '_price',
-				// 'value' => array(302, 380),
-				'value' => array($inputMinPrice, $inputMaxPrice),
-				// 'value' => $inputPriceRangeArray,
-				'compare' => 'BETWEEN',
-				'type' => 'NUMERIC'
-			)
-		),
-		'posts_per_page' => -1
+
+	$author_ids = $wpdb->get_col(
+	    $wpdb->prepare(
+	        "
+	        SELECT DISTINCT p.post_author
+	        FROM {$wpdb->prefix}posts p
+	        INNER JOIN {$wpdb->prefix}postmeta pm ON p.ID = pm.post_id
+	        WHERE p.post_type = 'product'
+	        AND p.post_status = 'publish'
+	        AND pm.meta_key = '_price'
+	        AND pm.meta_value BETWEEN %d AND %d
+	        ",
+	        $inputMinPrice,
+	        $inputMaxPrice
+	    )
 	);
 
-	$productQuery = new WP_Query($query);
-	$userIdArrayGetFromPriceFilter = array_unique(wp_list_pluck( $productQuery->posts, 'post_author' ));
+	$userIdArrayGetFromPriceFilter = array_unique($author_ids);
 
 	// Remove all the stores that doesnt match from default array
 	if(!empty($userIdArrayGetFromPriceFilter)){
@@ -1856,7 +1853,19 @@ function lpFilterAction() {
 
 		$defaultUserArray = $userIdArrayGetFromPriceFilter;
 	}
-	var_dump($defaultUserArray);
+
+
+
+	////////////////
+	// Filter: Price
+	// Location: City Page
+	// input price filter data come from front end
+
+
+	$userIdArrayGetFromPriceFilter = array_unique($author_ids);
+
+
+
 
 	// three array is
 	// $userIdArrayGetFromPostal
