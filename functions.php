@@ -2297,7 +2297,7 @@ function greeting_check_delivery_postcode( $fields, $errors ){
 	// push vendor postal code
 	// $vendorRelatedPCBillingWCArray[] = $vendorPostalCodeBilling;
 
-	$ship_postcode = (int) $fields['shipping_postcode'];
+	$ship_postcode = (int) trim($fields['shipping_postcode']);
 	$findPostCodeFromArray = in_array($ship_postcode, $vendorRelatedPCBillingWCArray);
 
 	if (!in_array($ship_postcode, $vendorRelatedPCBillingWCArray)){
