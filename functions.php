@@ -2262,7 +2262,7 @@ function attach_pdf_to_email ( $attachments, $email_id , $order ) {
  */
 add_action( 'woocommerce_after_checkout_validation', 'greeting_check_delivery_postcode', 10, 2);
 function greeting_check_delivery_postcode( $fields, $errors ){
-	global $wpdb, $wcmp;
+	global $wpdb, $WCMp;
 
 	$storeProductId = 0;
 	// Get $product object from Cart object
@@ -2297,7 +2297,7 @@ function greeting_check_delivery_postcode( $fields, $errors ){
 	// push vendor postal code
 	// $vendorRelatedPCBillingWCArray[] = $vendorPostalCodeBilling;
 
-	$ship_postcode = $fields['shipping_postcode'];
+	$ship_postcode = (int) $fields['shipping_postcode'];
 	$findPostCodeFromArray = in_array($ship_postcode, $vendorRelatedPCBillingWCArray);
 
 	if (!in_array($ship_postcode, $vendorRelatedPCBillingWCArray)){
@@ -2316,7 +2316,7 @@ function greeting_check_delivery_postcode( $fields, $errors ){
 		);
 		$city = new WP_Query( $args );
 
-		if($city && $city->posts && count($city->posts) > 0){
+		if($city && $city->posts && count($city->posts) > 0 && is_object($vendor)){
 			$errors->add( 'validation', '<p style="line-height:150%;">Beklager - den valgte butik kan ikke levere til '.$city->posts[0]->post_title.'. Du kan <a href="'.$vendor->get_permalink().'">gå til butikkens side</a> og se hvilke postnumre de leverer til eller <a href="'.get_permalink($city->posts[0]->ID).'">klikke her og se butikker der leverer i postnummer '.$city->posts[0]->post_title.'</a></p>' );
 		} else {
 			$errors->add( 'validation', 'Beklager - butikken kan desværre ikke levere til det postnummer, du har indtastet under levering. Du bedes enten ændre leveringens postnummer eller gå til <a href="'.home_url().'">forsiden</a> for at finde en butik i det ønskede postnummer.' );
