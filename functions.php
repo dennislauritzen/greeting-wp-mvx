@@ -2328,7 +2328,7 @@ function greeting_check_delivery_postcode( $fields, $errors ){
 		} else {
 			$errors->add( 'validation', 'Beklager - butikken kan desværre ikke levere til det postnummer, du har indtastet under levering. Du bedes enten ændre leveringens postnummer eller gå til <a href="'.home_url().'">forsiden</a> for at finde en butik i det ønskede postnummer.' );
 		}
-		exit;
+		die();
 	}
 }
 
