@@ -2291,7 +2291,7 @@ function greeting_check_delivery_postcode( $fields, $errors ){
 	// get vendor delivery zips
 	$vendorDeliveryZipsRow = $wpdb->get_row( "
 		SELECT * FROM {$wpdb->prefix}usermeta
-		WHERE user_id = $vendor_id
+		WHERE user_id = {$vendor_id}
 		AND meta_key = 'delivery_zips'
 	" );
 	$vendorDeliveryZipsBilling = $vendorDeliveryZipsRow->meta_value;
