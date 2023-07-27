@@ -2271,9 +2271,13 @@ function greeting_check_delivery_postcode( $fields, $errors ){
 	foreach( $cart as $cart_item_key => $cart_item ){
 		$product = $cart_item['data'];
 		$storeProductId = $product->get_id();
+		var_dump($product);
 	}
 
+	var_dump($storeProductId);
+
 	$vendor_id = get_post_field( 'post_author', $storeProductId );
+	var_dump($vendor_id);
 	$vendor = get_wcmp_vendor($vendor_id);
 
 	// get vendor postal code
@@ -2294,11 +2298,14 @@ function greeting_check_delivery_postcode( $fields, $errors ){
 
 	$vendorRelatedPCBillingWithoutComma = str_replace(" ","",$vendorDeliveryZipsBilling);
 	$vendorRelatedPCBillingWCArray = explode(",", $vendorRelatedPCBillingWithoutComma);
+	var_dump($vendorRelatedPCBillingWCArray);
 	// push vendor postal code
 	// $vendorRelatedPCBillingWCArray[] = $vendorPostalCodeBilling;
 
 	$ship_postcode = (int) trim($fields['shipping_postcode']);
+	var_dump($ship_postcode);
 	$findPostCodeFromArray = in_array($ship_postcode, $vendorRelatedPCBillingWCArray);
+	var_dump($findPostCodeFromArray);
 
 	if (!in_array($ship_postcode, $vendorRelatedPCBillingWCArray)){
 		$args = array(
