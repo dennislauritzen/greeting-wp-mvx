@@ -3306,8 +3306,8 @@ function greeting_echo_receiver_info( ) {
 			'type'				=> 'textarea',
 			'id'					=> 'deliveryInstructions',
 			'class'				=> array('form-row-wide'),
-			'label'				=> __('Særlig besked til butikken vedr. gaven eller leveringen', 'greeting2'),
-			'placeholder'	=> __('Notér her hvis du har særlige ønsker til din gave/levering. Det kunne eks. være særlige blomster i buketten, ønske til indhold i en kurv - eller en dørkode på leveringsadressen el.lign. :)', 'greeting2')
+			'label'				=> __('Leveringsinstruktioner', 'greeting2'),
+			'placeholder'	=> __('Har du særlige instruktioner til leveringen? Eks. en dørkode, særlige forhold på leveringsadressen, en dato hvor gaven må åbnes eller lignende? Notér dem her :)', 'greeting2')
 		), WC()->checkout->get_value( 'delivery_instructions' ) );
 
 	// Insert the delivery date area
