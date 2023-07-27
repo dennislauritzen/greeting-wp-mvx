@@ -2271,7 +2271,7 @@ function greeting_check_delivery_postcode( $fields, $errors ){
 	foreach( $cart as $cart_item_key => $cart_item ){
 		$product = $cart_item['data'];
 		$storeProductId = $product->get_id();
-		print "<p>Vendor ID: ".var_dump($product)."</p>";
+		print "<p>Product ID: ".var_dump($product)."</p>";
 	}
 
 	var_dump($storeProductId);
