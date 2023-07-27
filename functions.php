@@ -2263,7 +2263,7 @@ function attach_pdf_to_email ( $attachments, $email_id , $order ) {
 add_action( 'woocommerce_after_checkout_validation', 'greeting_check_delivery_postcode', 10, 2);
 function greeting_check_delivery_postcode( $fields, $errors ){
 	global $wpdb, $WCMp;
-
+	print "TEEEEEEEEEEEST";
 	$storeProductId = 0;
 	// Get $product object from Cart object
 	$cart = WC()->cart->get_cart();
@@ -2328,6 +2328,7 @@ function greeting_check_delivery_postcode( $fields, $errors ){
 		} else {
 			$errors->add( 'validation', 'Beklager - butikken kan desværre ikke levere til det postnummer, du har indtastet under levering. Du bedes enten ændre leveringens postnummer eller gå til <a href="'.home_url().'">forsiden</a> for at finde en butik i det ønskede postnummer.' );
 		}
+		exit;
 	}
 }
 
