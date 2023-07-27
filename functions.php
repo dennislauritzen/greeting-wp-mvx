@@ -3290,7 +3290,6 @@ function greeting_echo_receiver_info( ) {
 			'default' 		=> 1
 		), 1 );
 
-
 		woocommerce_form_field( 'leave_gift_neighbour', array(
 			'type'				=> 'checkbox',
 			'id'					=> 'deliveryLeaveGiftNeighbour',
