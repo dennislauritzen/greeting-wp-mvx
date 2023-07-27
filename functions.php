@@ -2263,7 +2263,7 @@ function attach_pdf_to_email ( $attachments, $email_id , $order ) {
 add_action( 'woocommerce_after_checkout_validation', 'greeting_check_delivery_postcode', 10, 2);
 function greeting_check_delivery_postcode( $fields, $errors ){
 	global $wpdb, $WCMp;
-	print "TEEEEEEEEEEEST";
+
 	$storeProductId = 0;
 	// Get $product object from Cart object
 	$cart = WC()->cart->get_cart();
@@ -2271,13 +2271,11 @@ function greeting_check_delivery_postcode( $fields, $errors ){
 	foreach( $cart as $cart_item_key => $cart_item ){
 		$product = $cart_item['data'];
 		$storeProductId = (!empty($product->get_parent_id()) ? (($product->get_parent_id() == 0) ? $product->get_id() : $product->get_parent_id()) : $product->get_id());
-		print "<p>Vendor ID: ";var_dump($storeProductId);print "</p>";
+		#print "<p>Store ID: ";var_dump($storeProductId);print "</p>";
 	}
 
-	var_dump($storeProductId);
-
 	$vendor_id = get_post_field( 'post_author', $storeProductId );
-	print "<p>Vendor ID: ";var_dump($vendor_id);print "</p>";
+	#print "<p>Vendor ID: ";var_dump($vendor_id);print "</p>";
 	$vendor = get_wcmp_vendor($vendor_id);
 
 	// get vendor postal code
@@ -2298,14 +2296,14 @@ function greeting_check_delivery_postcode( $fields, $errors ){
 
 	$vendorRelatedPCBillingWithoutComma = str_replace(" ","",$vendorDeliveryZipsBilling);
 	$vendorRelatedPCBillingWCArray = explode(",", $vendorRelatedPCBillingWithoutComma);
-	print "<p>BillingWCArray: ".var_dump($vendorRelatedPCBillingWCArray)."</p>";
+	#print "<p>BillingWCArray: ".var_dump($vendorRelatedPCBillingWCArray)."</p>";
 	// push vendor postal code
 	// $vendorRelatedPCBillingWCArray[] = $vendorPostalCodeBilling;
 
 	$ship_postcode = (int) trim($fields['shipping_postcode']);
-	print "<p>Vendor ID: ";var_dump($ship_postcode);print "</p>";
+	#print "<p>Shipping postcode: ";var_dump($ship_postcode);print "</p>";
 	$findPostCodeFromArray = in_array($ship_postcode, $vendorRelatedPCBillingWCArray);
-	print "<p>findPostCodeFromArray: ".var_dump($findPostCodeFromArray)."</p>";
+	#print "<p>findPostCodeFromArray: ".var_dump($findPostCodeFromArray)."</p>";
 
 	if (!in_array($ship_postcode, $vendorRelatedPCBillingWCArray)){
 		$args = array(
@@ -2328,7 +2326,6 @@ function greeting_check_delivery_postcode( $fields, $errors ){
 		} else {
 			$errors->add( 'validation', 'Beklager - butikken kan desværre ikke levere til det postnummer, du har indtastet under levering. Du bedes enten ændre leveringens postnummer eller gå til <a href="'.home_url().'">forsiden</a> for at finde en butik i det ønskede postnummer.' );
 		}
-		die();
 	}
 }
 
