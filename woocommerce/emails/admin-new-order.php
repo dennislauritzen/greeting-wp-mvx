@@ -284,6 +284,48 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                         </p>
                     </td>
                 </tr>-->
+                <tr>
+                    <td colspan="2" style="background: #f8f9fa; padding: 20px;">
+                        <?php
+                        $vendor = get_wcmp_vendor($vendor_id);
+                        if($vendor){
+                            ?>
+                            <div class="text-center">
+                                <?php
+                                $image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
+                                ?>
+                                <img class="img-fuid pb-3" style="max-height:75px;"
+                                     src="<?php echo esc_attr($image); ?>">
+                            </div>
+                            <h4 class="mt-3">Din gavehilsen leveres fra <?php echo esc_html($vendor->page_title); ?></h4>
+                            <div class="store-loc pt-1 pb-5">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
+                                    <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+                                </svg>
+                                <?php
+                                $vendor_address = !empty(get_user_meta($vendor_id, '_vendor_address_1', true)) ? get_user_meta($vendor_id, '_vendor_address_1', true) : '';
+                                $vendor_postal = !empty(get_user_meta($vendor_id, '_vendor_postcode', true)) ? get_user_meta($vendor_id, '_vendor_postcode', true) : '';
+                                $vendor_city = !empty(get_user_meta($vendor_id, '_vendor_city', true)) ? get_user_meta($vendor_id, '_vendor_city', true) : '';
+                                $location = '';
+                                if(!empty($vendor_address)){
+                                    $location .= $vendor_address.', ';
+                                }
+                                if(!empty($vendor_postal)){
+                                    $location .= $vendor_postal.' ';
+                                }
+                                if(!empty($vendor_city)){
+                                    $location .= $vendor_city.' ';
+                                }
+                                echo esc_html($location); ?>
+                            </div>
+                            <p></p>
+                            <p></p>
+                            <a href="<?php echo esc_url($vendor->get_permalink()); ?>" class="text-dark">Se butikkens sortiment</a>
+                            <?php
+                        }
+                        ?>
+                    </td>
+                </tr>
             </table>
         </td>
     </tr>

@@ -2278,14 +2278,6 @@ function greeting_check_delivery_postcode( $fields, $errors ){
 	#print "<p>Vendor ID: ";var_dump($vendor_id);print "</p>";
 	$vendor = get_wcmp_vendor($vendor_id);
 
-	// get vendor postal code
-	// $vendorPostalCodeRow = $wpdb->get_row( "
-	// 	SELECT * FROM {$wpdb->prefix}usermeta
-	// 	WHERE user_id = $vendor_id
-	// 	AND meta_key = '_vendor_postcode'
-	// " );
-	// $vendorPostalCodeBilling = $vendorPostalCodeRow->meta_value;
-
 	// get vendor delivery zips
 	$vendorDeliveryZipsRow = $wpdb->get_row( "
 		SELECT * FROM {$wpdb->prefix}usermeta
@@ -2296,14 +2288,9 @@ function greeting_check_delivery_postcode( $fields, $errors ){
 
 	$vendorRelatedPCBillingWithoutComma = str_replace(" ","",$vendorDeliveryZipsBilling);
 	$vendorRelatedPCBillingWCArray = explode(",", $vendorRelatedPCBillingWithoutComma);
-	#print "<p>BillingWCArray: ".var_dump($vendorRelatedPCBillingWCArray)."</p>";
-	// push vendor postal code
-	// $vendorRelatedPCBillingWCArray[] = $vendorPostalCodeBilling;
 
 	$ship_postcode = (int) trim($fields['shipping_postcode']);
-	#print "<p>Shipping postcode: ";var_dump($ship_postcode);print "</p>";
 	$findPostCodeFromArray = in_array($ship_postcode, $vendorRelatedPCBillingWCArray);
-	#print "<p>findPostCodeFromArray: ".var_dump($findPostCodeFromArray)."</p>";
 
 	if (!in_array($ship_postcode, $vendorRelatedPCBillingWCArray)){
 		$args = array(
@@ -2356,9 +2343,7 @@ function greeting_validate_new_checkout_fields() {
 }
 
 // Load JQuery Datepicker
-
 add_action( 'woocommerce_after_checkout_form', 'greeting_enable_datepicker', 10 );
-
 function greeting_enable_datepicker() { ?>
    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
@@ -2366,9 +2351,7 @@ function greeting_enable_datepicker() { ?>
 }
 
 // Load Calendar Dates
-
 add_action( 'woocommerce_after_checkout_form', 'greeting_load_calendar_dates', 20 );
-
 function greeting_load_calendar_dates( $available_gateways ) {
 	// Get $product object from Cart object
 	$cart = WC()->cart->get_cart();
@@ -5031,30 +5014,30 @@ add_action( 'woocommerce_order_action_wc_custom_order_action', 'greeting_wc_proc
  * @param \WC_Order $order
  */
 function greeting_wc_process_order_meta_box_action_test_mail( $order ) {
-	# Possible mail values:
-	# ----
-	# ARRAY: new_order, cancelled_order, failed_order, customer_on_hold_order, customer_processing_order, customer_completed_order, customer_refunded_order,
-	# customer_invoice, customer_note, customer_reset_password, customer_new_account, woocommerce_pensopay_payment_link, vendor_new_account, admin_new_vendor,
-	# approved_vendor_new_account, rejected_vendor_new_account, vendor_new_order, notify_shipped, admin_new_vendor_product, vendor_new_question, admin_new_question,
-	# customer_answer, admin_added_new_product_to_vendor, vendor_commissions_transaction, vendor_direct_bank, admin_widthdrawal_request, vendor_orders_stats_report,
-	# vendor_contact_widget_email, wcmp_send_report_abuse, vendor_new_announcement, customer_order_refund_request, admin_vendor_product_rejected,
-	# suspend_vendor_new_account, review_vendor_alert, vendor_followed, admin_change_order_status, admin_new_vendor_coupon
+		# Possible mail values:
+		# ----
+		# ARRAY: new_order, cancelled_order, failed_order, customer_on_hold_order, customer_processing_order, customer_completed_order, customer_refunded_order,
+		# customer_invoice, customer_note, customer_reset_password, customer_new_account, woocommerce_pensopay_payment_link, vendor_new_account, admin_new_vendor,
+		# approved_vendor_new_account, rejected_vendor_new_account, vendor_new_order, notify_shipped, admin_new_vendor_product, vendor_new_question, admin_new_question,
+		# customer_answer, admin_added_new_product_to_vendor, vendor_commissions_transaction, vendor_direct_bank, admin_widthdrawal_request, vendor_orders_stats_report,
+		# vendor_contact_widget_email, wcmp_send_report_abuse, vendor_new_announcement, customer_order_refund_request, admin_vendor_product_rejected,
+		# suspend_vendor_new_account, review_vendor_alert, vendor_followed, admin_change_order_status, admin_new_vendor_coupon
 
-	$mailer = WC()->mailer();
-	$mails = $mailer->get_emails();
+		$mailer = WC()->mailer();
+		$mails = $mailer->get_emails();
 
-	if ( !empty( $mails ) ) {
-			foreach ( $mails as $mail ) {
-					if ( $mail->id == 'customer_refunded_order' ) {
-						add_filter('woocommerce_new_order_email_allows_resend', '__return_true' );
-						#$mail->trigger( $order->get_id() );
-					}
-			 }
-	}
+		if ( !empty( $mails ) ) {
+				foreach ( $mails as $mail ) {
+						if ( $mail->id == 'customer_completed_order' ) {
+							add_filter('woocommerce_new_order_email_allows_resend', '__return_true' );
+							$mail->trigger( $order->get_id() );
+						}
+				 }
+		}
 
-	$user_id = (empty(get_current_user_id()) ? wp_get_current_user()->ID : get_current_user_id() );
-	$mailer->customer_new_account($user_id);
-	exit;
+		#$user_id = (empty(get_current_user_id()) ? wp_get_current_user()->ID : get_current_user_id() );
+		#$mailer->customer_new_account($user_id);
+		#exit;
 }
 add_action( 'woocommerce_order_action_wc_custom_order_action_test_mail', 'greeting_wc_process_order_meta_box_action_test_mail' );
 
