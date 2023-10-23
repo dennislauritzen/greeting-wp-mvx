@@ -58,11 +58,14 @@ do_action( 'woocommerce_email_header', $email_heading );
                                 </td>
                                 <td width="15%" style="width: 15%">
                                     <div style="margin-top: 0px; float: right;">
-                                        <a href="<?php echo $codeContents; ?>">
-                                            <img src="<?php echo $qrcode; ?>" alt="" style="width:100%; max-width: 100px;"/><br>
-                                            <span style="font-size: 12px; line-height: 15px !important;">
-                                                Opdatér levering & informér kunde
-                                            </span>
+                                        <a href="<?php echo $codeContents; ?>" style="border: 0;" border="0">
+                                          <img src="<?php echo $qrcode; ?>" alt="" style="width:100%; max-width: 100px;"/>
+                                        </a>
+                                        <br>
+                                        <a href="<?php echo $codeContents; ?>" style="border: 0;" border="0">
+                                          <span style="font-size: 12px; line-height: 15px !important;">
+                                            Opdatér levering & informér kunde
+                                          </span>
                                         </a>
                                     </div>
                                 </td>
