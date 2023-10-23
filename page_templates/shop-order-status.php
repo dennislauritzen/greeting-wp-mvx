@@ -51,6 +51,10 @@ $update_link = (isset($_GET['_u']) ? $urlPath : $urlPath.'&_u=u');
 if(isset($_GET['_u']) && $_GET['_u'] == 'u'){
   if($orderStatus == 'processing' || $orderStatus == 'order-mail-open' || $orderStatus == 'order-seen' || $orderStatus == 'order-forwarded'){
     $order->update_status( 'delivered' );
+
+    $date = date_i18n( 'l den d. F Y kl. h:i:s');
+    $order->add_order_note("Butikken har opdateret ordren til status 'Leveret' ".$date.".");
+
     wp_redirect($urlPath);
     exit();
   }
