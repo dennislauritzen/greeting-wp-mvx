@@ -2138,7 +2138,6 @@ function register_delivered_order_status() {
 add_filter( 'wc_order_statuses', 'add_awaiting_delivered_to_order_statuses' );
 
 function add_awaiting_delivered_to_order_statuses( $order_statuses ) {
-
     $new_order_statuses = array();
 
     foreach ( $order_statuses as $key => $status ) {
@@ -2149,6 +2148,7 @@ function add_awaiting_delivered_to_order_statuses( $order_statuses ) {
 					$new_order_statuses['wc-order-mail-open'] = 'Vendor Opened Mail';
 					$new_order_statuses['wc-order-seen'] = 'Order Seen by Vendor';
 					$new_order_statuses['wc-order-forwarded'] = 'Order Forwarded to Vendor';
+					$new_order_statuses['wc-order-accepted'] = 'Vendor Accepted';
           $new_order_statuses['wc-delivered'] = 'Leveret';
         }
 				if( 'wc-on-hold' === $key ){
@@ -2176,7 +2176,7 @@ function add_custom_order_status_actions_button( $actions, $order ) {
     $order_id = method_exists( $order, 'get_id' ) ? $order->get_id() : $order->id;
 
     // Display the button for all orders that have a 'processing' status
-    if ( $order->has_status( array( 'processing', 'order-mail-open', 'order-seen', 'order-forwarded' ) ) ) {
+    if ( $order->has_status( array( 'processing', 'order-mail-open', 'order-seen', 'order-forwarded', 'order-accepted' ) ) ) {
         // Set the action button
         $actions['delivered'] = array(
             'url'       => wp_nonce_url( admin_url( 'admin-ajax.php?action=woocommerce_mark_order_status&status=delivered&order_id=' . $order_id ), 'woocommerce-mark-order-status' ),
@@ -2185,7 +2185,7 @@ function add_custom_order_status_actions_button( $actions, $order ) {
         );
     }
 
-		if ( $order->has_status( array( 'completed', 'delivered', 'processing', 'order-mail-open', 'order-seen', 'order-forwarded' ) ) ) {
+		if ( $order->has_status( array( 'completed', 'delivered', 'processing', 'order-mail-open', 'order-seen', 'order-forwarded', 'order-accepted' ) ) ) {
 			$oh = hash('md4','gree_ting_dk#!4r1242142fgriejgfto'.$order_id.$order_id);
 			$sshh = hash('md4', 'vvkrne12onrtnFG_:____'.$order_id);
 
@@ -4079,6 +4079,15 @@ function register_order_seen_order_status() {
         'exclude_from_search'       => false,
         'label_count'               => _n_noop( 'Order Forwarded to Vendor <span class="count">(%s)</span>', 'Order Forwarded to Vendor <span class="count">(%s)</span>' )
     ) );
+
+		register_post_status( 'wc-order-accepted', array(
+        'label'                     => 'Vendor Accepted',
+        'public'                    => true,
+        'show_in_admin_status_list' => true,
+        'show_in_admin_all_list'    => true,
+        'exclude_from_search'       => false,
+        'label_count'               => _n_noop( 'Vendor Marked Order Received <span class="count">(%s)</span>', 'Vendor Marked Order Received <span class="count">(%s)</span>' )
+    ) );
 }
 
 
@@ -4121,6 +4130,14 @@ function styling_admin_order_list() {
           color: #3d7d91;
       }
     </style>';
+
+		$order_status = 'Order Seen'; // <==== HERE
+		echo '<style>
+			.order-status.status-'.sanitize_title( $order_status ).'{
+					background: #d7f8a7;
+					color: #0c942b;
+			}
+		</style>';
 }
 
 
@@ -5095,7 +5112,8 @@ function greeting_update_wc_delivered_orders_to_completed() {
     // Loop through the delivered orders and update their status to "completed"
     foreach ($delivered_orders as $order) {
 				if($order->get_status() == 'delivered'){
-        	$order->update_status('completed');
+					$date = date_i18n( 'l \\d\\e\\n d. F Y \\k\\l\\. H:i:s');
+        	$order->update_status('completed', 'Ordre er automatisk opdateret til Gennemført '.$date);
 				}
     }
 }

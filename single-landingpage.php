@@ -761,7 +761,71 @@ $occasionTermListArray = array_unique($occasionTermListArray);
     </div>
   </div>
 </section>
-<section id="description" class="mt-4 mb-5 pt-5">
+
+<section id="description" class="mt-3 mb-5 pb-4">
+  <div class="description lp-content-block row">
+      <div class="col-12">
+          <h2>
+              grgr<?php #echo $category_bottomtitle; ?>
+          </h2>
+          <div style="position: relative;">
+            <div id="categoryDescription" style="max-height: 400px; overflow: hidden;">
+              <?php
+              $description = get_the_content();
+              $collapsed = false;
+
+              // Check if the content exceeds the max-height
+              if (strlen($description) > 300) {
+                  $collapsed = true;
+              }
+
+              the_content();
+
+              if ($collapsed) {
+                  echo '<div class="overlay" id="ctaOverlayWhite"></div>';
+                  echo '<div class="button-line col-12 text-center py-2">';
+                  echo '<button class="btn bg-teal text-white rounded-pill border-teal border-1" id="toggleDescription" style="z-index: 1 !important;">Læs mere</button>';
+                  echo '</div>';
+              }
+              ?>
+            </div>
+            <style>
+              .overlay {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(to bottom, rgba(255, 255, 255, 0.33) 20%, rgba(255, 255, 255, 1) 100%);
+                pointer-events: none;
+              }
+              .button-line {
+                position: absolute;
+                bottom: -40px;
+                width: 100%;
+                z-index: 1 !important;
+              }
+            </style>
+        </div>
+      </div>
+  </div>
+  <script>
+
+    var categoryDescription = document.getElementById('categoryDescription');
+    var descriptionOverlay = document.getElementById('ctaOverlayWhite');
+    var showMoreButton = document.getElementById('toggleDescription');
+
+    if (showMoreButton) {
+        showMoreButton.addEventListener('click', function () {
+            categoryDescription.style.maxHeight = 'none'; // Allow the container to expand
+            descriptionOverlay.style.display = 'none';
+            showMoreButton.style.display = 'none'; // Hide the "Show More" button
+        });
+    }
+  </script>
+</section>
+
+<!--<section id="description" class="mt-4 mb-5 pt-5">
   <div class="container">
     <div class="row">
       <div class="col-12">
@@ -818,7 +882,7 @@ $occasionTermListArray = array_unique($occasionTermListArray);
       </div>
     </div>
   </div>
-</section>
+</section>-->
 </main>
 
 
