@@ -762,11 +762,36 @@ $occasionTermListArray = array_unique($occasionTermListArray);
   </div>
 </section>
 
+<style type="text/css">
+    .lp-content-block h1,
+    .lp-content-block h2,
+    .lp-content-block h3,
+    .lp-content-block h4,
+    .lp-content-block h5,
+    .lp-content-block h6
+    {
+        font-family: 'Inter','MS Trebuchet', 'Rubik',sans-serif;
+    }
+    .lp-content-block h1 { font-size: 24px; }
+    .lp-content-block h2 { font-size: 23px; }
+    .lp-content-block h3 { font-size: 22px; }
+    .lp-content-block h4 { font-size: 20px; }
+    .lp-content-block h5 { font-size: 18px; }
+    .lp-content-block h6 { font-size: 16px; }
+
+    .lp-content-block p {
+        font-size: 14px;
+    }
+    .lp-content-block a {
+        color: #000000;
+        text-decoration: underline;
+    }
+</style>
 <section id="description" class="mt-3 mb-5 pb-4">
   <div class="description lp-content-block row">
       <div class="col-12">
           <h2>
-              grgr<?php #echo $category_bottomtitle; ?>
+              <?php #echo $category_bottomtitle; ?>
           </h2>
           <div style="position: relative;">
             <div id="categoryDescription" style="max-height: 400px; overflow: hidden;">
