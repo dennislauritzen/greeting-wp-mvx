@@ -37,7 +37,7 @@ $allowed_html = array(
 	<?php
 	printf(
 		/* translators: 1: user display name 2: logout url */
-		wp_kses( __( 'Hello %1$s (not %1$s? <a href="%2$s"  class="text-dark text-decoration-underline">Log out</a>)', 'woocommerce' ), $allowed_html ),
+		wp_kses( __( 'Hello %1$s (not %1$s? <a href="%2$s">Log out</a>)', 'woocommerce' ), $allowed_html ),
 		'<strong>' . esc_html( $current_user->display_name ) . '</strong>',
 		esc_url( wc_logout_url() )
 	);
