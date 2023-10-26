@@ -54,7 +54,9 @@
 		.form-row-label {
 			width: 95%;
 		}
-
+		.bg-teal {
+			background-color: #446a6b;
+		}
 		.woocommerce-remove-coupon {
 			width: 100%;
 			display: block;

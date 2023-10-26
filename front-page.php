@@ -430,7 +430,7 @@ if (have_rows('frontpage_full_width_boxes', $this_post_id) ){
         <h4 class="pt-4 pb-3">🤔 Vidste du, at...</h4>
         <p class="px-lg-3 px-xl-3">Du på <b>Greeting.dk</b> handler i lokale, fysiske specialbutikker - og dermed er med til at støtte
           de fysiske, danske butikker?</p>
-        <p class="px-lg-3 px-xl-3 pb-3">Der er netop nu mere end <strong>70 forskellige specialbutikker</strong> at vælge i mellem, næste gang du skal sende en lækker gave til én, du holder af.</p>
+        <p class="px-lg-3 px-xl-3 pb-3">Der er netop nu mere end <strong>140 forskellige specialbutikker</strong> at vælge i mellem, næste gang du skal sende en lækker gave til én, du holder af.</p>
         <a href="<?php echo site_url(); ?>/om-os" class="btn bg-teal text-white py-3 px-4 rounded-pill">Mere om Greeting.dk ></a>
       </div>
     </div>
