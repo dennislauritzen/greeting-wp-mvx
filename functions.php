@@ -5090,7 +5090,12 @@ function greeting_get_vendor_id_from_order( $order ){
 }
 
 
-
+/**
+ * CRONJOB
+ * Function for using order object to get Vendor ID.
+ *
+ *
+ */
 // Define a custom 15-minute interval
 function greeting_custom_15_minute_interval($schedules) {
     $schedules['every_15_minutes'] = array(
@@ -5123,4 +5128,31 @@ add_action('update_completed_orders_event', 'greeting_update_wc_delivered_orders
 // Schedule the event to run every 15 minutes using the custom interval
 if (!wp_next_scheduled('update_completed_orders_event')) {
     wp_schedule_event(current_time('timestamp'), 'every_15_minutes', 'update_completed_orders_event');
+}
+
+
+
+/**
+* Format WordPress User's "Display Name" to Full Name on Login
+* ------------------------------------------------------------------------------
+*/
+
+add_action( 'wp_login', 'greeting_r19029_format_user_display_name_on_login' );
+
+function greeting_r19029_format_user_display_name_on_login( $username ) {
+    $user = get_user_by( 'login', $username );
+
+    $first_name = get_user_meta( $user->ID, 'first_name', true );
+    $last_name = get_user_meta( $user->ID, 'last_name', true );
+
+    $full_name = trim( $first_name . ' ' . $last_name );
+
+    if ( ! empty( $full_name ) && ( $user->data->display_name != $full_name ) ) {
+        $userdata = array(
+            'ID' => $user->ID,
+            'display_name' => $full_name,
+        );
+
+        wp_update_user( $userdata );
+    }
 }
