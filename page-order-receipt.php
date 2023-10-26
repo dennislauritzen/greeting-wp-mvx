@@ -120,7 +120,7 @@ get_header('checkout');
 
                         <?php $delivery_instructions = get_post_meta( $order->get_id(), '_delivery_instructions', true ); ?>
                         <?php if(!empty($delivery_instructions)){ ?>
-                        <p class="text-end">
+                        <p class="text-start">
                             <strong><?php _e('Leveringsinstruktioner', 'woocommerce'); ?></strong>
                             <br>
                             <?php echo $delivery_instructions; ?>
@@ -218,7 +218,7 @@ get_header('checkout');
 							<div class="col-6 text-end">
 								<?php echo $order->get_shipping_to_display(); ?>
 								<br>
-								(heraf <?php echo $order->get_total_tax(); ?> moms)
+								(heraf <?php echo $order->get_total_tax(); ?> kr. i moms)
 							</div>
 					</div>
 					<div class="row py-2 border-bottom">
@@ -228,7 +228,7 @@ get_header('checkout');
 							<div class="col-6 text-end">
 								<?php echo $order->get_formatted_order_total(true, 0); ?>
 								<br>
-								(heraf <?php echo $order->get_total_tax(); ?> moms)
+								(heraf <?php echo $order->get_total_tax(); ?> kr. i moms)
 							</div>
 					</div>
 				</div>
