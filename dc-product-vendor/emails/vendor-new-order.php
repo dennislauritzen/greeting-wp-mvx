@@ -24,7 +24,7 @@ $order_hash = hash('md4','gree_ting_dk#!4r1242142fgriejgfto'.$latestOrderId.$lat
 $order_hash2 = hash('md4', 'vvkrne12onrtnFG_:____'.$latestOrderId);
 
 // Generate QR code.
-$tracking_url = site_url() . '/shop-order-status/?order_id=' . $latestOrderId . '&oh=' . $order_hash . '&sshh=' . $order_hash2
+$tracking_url = site_url() . '/shop-order-status/?order_id=' . $latestOrderId . '&oh=' . $order_hash . '&sshh=' . $order_hash2;
 $code_contents = urlencode( $tracking_url );
 $qrcode = 'https://chart.googleapis.com/chart?chs=135x135&cht=qr&chl='.$code_contents;
 
