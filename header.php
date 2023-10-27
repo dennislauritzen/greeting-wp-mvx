@@ -8,7 +8,7 @@
 	<link rel='stylesheet' id='style-css' href='https://www.greeting.dk/wp-content/themes/greeting2/style.css?ver=3.0.4' media='all' />
 
 
-    <link rel='stylesheet' id='main-css' href='<?php echo site_url(); ?>/wp-content/themes/greeting2/assets/css/main.css?ver=3.0.4' media='all' />
+    <link rel='stylesheet' id='main-css' href='<?php echo site_url(); ?>/wp-content/themes/greeting2/assets/css/main.css?ver=3.0.5' media='all' />
 
 	<!-- LOCAL TM -->
 	<script async>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
