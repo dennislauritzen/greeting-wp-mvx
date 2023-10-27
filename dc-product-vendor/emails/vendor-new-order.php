@@ -24,8 +24,9 @@ $order_hash = hash('md4','gree_ting_dk#!4r1242142fgriejgfto'.$latestOrderId.$lat
 $order_hash2 = hash('md4', 'vvkrne12onrtnFG_:____'.$latestOrderId);
 
 // Generate QR code.
-$codeContents = urlencode( site_url().'/shop-order-status/?order_id='.$latestOrderId.'&oh='.$order_hash.'&sshh='.$order_hash2 );
-$qrcode = 'https://chart.googleapis.com/chart?chs=135x135&cht=qr&chl='.$codeContents;
+$tracking_url = site_url() . '/shop-order-status/?order_id=' . $latestOrderId . '&oh=' . $order_hash . '&sshh=' . $order_hash2
+$code_contents = urlencode( $tracking_url );
+$qrcode = 'https://chart.googleapis.com/chart?chs=135x135&cht=qr&chl='.$code_contents;
 
 // Calculate order IDs
 $main_order = (empty(get_post_parent($order->get_id())) ? $order->get_id() : get_post_parent($order->get_id()) );
@@ -40,10 +41,10 @@ do_action( 'woocommerce_email_header', $email_heading );
 <table width="100%" align="center" border="0" cellspacing="0" cellpadding="0" style="width: 100%; text-align: center; border-collapse: collapse;">
     <tr style="text-align: center;">
         <td align="center" style="text-align: center; padding: 0 15px;">
-            <table width="770" border="0"cellpadding="0" cellspacing="0" style="text-align: left; margin: 0 auto; width: 770px; max-width: 770px; border-collapse: collapse;">
+            <table width="770" border="0" cellpadding="0" cellspacing="0" style="text-align: left; margin: 0 auto; width: 770px; max-width: 770px; border-collapse: collapse;">
                 <tr>
                     <td colspan="2" class="summary-heading" style="padding-bottom: 20px;">
-                        <table width="100%" border="0"cellpadding="0" cellspacing="0" style="width: 100%; max-width: 800px; border-collapse: collapse;">
+                        <table width="100%" border="0" cellpadding="0" cellspacing="0" style="width: 100%; max-width: 800px; border-collapse: collapse;">
                             <tr>
                                 <td width="85%" style="width: 85%;">
                                     <!--<h1 style="margin-top: 35px;"><?php echo esc_html( $email_heading ); ?></h1>
@@ -58,11 +59,11 @@ do_action( 'woocommerce_email_header', $email_heading );
                                 </td>
                                 <td width="15%" style="width: 15%">
                                     <div style="margin-top: 0px; float: right;">
-                                        <a href="<?php echo $codeContents; ?>" style="border: 0;" border="0">
+                                        <a href="<?php echo $tracking_url; ?>" style="border: 0;" border="0">
                                           <img src="<?php echo $qrcode; ?>" alt="" style="width:100%; max-width: 100px;"/>
                                         </a>
                                         <br>
-                                        <a href="<?php echo $codeContents; ?>" style="border: 0;" border="0">
+                                        <a href="<?php echo $tracking_url; ?>" style="border: 0;" border="0">
                                           <span style="font-size: 12px; line-height: 15px !important;">
                                             Opdatér levering & informér kunde
                                           </span>
