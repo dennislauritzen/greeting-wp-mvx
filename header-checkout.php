@@ -5,121 +5,24 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<?php wp_head(); ?>
 
-		<link rel='stylesheet' id='style-css' href='https://www.greeting.dk/wp-content/themes/greeting2/style.css?ver=3.0.4' media='all' />
-		<link rel='stylesheet' id='main-css' href='https://www.greeting.dk/wp-content/themes/greeting2/assets/css/main.css?ver=3.0.4' media='all' />
+    <link rel='stylesheet' id='style-css' href='https://www.greeting.dk/wp-content/themes/greeting2/style.css?ver=3.0.4' media='all' />
+    <link rel='stylesheet' id='main-css' href='<?php echo site_url(); ?>/wp-content/themes/greeting2/assets/css/main.css?ver=3.0.4' media='all' />
 
-
-		<link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Merriweather:wght@300;400;700;900&family=Roboto+Slab:wght@100;200;300;400;500;600;700;800;900&family=Rubik:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Merriweather:wght@300;400;700;900&family=Roboto+Slab:wght@100;200;300;400;500;600;700;800;900&family=Rubik:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-		<style type="text/css">
-		#billing_country_field,
-		#shipping_country_field {
-			display: none;
-		}
-		#ship-to-different-address {
-			display: none;
-		}
-		label {
-			font-family: 'Inter', sans-serif;
-		}
-		div.argmc-tab-text {
-			font-family: 'Inter', sans-serif;
-			font-size: 11px;
-			margin:5px 0 10px 0;
-		}
-		h1, h2, h3, h4 {
-			font-family: 'Merriweather';
-		}
-		h1 {
-			font-size: 28px;
-			font-weight: 500;
-		}
-		h2 {
-			font-size: 25px;
-			font-weight: 500;
-		}
-		h3 {
-			font-size: 22px !important;
-			font-weight: 500 !important;
-		}
-		input {
-			font-family: 'Inter', sans-serif;
-		}
-		input[type="radio"] {
-			width: 4%;
-			min-width: 20px;
-		}
-		.form-row-label {
-			width: 95%;
-		}
-		.bg-teal {
-			background-color: #446a6b;
-		}
-		.woocommerce-remove-coupon {
-			width: 100%;
-			display: block;
-		}
-
-		  #greeting-footer h6 {
-		    font-family: 'Rubik', 'Inter', 'Comic Sans', sans-serif;
-		    font-size: 20px;
-		    color: #1b4949;
-		  }
-		  #greeting-footer h6.light {
-		    font-family: 'Rubik', 'Inter', 'Comic Sans', sans-serif;
-		    font-size: 18px;
-		    text-transform: uppercase;
-		    color: #ffffff;
-		  }
-		  #greeting-footer ul {
-		    font-family: 'Inter', 'Comic Sans', sans-serif;
-		    font-weight: 300;
-		    font-size: 13px;
-		  }
-		  #greeting-footer ul.social {
-		    width: 150px;
-		    list-style: none;
-		    margin: -30px 0 0 -100px;
-		    padding: 0 5px 0 0;
-		  }
-		  #greeting-footer ul.social li {
-		    float: left;
-		    width: 45px;
-		    margin: 0;
-		    padding: 0;
-		  }
-
-		  #formal-footer {
-		    border-top: 3px solid #fecbca;
-		    font-family: 'Inter',sans-serif;
-		    font-size: 12px;
-		    color: #555555;
-		  }
-		  #formal-footer ul {
-		    list-style: none;
-		    margin: 0;
-		    padding: 0;
-		  }
-		  #formal-footer ul li {
-		    float: left;
-		    margin: 0;
-		    padding: 0 10px 0 0;
-		  }
-		</style>
-		<!-- LOCALE GTM  -->
-		<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-		new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-		j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-		'https://gtm.greeting.dk/bocfvmll.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-		})(window,document,'script','dataLayer','GTM-N7VZGS3');</script>
-		<!-- LOCALE GTM  -->
-
-		<!-- LOCALE GTM (noscript) -->
-		<noscript><iframe src="https://gtm.greeting.dk/ns.html?id=GTM-N7VZGS3"
-		height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-		<!-- LOCALE GTM (noscript) -->
+    <!-- LOCALE GTM  -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://gtm.greeting.dk/bocfvmll.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-N7VZGS3');</script>
+    <!-- LOCALE GTM  -->
+    <!-- LOCALE GTM (noscript) -->
+    <noscript><iframe src="https://gtm.greeting.dk/ns.html?id=GTM-N7VZGS3"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- LOCALE GTM (noscript) -->
 </head>
 
 <body <?php body_class(); ?>>

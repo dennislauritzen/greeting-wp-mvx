@@ -281,7 +281,7 @@ do_action( 'woocommerce_email_header', $email_heading );
         </td>
     </tr>
 </table>
-<table width="100%" class="social" style="width: 100%;;">
+<table width="100%" align="center" border="0" cellspacing="0" cellpadding="0" style="width: 100%; text-align: center; border-collapse: collapse;">
     <tr>
         <td align="center" style="text-align: center; padding: 0 15px;">
             <table width="770" style="width: 770px; max-width: 770px;">

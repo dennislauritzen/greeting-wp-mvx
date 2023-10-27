@@ -3,7 +3,7 @@ $cart_count = WC()->cart->cart_contents_count; // Set variable for cart item cou
 $cart_url = wc_get_cart_url();  // Set Cart URL
 ?>
 
-<section id="top" class="bg-teal pt-1">
+<section id="top" class="general bg-teal pt-1">
     <div class="container py-4">
       <div class="row align-items-center">
         <div class="d-flex pb-3 pb-lg-0 pb-xl-0 position-relative justify-content-center justify-content-lg-start justify-content-xl-start col-md-12 col-lg-3">
