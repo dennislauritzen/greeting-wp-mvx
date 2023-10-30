@@ -3028,10 +3028,17 @@ function greeting_change_dk_currency_symbol( $currency_symbol, $currency ) {
 
 
 // Utility function to get the price of a variation from it's attribute value
+
+// Add a filter for always showing the variation price - the default settings is, that if
+// the variations have same price, it is not shown.
+add_filter( 'woocommerce_show_variation_price', '__return_true');
+
+// Function for getting the price for the current variation for the select dropdown
 function get_the_variation_price_html( $product, $name, $term_slug ){
     foreach ( $product->get_available_variations() as $variation ){
         if($variation['attributes'][$name] == $term_slug ){
-            return strip_tags( $variation['price_html'] );
+            $price = empty($variation['price_html']) ? $variation['display_regular_price'] : $variation['price_html'];
+            return strip_tags( $price );
         }
     }
 }
@@ -3068,7 +3075,9 @@ function show_price_in_attribute_dropdown( $html, $args ) {
                 if ( in_array( $term->slug, $options ) ) {
                     // Get and inserting the price
                     $price_html = get_the_variation_price_html( $product, $name, $term->slug );
-                    $html .= '<option value="' . esc_attr( $term->slug ) . '" ' . selected( sanitize_title( $args['selected'] ), $term->slug, false ) . '>' . esc_html( apply_filters( 'woocommerce_variation_option_name', $term->name ) . ' (' . $price_html ) . ')</option>';
+
+                    $price_title_text = (empty($price_html) ? esc_html( apply_filters( 'woocommerce_variation_option_name', $term->name ) ) : esc_html( apply_filters( 'woocommerce_variation_option_name', $term->name ) . ' (' . $price_html . ')' ) );
+                    $html .= '<option value="' . esc_attr( $term->slug ) . '" ' . selected( sanitize_title( $args['selected'] ), $term->slug, false ) . '>' . $price_title_text  . '</option>';
                 }
             }
         } else {
@@ -3076,7 +3085,8 @@ function show_price_in_attribute_dropdown( $html, $args ) {
                 $selected = sanitize_title( $args['selected'] ) === $args['selected'] ? selected( $args['selected'], sanitize_title( $option ), false ) : selected( $args['selected'], $option, false );
                 // Get and inserting the price
                 $price_html = get_the_variation_price_html( $product, $name, $term->slug );
-                $html .= '<option value="' . esc_attr( $option ) . '" ' . $selected . '>' . esc_html( apply_filters( 'woocommerce_variation_option_name', $option ) . ' (' . $price_html ) . ')</option>';
+                $option_title_text = ( empty($price_html) ? esc_html(apply_filters( 'woocommerce_variation_option_name', $option )) : esc_html( apply_filters( 'woocommerce_variation_option_name', $option ) . ' (' . $price_html . ')' ) );
+                $html .= '<option value="' . esc_attr( $option ) . '" ' . $selected . '>' . $option_title_text . '</option>';
             }
         }
     }
