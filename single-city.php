@@ -630,7 +630,32 @@ document.addEventListener("DOMContentLoaded", function() {
     <?php
     if(!empty(the_content())){
     ?>
-    <div class="">
+    <style type="text/css">
+        .lp-content-block h1,
+        .lp-content-block h2,
+        .lp-content-block h3,
+        .lp-content-block h4,
+        .lp-content-block h5,
+        .lp-content-block h6
+        {
+            font-family: 'Inter','MS Trebuchet', 'Rubik',sans-serif;
+        }
+        .lp-content-block h1 { font-size: 24px; }
+        .lp-content-block h2 { font-size: 23px; }
+        .lp-content-block h3 { font-size: 22px; }
+        .lp-content-block h4 { font-size: 20px; }
+        .lp-content-block h5 { font-size: 18px; }
+        .lp-content-block h6 { font-size: 16px; }
+
+        .lp-content-block p {
+            font-size: 14px;
+        }
+        .lp-content-block a {
+            color: #000000;
+            text-decoration: underline;
+        }
+    </style>
+    <div class="lp-content-block">
       <?php echo the_content(); ?>
     </div>
     <?php
@@ -639,6 +664,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
       <?php
+      # TODO: Add so the description is here with a "read more"
+      # TODO: Add so we only show this part if there is a description. We shouldn't just stuff links in here.
+
       if(get_field('show_landingpage_links_on_city_page', 'option') == 1){
         $args = array(
             'post_type' => 'landingpage',
