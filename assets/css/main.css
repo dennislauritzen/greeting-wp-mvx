@@ -10318,6 +10318,50 @@ a.greeting-link-pink {
   width: 100%;
 }
 
+#spinner {
+  color: #fecbca;
+}
+
+#spinner:after {
+  content: "";
+  animation: spin 20s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    content: "en gavekurv";
+  }
+  10% {
+    content: "en vingave";
+  }
+  20% {
+    content: "et strikkesæt";
+  }
+  30% {
+    content: "en overraskelse";
+  }
+  40% {
+    content: "en buket blomster";
+  }
+  50% {
+    content: "en lækker gin";
+  }
+  60% {
+    content: "smukke roser";
+  }
+  70% {
+    content: "tak for besøg-gaven";
+  }
+  80% {
+    content: "bare fordi-gaven";
+  }
+  90% {
+    content: "en gavehilsen";
+  }
+  100% {
+    content: "en gavekurv";
+  }
+}
 /*
  *
  * Recommandations for cities on frontpage search box

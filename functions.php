@@ -5138,7 +5138,6 @@ if (!wp_next_scheduled('update_completed_orders_event')) {
 */
 
 add_action( 'wp_login', 'greeting_r19029_format_user_display_name_on_login' );
-
 function greeting_r19029_format_user_display_name_on_login( $username ) {
     $user = get_user_by( 'login', $username );
 
@@ -5156,3 +5155,20 @@ function greeting_r19029_format_user_display_name_on_login( $username ) {
         wp_update_user( $userdata );
     }
 }
+
+function custom_wp_link_query_args($query)
+{
+    $pt_new = array();
+
+    $exclude_types = array('landingpage','product');
+
+    foreach ($query['post_type'] as $pt)
+    {
+        if (in_array($pt, $exclude_types)) continue;
+        $pt_new[] = $pt;
+    }
+
+    $query['post_type'] = $pt_new;
+    return $query;
+}
+add_filter('wp_link_query_args', 'custom_wp_link_query_args');

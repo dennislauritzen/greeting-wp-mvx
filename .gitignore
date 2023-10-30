@@ -1,1 +1,7 @@
 /node_modules/
+/assets/scss/
+/.idea/
+package-lock.json
+.gitignore
+assets/main.css
+assets/main.css.map
