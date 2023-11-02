@@ -156,20 +156,20 @@ if(!empty($args['city']) && !empty($args['postalcode'])){
             if(count($productPriceArray) == 0){
               $minProductPrice = 0;
               $maxProductPrice = 0;
-              $topProductPrice = (max($productPriceArray) > 1000) ? '1000' : max($productPriceArray);
+              $topProductPrice = (max($productPriceArray) > 1000) ? 1000 : (int) max($productPriceArray);
             }
             elseif(min($productPriceArray) == max($productPriceArray)){
               $minProductPrice = 0;
-              $maxProductPrice = max($productPriceArray);
-              $topProductPrice = (max($productPriceArray) > 1000) ? '1000' : max($productPriceArray);
+              $maxProductPrice = (int) max($productPriceArray);
+              $topProductPrice = (max($productPriceArray) > 1000) ? 1000 : (int) max($productPriceArray);
             }
             else {
               $minProductPrice = 0;
-              $maxProductPrice = max($productPriceArray);
-              $topProductPrice = (max($productPriceArray) > 1000) ? '1000' : max($productPriceArray);
+              $maxProductPrice = (int) max($productPriceArray);
+              $topProductPrice = (max($productPriceArray) > 1000) ? 1000 : (int) max($productPriceArray);
             }
 
-            $priceIntArray = range($minProductPrice, $topProductPrice, 250);
+            $priceIntArray = ($maxProductPrice > 250 ? range($minProductPrice, $topProductPrice, 250) : array(0) );
 
             $start_val = $minProductPrice;
             $end_val = $maxProductPrice;
@@ -182,6 +182,7 @@ if(!empty($args['city']) && !empty($args['postalcode'])){
                 $end_val = $price_arr['1'];
               }
             }
+
 
             ?>
 
@@ -199,7 +200,11 @@ if(!empty($args['city']) && !empty($args['postalcode'])){
                 foreach($priceIntArray as $k => $v){
                   $start = $v;
                   $end = (isset($priceIntArray[$k+1]) ? $priceIntArray[$k+1] : '+');
-                  if($end == '+'){
+                  if($k == 0 && $end == '+'){
+                      $label = 'Under 250';
+                      $value = '0-250';
+                  } else
+                  if($end == '+' && $k > 0){
                     $label = 'Over '.$start;
                     $value = $start.'-'.$maxProductPrice;
                   } else {

@@ -2032,14 +2032,13 @@ function productFilterAction() {
 
 	// Get secrets & info
 	$nn = $_POST['nn'];
-	$gid = $_POST['gid'];
+	$gid = (int) $_POST['gid'];
 	$guid = $_POST['guid'];
 
 	// Check (best we can) if the data has been changed before post.
 	if($guid != hash('crc32c', $gid.'-_-'.$nn)){
 		return;
 	}
-
 
 	global $wpdb;
 
@@ -2048,27 +2047,28 @@ function productFilterAction() {
 	$inputMinPrice = (int) $inputPriceRangeArray[0];
 	$inputMaxPrice = (int) $inputPriceRangeArray[1];
 
-	// after click filter data keep on this array
-	$catIDs = is_array($_POST['catIds']) ? $_POST['catIds'] : explode(",", $_POST['catIds']);
-    $catIDs = is_array($catIDs) ? $catIDs : array();
-	
-    $occIDs = is_array($_POST['occIds']) ? $_POST['occIds'] : explode(",", $_POST['occIds']);
-    $occIDs = is_array($occIDs) ? $occIDs : array();
+    #var_dump($inputPriceRangeArray);
 
+	// after click filter data keep on this array
+	$catIDs = !empty($_POST['catIds']) ? $_POST['catIds'] : array();
+
+    $occIDs = !empty($_POST['occIds']) ? $_POST['occIds'] : array();
+    
 	$query = array(
-		'post_status' => 'publish',
-		'post_type' => 'product',
-		'author' => $gid,
-		'meta_query' => array(
-			array(
-				'key' => '_price',
-				// 'value' => array(50, 100),
-				'value' => array($inputMinPrice, $inputMaxPrice),
-				'compare' => 'BETWEEN',
-				'type' => 'NUMERIC'
-			)
-		)
+        'post_type' => 'product',
+        'post_status' => 'publish',
+        'author' => $gid,
+        'meta_query' => array(
+            array(
+                'key' => '_price',
+                // 'value' => array(50, 100),
+                'value' => array($inputMinPrice, $inputMaxPrice),
+                'compare' => 'BETWEEN',
+                'type' => 'NUMERIC'
+            )
+        )
 	);
+
 	// Loop category IDs for where
 	$cat_arr = array();
 	foreach($catIDs as $k => $v){
@@ -2098,15 +2098,14 @@ function productFilterAction() {
 			'terms' => $occ_arr
 		);
 	}
+	$loop = new WP_Query($query);
+    #var_dump($loop->have_posts());
 
-	$loop  = new WP_Query($query);
-
-	if ( $loop ->have_posts() ) {
-
-		while ( $loop ->have_posts() ) : $loop ->the_post();
-        wc_get_template_part( 'content', 'product' );
-    endwhile;
-
+	if ( $loop->have_posts() ) {
+		while ( $loop->have_posts() ) {
+            $loop->the_post();
+            wc_get_template_part( 'content', 'product' );
+        }
 	} else { ?>
 
 	<div>
