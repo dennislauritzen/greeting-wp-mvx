@@ -2049,8 +2049,11 @@ function productFilterAction() {
 	$inputMaxPrice = (int) $inputPriceRangeArray[1];
 
 	// after click filter data keep on this array
-	$catIDs = $_POST['catIds'];
-	$occIDs = $_POST['occIds'];
+	$catIDs = is_array($_POST['catIds']) ? $_POST['catIds'] : explode(",", $_POST['catIds']);
+    $catIDs = is_array($catIDs) ? $catIDs : array();
+	
+    $occIDs = is_array($_POST['occIds']) ? $_POST['occIds'] : explode(",", $_POST['occIds']);
+    $occIDs = is_array($occIDs) ? $occIDs : array();
 
 	$query = array(
 		'post_status' => 'publish',
