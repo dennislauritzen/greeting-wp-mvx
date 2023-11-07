@@ -150,8 +150,8 @@ if(!empty($args['city']) && !empty($args['postalcode'])){
               array_push($productPriceArray, $singleProduct->get_price()); // for price filter
             }
 
-            $minProductPrice;
-            $maxProductPrice;
+            $minProductPrice = 0;
+            $maxProductPrice = 0;
 
             if(count($productPriceArray) == 0){
               $minProductPrice = 0;
@@ -213,7 +213,7 @@ if(!empty($args['city']) && !empty($args['postalcode'])){
                     } else {
                       $label = $start.'-'.$end;
                     }
-                    $value = $start.'-'.$end;
+                    $value = $start.'-'.$maxProductPrice;
                   }
                 ?>
                 <div class="rounded border-0 rounded-pill bg-light" style="display: inline-block; margin: 5px 5px 4px 0; font-size: 13px;">
@@ -397,7 +397,7 @@ if(!empty($args['city']) && !empty($args['postalcode'])){
 												<?php echo $product->get_name();?>
 											</a>
 										</h6>
-										<p class="price"><?php echo woocommerce_template_loop_price();?></small>
+										<p class="price"><?php echo woocommerce_template_loop_price();?></p>
 										<div class="links" style="display: none;">
 											<a href="?add-to-cart=<?php echo $product->get_id();?>" data-quantity="1" class="button product_type_simple add_to_cart_button ajax_add_to_cart" title="Add to cart" data-product_id="<?php echo $product->get_id();?>" data-product_sku="RGD-00010-1" aria-label="Add “Framed Poster” to your cart" rel="nofollow">Add to cart</a>
 											<a href="<?php echo get_permalink($product->get_id());?>" class="rigid-quick-view-link" data-id="<?php echo $product->get_id();?>" title="Quick View"><i class="fa fa-eye"></i></a>

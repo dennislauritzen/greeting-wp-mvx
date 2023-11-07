@@ -2053,7 +2053,7 @@ function productFilterAction() {
 	$catIDs = !empty($_POST['catIds']) ? $_POST['catIds'] : array();
 
     $occIDs = !empty($_POST['occIds']) ? $_POST['occIds'] : array();
-    
+
 	$query = array(
         'post_type' => 'product',
         'post_status' => 'publish',

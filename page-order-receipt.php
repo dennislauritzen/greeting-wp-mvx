@@ -76,7 +76,8 @@ get_header('checkout');
 	}
 	});
 </script>
-<div class="container">
+
+<div id="receipt" class="container">
 	<div class="row">
 		<div class="offset-lg-1 offset-xl-2 col-md-12 col-lg-10 col-xl-8">
 			<div class="row pb-4">
