@@ -10186,6 +10186,7 @@ a {
 a.greeting-link:hover,
 a:hover {
   color: #304b4c;
+  color: #304b4c;
   text-decoration: underline;
 }
 
@@ -10908,7 +10909,7 @@ div.woocommerce div.argmc-tab-text {
   margin: 5px 0 10px 0;
 }
 div.woocommerce h1, div.woocommerce .h1, div.woocommerce h2, div.woocommerce .h2, div.woocommerce h3, div.woocommerce .h3, div.woocommerce h4, div.woocommerce .h4 {
-  font-family: "Merriweather";
+  font-family: "Merriweather", serif;
 }
 div.woocommerce h1, div.woocommerce .h1 {
   font-size: 28px;
@@ -10935,6 +10936,22 @@ div.woocommerce .form-row-label {
 div.woocommerce .woocommerce-remove-coupon {
   width: 100%;
   display: block;
+}
+
+section#receipt h1, section#receipt .h1, section#receipt h2, section#receipt .h2, section#receipt h3, section#receipt .h3, section#receipt h4, section#receipt .h4 {
+  font-family: "Merriweather", sans-serif;
+}
+section#receipt h1, section#receipt .h1 {
+  font-size: 28px;
+  font-weight: 500;
+}
+section#receipt h2, section#receipt .h2 {
+  font-size: 25px;
+  font-weight: 500;
+}
+section#receipt h3, section#receipt .h3 {
+  font-size: 22px !important;
+  font-weight: 500 !important;
 }
 
 /* Filter styles */
