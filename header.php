@@ -23,8 +23,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 	<link rel="preload" as="style" crossorigin onload="this.onload=null;this.rel='stylesheet'" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Rubik:wght@300;400;500;600;700;800;900&display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One:wght@300,700,900&family=Inter:wght@300;400;700;900&family=Rubik:wght@300;400;700;900&display=swap">
-    <noscript>
+	<noscript>
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One:wght@300,700,900&family=Inter:wght@300;400;700;900&family=Rubik:wght@300;400;700;900&display=swap">
 	</noscript>
 </head>
