@@ -16,7 +16,7 @@ if (!defined('ABSPATH'))
 global $WCMp;
 $vendor = get_wcmp_vendor(absint($vendor_id));
 
-$parent_order_id = (empty(wp_get_post_parent_id($order->get_id())) ? $order->get_id() : wp_get_post_parent_id($order->get_id()));
+$parent_order_id = (empty(wp_get_post_parent_id($order->get_id())) ? $order->get_id() : get_post_parent_id($order->get_id()));
 
 // The different number orders
 $latestOrderId = $parent_order_id; // Last order ID
@@ -29,7 +29,7 @@ $code_contents = urlencode( $tracking_url );
 $qrcode = 'https://chart.googleapis.com/chart?chs=135x135&cht=qr&chl='.$code_contents;
 
 // Calculate order IDs
-$main_order = (empty(get_post_parent($order->get_id())) ? $order->get_id() : get_post_parent($order->get_id()) );
+$main_order = $parent_order_id;
 $main_order_object = wc_get_order($main_order);
 $main_order_ID_str = ( empty($main_order_object->get_id())  ? $main_order->ID : $main_order_object->get_id() );
 $main_order_id = (empty(get_post_parent($order->get_id())) ? $order->get_id() : $main_order_ID_str );

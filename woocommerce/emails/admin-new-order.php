@@ -19,7 +19,7 @@ defined( 'ABSPATH' ) || exit;
 
 global $WCMp;
 
-$parent_order_id = (empty(wp_get_post_parent_id($order->get_id())) ? $order->get_id() : wp_get_post_parent_id($order->get_id()));
+$parent_order_id = (empty(wp_get_post_parent_id($order->get_id())) ? $order->get_id() : get_post_parent_id($order->get_id()));
 
 // The different number orders
 $latestOrderId = $parent_order_id; // Last order ID
@@ -31,11 +31,16 @@ $vendor_id = greeting_get_vendor_id_from_order( $order );
 $vendor = get_wcmp_vendor(absint($vendor_id));
 
 // Generate QR code.
+$tracking_url = site_url() . '/shop-order-status/?order_id=' . $latestOrderId . '&oh=' . $order_hash . '&sshh=' . $order_hash2;
+$code_contents = urlencode( $tracking_url );
+$qrcode = 'https://chart.googleapis.com/chart?chs=135x135&cht=qr&chl='.$code_contents;
+
+// Generate QR code.
 $codeContents = site_url().'/shop-order-status/?order_id='.$latestOrderId.'&oh='.$order_hash.'&sshh='.$order_hash2;
 $qrcode = 'https://chart.googleapis.com/chart?chs=135x135&cht=qr&chl='.$codeContents;
 
 // Calculate order IDs
-$main_order = (empty(get_post_parent($order->get_id())) ? $order->get_id() : get_post_parent($order->get_id()) );
+$main_order = $parent_order_id;
 $main_order_object = wc_get_order($main_order);
 $main_order_ID_str = ( empty($main_order_object->get_id())  ? $main_order->ID : $main_order_object->get_id() );
 $main_order_id = (empty(get_post_parent($order->get_id())) ? $order->get_id() : $main_order_ID_str );
