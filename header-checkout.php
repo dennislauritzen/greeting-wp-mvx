@@ -5,8 +5,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<?php wp_head(); ?>
 
-    <link rel='stylesheet' id='style-css' href='https://www.greeting.dk/wp-content/themes/greeting2/style.css?ver=3.0.4' media='all' />
-    <link rel='stylesheet' id='main-css' href='<?php echo site_url(); ?>/wp-content/themes/greeting2/assets/css/main.css?ver=3.0.5' media='all' />
+    <link rel='stylesheet' id='style-css' href='https://www.greeting.dk/wp-content/themes/greeting2/style.css?ver=3.0.8' media='all' />
+    <link rel='stylesheet' id='main-css' href='<?php echo site_url(); ?>/wp-content/themes/greeting2/assets/css/main.css?ver=3.0.8' media='all' />
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
