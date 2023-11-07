@@ -143,12 +143,55 @@ if(!empty($args['city']) && !empty($args['postalcode'])){
             $vendorId = wcmp_find_shop_page_vendor();
             $vendor = get_wcmp_vendor($vendorId);
             $productPriceArray = array();
-            $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
 
-            foreach ($vendorProducts as $productId) {
-              $singleProduct = wc_get_product( $productId );
-              array_push($productPriceArray, $singleProduct->get_price()); // for price filter
+            $args = array(
+                'post_type' => 'product',
+                'post_status' => 'publish',
+                'author' => $vendorId,
+                'posts_per_page' => -1,  // Retrieve all products (including variations)
+                'meta_query' => array(
+                    array(
+                        'key' => '_price',
+                        'compare' => 'EXISTS',  // Ensure the _price key exists
+                    ),
+                ),
+            );
+            $vendorGetProducts = new WP_Query($args);
+
+            // Retrieve prices, including variation prices
+            if ($vendorGetProducts->have_posts()) {
+                while ($vendorGetProducts->have_posts()) {
+                    $vendorGetProducts->the_post();
+                    $product = wc_get_product();
+
+                    $product_id = $product->get_id();
+                    $product_prices = array();
+
+                    // Get the base product price
+                    $price = $product->get_price();
+
+                    if ($price) {
+                        $productPriceArray[] = $price;
+                    }
+
+                    // Get prices for variations
+                    if ($product->is_type('variable')) {
+                        $variations = $product->get_available_variations();
+
+                        foreach ($variations as $variation) {
+                            $variation_id = $variation['variation_id'];
+                            $variation_price = get_post_meta($variation_id, '_price', true);
+
+                            if ($variation_price) {
+                                $productPriceArray[] = $variation_price;
+                            }
+                        }
+                    }
+                }
             }
+
+            // Restore original Post Data
+            wp_reset_postdata();
 
             $minProductPrice = 0;
             $maxProductPrice = 0;

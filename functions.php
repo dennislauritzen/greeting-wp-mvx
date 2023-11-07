@@ -2054,20 +2054,52 @@ function productFilterAction() {
 
     $occIDs = !empty($_POST['occIds']) ? $_POST['occIds'] : array();
 
-	$query = array(
+#	$query = array(
+#        'post_type' => 'product',
+#        'post_status' => 'publish',
+#        'author' => $gid,
+#        'meta_query' => array(
+#            array(
+#                'key' => '_price',
+#                // 'value' => array(50, 100),
+#                'value' => array($inputMinPrice, $inputMaxPrice),
+#                'compare' => 'BETWEEN',
+#                'type' => 'NUMERIC'
+#            )
+#        )
+#	);
+
+    $query = array(
         'post_type' => 'product',
         'post_status' => 'publish',
         'author' => $gid,
         'meta_query' => array(
+            'relation' => 'OR',
             array(
                 'key' => '_price',
-                // 'value' => array(50, 100),
                 'value' => array($inputMinPrice, $inputMaxPrice),
                 'compare' => 'BETWEEN',
-                'type' => 'NUMERIC'
-            )
-        )
-	);
+                'type' => 'NUMERIC',
+            ),
+            array(
+                'key' => '_price',
+                'compare' => 'NOT EXISTS', // Exclude products with no specific price
+            ),
+            array(
+                'relation' => 'AND',
+                array(
+                    'key' => '_price',
+                    'compare' => 'EXISTS', // Include products with price
+                ),
+                array(
+                    'key' => '_price',
+                    'value' => array($inputMinPrice, $inputMaxPrice),
+                    'compare' => 'BETWEEN',
+                    'type' => 'NUMERIC',
+                ),
+            ),
+        ),
+    );
 
 	// Loop category IDs for where
 	$cat_arr = array();
