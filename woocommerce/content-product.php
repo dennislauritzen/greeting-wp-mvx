@@ -34,7 +34,7 @@ $classes = array('prod_hold');
 	 * @hooked woocommerce_template_loop_product_link_open - 10 - removed
 	 */
     //do_action('woocommerce_before_shop_loop_item'); ?>
-		<div class="col-6 col-md-3">
+		<div class="col-6 col-xs-6 col-sm-6 col-md-6 col-lg-4 col-xl-3">
 			<div class="card mb-4 border-0">
 					<a href="<?php the_permalink(); ?>">
 						<?php

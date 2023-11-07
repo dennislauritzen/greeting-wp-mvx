@@ -140,11 +140,8 @@ if(!empty($args['city']) && !empty($args['postalcode'])){
              * Price filter
              * ---------------------
             **/
-            $vendorId = wcmp_find_shop_page_vendor();
-            $vendor = get_wcmp_vendor($vendorId);
             $productPriceArray = array();
-
-            $args = array(
+            $productPriceArgs = array(
                 'post_type' => 'product',
                 'post_status' => 'publish',
                 'author' => $vendorId,
@@ -156,42 +153,37 @@ if(!empty($args['city']) && !empty($args['postalcode'])){
                     ),
                 ),
             );
-            $vendorGetProducts = new WP_Query($args);
+            $vendorGetProductsMain = new WP_Query($productPriceArgs);
 
             // Retrieve prices, including variation prices
-            if ($vendorGetProducts->have_posts()) {
-                while ($vendorGetProducts->have_posts()) {
-                    $vendorGetProducts->the_post();
-                    $product = wc_get_product();
+            if ($vendorGetProductsMain->have_posts()) {
+                foreach ($vendorGetProductsMain->posts as $post) {
+                    // Access the post ID directly
+                    $post_id = $post->ID;
 
-                    $product_id = $product->get_id();
-                    $product_prices = array();
+                    // Retrieve the product price using get_post_meta
+                    $vendorProduct_price = get_post_meta($post_id, '_price', true);
 
-                    // Get the base product price
-                    $price = $product->get_price();
-
-                    if ($price) {
-                        $productPriceArray[] = $price;
+                    if ($vendorProduct_price) {
+                        $productPriceArray[] = $vendorProduct_price;
                     }
 
-                    // Get prices for variations
-                    if ($product->is_type('variable')) {
-                        $variations = $product->get_available_variations();
+                    // If the product is a variable product, handle variations here
+                    if (wc_get_product($post_id)->is_type('variable')) {
+                        // Get variations and loop through them
+                        $vendorProduct_variations = wc_get_product($post_id)->get_available_variations();
 
-                        foreach ($variations as $variation) {
-                            $variation_id = $variation['variation_id'];
-                            $variation_price = get_post_meta($variation_id, '_price', true);
+                        foreach ($vendorProduct_variations as $vp_variation) {
+                            $vp_variation_id = $vp_variation['variation_id'];
+                            $vp_variation_price = get_post_meta($vp_variation_id, '_price', true);
 
-                            if ($variation_price) {
-                                $productPriceArray[] = $variation_price;
+                            if ($vp_variation_price) {
+                                $productPriceArray[] = $vp_variation_price;
                             }
                         }
                     }
                 }
             }
-
-            // Restore original Post Data
-            wp_reset_postdata();
 
             $minProductPrice = 0;
             $maxProductPrice = 0;
@@ -408,9 +400,11 @@ if(!empty($args['city']) && !empty($args['postalcode'])){
 					array_push($productIdArray, $productId);
 					$product = wc_get_product( $productId );
 
-          $imageId = $product->get_image_id();
+                    #var_dump($product);
+
+                    $imageId = $product->get_image_id();
 					$uploadedImage = wp_get_attachment_image_url($imageId, 'medium');
-          $placeHolderImage = wc_placeholder_img_src('medium');
+                    $placeHolderImage = wc_placeholder_img_src('medium');
 
 					$uploadDir = wp_upload_dir();
 					$uploadDirBaseUrl = $uploadDir['baseurl'];
@@ -830,24 +824,22 @@ get_footer( 'shop' );
       if(updateVendors === true){
         var elmId = dataRemove;
         document.getElementById(elmId).checked = false;
-        update();
+        updateVendor();
       }
     }
 
 
     // reset filter
     $('#vendorPageReset').click(function(){
-      $("input:checkbox[name=filter_catocca_vendor]").removeAttr("checked");
-
-      $("input#slideEndPoint").val(val_max);
-      $("input#slideStartPoint").val(0);
+      $("input:checkbox[name=filter_cat_vendor]").removeAttr("checked");
+      $("input:checkbox[name=filter_occ_vendor]").removeAttr("checked");
+      $("input:checkbox[name=filter_del_price]").removeAttr("checked");
 
       $('div.filter-list div.dynamic-filters').remove();
 
       //catOccaDeliveryIdArray.length = 0;
 
-      jQuery('#products').show();
-      jQuery('#filteredProduct').hide();
+        updateVendor();
     });
 
 
