@@ -10319,11 +10319,11 @@ a.greeting-link-pink {
   width: 100%;
 }
 
-#spinner {
+#frontpageSpinner {
   color: #fecbca;
 }
 
-#spinner:after {
+#frontpageSpinner:after {
   content: "";
   animation: frontpageVideoOverlaySpin 20s linear infinite;
 }

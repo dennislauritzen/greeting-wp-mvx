@@ -68,7 +68,7 @@ get_header();
                     </svg>
                 </div>
                 <h4 class="text-teal fs-6">#STØTLOKALT</h4>
-                <h1 class="text-white pb-3">Skal vi levere <span id="spinner"></span> <br>til én du holder af?</h1>
+                <h1 class="text-white pb-3">Skal vi levere <span id="frontpageSpinner"></span> <br>til én du holder af?</h1>
                 <script type="text/javascript">
                 //set responsive mobile input field placeholder text
                 if (jQuery(window).width() < 769) {
