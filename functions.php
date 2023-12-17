@@ -5241,6 +5241,9 @@ function add_links_to_keywords($content, $taxonomies) {
 
     $all_keywords = array();
 
+    // Initialize array to store linked phrases
+    $linkedPhrases = array();
+
     // Process taxonomies
     foreach ($taxonomies as $taxonomy) {
         $terms = get_terms(array('taxonomy' => $taxonomy, 'hide_empty' => false));
@@ -5253,7 +5256,7 @@ function add_links_to_keywords($content, $taxonomies) {
                 $keywords = array_filter(explode(',', $seo_keyword), 'strlen');
 
                 // Sort keywords by length in descending order
-                usort($keywords, function($a, $b) {
+                usort($keywords, function ($a, $b) {
                     return strlen($b) - strlen($a);
                 });
 
@@ -5263,7 +5266,14 @@ function add_links_to_keywords($content, $taxonomies) {
                         $pattern = '/(?<!<\/a>)\b' . preg_quote($escaped_value, '/') . '\b(?![^<]*>)/i';
 
                         // Perform the replacement only if the word or phrase doesn't have a link
-                        $content = preg_replace($pattern, '<a href="' . esc_url($term_link) . '">$0</a>', $content);
+                        $content = preg_replace_callback($pattern, function ($matches) use ($term_link, &$linkedPhrases) {
+                            $phrase = $matches[0];
+                            if (!in_array($phrase, $linkedPhrases)) {
+                                $linkedPhrases[] = $phrase;
+                                return '<a href="' . esc_url($term_link) . '">' . $phrase . '</a>';
+                            }
+                            return $phrase;
+                        }, $content);
                     }
                 }
             }
