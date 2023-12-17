@@ -25,12 +25,25 @@ global $post;
 $short_description = apply_filters( 'woocommerce_short_description', $post->post_excerpt );
 $description = $post->post_content;
 
+
+
 if ( ! $short_description && ! $description ) {
 	return;
 }
 
+// Go through the descriptions to make the links.
+$short_description_new = add_links_to_keywords(
+    wp_kses_post( $short_description ),
+    array('product_cat', 'occasion')
+);
+
+$description_new = add_links_to_keywords(
+    $description,
+    array('product_cat', 'occasion')
+);
+
 ?>
 <div class="description">
-	<?php echo wp_kses_post( $short_description ); // WPCS: XSS ok.  ?>
-	<?php echo $description; ?>
+	<?php echo $short_description_new; // WPCS: XSS ok.  ?>
+	<?php echo $description_new; ?>
 </div>

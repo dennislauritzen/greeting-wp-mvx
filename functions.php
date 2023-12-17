@@ -2430,45 +2430,46 @@ function greeting_load_calendar_dates( $available_gateways ) {
 		 };
 
 			jQuery(document).ready(function($) {
-        $('#datepicker').click(function() {
-		  	var customMinDateVal = $('#vendorDeliverDay').val();
-		  	var customMinDateValInt = parseInt(customMinDateVal);
-		  	let vendorDropOffTimeVal = $('#vendorDropOffTimeId').val();
-		  	let d = new Date();
-		  	let hour = d.getHours();
-				if(hour > vendorDropOffTimeVal){
-					var customMinDateVal = customMinDateValInt+1;
-				} else {
-					customMinDateVal = $('#vendorDeliverDay').val();
-				}
-				// var vendorClosedDayArray = $('#vendorClosedDayId').val();
-				var vendorClosedDayArray = <?php echo $dates_json; ?>;
+                $('#datepicker').click(function() {
+                    var customMinDateVal = $('#vendorDeliverDay').val();
+                    var customMinDateValInt = parseInt(customMinDateVal);
+                    let vendorDropOffTimeVal = $('#vendorDropOffTimeId').val();
+                    let d = new Date();
+                    let hour = d.getHours();
+                        if(hour > vendorDropOffTimeVal){
+                            var customMinDateVal = customMinDateValInt+1;
+                        } else {
+                            customMinDateVal = $('#vendorDeliverDay').val();
+                        }
+                        // var vendorClosedDayArray = $('#vendorClosedDayId').val();
+                        var vendorClosedDayArray = <?php echo $dates_json; ?>;
 
-			jQuery('#datepicker').datepicker({
-				dateFormat: 'dd-mm-yy',
-				// minDate: -1,
-				minDate: new Date(),
-				// maxDate: "+1M +10D"
-				maxDate: "+58D",
-				// closed on specific date
-				beforeShowDay: function(date){
-					var string = jQuery.datepicker.formatDate('dd-mm-yy', date);
-					return [ vendorClosedDayArray.indexOf(string) == -1 ];
-				},
-				onClose: function(date, datepicker){
-					const par_elm = jQuery(this).closest('.form-row');
+                    jQuery('#datepicker').datepicker({
+                        dateFormat: 'dd-mm-yy',
+                        // minDate: -1,
+                        minDate: new Date(),
+                        // maxDate: "+1M +10D"
+                        maxDate: "+58D",
+                        // closed on specific date
+                        beforeShowDay: function(date){
+                            var string = jQuery.datepicker.formatDate('dd-mm-yy', date);
+                            return [ vendorClosedDayArray.indexOf(string) == -1 ];
+                        },
+                        onClose: function(date, datepicker){
+                            const par_elm = jQuery(this).closest('.form-row');
 
-					if (!isValidDate(date) || date == '') {
-						par_elm.addClass('has-error');
-					} else {
-						par_elm.removeClass('has-error').addClass('woocommerce-validated');
-						jQuery("#datepicker_field label.error").css('display','none');
-					}
-				},
-				errorPlacement: function(error, element) { }
-			}).datepicker( "show" );
-         });
-      });
+                            if (!isValidDate(date) || date == '') {
+                                par_elm.addClass('has-error');
+                            } else {
+                                par_elm.removeClass('has-error').addClass('woocommerce-validated');
+                                jQuery("#datepicker_field label.error").css('display','none');
+                            }
+                        },
+                        errorPlacement: function(error, element) { }
+                    }).datepicker( "show" );
+                    jQuery(".ui-datepicker").addClass('notranslate');
+                 });
+            });
    </script>
    <?php
 }
@@ -3568,7 +3569,7 @@ function greeting_echo_date_picker( ) {
 	$vendor_id = (!empty($product->post_author) ? $product->post_author : get_post_field('post_author', $storeProductId));
 
 	// Get delivery type.
-  $del_value = get_vendor_delivery_type($vendor_id, 'value');
+    $del_value = get_vendor_delivery_type($vendor_id, 'value');
 
 	// Get delivery day requirement, cut-off-time for orders and the closed dates.
 	$vendorDeliverDayReq = get_vendor_delivery_days_required($vendor_id);
@@ -3640,12 +3641,12 @@ function greeting_echo_date_picker( ) {
  */
 function argmcAddStepsContent($step) {
 	//First Step Content
-  if ($step == 'step_6') {
-		greeting_echo_receiver_info();
+
+    if ($step == 'step_6') {
+		#greeting_echo_receiver_info();
 	}
 }
 add_action('arg-mc-checkout-step', 'argmcAddStepsContent');
-
 
 
 /**
@@ -4697,6 +4698,7 @@ function shop_order_display_callback( $post ) {
 								return [ vendorClosedDayArray.indexOf(string) == -1 ];
 							}
 						}).datepicker( "show" );
+                        jQuery('.ui-datepicker').addClass('notranslate');
 					});
 				});
 		 </script>
@@ -5216,3 +5218,41 @@ function custom_wp_link_query_args($query)
     return $query;
 }
 add_filter('wp_link_query_args', 'custom_wp_link_query_args');
+
+// Function to look through a text for links to specified taxonomies.
+function add_links_to_keywords($content, $taxonomies) {
+    // Check if ACF is active
+    if (!function_exists('get_field')) {
+        return $content;
+    }
+
+    $all_keywords = array();
+
+    // Process taxonomies
+    foreach ($taxonomies as $taxonomy) {
+        $terms = get_terms(array('taxonomy' => $taxonomy, 'hide_empty' => false));
+
+        foreach ($terms as $term) {
+            $seo_keyword = get_field('seo_keywords', $taxonomy . '_' . $term->term_id);
+            $term_link = get_term_link($term->term_id, $taxonomy);
+
+            if ($seo_keyword && $term_link) {
+                $keywords = array_filter(explode(',', $seo_keyword), 'strlen');
+
+                foreach ($keywords as $value) {
+                    if (!empty($value)) {
+                        // Modify $content to add links for each keyword in taxonomy
+                        $content = preg_replace_callback('/\b' . preg_quote(trim($value), '/') . '\b/i', function ($matches) use ($term_link) {
+                            return '<a href="' . esc_url($term_link) . '">' . $matches[0] . '</a>';
+                        }, $content, 1);
+                    }
+                }
+            }
+        }
+    }
+
+    // Apply wpautop to preserve line breaks
+    $content = wpautop($content);
+
+    return $content;
+}
