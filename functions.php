@@ -3643,7 +3643,7 @@ function argmcAddStepsContent($step) {
 	//First Step Content
 
     if ($step == 'step_6') {
-		#greeting_echo_receiver_info();
+		greeting_echo_receiver_info();
 	}
 }
 add_action('arg-mc-checkout-step', 'argmcAddStepsContent');
@@ -5239,17 +5239,24 @@ function add_links_to_keywords($content, $taxonomies) {
             if ($seo_keyword && $term_link) {
                 $keywords = array_filter(explode(',', $seo_keyword), 'strlen');
 
+                // Sort keywords by length in descending order
+                usort($keywords, function($a, $b) {
+                    return strlen($b) - strlen($a);
+                });
+
                 foreach ($keywords as $value) {
                     if (!empty($value)) {
-                        // Modify $content to add links for each keyword in taxonomy
-                        $content = preg_replace_callback('/\b' . preg_quote(trim($value), '/') . '\b/i', function ($matches) use ($term_link) {
-                            return '<a href="' . esc_url($term_link) . '">' . $matches[0] . '</a>';
-                        }, $content, 1);
+                        $escaped_value = preg_quote(trim($value), '/');
+                        $pattern = '/(?<!<\/a>)\b' . preg_quote($escaped_value, '/') . '\b(?![^<]*>)/i';
+
+                        // Perform the replacement only if the word or phrase doesn't have a link
+                        $content = preg_replace($pattern, '<a href="' . esc_url($term_link) . '">$0</a>', $content);
                     }
                 }
             }
         }
     }
+
 
     // Apply wpautop to preserve line breaks
     $content = wpautop($content);
