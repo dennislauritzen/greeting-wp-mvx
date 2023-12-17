@@ -3721,7 +3721,20 @@ function greeting_marketplace_checkout_age_restriction() {
 	$age_restricted_items_in_cart = false;
 	foreach(WC()->cart->get_cart() as $cart_item_key => $cart_item) {
 		$product_alchohol = get_post_meta($cart_item['product_id'], 'alcholic_content', true);
-		if($product_alchohol){
+        $product_alchohol = (is_array($product_alchohol)) ? $product_alchohol[0] : $product_alchohol;
+
+        $product_alcohol_acf = get_field('alcholic_content', 'product_'.$cart_item['product_id']);
+
+
+        // value: 0 or 1
+        $product_alcohol = 0;
+        if($product_alchohol == 1){
+            $product_alcohol = 1;
+        } else if($product_alcohol_acf == 1){
+            $product_alcohol = 1;
+        }
+
+		if($product_alcohol == 1){
 			$age_restricted_items_in_cart = true;
 			break;
 		}
