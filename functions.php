@@ -5344,16 +5344,14 @@ add_action(
     'rest_api_init',
     function () {
         // Field name to register.
-        $field = 'vendor_name';
+        $field = '_vendor_name';
         register_rest_field(
             'shop_order',
             $field,
             array(
                 'get_callback'    => function ( $object ) use ( $field ) {
                     // Get field as single value from post meta.
-                    $author_id = get_post_meta( $object['id'], 'post_author', true );
-
-                    return get_user_meta($author_id, 'nickname', true);
+                    return get_post_meta( $object['id'], $field, true );
                 },
                 'schema'          => array(
                     'type'        => 'string',
