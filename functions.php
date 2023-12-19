@@ -5311,7 +5311,7 @@ add_action(
         // Field name to register.
         $field = 'vendor_id';
         register_rest_field(
-            'post',
+            'shop_order',
             $field,
             array(
                 'get_callback'    => function ( $object ) use ( $field ) {
