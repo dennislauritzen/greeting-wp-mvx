@@ -5353,8 +5353,7 @@ add_action(
                     // Get field as single value from post meta.
                     $author_id = get_post_meta( $object['id'], 'post_author', true );
 
-                    $user = get_user_meta($author_id, '_vendor_page_title', true);
-                    return $user;
+                    return get_user_meta($author_id, 'nickname', true);
                 },
                 'schema'          => array(
                     'type'        => 'string',
