@@ -5339,3 +5339,37 @@ add_action(
         );
     }
 );
+
+add_action(
+    'rest_api_init',
+    function () {
+        // Field name to register.
+        $field = 'author';
+        register_rest_field(
+            'shop_order',
+            $field,
+            array(
+                'get_callback'    => function ( $object ) use ( $field ) {
+                    // Get field as single value from post meta.
+                    $author_id = get_post_meta( $object['id'], $field, true );
+
+                    $user = get_user_meta($author_id, 'display_name', true);
+                    return $user;
+                },
+                'schema'          => array(
+                    'type'        => 'string',
+                    'arg_options' => array(
+                        'sanitize_callback' => function ( $value ) {
+                            // Make the value safe for storage.
+                            return sanitize_text_field( $value );
+                        },
+                        'validate_callback' => function ( $value ) {
+                            // Valid if it contains exactly 10 English letters.
+                            return (bool) preg_match( '/\A[a-z]{10}\Z/', $value );
+                        },
+                    ),
+                ),
+            )
+        );
+    }
+);
