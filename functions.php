@@ -2285,13 +2285,8 @@ function attach_pdf_to_email ( $attachments, $email_id , $order ) {
 // vendor attachment end
 
 
-
-
 /**
  * Check if store delivers in the postal code
- *
- *
- *
  *
  */
 add_action( 'woocommerce_after_checkout_validation', 'greeting_check_delivery_postcode', 10, 2);
@@ -2562,20 +2557,6 @@ function update_sub_order_meta($vendor_order_id, $posted_data, $order){
 	$vendor_id = get_post_meta($vendor_order_id, '_vendor_id', true);
 
 	#$vendor_id = get_post_meta($vendor_order_id, '_vendor_id', true);
-}
-
-/* replace suborder id with parent order id in email */
-#add_filter('wcmp_vendor_new_order_email_subject', 'change_order_number', 10, 2);
-function change_order_number($subject, $order) {
-#$order_id = wp_get_post_parent_id($order->get_id());
-#return __(‘[{site_title}] New vendor order (‘.$order_id.’) – {order_date}’, ‘dc-woocommerce-multi-vendor’);
-}
-/* replace suborder id with parent order id in vendor dashboard */
-#add_filter('wcmp_datatable_order_list_row_data', 'change_order_number_dashboard');
-function change_order_number_dashboard($data) {
-  #$order_id = wp_get_post_parent_id($data['order_id']);
-  #$data['order_id'] = $order_id;
-  #return $data;
 }
 
 
@@ -3430,10 +3411,10 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 
 	// Get the time the store has chosen as their "cut-off" / drop-off for next order.
 	$vendorDropOffTime = get_vendor_dropoff_time($vendor_id);
-  $vendorDropOffTimeWeekend = get_vendor_dropoff_time($vendor_id, 'weekend');
+    $vendorDropOffTimeWeekend = get_vendor_dropoff_time($vendor_id, 'weekend');
 
-  // Get the number of days required for delivery by the vendor
-  $vendorDeliveryDayReq = get_vendor_delivery_days_required($vendor_id);
+    // Get the number of days required for delivery by the vendor
+    $vendorDeliveryDayReq = get_vendor_delivery_days_required($vendor_id);
 
 	// @todo - Dennis update according to latest updates in closing day-field.
 	// open close days begin. Generate an array of all days ISO.
@@ -3444,7 +3425,7 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
     $closed_days = (is_array($opening_days) ? array_diff($default_days, $opening_days) : $closed_days);
 
 	// Global closed dates (when Greeting.dk is totally closed).
-	$global_closed_dates = array( '24-12-2022', '25-12-2022',	'31-12-2022', '01-01-2023', '05-05-2023', '18-05-2023', '29-05-2023');
+	$global_closed_dates = array( '24-12-2023', '25-12-2023',	'31-12-2022', '01-01-2023', '05-05-2023', '18-05-2023', '29-05-2023');
 
 	// Explicitly set todays timezone and date, since there is some problems with this if not set explicitly.
 	// Define today's timezone and date.
@@ -3454,15 +3435,19 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 
 	// Get the explicitly defined closed DATES from admin (e.g. if one store is closed on a specific date)
 	// Loop through the closed dates from admin.
+    // The $closed_days_date array gets exploded, and then array_filter applied to make sure no empty items is left in the array.
 	$meta_closed_days = get_user_meta($vendor_id, 'vendor_closed_day', true);
-	$closed_days_date = (!empty($meta_closed_days) ? explode(",",$meta_closed_days) : array());
+	$closed_days_date = (!empty($meta_closed_days) ? explode(",", $meta_closed_days) : array());
+    $closed_days_date = array_filter($closed_days_date, function ($element) {
+        return is_string($element) && '' !== trim($element);
+    });
 	$closed_dates_arr = array();
 
 	// Loop through the closed dates string from admin (exploded above)
 	// Check if it is larger than today, if so then add to array of closed dates.
 	if(!empty($closed_days_date)){
 		foreach($closed_days_date as $ok_date){
-			$date_time_object = new DateTime();
+			$date_time_object = new DateTime($ok_date);
 			if($date_time_object > $today){
 				$closed_dates_arr[] = $date_time_object->format($date_format);
 			}
