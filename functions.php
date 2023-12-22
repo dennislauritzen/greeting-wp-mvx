@@ -3447,7 +3447,8 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 	// Check if it is larger than today, if so then add to array of closed dates.
 	if(!empty($closed_days_date)){
 		foreach($closed_days_date as $ok_date){
-			$date_time_object = new DateTime($ok_date);
+            $date = strstr($ok_date, ' ', true);
+            $date_time_object = new DateTime($date);
 			if($date_time_object > $today){
 				$closed_dates_arr[] = $date_time_object->format($date_format);
 			}
@@ -4613,8 +4614,10 @@ function set_custom_edit_shop_order_columns($columns) {
 add_action( 'manage_shop_order_posts_custom_column' , 'custom_shop_order_column2', 10, 2 );
 function custom_shop_order_column2( $column, $post_id ) {
     switch ( $column ) {
-      case 'delivery_date' :
-        echo esc_html( get_post_meta( $post_id, '_delivery_date', true ) );
+        case 'delivery_date' :
+            $delivery_date = get_post_meta( $post_id, '_delivery_date', true );
+            $delivery_date = empty($delivery_date) ? '' : $delivery_date;
+        echo esc_html( $delivery_date );
         break;
     }
 }
@@ -4636,7 +4639,7 @@ function add_shop_order_meta_box() {
 
 // For displaying.
 function shop_order_display_callback( $post ) {
-    $value = get_post_meta( $post->ID, '_delivery_date', true );
+        $value = get_post_meta( $post->ID, '_delivery_date', true );
 
 		$order = wc_get_order($post->ID);
 
