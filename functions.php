@@ -3425,7 +3425,7 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
     $closed_days = (is_array($opening_days) ? array_diff($default_days, $opening_days) : $closed_days);
 
 	// Global closed dates (when Greeting.dk is totally closed).
-	$global_closed_dates = array( '24-12-2023', '25-12-2023',	'31-12-2022', '01-01-2023', '05-05-2023', '18-05-2023', '29-05-2023');
+	$global_closed_dates = array( '24-12-2023', '25-12-2023', '31-12-2022', '01-01-2023', '05-05-2023', '18-05-2023', '29-05-2023');
 
 	// Explicitly set todays timezone and date, since there is some problems with this if not set explicitly.
 	// Define today's timezone and date.
@@ -3437,6 +3437,9 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 	// Loop through the closed dates from admin.
     // The $closed_days_date array gets exploded, and then array_filter applied to make sure no empty items is left in the array.
 	$meta_closed_days = get_user_meta($vendor_id, 'vendor_closed_day', true);
+    $meta_closed_days = empty($meta_closed_days) ? get_field('vendor_closed_day', 'user_'.$vendor_id) : $meta_closed_days;
+    var_dump($vendor_id);
+    var_dump($meta_closed_days);
 	$closed_days_date = (!empty($meta_closed_days) ? explode(",", $meta_closed_days) : array());
     $closed_days_date = array_filter($closed_days_date, function ($element) {
         return is_string($element) && '' !== trim($element);
@@ -3448,7 +3451,7 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 	if(!empty($closed_days_date)){
 		foreach($closed_days_date as $ok_date){
             $date = strstr($ok_date, ' ', true);
-            $date_time_object = new DateTime($date);
+            $date_time_object = new DateTime($ok_date);
 			if($date_time_object > $today){
 				$closed_dates_arr[] = $date_time_object->format($date_format);
 			}
