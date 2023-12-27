@@ -3438,8 +3438,8 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
     // The $closed_days_date array gets exploded, and then array_filter applied to make sure no empty items is left in the array.
 	$meta_closed_days = get_user_meta($vendor_id, 'vendor_closed_day', true);
     $meta_closed_days = empty($meta_closed_days) ? get_field('vendor_closed_day', 'user_'.$vendor_id) : $meta_closed_days;
-    var_dump($vendor_id);
-    var_dump($meta_closed_days);
+    #var_dump($vendor_id);
+    #var_dump($meta_closed_days);
 	$closed_days_date = (!empty($meta_closed_days) ? explode(",", $meta_closed_days) : array());
     $closed_days_date = array_filter($closed_days_date, function ($element) {
         return is_string($element) && '' !== trim($element);
