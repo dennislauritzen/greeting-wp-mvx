@@ -186,11 +186,21 @@ do_action( 'woocommerce_email_header', $email_heading );
 
                 <?php
                 if (apply_filters('show_cust_order_calulations_field', true, $vendor->id)) {
+                    // Get the total including tax
                     $order_total = $order->get_total();
+
+                    // Get the total discount amount including tax
+                    $total_discount = $order->get_discount_total() + $order->get_discount_tax();
+
+                    // Calculate the total without any discounts
+                    $total_without_discount = $order_total + $total_discount;
+
+                    // Get the shipping total
                     $order_ship_total = $order->get_shipping_total() + $order->get_shipping_tax();
 
+                    // Calculate the new subtotal without shipping
+                    $order_new_subtotal = $total_without_discount - $order_ship_total;
 
-                    $order_new_subtotal = $order_total - $order_ship_total;
                     $order_ship_new = 39;
                     $order_new_total = $order_new_subtotal + $order_ship_new;
                 ?>
