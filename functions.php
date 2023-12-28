@@ -4676,8 +4676,8 @@ function shop_order_display_callback( $post ) {
 		}
 
 		// BEWARE: Not used because then we cant change date according to our needs
-		$dates = get_vendor_dates($vendor_id);
-		$dates_json = json_encode($dates);
+		#$dates = get_vendor_dates($vendor_id);
+		#$dates_json = json_encode($dates);
 		?>
 
 		 <script type="text/javascript">
