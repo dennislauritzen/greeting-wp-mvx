@@ -3450,7 +3450,7 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 	// Check if it is larger than today, if so then add to array of closed dates.
 	if(!empty($closed_days_date)){
 		foreach($closed_days_date as $ok_date){
-            $ok_date = (strpos($ok_date, ' ') == true) ? strstr($ok_date, ' ', true) : $ok_date;
+            $ok_date = (strpos($ok_date, ' ') == true) ? strstr(trim($ok_date), ' ', true) : $ok_date;
             $date_time_object = new DateTime($ok_date);
 			if($date_time_object > $today){
 				$closed_dates_arr[] = $date_time_object->format($date_format);
