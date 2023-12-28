@@ -3440,7 +3440,8 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
     $meta_closed_days = empty($meta_closed_days) ? get_field('vendor_closed_day', 'user_'.$vendor_id) : $meta_closed_days;
     #var_dump($vendor_id);
     #var_dump($meta_closed_days);
-	$closed_days_date = (!empty($meta_closed_days) ? explode(",", $meta_closed_days) : array());
+	$closed_days_date = (!empty($meta_closed_days) ? preg_split('/[, ]+/', $meta_closed_days, -1, PREG_SPLIT_NO_EMPTY) : array());
+
     $closed_days_date = array_filter($closed_days_date, function ($element) {
         return is_string($element) && '' !== trim($element);
     });
@@ -3450,8 +3451,9 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 	// Check if it is larger than today, if so then add to array of closed dates.
 	if(!empty($closed_days_date)){
 		foreach($closed_days_date as $ok_date){
-            $ok_date = (strpos($ok_date, ' ') == true) ? strstr(trim($ok_date), ' ', true) : $ok_date;
-            $date_time_object = new DateTime($ok_date);
+            $the_date = trim($ok_date);
+            $the_date = (strpos($the_date, ' ') == true) ? strstr(trim($the_date), ' ', true) : $the_date;
+            $date_time_object = new DateTime($the_date);
 			if($date_time_object > $today){
 				$closed_dates_arr[] = $date_time_object->format($date_format);
 			}
@@ -4676,8 +4678,8 @@ function shop_order_display_callback( $post ) {
 		}
 
 		// BEWARE: Not used because then we cant change date according to our needs
-		#$dates = get_vendor_dates($vendor_id);
-		#$dates_json = json_encode($dates);
+		$dates = get_vendor_dates($vendor_id);
+		$dates_json = json_encode($dates);
 		?>
 
 		 <script type="text/javascript">
