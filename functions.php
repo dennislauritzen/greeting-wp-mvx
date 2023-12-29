@@ -3447,6 +3447,7 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
     });
 	$closed_dates_arr = array();
 
+    
 	// Loop through the closed dates string from admin (exploded above)
 	// Check if it is larger than today, if so then add to array of closed dates.
 	if(!empty($closed_days_date)){
