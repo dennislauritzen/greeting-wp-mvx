@@ -29,7 +29,7 @@ defined( 'ABSPATH' ) || exit;
 		</h3>
 
 		<div class="shipping_address">
-            <h3>Shipping address</h3>
+            <h3 style="margin-top: 0px;">Leveringsadresse</h3>
 			<?php do_action( 'woocommerce_before_checkout_shipping_form', $checkout ); ?>
 
 			<div class="woocommerce-shipping-fields__field-wrapper">
