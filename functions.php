@@ -1099,8 +1099,8 @@ function catocca_landing_data_fetch(){
 
  		foreach($delDateArr as $v){
  			$dropoff_time 		= get_field('vendor_drop_off_time','user_'.$v->ID);
- 			$delDate 					= get_field('vendor_require_delivery_day','user_'.$v->ID);
- 			$delClosedDates		= get_field('vendor_closed_day','user_'.$v->ID);
+ 			$delDate 			= get_field('vendor_require_delivery_day','user_'.$v->ID);
+ 			$closedDatesArr		= get_vendor_closed_dates($v->ID);
  			$delWeekDays	    = get_field('openning','user_'.$v->ID);
 
  			$open_iso_days = array();
@@ -1112,7 +1112,6 @@ function catocca_landing_data_fetch(){
  			#var_dump($open_this_day);
 
  			// Check if the store is closed this specific date.
- 			$closedDatesArr		= array_map('trim', explode(",",$delClosedDates));
  			$closedThisDate 	= 0;
  			if(in_array($selectedDate, $closedDatesArr)){
  				$closedThisDate = 1;
@@ -1430,7 +1429,8 @@ function catOccaDeliveryAction() {
 		foreach($delDateArr as $v){
 			$dropoff_time 		= get_field('vendor_drop_off_time','user_'.$v->ID);
 			$delDate 			= get_field('vendor_require_delivery_day','user_'.$v->ID);
-			$delClosedDates		= get_field('vendor_closed_day','user_'.$v->ID);
+            $closedDatesArr		= get_vendor_closed_dates($v->ID);
+
 			$delWeekDays	    = get_field('openning','user_'.$v->ID);
 
 			$open_iso_days = array();
@@ -1440,8 +1440,7 @@ function catOccaDeliveryAction() {
 
 			$open_this_day = (in_array($selectedDay, $open_iso_days) ? 1 : 0);
 
-			// Check if the store is closed this specific date.
-			$closedDatesArr		= array_map('trim', explode(",",$delClosedDates));
+            // Check for closed dates
 			$closedThisDate 	= 0;
 			if(in_array($selectedDate, $closedDatesArr)){
 				$closedThisDate = 1;
@@ -1739,8 +1738,8 @@ function lpFilterAction() {
 
 		foreach($delDateArr as $v){
 			$dropoff_time 		= get_field('vendor_drop_off_time','user_'.$v->ID);
-			$delDate 					= (int) get_field('vendor_require_delivery_day','user_'.$v->ID);
-			$delClosedDates		= get_field('vendor_closed_day','user_'.$v->ID);
+			$delDate 			= (int) get_field('vendor_require_delivery_day','user_'.$v->ID);
+            $closedDatesArr		= get_vendor_closed_dates('user_'.$v->ID);
 			$delWeekDays	    = get_field('openning','user_'.$v->ID);
 
 			$open_iso_days = array();
@@ -1751,7 +1750,6 @@ function lpFilterAction() {
 			$open_this_day = (in_array($selectedDay, $open_iso_days) ? 1 : 0);
 
 			// Check if the store is closed this specific date.
-			$closedDatesArr		= array_map('trim', explode(",",$delClosedDates));
 			$closedThisDate 	= 0;
 			if(in_array($selectedDate, $closedDatesArr)){
 				$closedThisDate = 1;
@@ -2391,9 +2389,9 @@ function greeting_load_calendar_dates( $available_gateways ) {
 	}
 
 	$vendor_id = get_post_field( 'post_author', $storeProductId );
-	$dates = get_vendor_dates($vendor_id, 'd-m-Y', 'close');
-	$dates_json = json_encode($dates);
-	#var_dump($dates);
+	$dates = get_vendor_dates_new($vendor_id, 'd-m-Y', 'close');
+    $dates_values_only = array_values($dates);
+    $dates_json = json_encode($dates_values_only);
 ?>
 
    <script type="text/javascript">
@@ -3273,6 +3271,12 @@ function greeting_echo_receiver_info( ) {
 			'maxlength' 	=> 160
 		), WC()->checkout->get_value( 'greeting_message' ) );
 
+        echo '
+        <div style="padding: 6px 10px; font-size: 12px; font-family: Inter,sans-serif; margin-top: -5px;  margin-bottom: 10px; background: #fafafa; color: #666666;">
+            Da vores kort med hilsener er håndskrevne, kan vi ikke indsætte emojis, men vi forsøger at gengive dem på bedst mulig vis.   
+        </div>
+        ';
+
 		woocommerce_form_field( 'receiver_phone', array(
 			'type'          => 'tel',
 			'class'         => array('form-row-wide', 'greeting-custom-input'),
@@ -3282,6 +3286,13 @@ function greeting_echo_receiver_info( ) {
 			'placeholder'       => __('Indtast modtagerens telefonnummer.', 'greeting2'),
 			), WC()->checkout->get_value( 'receiver_phone' ));
 		#echo '<tr class="message-pro-radio"><td>';
+
+        echo '
+        <div style="padding: 6px 10px; font-size: 12px; font-family: Inter,sans-serif; margin-top: -5px; margin-bottom: 10px; background: #fafafa; color: #666666;">
+            Telefonnummeret bruges <b>kun</b> i forbindelse med selve leveringen, hvis vi modtageren eks. ikke åbner, eller vi skal bruge deres hjælp til at finde indgangen.<br>
+            Vi sender ikke nogen information om bestillingen - hverken før, under eller efter levering.
+        </div>
+        ';
 
 		echo '<h3>Leveringsinstruktioner</h3>
 		<style type="text/css">
@@ -3330,36 +3341,151 @@ function greeting_echo_receiver_info( ) {
 	echo '</div>';
 }
 
-function get_vendor_delivery_days_required($vendor_id){
-	$delday_req = get_field('vendor_require_delivery_day', 'user_'.$vendor_id);
-	return $delday_req;
+function get_vendor_delivery_days_required($vendor_id, $type = 'weekday'){
+    $get_deliveryday_required_repeater = get_field('vendor_require_order_days_before', 'user_'.$vendor_id);
+
+    if(empty($get_deliveryday_required_repeater)){
+        $delday_req = get_field('vendor_require_delivery_day', 'user_'.$vendor_id);
+        return $delday_req;
+    } else {
+        if($type == 'holiday'){
+            return (!empty($get_deliveryday_required_repeater['order_days_before_holiday']) ? $get_deliveryday_required_repeater['order_days_before_holiday'] : 0);
+        } else if($type == 'weekend') {
+            return (!empty($get_deliveryday_required_repeater['order_days_before_weekend']) ? $get_deliveryday_required_repeater['order_days_before_weekend'] : 0);
+        } else {
+            return (!empty($get_deliveryday_required_repeater['order_days_before_weekday']) ? $get_deliveryday_required_repeater['order_days_before_weekday'] : 0);
+        }
+    }
 }
 
+/**
+ * Function for getting the closed dates from the Vendor.
+ * Either from the text field - or from the repeater field
+ *
+ * @author Dennis Lauritzen <dl@dvlp-consult.dk
+ * @param $vendor_id integer
+ * @return array
+ */
 function get_vendor_closed_dates($vendor_id){
     // Get the closed days / dates for the vendor.
-    $vendorClosedDay = get_user_meta($vendor_id, 'vendor_drop_off_time', true);
 
-    return $vendorClosedDay;
+    // TEXT FIELD
+    // Get the closed dates from the text field
+    $vendorClosedDay = get_user_meta($vendor_id, 'vendor_closed_day', true);
+    $meta_closed_days = empty($vendorClosedDay) ? get_field('vendor_closed_day', 'user_'.$vendor_id) : $vendorClosedDay;
+
+    // Split the closed dates
+    $vendor_closed_days_text = (!empty($meta_closed_days) ? preg_split('/[, ]+/', $meta_closed_days, -1, PREG_SPLIT_NO_EMPTY) : array());
+
+    // REPEATER FIELD
+    // If the closed dates from the text field is empty, get it from
+    $vendor_closed_days_repeater = get_field('vendor_closed_dates', 'user_'.$vendor_id);
+
+    // Set the array
+    $closed_dates_array = array();
+
+    # We could think about merging the two arrays (TEXT & REPEATER) if both are set:
+    #return array_merge($vendor_closed_days_text, $vendor_closed_days_repeater);
+
+    if(!empty($vendor_closed_days_repeater)
+    && is_array($vendor_closed_days_repeater)
+    && $vendor_closed_days_text != $vendor_closed_days_repeater){
+        return array_map(function($item) {
+            $closingDate = DateTime::createFromFormat('d/m/Y', $item['closing_dates']);
+            return $closingDate->format('d-m-Y');
+        }, $vendor_closed_days_repeater);
+    } else {
+        return array_filter($vendor_closed_days_text, function ($element) {
+            return is_string($element) && '' !== trim($element);
+        });
+        // Old days this was done this way: $closedDatesArr		= array_map('trim', explode(",",$delClosedDates));
+        #$closed_dates_array = $vendor_closed_days_text;
+    }
 }
 
 /**
  * Function for getting the dropoff time for a specific vendor.
  *
  * @param $vendor_id
- * @param $type
+ * @param $type weekday|weekend|holiday
  * @return string
  */
 function get_vendor_dropoff_time($vendor_id, $type = 'weekday'){
+    // Get the vendor dropoff time the old way
     // Get the dropoff time metavalue for the vendor.
-    $vendorDropOffTime = ($type == 'weekend' ? get_user_meta($vendor_id, 'vendor_drop_off_time_weekend', true) : get_user_meta($vendor_id, 'vendor_drop_off_time', true));
+    #$vendorDropOffTime = ($type == 'weekend' ? get_user_meta($vendor_id, 'vendor_drop_off_time_weekend', true) : get_user_meta($vendor_id, 'vendor_drop_off_time', true));
+    $vendor_dropoff_time = get_field('vendor_drop_off_time', 'user_'.$vendor_id);
+    $vendor_dropoff_time = empty($vendor_dropoff_time)?: get_user_meta($vendor_id, 'vendor_drop_off_time', true);
 
-    if(strpos($vendorDropOffTime,':') === false && strpos($vendorDropOffTime,'.') === false){
-        $vendorDropOffTime = $vendorDropOffTime.':00';
-    } else {
-        $vendorDropOffTime = str_replace(array(':','.'),array(':',':'),$vendorDropOffTime);
+    $vendor_cutoff_times = get_field('vendor_cutoff_times', 'user_'.$vendor_id);
+
+    // Get the new vendor dropoff time.
+    if(!empty($vendor_cutoff_times) && count($vendor_cutoff_times) > 0){
+        if($type == 'weekend' && !empty($vendor_cutoff_times['cutoff_time_weekend'])) {
+            $vendor_dropoff_time = $vendor_cutoff_times['cutoff_time_weekend'];
+        } else if($type == 'holiday' && !empty($vendor_cutoff_times['cutoff_time_holiday'])) {
+            $vendor_dropoff_time = $vendor_cutoff_times['cutoff_time_holiday'];
+        } else if($type == 'weekday'  && !empty($vendor_cutoff_times['cutoff_time_weekday'])) {
+            $vendor_dropoff_time = $vendor_cutoff_times['cutoff_time_weekday'];
+        }
     }
 
-    return $vendorDropOffTime;
+    if(strpos($vendor_dropoff_time,':') === false && strpos($vendor_dropoff_time,'.') === false){
+        $vendor_dropoff_time = $vendor_dropoff_time.':00';
+    } else {
+        $vendor_dropoff_time = str_replace(array(':','.'),array(':',':'),$vendor_dropoff_time);
+    }
+
+    return $vendor_dropoff_time;
+}
+
+function get_vendor_name($vendor_id){
+    if(empty($vendor_id) || !is_numeric($vendor_id)){
+        return;
+    }
+
+    global $WCMp;
+
+    $vendor = get_wcmp_vendor($vendor_id);
+
+    return ucfirst(esc_html($vendor->page_title));
+}
+
+
+/**
+ * Function for getting text for delivery days until the vendor can delivery
+ *
+ * @param $vendor_id
+ * @param $prepend_text
+ * @param $html_container the HTML container to have around the delivery text. Placeholder is {placeholder}
+ * @return array|mixed|string|string[]
+ */
+function get_vendor_delivery_date_text($vendor_id, $prepend_text = '', $html_container = ''){
+    ///////////////////////////
+    // Days until delivery
+    $delivery_days 		= get_vendor_days_until_delivery($vendor_id);
+
+    switch($delivery_days) {
+        case 0:
+            $text = 'i dag';
+            break;
+        case 1:
+            $text = 'i morgen';
+            break;
+        case 2:
+            $text = 'i overmorgen';
+            break;
+        default:
+            $text = 'om '.$delivery_days.' dage';
+            break;
+    }
+
+    if(!empty($html_container)) {
+        $text = str_replace('{placeholder}', $text, $html_container);
+    }
+
+    $text = (empty($prepent_text) ? $text : $prepend_text.$text);
+    return $text;
 }
 
 /**
@@ -3395,6 +3521,44 @@ function get_vendor_delivery_type($vendor_id, $return_type = 'type'){
     }
 }
 
+function get_vendor_delivery_dates_extraordinary($vendor_id){
+    $extraordinary_dates = get_field('vendor_open_dates_extraordinary', 'user_'.$vendor_id);
+
+    // Check if $extraordinary_dates is empty, and return an empty array if true
+    if (empty($extraordinary_dates)) {
+        return array();
+    }
+
+    return array_map(function ($item) {
+        $openingDate = DateTime::createFromFormat('d/m/Y', $item['opening_date']);
+        return $openingDate ? $openingDate->format('d-m-Y') : null;
+    }, $extraordinary_dates);
+}
+
+function get_global_days($type = 'closed') {
+    $result = [];
+
+    if ($type != 'closed' && $type != 'holidays') {
+        return $result;
+    }
+
+    if ($type == 'holidays') {
+        $holidays = get_field('global_holidays', 'option');
+
+        return array_map(function ($item) {
+            $closingDate = DateTime::createFromFormat('d/m/Y', $item['holiday_date']);
+            return $closingDate ? $closingDate->format('d-m-Y') : null;
+        }, $holidays);
+    } else {
+        $closed_dates = get_field('global_closed_dates', 'option');
+
+        return array_map(function ($item) {
+            $closingDate = DateTime::createFromFormat('d-m-Y', $item['closed_date']);
+            return $closingDate ? $closingDate->format('d-m-Y') : null;
+        }, $closed_dates);
+    }
+}
+
 
 /**
  * Function to get all closed dates calculated
@@ -3405,13 +3569,17 @@ function get_vendor_delivery_type($vendor_id, $return_type = 'type'){
 function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'close'){
 	global $wpdb;
 
+    #var_dump(get_field('vendor_require_order_days_before','user_'.$vendor_id));
+    #var_dump(get_vendor_dates_new($vendor_id, $date_format, $open_close, 60));
+
 	// Explicitly set arrays used in the formula.
 	$open_days = array();
+    $closed_days = array();
 	$dates = array();
 
 	// Get the time the store has chosen as their "cut-off" / drop-off for next order.
 	$vendorDropOffTime = get_vendor_dropoff_time($vendor_id);
-    $vendorDropOffTimeWeekend = get_vendor_dropoff_time($vendor_id, 'weekend');
+    #$vendorDropOffTimeWeekend = get_vendor_dropoff_time($vendor_id, 'weekend');
 
     // Get the number of days required for delivery by the vendor
     $vendorDeliveryDayReq = get_vendor_delivery_days_required($vendor_id);
@@ -3436,15 +3604,7 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 	// Get the explicitly defined closed DATES from admin (e.g. if one store is closed on a specific date)
 	// Loop through the closed dates from admin.
     // The $closed_days_date array gets exploded, and then array_filter applied to make sure no empty items is left in the array.
-	$meta_closed_days = get_user_meta($vendor_id, 'vendor_closed_day', true);
-    $meta_closed_days = empty($meta_closed_days) ? get_field('vendor_closed_day', 'user_'.$vendor_id) : $meta_closed_days;
-    #var_dump($vendor_id);
-    #var_dump($meta_closed_days);
-	$closed_days_date = (!empty($meta_closed_days) ? preg_split('/[, ]+/', $meta_closed_days, -1, PREG_SPLIT_NO_EMPTY) : array());
-
-    $closed_days_date = array_filter($closed_days_date, function ($element) {
-        return is_string($element) && '' !== trim($element);
-    });
+    $closed_days_date = get_vendor_closed_dates($vendor_id);
 	$closed_dates_arr = array();
 
 	// Loop through the closed dates string from admin (exploded above)
@@ -3493,6 +3653,171 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
 
 	// Return either the closed days or the open days, depending on the $open_close parameter.
 	return $open_close == 'close' ? $closed_days_date : $dates;
+}
+
+function get_vendor_dates_new($vendor_id, $date_format = 'd-m-Y', $open_close = 'close', $num_dates = 60)
+{
+    if(empty($vendor_id)){
+        return false;
+    }
+
+    global $wpdb;
+
+
+    // Explicitly set arrays used in the formula.
+    $open_days_arr = array();
+    $closed_days_arr = array();
+    $dates = array();
+
+    // Get the number of days required for delivery by the vendor
+    // Days before, that an order should be places for the date types.
+    $vendor_order_delivery_days_before = get_vendor_delivery_days_required($vendor_id);
+    $vendor_order_delivery_days_before_weekend = get_vendor_delivery_days_required($vendor_id, 'weekend');
+    $vendor_order_delivery_days_before_holiday = get_vendor_delivery_days_required($vendor_id, 'holiday');
+    ## Todo here: We need to make this so it can handle the weekend days.
+    // Get the number of days required for delivery by the vendor
+    #$vendorDeliveryDayReq = get_vendor_delivery_days_required($vendor_id);
+    #$vendorDeliveryDayRequiredCalculated = ($now->format('H:i') > $vendorDropOffTime) ? $vendorDeliveryDayReq+1 : $vendorDeliveryDayReq;
+    #$closed_num = 0;
+
+    // Get the time the store has chosen as their "cut-off" / drop-off for next order.
+    $vendor_dropoff_time = get_vendor_dropoff_time($vendor_id);
+    $vendor_dropoff_time_weekend = get_vendor_dropoff_time($vendor_id, 'weekend');
+    $vendor_dropoff_time_holiday = get_vendor_dropoff_time($vendor_id, 'holiday');
+
+    // @todo - Dennis update according to latest updates in closing day-field.
+    // open close days begin. Generate an array of all days ISO.
+    $default_days = ['1','2','3','4','5','6','7'];
+
+    // Get the opening days string/array from the database and handle it.
+    $opening_days = !empty(get_user_meta($vendor_id, 'openning')) ? get_user_meta($vendor_id, 'openning', true) : get_field('openning', 'user_'.$vendor_id); // true for not array return
+    $closed_days = (is_array($opening_days) ? array_diff($default_days, $opening_days) : array());
+
+    // Get the global dates.
+    // Global dates is defined by Greeting - and it is defining close days and "holidays"
+    $global_closed_dates = get_global_days('closed');//array( '24-12-2023', '25-12-2023', '31-12-2022', '01-01-2023', '05-05-2023', '18-05-2023', '29-05-2023');
+    $global_holidays = get_global_days('holidays');
+
+    // Explicitly set todays timezone and date, since there is some problems with this if not set explicitly.
+    // Define today's timezone and date.
+    $timezone = new DateTimeZone('Europe/Copenhagen');
+    $today = new DateTime('now', $timezone); # $today is used for incrementing in the for loop.
+    $now = new DateTime('now', $timezone); # $now is used for getting the time right now.
+
+    // Get the explicitly defined closed DATES from admin (e.g. if one store is closed on a specific date)
+    // Loop through the closed dates from admin.
+    // The $closed_days_date array gets exploded, and then array_filter applied to make sure no empty items is left in the array.
+    $closed_dates_arr = get_vendor_closed_dates($vendor_id);
+
+    // Get the explicitly set opening days.
+    $open_days_extraordinary = get_vendor_delivery_dates_extraordinary($vendor_id);
+
+    // If $num_dates is greater than 180, then we set it to 180 due to minimizing the load.
+    $num_dates = ($num_dates > 180) ? 180 : $num_dates;
+
+    for($i=0;$i<$num_dates;$i++){
+        $datekey = $today->format('dmY');
+        $date = $today->format($date_format);
+        $date_weekday = $today->format('N');
+
+        $is_open = true; // true or false - is this date open at the time?
+        $is_closed = !$is_open; // true or false - is this date closed at the time? Will always be the opposite of $is_open
+        $is_open_extraordinary_day = in_array($today->format('d-m-Y',), $open_days_extraordinary) ? true : false; // true or false
+        $is_closed_date = in_array($today->format('d-m-Y',), $closed_dates_arr);
+        $is_open_day_weekdays = in_array($today->format('N'), $opening_days) ? true : false;
+        $is_holiday = in_array($date, $global_holidays) ? true : false;
+        $is_global_closed_date = in_array($date, $global_closed_dates) ? true : false;
+
+        $type = 'weekday';
+        if ($$date_weekday >= 1 && $date_weekday <= 5) {
+            $type = 'weekday';
+        } elseif ($date_weekday >= 6 && $date_weekday <= 7) {
+            $type = 'weekend';
+        }
+        $type = in_array($today->format('d-m-Y'), $global_holidays) ? 'holiday' : $type;
+
+        switch ($type) {
+            case 'weekend':
+                $cutoff = $vendor_dropoff_time_weekend;
+                break;
+            case 'holiday':
+                $cutoff = $vendor_dropoff_time_holiday;
+                break;
+            default:
+                $cutoff = $vendor_dropoff_time;
+                break;
+        }
+
+        // Calculation of the specific cutoff time for this date.
+        # @todo - Make the calculation
+        $cutoff_datetime = new DateTime($today->format('d-m-Y '.$cutoff), $timezone);
+        if($type == 'weekday'){
+            $cutoff_datetime->modify('-'.$vendor_order_delivery_days_before.' day');
+        } else if($type == 'weekend'){
+            $cutoff_datetime->modify('-'.$vendor_order_delivery_days_before_weekend.' day');
+        } else if($type == 'holiday'){
+            $cutoff_datetime->modify('-'.$vendor_order_delivery_days_before_holiday.' day');
+        }
+
+        if($now->format('H:i') > $cutoff){
+            $cutoff_datetime->modify('-1 day');
+        }
+
+        if(
+            (!in_array($date_weekday, $opening_days)
+            && !in_array($today->format('d-m-Y'), $open_days_extraordinary))
+            ||
+            (in_array($today->format('d-m-Y'), $closed_dates_arr)
+            && !in_array($today->format('d-m-Y'), $open_days_extraordinary))
+        ){
+
+            $cutoff_datetime = false;
+            $is_open = false;
+        }
+
+        $dates[$datekey] = array(
+            'date' => $date,
+            'cutoff_datetime' => $cutoff_datetime, // the exact time you can order for this date.
+            'cutoff_time' => $cutoff, // the value from the cutoff field based on the type of the date
+            'is_open' => $is_open, // true or false - is this date closed at the time?
+            'is_closed' => !$is_open, // true or false - is this date open at the time?
+            'is_open_day_weekdays' => $is_open_day_weekdays,
+            'is_closed_date' => $is_closed_date,
+            'type' => $type,
+            'is_extraordinary_date' => $is_open_extraordinary_day,
+            'is_global_closed_date' => $is_global_closed_date,
+            'is_holiday' => $is_holiday
+        );
+
+        // Last action, add 1 day.
+        $today->modify('+1 day');
+    }
+
+    foreach ($dates as $key => $value) {
+        $cutoffDatetime = $value['cutoff_datetime'];
+        $date = DateTime::createFromFormat('d-m-Y', $value['date']);
+
+        if($value['is_global_closed_date'] === true){
+            $closed_days_arr[$key] = $date->format('d-m-Y');
+            continue;
+        }
+
+        if (isset($cutoffDatetime) && $cutoffDatetime instanceof DateTime) {
+            if ($cutoffDatetime->format('d-m-Y H:i:s') >= $today->format('d-m-Y H:i:s')) {
+                $open_days_arr[$key] = $date->format('d-m-Y');
+            } else {
+                $closed_days_arr[$key] = $date->format('d-m-Y');
+            }
+        } else if ($cutoffDatetime === false) {
+            $closed_days_arr[$key] = $date->format('d-m-Y');
+        } else {
+
+        }
+    }
+
+    #return $dates;
+    // Return either the closed days or the open days, depending on the $open_close parameter.
+    return $open_close == 'close' ? $closed_days_arr : $open_days_arr;
 }
 
 function estimateDeliveryDate($days = 1, $cut_off = 15, $iso_opening_days = array(1,2,3,4,5,6,7), $format = 'U')
@@ -3567,7 +3892,7 @@ function greeting_echo_date_picker( ) {
 	$vendorDeliverDayReq = get_vendor_delivery_days_required($vendor_id);
 	$vendorDropOffTime = get_vendor_dropoff_time($vendor_id);
 
-	$closed_dates_arr = explode(",",get_vendor_closed_dates($vendor_id));
+	$closed_dates_arr = get_vendor_closed_dates($vendor_id);
 
 	if($del_value == '0'){
 		echo '<h3 class="pt-4">Leveringsdato</h3>';
@@ -3590,34 +3915,23 @@ function greeting_echo_date_picker( ) {
 			'custom_attributes' => array('readonly' => 'readonly', 'translate' => 'no')
 		), WC()->checkout->get_value( 'delivery_date' ) );
 
+
 		// Build intervals & delivery days.
 		$opening = get_field('openning', 'user_'.$vendor_id);
-		$del_days = get_del_days_text($opening, $del_value, 1);
-		echo $del_days;
-		echo '.</p>';
+		$del_days = get_del_days_text($opening, $del_value, 2);
+		//echo $del_days;
+		//echo '.</p>';
 
-		echo '<div id="show-if-shipping">';
-		echo '<span>Ved bestillingen inden klokken ';
-		echo $vendorDropOffTime.'</span>';
-		echo ' kan butikken levere om '.$vendorDeliverDayReq;
-		echo ' leveringsdag(e).';
-
-		#$closed_days_date_iteration = count($closed_dates_arr);
-		#$cdi = 0;
-		#if(!empty($closed_dates_arr)){
-		#	echo '<p>Butikken holder lukket på flg. datoer: ';
-		#	foreach($closed_dates_arr as $closed_date){
-		#		if(++$cdi == $closed_days_date_iteration){
-		#			echo $closed_date;
-		#		} else {
-		#			echo $closed_date.", ";
-		#		}
-		#	}
-		#	echo '</p>';
-		#	// open close days end
-		#}
-
-		echo '</div>';
+        // @todo - get the days. "I dag", "I morgen" etc. - must be a function from the overviews.
+        $delivery_text = get_vendor_delivery_date_text($vendor_id);
+        echo '
+        <div style="padding: 6px 10px; font-size: 12px; font-family: Inter,sans-serif; background: #fafafa; color: #666666;">
+            <b>Info om butikken, der leverer din gavehilsen</b><br>
+            Du er i gang med at bestille en gavehilsen hos '.get_vendor_name($vendor_id).', der har åbent og kan levere din gave '.$del_days.'.<br><br>
+        
+            Hvis du bestiller nu, kan butikken levere <b>'.$delivery_text.'</b>. (Butikken kan levere inden for '.$vendorDeliverDayReq.' åbningsdag(e), hvis du bestiller inden kl. '.$vendorDropOffTime.').
+        </div>
+        ';
 	}
 	?>
 
@@ -3683,7 +3997,7 @@ function greeting_marketplace_checkout_fields($fields) {
     // Remove order comment fields
 	unset($fields['order']['order_comments']);
 
-	$disable_autocomplete = 'nope';
+	$disable_autocomplete = false;
 	$fields['shipping']['shipping_address_1']['autocomplete'] = $disable_autocomplete;
 	$fields['shipping']['shipping_postcode']['autocomplete'] = $disable_autocomplete;
 	$fields['shipping']['shipping_city']['autocomplete'] = $disable_autocomplete;
@@ -4678,7 +4992,7 @@ function shop_order_display_callback( $post ) {
 		}
 
 		// BEWARE: Not used because then we cant change date according to our needs
-		$dates = get_vendor_dates($vendor_id);
+		$dates = get_vendor_dates_new($vendor_id);
 		$dates_json = json_encode($dates);
 		?>
 
@@ -4849,13 +5163,12 @@ function get_vendor_days_until_delivery($vendor_id){
 	}
 
 	$dropoff_time 		= get_field('vendor_drop_off_time','user_'.$vendor_id);
-	$dropoff_time			= (int) substr($dropoff_time, 0, 2);
-	$delDate 					= get_field('vendor_require_delivery_day','user_'.$vendor_id);
-	$delClosedDates		= get_field('vendor_closed_day','user_'.$vendor_id);
-	$delWeekDays			= get_field('openning','user_'.$vendor_id);
+	$dropoff_time		= (int) substr($dropoff_time, 0, 2);
+	$delDate 			= get_field('vendor_require_delivery_day','user_'.$vendor_id);
+	$closedDatesArr		= get_vendor_closed_dates($vendor_id);
+	$delWeekDays		= get_field('openning','user_'.$vendor_id);
 
 	// Check if the store is closed this specific date.
-	$closedDatesArr		= array_map('trim', explode(",",$delClosedDates));
 	$closedThisDate 	= (in_array(date('d-m-Y'), $closedDatesArr)) ? 1 : 0;
 
 	// Start calculation from 0 (= today)
@@ -4923,7 +5236,7 @@ function get_del_days_text($opening, $del_type = '1', $long_or_short_text = 0){
 	} else {
 		$str .= 'Leveringsdage er ukendte';
 		if($long_or_short_text == 1){
-			$str .= 'Butikkens'.strtolower($str);
+			$str .= 'Butikkens '.strtolower($str);
 		}
 	}
 	$i = 1;
@@ -4936,7 +5249,9 @@ function get_del_days_text($opening, $del_type = '1', $long_or_short_text = 0){
 		}
 		if($long_or_short_text == 1){
 			$str = "Butikken ".strtolower($str);
-		}
+		} else if($long_or_short_text == 2){
+            $str = '';
+        }
 
 		foreach($interv as $v){
 			$val = explode('..',$v);
@@ -5461,3 +5776,99 @@ function get_customer_order( $customer_id, $billing_email, $first_or_last )
 
     return wc_get_order(absint($order));
 }
+
+function vendor_remove_fields_from_admin($contactmethods, $user) {
+    // Check if the current user is an administrator and if the user being edited has the 'dc_vendor' role
+    $current_user = wp_get_current_user();
+    if (current_user_can('administrator') && is_array($contactmethods) && $user && in_array('dc_vendor', $user->roles)) {
+        // Replace 'field-id' with the actual ID or name of the field you want to unset
+        $fields_to_unset = array(
+            'facebook',
+            'instagram',
+            'linkedin',
+            'twitter',
+            'youtube',
+            'wikipedia',
+            'myspace',
+            'pinterest',
+            'soundcloud',
+            'tumblr',
+            'facebook_profile',
+            'twitter_profile',
+            'linkedin_profile',
+            'github_profile',
+            'vendor_csd_return_address1',
+            'vendor_csd_return_address2'
+        );
+
+        // Unset each shipping address field
+        foreach ($fields_to_unset as $field) {
+            unset($contactmethods[$field]);
+        }
+    }
+
+    return $contactmethods;
+}
+add_filter('user_contactmethods', 'vendor_remove_fields_from_admin', 10, 2);
+
+add_filter( 'woocommerce_customer_meta_fields', 'vendor_remove_shipping_fields' );
+function vendor_remove_shipping_fields($show_fields) {
+    // Get the ID of the user currently being edited
+    $edited_user_id = isset($_REQUEST['user_id']) ? absint($_REQUEST['user_id']) : 0;
+
+    // Check if the current user is an administrator and if the user being edited has the 'dc_vendor' role
+    if ($edited_user_id > 0
+    && current_user_can('administrator')
+    && in_array('dc_vendor', get_userdata($edited_user_id)->roles)) {
+        // Check if $show_fields is an array before attempting to loop through it
+
+        if (is_array($show_fields)) {
+            unset($show_fields['billing']);
+            unset($show_fields['shipping']);
+        }
+    }
+
+    return $show_fields;
+}
+
+function vendor_hide_fields_css() {
+    $edited_user_id = isset($_REQUEST['user_id']) ? absint($_REQUEST['user_id']) : 0;
+
+    // Check if the current user has the 'dc_vendor' role
+    if ($edited_user_id > 0
+        && current_user_can('administrator')
+        && in_array('dc_vendor', get_userdata($edited_user_id)->roles)) {
+        // Hide specific fields or sections by their IDs or names
+        ?>
+        <style type="text/css">
+            /* Replace 'field-id' with the actual ID or name of the field you want to hide */
+            .vendor_fb_profile_wrapper,
+            .vendor_instagram_wrapper,
+            .vendor_twitter_profile_wrapper,
+            .vendor_linkdin_profile_wrapper,
+            .vendor_pinterest_profile_wrapper,
+            .vendor_youtube_wrapper,
+            .vendor_csd_return_address1_wrapper,
+            .vendor_csd_return_address2_wrapper,
+            .vendor_csd_return_country_wrapper,
+            .vendor_csd_return_state_wrapper,
+            .vendor_csd_return_city_wrapper,
+            .vendor_csd_return_zip_wrapper,
+            .vendor_customer_phone_wrapper,
+            .vendor_customer_email_wrapper,
+            .vendor_paypal_email_wrapper,
+            .vendor_give_tax_wrapper,
+            .vendor_give_shipping_wrapper,
+            .vendor_hide_address_wrapper,
+            .vendor_hide_phone_wrapper,
+            .vendor_hide_email_wrapper,
+            .vendor_hide_description_wrapper,
+            .vendor_message_to_buyers_wrapper
+            {
+                display: none;
+            }
+        </style>
+        <?php
+    }
+}
+add_action('admin_head', 'vendor_hide_fields_css');
