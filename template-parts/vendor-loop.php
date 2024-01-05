@@ -80,12 +80,14 @@ if($args['vendor']){
           ///////////////////////////
           // STORE TYPE TAG
           $store_type = get_field('store_type','user_'.$vendor_id);
-          var_dump($store_type);
+          #var_dump($store_type);
           if(!empty($store_type)){
             foreach($store_type as $k => $v){
-            ?>
-              <span class="badge text-dark border border-dark fw-light shadow-none "><?php echo $v['label']; ?></span>
-            <?php
+                if($v['label'] != "1" && $v['label'] != "0"){
+                ?>
+                <span class="badge text-dark border border-dark fw-light shadow-none "><?php echo $v['label']; ?></span>
+                <?php
+                }
             } // endforeach store_type
           } // endif $store_type
         }
