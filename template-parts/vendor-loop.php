@@ -80,6 +80,7 @@ if($args['vendor']){
           ///////////////////////////
           // STORE TYPE TAG
           $store_type = get_field('store_type','user_'.$vendor_id);
+          var_dump($store_type);
           if(!empty($store_type)){
             foreach($store_type as $k => $v){
             ?>
