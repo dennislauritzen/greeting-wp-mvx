@@ -691,7 +691,7 @@ document.addEventListener("DOMContentLoaded", function() {
         if($count > 0){
         ?>
         <div class="row mb-3">
-          <h5 style="font-family: 'Inter', sans-serif;">Er du på udkig efter noget specifikt? Find alle typer af gavehilsner i <?php echo $cityName; ?></h5>
+          <h5 style="font-family: 'Inter', sans-serif; margin-top: 25px;">Er du på udkig efter noget specifikt? Find alle typer af gavehilsner i <?php echo $cityName; ?></h5>
           <div class="col-12 col-md-6 col-lg-4 mb-3" style="overflow-wrap: break-word;">
             <?php
             foreach($posts->posts as $k => $v){

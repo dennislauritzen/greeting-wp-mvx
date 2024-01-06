@@ -2659,7 +2659,6 @@ function custom_display_order_data_in_admin(){
  * @since v1.0
  * @author Dennis
  */
-add_filter( 'woocommerce_email_order_meta_fields', 'custom_woocommerce_email_order_meta_fields', 10, 3 );
 function custom_woocommerce_email_order_meta_fields( $fields, $sent_to_admin, $order ) {
 		$del_date = get_post_meta( $order->get_id(), '_delivery_date', true );
     $delivery_date = (!empty($del_date) ? $del_date : 'Hurtigst muligt');
@@ -2700,7 +2699,7 @@ function custom_woocommerce_email_order_meta_fields( $fields, $sent_to_admin, $o
 
     return $fields;
 }
-
+add_filter( 'woocommerce_email_order_meta_fields', 'custom_woocommerce_email_order_meta_fields', 10, 3 );
 #do_action('wcmp_checkout_vendor_order_processed', $vendor_order_id, $posted_data, $order);
 
 
@@ -2719,21 +2718,26 @@ function checkout_message_fee( $cart ) {
     }
 }
 
-add_action( 'woocommerce_checkout_update_order_review', 'checkout_message_choice_to_session' );
+
+/**
+ * @param $posted_data
+ * @return void
+ */
 function checkout_message_choice_to_session( $posted_data ) {
     parse_str( $posted_data, $output );
     if ( isset( $output['message-pro'] ) ){
         WC()->session->set( 'message-pro', $output['message-pro'] );
     }
 }
+add_action( 'woocommerce_checkout_update_order_review', 'checkout_message_choice_to_session' );
 
 /**
-*
-* Function for the greeting text / greeting message
-* #greeting_text #greeting_meesage
-*
-*
-*/
+ * Function for the greeting text / greeting message
+ * #greeting_text #greeting_meesage
+ *
+ * @author Dennis Lauritzen
+ * @return void
+ */
 add_action( 'woocommerce_after_checkout_validation', 'greeting_validate_new_receiver_info_fields', 10, 2 );
 function greeting_validate_new_receiver_info_fields($fields, $errors) {
 	global $woocommerce;
@@ -2872,7 +2876,11 @@ function checkout_packaging_choice_to_session( $posted_data ) {
     }
 }
 
-/** redirect pages for restricted page */
+/**
+ * redirect pages for restricted page
+ *
+ * @return void
+ */
 function redirect_direct_access( ) {
     $currentUrl = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
     if ( $currentUrl == home_url().'/dashboard/transaction-details/' ) {
@@ -2881,17 +2889,15 @@ function redirect_direct_access( ) {
         exit();
     }
 }
-
 add_action( 'template_redirect', 'redirect_direct_access' );
 
 
 /**
- * Shop only one store same time
+ * Only show one store at a time
+ *
+ * @author Dennis Lauritzen
+ * @return void
  */
-
-//  add_action('init', 'greeting_shop_only_one_store_same_time');
-add_action('wp_loaded', 'greeting_shop_only_one_store_same_time');
-
 function greeting_shop_only_one_store_same_time() {
 	$single_vendor = 0;
 	$last_inserted_vendor_id = null;
@@ -2936,13 +2942,20 @@ function greeting_shop_only_one_store_same_time() {
 		}
 	}
 }
+//  add_action('init', 'greeting_shop_only_one_store_same_time');
+add_action('wp_loaded', 'greeting_shop_only_one_store_same_time');
+
 
 /**
  *
  * The notice when someone shops in more than one store.
  * Should be localized and danish
+ *
  * @todo Dennis - translate
  * @todo Dennis - set up with localization.
+ *
+ * @author Dennis Lauritzen
+ * @return void
  */
 // show shop only one store same time notice
 function show_shop_only_one_store_same_time_notice(){
@@ -2951,10 +2964,10 @@ function show_shop_only_one_store_same_time_notice(){
 }
 
 /**
-* @author Dennis Lauritzen
-* Remove report abuse link
-*
-*/
+ * Remove report abuse link
+ *
+ * @author Dennis Lauritzen
+ */
 add_filter('wcmp_show_report_abuse_link', '__return_false');
 
 /**
@@ -2979,7 +2992,7 @@ function greeting_wc_shop_disabled() {
     wc_print_notice( 'Greeting.dk er lukket ned pga. vedligehold netop nu, desværre :)', 'error');
 }
 
-add_action( 'woocommerce_single_product_summary', 'reorder_product_page_hooks', 1 );
+
 function reorder_product_page_hooks(){
 	remove_action('woocommerce_single_product_summary','woocommerce_template_single_rating', 10);
 	remove_action('woocommerce_single_product_summary','woocommerce_template_single_excerpt', 20);
@@ -2993,9 +3006,9 @@ function reorder_product_page_hooks(){
 	add_action('woocommerce_single_product_summary','woocommerce_template_single_excerpt', 15);
 	add_action('woocommerce_single_product_summary','woocommerce_template_single_add_to_cart', 20);
 }
+add_action( 'woocommerce_single_product_summary', 'reorder_product_page_hooks', 1 );
 
 
-add_action( 'woocommerce_after_single_product_summary', 'reorder_product_page_after_product_hooks', 1 );
 function reorder_product_page_after_product_hooks(){
 	remove_action('woocommerce_after_single_product_summary','woocommerce_output_product_data_tabs', 10);
 	remove_action('woocommerce_after_single_product_summary','woocommerce_upsell_display', 15);
@@ -3004,11 +3017,26 @@ function reorder_product_page_after_product_hooks(){
 	add_action('woocommerce_after_single_product_summary','add_vendor_info_to_product_page', 5);
 	add_action('woocommerce_after_single_product_summary','woocommerce_output_related_products', 10);
 }
+add_action( 'woocommerce_after_single_product_summary', 'reorder_product_page_after_product_hooks', 1 );
+
+/**
+ * Add the vendor information block to the product page
+ *
+ * @author Dennis Lauritzen
+ * @return void
+ */
 function add_vendor_info_to_product_page(){
-		wc_get_template( 'single-product/vendor-information.php' );
+    wc_get_template( 'single-product/vendor-information.php' );
 }
 
-add_filter( 'woocommerce_get_price_html', 'change_variable_products_price_display', 10, 2 );
+
+/**
+ * Change the way the price is shown for variable products
+ *
+ * @param $price
+ * @param $product
+ * @return mixed|null
+ */
 function change_variable_products_price_display( $price, $product ) {
     // Only for variable products type
     if( ! $product->is_type('variable') ) return $price;
@@ -3026,13 +3054,15 @@ function change_variable_products_price_display( $price, $product ) {
 
     return apply_filters( 'woocommerce_variable_price_html', $prefix . wc_price( $min_price ) . $product->get_price_suffix(), $product );
 }
+add_filter( 'woocommerce_get_price_html', 'change_variable_products_price_display', 10, 2 );
 
 /**
+ * Change currency symbol for danish goods.
  *
- *	Change currency symbol for danish goods.
- *
+ * @param $currency_symbol
+ * @param $currency
+ * @return mixed|string
  */
-add_filter('woocommerce_currency_symbol', 'greeting_change_dk_currency_symbol', 10, 2);
 function greeting_change_dk_currency_symbol( $currency_symbol, $currency ) {
     switch( $currency ) {
         // DKK til kr
@@ -3040,6 +3070,7 @@ function greeting_change_dk_currency_symbol( $currency_symbol, $currency ) {
     }
     return $currency_symbol;
 }
+add_filter('woocommerce_currency_symbol', 'greeting_change_dk_currency_symbol', 10, 2);
 
 
 // Utility function to get the price of a variation from it's attribute value
@@ -3059,8 +3090,13 @@ function get_the_variation_price_html( $product, $name, $term_slug ){
 }
 
 
-// Add the price  to the dropdown options items.
-add_filter( 'woocommerce_dropdown_variation_attribute_options_html', 'show_price_in_attribute_dropdown', 10, 2);
+/**
+ * Function for showing the price in the attribute dropdown on product pages
+ *
+ * @param $html
+ * @param $args
+ * @return mixed|string
+ */
 function show_price_in_attribute_dropdown( $html, $args ) {
     // Only if there is a unique variation attribute (one dropdown)
     if( sizeof($args['product']->get_variation_attributes()) == 1 ) :
@@ -3111,9 +3147,9 @@ function show_price_in_attribute_dropdown( $html, $args ) {
 
     return $html;
 }
+add_filter( 'woocommerce_dropdown_variation_attribute_options_html', 'show_price_in_attribute_dropdown', 10, 2);
 
 /**
- *
  * Add javascript and some styles to header only on cart page
  * for qty updates
  *
@@ -5313,12 +5349,19 @@ function rephraseDate($weekday, $date, $month, $year) {
 	return $weekday_str." d. ".$date.". ".$month_str. " ". $year_str;
 }
 
+/**
+ * Turn off the xmlRPC
+ *
+ * @author Dennis Lauritzen
+ */
 add_filter( 'xmlrpc_enabled', '__return_false' );
 
 
 
 /**
  * Register meta box(es).
+ *
+ * @author Dennis Lauritzen
  */
 function greeting_change_vendor_show_meta() {
 	add_meta_box( 'meta-change-vendor', __( 'Change Vendor', 'textdomain' ), 'greeting_change_vendor_show_meta_callback', 'shop_order' );
@@ -5328,6 +5371,7 @@ add_action( 'add_meta_boxes', 'greeting_change_vendor_show_meta' );
 /**
  * Meta box display callback.
  *
+ * @author Dennis Lauritzen
  * @param WP_Post $post Current post object.
  */
 function greeting_change_vendor_show_meta_callback( $post ) {
@@ -5352,6 +5396,13 @@ function greeting_change_vendor_show_meta_callback( $post ) {
 	echo '</select>';
 }
 
+/**
+ * Function for changing an order to another vendor
+ *
+ * @author Dennis Lauritzen
+ * @param Integer $post_id
+ * @return void
+ */
 function greeting_change_vendor_show_meta_action( $post_id ) {
   if( !isset( $_POST['vendor_meta_name'] ) || !wp_verify_nonce( $_POST['greeting_vendor_change'],'greeting_vendor_change_metabox_action') )
 		return;
@@ -5370,6 +5421,7 @@ add_action('save_post', 'greeting_change_vendor_show_meta_action');
  * Add a custom action to order actions select box on edit order page.
  * Only added for paid orders that haven't fired this action yet
  *
+ * @author Dennis Lauritzen
  * @param array $actions order actions array to display
  * @return array - updated actions
  */
@@ -5383,7 +5435,7 @@ function greeting_wc_add_order_meta_box_action( $actions ) {
 
 	// add "mark printed" custom action
 	$actions['wc_custom_order_action'] = __( 'Gensend mail til butikken', 'greeting2' );
-  $actions['wc_custom_order_action_test_mail'] = __( 'SEND TEST MAIL', 'greeting2' );
+    $actions['wc_custom_order_action_test_mail'] = __( 'SEND TEST MAIL', 'greeting2' );
 	return $actions;
 }
 add_action( 'woocommerce_order_actions', 'greeting_wc_add_order_meta_box_action' );
@@ -5392,6 +5444,7 @@ add_action( 'woocommerce_order_actions', 'greeting_wc_add_order_meta_box_action'
  * Add an order note when custom action is clicked
  * Add a flag on the order to show it's been run
  *
+ * @author Dennis Lauritzen
  * @param \WC_Order $order
  */
 function greeting_wc_process_order_meta_box_action( $order ) {
@@ -5412,6 +5465,7 @@ add_action( 'woocommerce_order_action_wc_custom_order_action', 'greeting_wc_proc
  * Add an order note when custom action is clicked
  * Add a flag on the order to show it's been run
  *
+ * @author Dennis Lauritzen
  * @param \WC_Order $order
  */
 function greeting_wc_process_order_meta_box_action_test_mail( $order ) {
@@ -5447,6 +5501,9 @@ add_action( 'woocommerce_order_action_wc_custom_order_action_test_mail', 'greeti
  * Function for duplicating taxonomies when duplicating a product.
  *
  * @author Dennis Lauritzen
+ * @param \WC_Product $duplicate The new product, that is the receiver of the copied stuff
+ * @param \WC_Product $product The original product, that we are copying from
+ * @return void
 */
 add_action( 'woocommerce_product_duplicate', 'greeting_duplicate_custom_taxonomies', 999, 2);
 function greeting_duplicate_custom_taxonomies( WC_Product $duplicate, WC_Product $product ) {
@@ -5461,7 +5518,9 @@ function greeting_duplicate_custom_taxonomies( WC_Product $duplicate, WC_Product
 /**
  * Function for using order object to get Vendor ID.
  *
- *
+ * @author Dennis Lauritzen
+ * @param \WC_Order $order
+ * @return Integer $vendor_id
  */
 function greeting_get_vendor_id_from_order( $order ){
 	$vendor_id = 0;
@@ -5478,7 +5537,9 @@ function greeting_get_vendor_id_from_order( $order ){
  * CRONJOB
  * Function for using order object to get Vendor ID.
  *
- *
+ * @author Dennis Lauritzen
+ * @param array $schedules
+ * @return array
  */
 // Define a custom 15-minute interval
 function greeting_custom_15_minute_interval($schedules) {
@@ -5490,7 +5551,12 @@ function greeting_custom_15_minute_interval($schedules) {
 }
 add_filter('cron_schedules', 'greeting_custom_15_minute_interval');
 
-// Define a function to update order statuses
+/**
+ * Function for updatering via cronjob all orders from delivered status to completed every 15 minutes.
+ *
+ * @author Dennis Lauritzen
+ * @return void
+ */
 function greeting_update_wc_delivered_orders_to_completed() {
     // Get orders with "wc-delivered" status
     $delivered_orders = wc_get_orders(array(
@@ -5500,13 +5566,12 @@ function greeting_update_wc_delivered_orders_to_completed() {
 
     // Loop through the delivered orders and update their status to "completed"
     foreach ($delivered_orders as $order) {
-				if($order->get_status() == 'delivered'){
-					$date = date_i18n( 'l \\d\\e\\n d. F Y \\k\\l\\. H:i:s');
-        	$order->update_status('completed', 'Ordre er automatisk opdateret til Gennemført '.$date);
-				}
+        if($order->get_status() == 'delivered'){
+            $date = date_i18n( 'l \\d\\e\\n d. F Y \\k\\l\\. H:i:s');
+            $order->update_status('completed', 'Ordre er automatisk opdateret til Gennemført '.$date);
+        }
     }
 }
-// Hook the function to a scheduled event
 add_action('update_completed_orders_event', 'greeting_update_wc_delivered_orders_to_completed');
 
 // Schedule the event to run every 15 minutes using the custom interval
@@ -5519,6 +5584,10 @@ if (!wp_next_scheduled('update_completed_orders_event')) {
 /**
 * Format WordPress User's "Display Name" to Full Name on Login
 * ------------------------------------------------------------------------------
+ *
+ * @author Dennis Lauritzen
+ * @param String $username
+ * @return void
 */
 
 add_action( 'wp_login', 'greeting_r19029_format_user_display_name_on_login' );
@@ -5540,6 +5609,10 @@ function greeting_r19029_format_user_display_name_on_login( $username ) {
     }
 }
 
+/**
+ * @param $query
+ * @return array
+ */
 function custom_wp_link_query_args($query)
 {
     $pt_new = array();
@@ -5557,8 +5630,17 @@ function custom_wp_link_query_args($query)
 }
 add_filter('wp_link_query_args', 'custom_wp_link_query_args');
 
-// Function to look through a text for links to specified taxonomies.
-function add_links_to_keywords($content, $taxonomies) {
+/**
+ * Function to look through a text for links to specified taxonomies.
+ *
+ * @param String $content
+ * @param Array|Object $taxonomies
+ * @param Boolean $city_search
+ * @param Array $cities An array of the Cities that needs to be searched for. The Array can contain WP_Post
+ * @param Boolean $no_headings Do you want the search to look for the keywords in <h1>, <h2>, <h3> etc.? True/false
+ * @return mixed|string
+ */
+function add_links_to_keywords($content, $taxonomies, $city_search = false, $cities = array(), $no_headings = true) {
     // Check if ACF is active
     if (!function_exists('get_field')) {
         return $content;
@@ -5588,7 +5670,11 @@ function add_links_to_keywords($content, $taxonomies) {
                 foreach ($keywords as $value) {
                     if (!empty($value)) {
                         $escaped_value = preg_quote(trim($value), '/');
-                        $pattern = '/(?<!<\/a>)\b' . preg_quote($escaped_value, '/') . '\b(?![^<]*>)/i';
+                        if($no_headings === true){
+                            $pattern = '/(?<!<\/a>)\b' . preg_quote($escaped_value, '/') . '\b(?![^<]*<\/(?:h1|h2|h3|h4|h5|h6)>)/i';
+                        } else {
+                            $pattern = '/(?<!<\/a>)\b' . preg_quote($escaped_value, '/') . '\b(?![^<]*>)/i';
+                        }
 
                         // Perform the replacement only if the word or phrase doesn't have a link
                         $content = preg_replace_callback($pattern, function ($matches) use ($term_link, &$linkedPhrases) {
@@ -5605,14 +5691,56 @@ function add_links_to_keywords($content, $taxonomies) {
         }
     }
 
+    if($city_search === true
+    && is_array($cities)
+    && !empty($cities)){
+        // Make links for citi names too.
+        $city_posts = $cities;
+        $city_names = array_map(function ($city_post) {
+            $title = (strpos($city_post->post_title, ' ') == true ? substr($city_post->post_title, strpos($city_post->post_title, ' ') + 1) : $city_post->post_title );
+            return array(
+                'title' => $title,
+                'link' => get_permalink($city_post->ID),
+            );
+        }, $city_posts);
+
+        $linked_cities = array();
+
+        foreach ($city_names as $value) {
+            if (!empty($value)) {
+                // Regular expression pattern to find the first occurrence of "Beder" outside heading tags
+                if($no_headings === true){
+                    $pattern = '/<(h[1-6])[^>]*>.*?<\/\1>(*SKIP)(*FAIL)|\b'.$value['title'].'\b/i';
+                } else {
+                    $pattern = '/\b' . preg_quote($value['title'], '/') . '\b/i';
+                }
+
+                // Link to be added
+                $link = $value['link'];
+
+                // Replace the first occurrence of "Beder" outside heading tags with a link
+                $content = preg_replace($pattern, '<a href="' . esc_url($link) . '">$0</a>', $content, 1);
+            }
+        }
+
+        #foreach ($city_posts as $city_post) {
+        #    echo $city_post->post_title . '<br>';
+        #}
+    }
+
     // Apply wpautop to preserve line breaks
     $content = wpautop($content);
 
     return $content;
 }
 
-/* Register vendor ID in REST API */
-// Make sure to use PHP >= 5.4
+
+/**
+ * Register vendor ID in Rest API.
+ * Make sure to use PHP >= 5.4
+ *
+ * @author Dennis Lauritzen
+ */
 add_action(
     'rest_api_init',
     function () {
@@ -5648,6 +5776,12 @@ add_action(
     }
 );
 
+/**
+ * Register vendor name in Rest API.
+ * Make sure to use PHP >= 5.4
+ *
+ * @author Dennis Lauritzen
+ */
 add_action(
     'rest_api_init',
     function () {
@@ -5679,6 +5813,12 @@ add_action(
     }
 );
 
+/**
+ * Register a users first order date in Rest API.
+ * Make sure to use PHP >= 5.4
+ *
+ * @author Dennis Lauritzen
+ */
 add_action(
     'rest_api_init',
     function () {
@@ -5729,8 +5869,10 @@ add_action(
 );
 
 /**
- * @param $user integer
- * @param $order_meta object
+ * Get a users order based on either customer ID or billing e-mail
+ *
+ * @param $customer_id integer
+ * @param $billing_email object
  * @param $first_or_last string #Values: 'first' or 'last'
  * @return bool|WC_Order|WC_Order_Refund
  */
@@ -5777,6 +5919,13 @@ function get_customer_order( $customer_id, $billing_email, $first_or_last )
     return wc_get_order(absint($order));
 }
 
+/**
+ * Removing unnecessary fields from vendor admin
+ *
+ * @param $contactmethods
+ * @param $user
+ * @return mixed
+ */
 function vendor_remove_fields_from_admin($contactmethods, $user) {
     // Check if the current user is an administrator and if the user being edited has the 'dc_vendor' role
     $current_user = wp_get_current_user();
@@ -5811,7 +5960,14 @@ function vendor_remove_fields_from_admin($contactmethods, $user) {
 }
 add_filter('user_contactmethods', 'vendor_remove_fields_from_admin', 10, 2);
 
-add_filter( 'woocommerce_customer_meta_fields', 'vendor_remove_shipping_fields' );
+
+/**
+ * Remove unneccessary shipping fields from admin
+ *
+ * @author Dennis Lauritzen
+ * @param Array $show_fields
+ * @return Array
+ */
 function vendor_remove_shipping_fields($show_fields) {
     // Get the ID of the user currently being edited
     $edited_user_id = isset($_REQUEST['user_id']) ? absint($_REQUEST['user_id']) : 0;
@@ -5830,7 +5986,14 @@ function vendor_remove_shipping_fields($show_fields) {
 
     return $show_fields;
 }
+add_filter( 'woocommerce_customer_meta_fields', 'vendor_remove_shipping_fields' );
 
+/**
+ * Hide fields through CSS in the vendor user admin
+ *
+ * @author Dennis Lauritzen
+ * @return void
+ */
 function vendor_hide_fields_css() {
     $edited_user_id = isset($_REQUEST['user_id']) ? absint($_REQUEST['user_id']) : 0;
 

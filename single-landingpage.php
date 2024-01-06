@@ -797,6 +797,12 @@ $occasionTermListArray = array_unique($occasionTermListArray);
             <div id="categoryDescription" style="max-height: 400px; overflow: hidden;">
               <?php
               $description = get_the_content();
+              $description = add_links_to_keywords(
+                  wp_kses_post( $description ),
+                  array('product_cat', 'occasion'),
+                  true,
+                  $postal_codes
+              );
               $collapsed = false;
 
               // Check if the content exceeds the max-height
@@ -804,7 +810,8 @@ $occasionTermListArray = array_unique($occasionTermListArray);
                   $collapsed = true;
               }
 
-              the_content();
+              print $description;
+              #the_content();
 
               if ($collapsed) {
                   echo '<div class="overlay" id="ctaOverlayWhite"></div>';

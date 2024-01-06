@@ -706,24 +706,28 @@ $categoryDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode);
 	          </h2>
 	          <div style="position: relative;">
 	            <div id="categoryDescription" style="max-height: 400px; overflow: hidden;">
-								<?php
-	              $description = category_description($category_id);
-	              $collapsed = false;
+                    <?php
+                    $description = category_description($category_id);
+                    $description = add_links_to_keywords(
+                        wp_kses_post( $description ),
+                        array('product_cat', 'occasion')
+                    );
+                    $collapsed = false;
 
-	              // Check if the content exceeds the max-height
-	              if (strlen($description) > 300) {
-	                  $collapsed = true;
-	              }
+                    // Check if the content exceeds the max-height
+                    if (strlen($description) > 300) {
+                        $collapsed = true;
+                    }
 
-	              echo $description;
+                    echo $description;
 
-	              if ($collapsed) {
-	                  echo '<div class="overlay" id="ctaOverlayWhite"></div>';
-	                  echo '<div class="button-line col-12 text-center py-2">';
-	                  echo '<button class="btn bg-teal text-white rounded-pill border-teal border-1" id="toggleDescription" style="z-index: 1 !important;">Læs mere</button>';
-	                  echo '</div>';
-	              }
-	              ?>
+                    if ($collapsed) {
+                    echo '<div class="overlay" id="ctaOverlayWhite"></div>';
+                    echo '<div class="button-line col-12 text-center py-2">';
+                        echo '<button class="btn bg-teal text-white rounded-pill border-teal border-1" id="toggleDescription" style="z-index: 1 !important;">Læs mere</button>';
+                        echo '</div>';
+                    }
+                    ?>
 	            </div>
 	            <style>
 	              .overlay {
