@@ -3813,7 +3813,7 @@ function get_vendor_dates_new($vendor_id, $date_format = 'd-m-Y', $open_close = 
 
         $dates[$datekey] = array(
             'date' => $date,
-            'cutoff_datetime' => $cutoff_datetime->format('d-m-Y H:i:s'), // the exact time you can order for this date.
+            'cutoff_datetime' => $cutoff_datetime, // the exact time you can order for this date.
             'cutoff_time' => $cutoff, // the value from the cutoff field based on the type of the date
             'is_open' => $is_open, // true or false - is this date closed at the time?
             'is_closed' => !$is_open, // true or false - is this date open at the time?
