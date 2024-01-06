@@ -3831,6 +3831,8 @@ function get_vendor_dates_new($vendor_id, $date_format = 'd-m-Y', $open_close = 
 
     var_dump($dates);
 
+    var_dump($today->format('d-m-Y H:i:s'));
+
     foreach ($dates as $key => $value) {
         $cutoffDatetime = $value['cutoff_datetime'];
         $date = DateTime::createFromFormat('d-m-Y', $value['date']);
