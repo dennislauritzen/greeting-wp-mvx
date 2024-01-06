@@ -3829,9 +3829,9 @@ function get_vendor_dates_new($vendor_id, $date_format = 'd-m-Y', $open_close = 
         $today->modify('+1 day');
     }
 
-    var_dump($dates);
+    #var_dump($dates);
 
-    var_dump($today);
+    #var_dump($today);
 
     foreach ($dates as $key => $value) {
         $cutoffDatetime = $value['cutoff_datetime'];
@@ -3843,7 +3843,7 @@ function get_vendor_dates_new($vendor_id, $date_format = 'd-m-Y', $open_close = 
         }
 
         if (isset($cutoffDatetime) && $cutoffDatetime instanceof DateTime) {
-            if ($cutoffDatetime->format('d-m-Y H:i:s') >= $today->format('d-m-Y H:i:s')) {
+            if ($cutoffDatetime->format('d-m-Y H:i:s') >= $now->format('d-m-Y H:i:s')) {
                 $open_days_arr[$key] = $date->format('d-m-Y');
             } else {
                 $closed_days_arr[$key] = $date->format('d-m-Y');
