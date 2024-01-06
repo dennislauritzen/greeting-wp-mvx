@@ -5671,7 +5671,7 @@ function add_links_to_keywords($content, $taxonomies, $city_search = false, $cit
                     if (!empty($value)) {
                         $escaped_value = preg_quote(trim($value), '/');
                         if($no_headings === true){
-                            $pattern = '/(?<!<\/a>)\b' . preg_quote($escaped_value, '/') . '\b(?![^<]*<\/(?:h1|h2|h3|h4|h5|h6)>)/i';
+                            $pattern = '/(?<!<\/a>)\b' . preg_quote($escaped_value, '/') . '\b(?![^<]*<\/(?:h1|h2|h3|h4|h5|h6)>)(?![^<]*["\'])/i';
                         } else {
                             $pattern = '/(?<!<\/a>)\b' . preg_quote($escaped_value, '/') . '\b(?![^<]*>)/i';
                         }
