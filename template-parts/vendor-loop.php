@@ -64,22 +64,10 @@ if($args['vendor']){
         } else {
           ///////////////////////////
           // Days until delivery
-          $delivery_days 		= get_vendor_days_until_delivery($vendor_id);
-
-          if($delivery_days == 0){
-            ?>
-            <span class="badge text-dark border border-dark text-dark fw-light shadow-none ">Kan levere i dag</span>
-            <?php
-          } else if($delivery_days == 1){
-            ?>
-            <span class="badge text-dark border border-dark text-dark fw-light shadow-none ">Kan levere i morgen</span>
-            <?php
-          } else if($delivery_days == 2){
-            ?>
-            <span class="badge text-dark border border-dark text-dark fw-light shadow-none ">Kan levere i overmorgen</span>
-            <?php
-          }
+          $delivery_days 		= get_vendor_delivery_days_from_today($vendor_id, 'Kan ');
           ?>
+            <span class="badge text-dark border border-dark text-dark fw-light shadow-none "><?php echo $delivery_days; ?></span>
+
 
           <?php
           ///////////////////////////
@@ -110,7 +98,6 @@ if($args['vendor']){
       ///////////////////////////
       // Get product categories
       //
-
       ?>
       <!--<div>
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#e1e1e1" class="bi bi-tags" viewBox="0 0 16 16">

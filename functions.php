@@ -5271,7 +5271,7 @@ function build_intervals($items, $is_contiguous, $make_interval) {
  * @param $today
  * @return String
  */
-function get_vendor_delivery_days_from_today($vendor_id, $del_type = "1", $long_or_short_text = 0)
+function get_vendor_delivery_days_from_today($vendor_id, $prepend_text = '', $del_type = "1", $long_or_short_text = 0)
 {
     #if(!($comparison_date instanceof DateTime)){
      #   $comparison_date = DateTime::createFromFormat('d-m-Y', now());
@@ -5302,16 +5302,42 @@ function get_vendor_delivery_days_from_today($vendor_id, $del_type = "1", $long_
         return;
     } else {
         $date_str = $result['date'];
-        $date = DateTime::createFromFormat('d-m-Y', $date_str)->format('d-m-Y'); // Construct from the date.
-        var_dump($date);
+        $date_obj =  DateTime::createFromFormat('d-m-Y', $date_str);
+        $date = $date_obj->format('d-m-Y'); // Construct from the date.
+
+        if($del_type == "1"){
+            $str .= 'Levere ';
+        } else if($del_type == "0"){
+            $str .= 'Afsende ';
+        }
+        if($long_or_short_text == 1){
+            $str = "Butikken kan ".strtolower($str);
+        } else if($long_or_short_text == 2){
+            $str = '';
+        }
+
+        return $prepend_text . ' ' . strtolower($str . get_date_diff_text($date_obj));
         // There is a date. Let's populate the variables for the calculation.
     }
+}
 
-    // @todo - Now we have the date in the array. Now we need to calculate the difference from today.
-    // @todo - Then we need to figure out if there is 0 days (=i dag), 1 day (=i morgen), 2 days (=i overmorgen) or more ("kan levere om X dage).
-    // @todo - Then implement the $long_or_short_text combined with the delivery type.
-    var_dump($result);
-    #var_dump($vendor_days);
+function get_date_diff_text($date){
+    if(!($date instanceof DateTime)){
+        return;
+    }
+
+    $today = new DateTime();
+    $date_diff = $today->diff($date);
+
+    if($date_diff->format('%R%a') == '0'){
+        return 'i dag';
+    } else if($date_diff->format('%R%a') == '+1'){
+        return 'i morgen';
+    } else if($date_diff->format('%R%a') == '+2'){
+        return 'i overmorgen';
+    } else {
+        return 'om '.$date_diff->format('%a').' dage';
+    }
 }
 
 function get_del_days_text($opening, $del_type = '1', $long_or_short_text = 0){
