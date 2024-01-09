@@ -67,8 +67,6 @@ if($args['vendor']){
           $delivery_days 		= get_vendor_delivery_days_from_today($vendor_id, 'Kan ');
           ?>
             <span class="badge text-dark border border-dark text-dark fw-light shadow-none "><?php echo $delivery_days; ?></span>
-
-
           <?php
           ///////////////////////////
           // STORE TYPE TAG
@@ -76,7 +74,7 @@ if($args['vendor']){
           #var_dump($store_type);
           if(!empty($store_type)){
             foreach($store_type as $k => $v){
-                if($v['label'] != "1" && $v['label'] != "0"){
+                if(!in_array($v['label'], array("1","2","3","4","5","6","7")) && $v['label'] != "1" && $v['label'] != "0"){
                 ?>
                 <span class="badge text-dark border border-dark fw-light shadow-none "><?php echo $v['label']; ?></span>
                 <?php
