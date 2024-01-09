@@ -3795,7 +3795,8 @@ function get_vendor_dates_new($vendor_id, $date_format = 'd-m-Y', $open_close = 
             $cutoff_datetime->modify('-'.$vendor_order_delivery_days_before_holiday.' day');
         }
 
-        if($now->format('H:i') > $cutoff){
+        if($now->format('H:i') > $cutoff
+        && $now->format('d-m-Y') == $today->format('d-m-Y')){
             $cutoff_datetime->modify('-1 day');
         }
 
@@ -3829,9 +3830,9 @@ function get_vendor_dates_new($vendor_id, $date_format = 'd-m-Y', $open_close = 
         $today->modify('+1 day');
     }
 
-    #var_dump($dates);
-
-    #var_dump($today);
+    if($open_close === "all"){
+        return $dates;
+    }
 
     foreach ($dates as $key => $value) {
         $cutoffDatetime = $value['cutoff_datetime'];
@@ -5259,6 +5260,58 @@ function build_intervals($items, $is_contiguous, $make_interval) {
 				$intervals[] = $make_interval($begin, $end);
 		}
 		return $intervals;
+}
+
+/**
+ * Function for calculating how many days from now until next time the store can deliver.
+ * Implements the array from the get_vendor_dates_new() function.
+ *
+ * @uses get_vendor_dates_new()
+ * @param $days_array
+ * @param $today
+ * @return String
+ */
+function get_vendor_delivery_days_from_today($vendor_id, $del_type = "1", $long_or_short_text = 0)
+{
+    #if(!($comparison_date instanceof DateTime)){
+     #   $comparison_date = DateTime::createFromFormat('d-m-Y', now());
+    #}
+
+    $vendor_days = get_vendor_dates_new($vendor_id, 'd-m-Y', 'all', 60);
+    $result = [];
+
+    $now = new DateTime();
+
+    foreach ($vendor_days as $p => $c) {
+        if(isset($c['cutoff_datetime'])
+        && $c['cutoff_datetime'] !== false
+        && $c['cutoff_datetime']->format('d-m-Y H:i:s') > $now->format('d-m-Y H:i:s')){
+            $result = array(
+                'date' => $c['date'],
+                'cutoff_datetime' => $c['cutoff_datetime'],
+                'cutoff_time' => $c['cutoff_time'],
+                'type' => $c['type']
+            );
+            break; // Break out of the inner loop once a non-false 'cutoff_time' is found
+        }
+    }
+
+    $date = '';
+    $text = '';
+    if(empty($result)){
+        return;
+    } else {
+        $date_str = $result['date'];
+        $date = DateTime::createFromFormat('d-m-Y', $date_str)->format('d-m-Y'); // Construct from the date.
+        var_dump($date);
+        // There is a date. Let's populate the variables for the calculation.
+    }
+
+    // @todo - Now we have the date in the array. Now we need to calculate the difference from today.
+    // @todo - Then we need to figure out if there is 0 days (=i dag), 1 day (=i morgen), 2 days (=i overmorgen) or more ("kan levere om X dage).
+    // @todo - Then implement the $long_or_short_text combined with the delivery type.
+    var_dump($result);
+    #var_dump($vendor_days);
 }
 
 function get_del_days_text($opening, $del_type = '1', $long_or_short_text = 0){
