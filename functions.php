@@ -5178,6 +5178,8 @@ function save_shop_order_meta_box_store_own_ref_data( $post_id, $post ) {
     # SET THE POST PARENT ID FOR DELIVERY DATE
     if (get_post_parent($post_id) !== null){
         $post = get_post_parent($post_id);
+        // Before changing the post_id variable, lets update the child order value too.
+        update_post_meta( $post_id, '_store_own_order_reference', $my_data );
         $post_id = $post->ID;
     }
     #print $post_id; exit;
