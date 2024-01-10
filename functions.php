@@ -2660,7 +2660,7 @@ function custom_display_order_data_in_admin(){
  * @author Dennis
  */
 function custom_woocommerce_email_order_meta_fields( $fields, $sent_to_admin, $order ) {
-		$del_date = get_post_meta( $order->get_id(), '_delivery_date', true );
+    $del_date = get_post_meta( $order->get_id(), '_delivery_date', true );
     $delivery_date = (!empty($del_date) ? $del_date : 'Hurtigst muligt');
     $fields['delivery_date'] = array(
         'label' => __( 'Leveringsdato' ),
@@ -2811,22 +2811,22 @@ function greeting_view_order_and_receiver_info_thankyou_page( $order_id ){  ?>
     <?php echo '<p><strong>'.__('Receiver phone','greeting2').':</strong> ' . get_post_meta( $order_id, 'receiver_phone', true ) . '</p>';
 }
 
-// Add custom order meta data to make it accessible in Order preview template
-add_filter( 'woocommerce_admin_order_preview_get_order_details', 'admin_order_preview_add_receiver_info_custom_meta_data', 10, 2 );
 
 function admin_order_preview_add_receiver_info_custom_meta_data( $data, $order ) {
     if( $receiver_info_value = $order->get_meta('receiver_phone') )
         $data['receiver_info_key'] = $receiver_info_value; // <= Store the value in the data array.
     	return $data;
 }
+// Add custom order meta data to make it accessible in Order preview template
+add_filter( 'woocommerce_admin_order_preview_get_order_details', 'admin_order_preview_add_receiver_info_custom_meta_data', 10, 2 );
 
-// Display order date in admin order preview
-add_action( 'woocommerce_admin_order_preview_start', 'custom_display_order_receiver_info_data_in_admin' );
 
 function custom_display_order_receiver_info_data_in_admin(){
     // Call the stored value and display it
     echo '<div style="margin:5px 0px 0px 15px;"><strong>Receiver Info:</strong> {{data.receiver_info_key}}</div>';
 }
+// Display order date in admin order preview
+add_action( 'woocommerce_admin_order_preview_start', 'custom_display_order_receiver_info_data_in_admin' );
 
 // Display receiver info in vendor dashboard  order preview
 // add_action( 'wcmp_vendor_dashboard_content', 'vendor_custom_display_order_receiver_info_data_in_admin' );
@@ -4963,10 +4963,10 @@ add_filter( 'wcmp_shop_order_query_request', 'filter_orders_by_vendor_in_admin_d
  * for edit of delivery date
  *
  */
-
 add_filter( 'manage_edit-shop_order_columns', 'set_custom_edit_shop_order_columns' );
 function set_custom_edit_shop_order_columns($columns) {
     $columns['delivery_date'] = __( 'Leveringsdato', 'greeting2' );
+    $columns['store_own_order_reference'] = __( 'Butikkens egen ref. for ordre', 'greeting2' );
     return $columns;
 }
 
@@ -4995,9 +4995,18 @@ function add_shop_order_meta_box() {
 			'core'
     );
 
+    add_meta_box(
+        'store_own_order_reference',
+        __( 'Butikkens egen ref. for ordre', 'greeting2' ),
+        'shop_order_store_own_ref_callback',
+        'shop_order',
+        'side',
+        'core'
+    );
+
 }
 
-// For displaying.
+// For displaying the delivery date edit field
 function shop_order_display_callback( $post ) {
         $value = get_post_meta( $post->ID, '_delivery_date', true );
 
@@ -5080,6 +5089,23 @@ function shop_order_display_callback( $post ) {
 		), esc_attr( $value ) );
 }
 
+/**
+ * @param $post WP_Post
+ * @return void
+ */
+function shop_order_store_own_ref_callback( $post ){
+    $value = get_post_meta( $post->ID, '_store_own_order_reference', true );
+
+    woocommerce_form_field( 'store_own_order_reference', array(
+        'type'          => 'text',
+        'class'         => array(),
+        'id'            => 'store_own_ref',
+        'required'      => true,
+        'label'         => __('Indtast butikkens egen referencenr.'),
+        'placeholder'   => __('Indtast butikkens egen referencenr.')
+    ), esc_attr( $value ) );
+}
+
 // For saving.
 function save_shop_order_meta_box_data( $post_id, $post ) {
     // If this is an autosave, our form has not been submitted, so we don't want to do anything.
@@ -5120,6 +5146,46 @@ function save_shop_order_meta_box_data( $post_id, $post ) {
 }
 add_action( 'save_post', 'save_shop_order_meta_box_data', 20, 2 );
 
+
+/**
+ * For saving the data of the "Store own ref" meta box on order page.
+ *
+ * @param $post_id
+ * @param $post
+ * @return void
+ */
+function save_shop_order_meta_box_store_own_ref_data( $post_id, $post ) {
+    // If this is an autosave, our form has not been submitted, so we don't want to do anything.
+    if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+        return;
+    }
+
+    // Check the user's permissions.
+    if ( isset( $post->post_type ) && 'shop_order' == $post->post_type ) {
+        if ( ! current_user_can( 'edit_shop_order', $post_id ) ) {
+            return;
+        }
+    }
+
+    // Make sure that it is set.
+    if ( !isset($_POST['store_own_order_reference']) ){
+        return;
+    }
+
+    // Sanitize user input.
+    $my_data = sanitize_text_field( $_POST['store_own_order_reference'] );
+
+    # SET THE POST PARENT ID FOR DELIVERY DATE
+    if (get_post_parent($post_id) !== null){
+        $post = get_post_parent($post_id);
+        $post_id = $post->ID;
+    }
+    #print $post_id; exit;
+
+    // Update the meta field in the database.
+    update_post_meta( $post_id, '_store_own_order_reference', $my_data );
+}
+add_action( 'save_post', 'save_shop_order_meta_box_store_own_ref_data', 20, 2 );
 
 function shapeSpace_customize_image_sizes($sizes) {
 	unset($sizes['medium_large']); // 768px
