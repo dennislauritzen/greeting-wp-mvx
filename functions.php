@@ -4704,6 +4704,9 @@ function woo_order_status_change_custom( $order_id, $from_status, $to_status ) {
     }
 }
 
+
+
+
 /**
  * Add new column to the order table on WCMP frontend order table
  * This is the Parent Order ID / Hoved ordre nr.
@@ -4775,9 +4778,134 @@ function vendor_redirect_to_home( $query ){
 }
 #add_action( 'parse_query', 'vendor_redirect_to_home' );
 
+/**
+ * Function for validation a date has the correct format
+ *
+ * @param $date
+ * @param $format
+ * @return bool
+ */
+function validateDate($date, $format = 'Y-m-d')
+{
+    $d = DateTime::createFromFormat($format, $date);
+    // The Y ( 4 digits year ) returns TRUE for any integer with any number of digits so changing the comparison from == to === fixes the issue.
+    return $d && $d->format($format) === $date;
+}
 
-// ADDING 2 NEW COLUMNS WITH THEIR TITLES (keeping "Total" and "Actions" columns at the end)
-add_filter( 'manage_edit-shop_order_columns', 'custom_shop_order_column', 20 );
+// Make custom column sortable
+function filter_manage_edit_shop_order_sortable_columns( $sortable_columns ) {
+    return wp_parse_args( array( 'delivery-date' => '_delivery_unixdate' ), $sortable_columns );
+}
+add_filter( 'manage_edit-shop_order_sortable_columns', 'filter_manage_edit_shop_order_sortable_columns', 10, 1 );
+
+// Orderby for custom column
+function action_pre_get_posts( $query ) {
+    // If it is not admin area, exit
+    if ( ! is_admin() ) return;
+
+    global $pagenow;
+
+    // Compare
+    if ( $pagenow === 'edit.php' && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'shop_order' ) {
+        // Get orderby
+        $orderby = $query->get( 'orderby' );
+
+        // Set query
+        if ( $orderby == '_delivery_unixdate' ) {
+            $query->set( 'meta_key', '_delivery_unixdate' );
+            $query->set( 'orderby', 'meta_value' );
+        }
+    }
+}
+add_action( 'pre_get_posts', 'action_pre_get_posts', 10, 1 );
+
+
+/**
+ * function to handling filtering vendor in admin
+ *
+ * @return void
+ */
+function wcmp_admin_filter_by_vendor() {
+	global $typenow;
+	if ($typenow == 'shop_order') {
+		$admin_dd_html = '<select name="admin_order_vendor" id="dropdown_admin_order_vendor"><option value="">'.__("Show All Vendors", "dc-woocommerce-multi-vendor").'</option>';
+		$vendors = get_wcmp_vendors();
+
+		if($vendors){
+			$vendor_arr = array();
+			foreach ($vendors as $vendor) {
+				$vendor_arr[$vendor->term_id] = $vendor->page_title;
+			}
+
+		 	asort($vendor_arr);
+			foreach($vendor_arr as $vendor => $value){
+				$checked = isset($_REQUEST['admin_order_vendor']) ? sanitize_text_field($_REQUEST['admin_order_vendor']) : '';
+				$checked = ($checked == $vendor) ? ' selected="selected"' : '';
+				$admin_dd_html .= '<option value="'.$vendor.'"'.$checked.'>'.$value.'</option>';
+			}
+		}
+
+		$admin_dd_html .= '</select>';
+		echo $admin_dd_html;
+	}
+}
+add_action( 'restrict_manage_posts', 'wcmp_admin_filter_by_vendor');
+
+
+/**
+ * Filtering action for the admin order page, to filter vendors
+ *
+ * @param $query
+ * @return mixed
+ */
+function filter_orders_by_vendor_in_admin_dashboard( $query ) {
+    if (current_user_can('administrator') && !empty($_REQUEST['admin_order_vendor'])) {
+        $vendor_term_id = isset($_GET['admin_order_vendor']) ? $_GET['admin_order_vendor'] : '';
+        $vendor =  get_wcmp_vendor_by_term($vendor_term_id);
+        #var_dump($vendor);
+
+        $parent_orders = get_vendor_parent_order($vendor->id);
+        $query['post__in'] = $parent_orders;
+        return $query;
+    }
+    return $query;
+}
+add_filter( 'wcmp_shop_order_query_request', 'filter_orders_by_vendor_in_admin_dashboard');
+
+
+function get_vendor_parent_order($id) {
+    $return_orders = array();
+
+    $vendor_orders = get_posts( array(
+        'fields'      => 'all',          // Retrieve only post IDs
+        'numberposts' => -1,
+        'meta_key'    => '_vendor_id',
+        'meta_value'  => $id,
+        'post_type'   => 'shop_order',
+        'post_status' => 'any',
+    ) );
+
+    foreach( $vendor_orders as $vendor_order ) {
+        if ( wc_get_order( $vendor_order->ID )->get_parent_id() === 0 ) {
+            // This is a parent order
+            $return_orders[] = $vendor_order->ID;
+        }
+    }
+#print "<div>";var_dump($return_orders);print "</div>";
+	return $return_orders;
+}
+
+
+/**
+ * ADDING 2 NEW COLUMNS WITH THEIR TITLES (keeping "Total" and "Actions" columns at the end)
+ * Possible values: cborder_number, wcmp_suborder, order_date, order_status, billing_address, shipping_address, pensopay_transaction_info, order_total, woe_export_status,
+ * wc_actions, store_own_order_reference
+ *
+ * Also - Removing the suborder column and the export column.
+ *
+ * @param $columns
+ * @return array
+ */
 function custom_shop_order_column($columns)
 {
     $reordered_columns = array();
@@ -4785,32 +4913,85 @@ function custom_shop_order_column($columns)
     // Inserting columns to a specific location
     foreach( $columns as $key => $column){
         $reordered_columns[$key] = $column;
+        if( $key == 'wcmp_suborder' || $key == 'woe_export_status'){
+            unset($reordered_columns['wcmp_suborder']);
+            unset($reordered_columns['woe_export_status']);
+        }
         if( $key ==  'order_status' ){
             // Inserting after "Status" column
             $reordered_columns['delivery-date'] = __( 'Leveringsdato','greeting2');
         }
+        if( $key == 'order_number'){
+            $reordered_columns['store_vendor_id_name'] = __( 'Butik', 'greeting2' );
+        }
+        if( $key == 'wc_actions'){
+            $reordered_columns['store_own_order_reference'] = __( 'Butikkens egen ref. for ordre', 'greeting2' );
+        }
     }
     return $reordered_columns;
 }
+add_filter( 'manage_edit-shop_order_columns', 'custom_shop_order_column', 20 );
 
 // Adding custom fields meta data for each new column (example)
+/**
+ * Adding column for admin order view
+ *
+ * @param $column String
+ * @param $post_id int
+ */
 add_action( 'manage_shop_order_posts_custom_column' , 'custom_orders_list_column_content', 20, 2 );
 function custom_orders_list_column_content( $column, $post_id )
 {
+    $vendor_id = get_post_meta( $post_id, '_vendor_id', true);
+    $vendor_name = get_vendor_name_by_id($vendor_id);
+    $order = wc_get_order( $post_id );
+
     switch ( $column )
     {
-      case 'delivery-date' :
-        // Get custom post meta data
+        case 'store_vendor_id_name' :
+            print $vendor_name;
+
+            // Initialize an array to store suborder IDs and corresponding vendor IDs
+            $suborders = array();
+
+            // Check if it's a parent order with suborders
+            if ($order && $order->get_id() > 0 && $order->get_type() === 'shop_order') {
+                // Get the suborder IDs
+                $suborder_ids = wc_get_orders(array('parent_id' => $post_id, 'post_status' => 'any', 'posts_per_page' => -1));
+
+                // Loop through each suborder
+                foreach ($suborder_ids as $suborder_id) {
+                    $suborder = wc_get_order($suborder_id);
+                    // Get the vendor ID from the suborder's metadata
+                    $suborder_vendor_id = $suborder->get_meta('_vendor_id', true);
+                    $suborder_vendor_name = get_vendor_name_by_id($suborder_vendor_id);
+
+                    // Store the suborder ID and corresponding vendor ID in the array
+                    $suborders[] = array('order_id' => $suborder->get_id(), 'vendor_name' => $suborder_vendor_name, 'vendor_id' => $suborder_vendor_id);
+                }
+            }
+
+            if(!empty($suborders[0])){
+                if($suborders[0]['vendor_id'] != $vendor_id){
+                    print '<ul class="wcmp-order-vendor" style="margin:0px;"><li>';
+                    print '<small class="wcmp-order-for-vendor"> –  tidl.: '.$suborders[0]['vendor_name'].'</small>';
+                    print '</li></ul>';
+                }
+            }
+
+            break;
+        case 'delivery-date' :
+            // Get custom post meta data
             if(has_post_parent($post_id)){
                 $post_id = get_post_parent($post_id);
             }
 
-            $vendor_id = get_post_meta( $post_id, '_vendor_id', true);
+
             $del_date_unix = get_post_meta( $post_id, '_delivery_unixdate', true );
             $del_date = get_post_meta( $post_id, '_delivery_date', true );
 
             if(!$vendor_id){
-                $order = wc_get_order( $post_id );
+
                 foreach ( $order->get_items() as $itemId => $item ){
                     if(!empty($product_meta->post_author)){
                         $vendor_id = $product_meta->post_author;
@@ -4866,124 +5047,15 @@ function custom_orders_list_column_content( $column, $post_id )
                 // The user chose a delivery date.
                 echo '<small>(<em>Hurtigst muligt</em>)</small>';
             }
-    break;
+            break;
     }
 }
-
-function validateDate($date, $format = 'Y-m-d')
-{
-    $d = DateTime::createFromFormat($format, $date);
-    // The Y ( 4 digits year ) returns TRUE for any integer with any number of digits so changing the comparison from == to === fixes the issue.
-    return $d && $d->format($format) === $date;
-}
-
-// Make custom column sortable
-function filter_manage_edit_shop_order_sortable_columns( $sortable_columns ) {
-    return wp_parse_args( array( 'delivery-date' => '_delivery_unixdate' ), $sortable_columns );
-}
-add_filter( 'manage_edit-shop_order_sortable_columns', 'filter_manage_edit_shop_order_sortable_columns', 10, 1 );
-
-// Orderby for custom column
-function action_pre_get_posts( $query ) {
-    // If it is not admin area, exit
-    if ( ! is_admin() ) return;
-
-    global $pagenow;
-
-    // Compare
-    if ( $pagenow === 'edit.php' && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'shop_order' ) {
-        // Get orderby
-        $orderby = $query->get( 'orderby' );
-
-        // Set query
-        if ( $orderby == '_delivery_unixdate' ) {
-            $query->set( 'meta_key', '_delivery_unixdate' );
-            $query->set( 'orderby', 'meta_value' );
-        }
-    }
-}
-add_action( 'pre_get_posts', 'action_pre_get_posts', 10, 1 );
-
-
-function wcmp_admin_filter_by_vendor() {
-	global $typenow;
-	if ($typenow == 'shop_order') {
-		$admin_dd_html = '<select name="admin_order_vendor" id="dropdown_admin_order_vendor"><option value="">'.__("Show All Vendors", "dc-woocommerce-multi-vendor").'</option>';
-		$vendors = get_wcmp_vendors();
-
-		if($vendors){
-			$vendor_arr = array();
-			foreach ($vendors as $vendor) {
-				$vendor_arr[$vendor->term_id] = $vendor->page_title;
-			}
-
-		 	asort($vendor_arr);
-			foreach($vendor_arr as $vendor => $value){
-				$checked = isset($_REQUEST['admin_order_vendor']) ? sanitize_text_field($_REQUEST['admin_order_vendor']) : '';
-				$checked = ($checked == $vendor) ? ' selected="selected"' : '';
-				$admin_dd_html .= '<option value="'.$vendor.'"'.$checked.'>'.$value.'</option>';
-			}
-		}
-
-		$admin_dd_html .= '</select>';
-		echo $admin_dd_html;
-	}
-}
-add_action( 'restrict_manage_posts', 'wcmp_admin_filter_by_vendor');
-
-function get_vendor_parent_order($id) {
-	$vendor_orders = get_posts( array(
-																	'numberposts' => -1,
-																	'meta_key'    => '_vendor_id',
-																	'meta_value'  => $id,
-																	'post_type'   => 'shop_order',
-																	'post_status' => 'any',
-													) );
-	foreach( $vendor_orders as $vendor_order ) {
-			$parent_order = wp_get_post_parent_id( $vendor_order->ID );
-			$parent_orders[] = $parent_order;
-	}
-	return $parent_orders;
-}
-function filter_orders_by_vendor_in_admin_dashboard( $query ) {
-    if (current_user_can('administrator') && !empty($_REQUEST['admin_order_vendor'])) {
-			$vendor_term_id = isset($_GET['admin_order_vendor'])?$_GET['admin_order_vendor']:'';
-			$vendor =  get_wcmp_vendor_by_term($vendor_term_id);
-			$parent_orders = get_vendor_parent_order($vendor->id);
-			$query['post__in'] = $parent_orders;
-			return $query;
-   }
-   return $query;
-}
-add_filter( 'wcmp_shop_order_query_request', 'filter_orders_by_vendor_in_admin_dashboard');
-
 
 /**
- * Function for showing the meta field
- * for edit of delivery date
+ * For display and saving in order details page.
  *
+ * @return void
  */
-add_filter( 'manage_edit-shop_order_columns', 'set_custom_edit_shop_order_columns' );
-function set_custom_edit_shop_order_columns($columns) {
-    $columns['delivery_date'] = __( 'Leveringsdato', 'greeting2' );
-    $columns['store_own_order_reference'] = __( 'Butikkens egen ref. for ordre', 'greeting2' );
-    return $columns;
-}
-
-// Add the data to the custom columns for the order post type:
-add_action( 'manage_shop_order_posts_custom_column' , 'custom_shop_order_column2', 10, 2 );
-function custom_shop_order_column2( $column, $post_id ) {
-    switch ( $column ) {
-        case 'delivery_date' :
-            $delivery_date = get_post_meta( $post_id, '_delivery_date', true );
-            $delivery_date = empty($delivery_date) ? '' : $delivery_date;
-        echo esc_html( $delivery_date );
-        break;
-    }
-}
-
-// For display and saving in order details page.
-add_action( 'add_meta_boxes', 'add_shop_order_meta_box' );
 function add_shop_order_meta_box() {
 
     add_meta_box(
@@ -5005,6 +5077,7 @@ function add_shop_order_meta_box() {
     );
 
 }
+add_action( 'add_meta_boxes', 'add_shop_order_meta_box' );
 
 // For displaying the delivery date edit field
 function shop_order_display_callback( $post ) {
@@ -5511,6 +5584,7 @@ add_filter( 'xmlrpc_enabled', '__return_false' );
 
 /**
  * Register meta box(es).
+ * This is for changing vendor data on an order
  *
  * @author Dennis Lauritzen
  */
@@ -5521,6 +5595,7 @@ add_action( 'add_meta_boxes', 'greeting_change_vendor_show_meta' );
 
 /**
  * Meta box display callback.
+ * This is for changing vendor data on an order
  *
  * @author Dennis Lauritzen
  * @param WP_Post $post Current post object.
@@ -5562,11 +5637,26 @@ function greeting_change_vendor_show_meta_action( $post_id ) {
     return;
 
   if ( isset($_POST['vendor_meta_name']) ) {
-    update_post_meta($post_id, '_vendor_id', sanitize_text_field( $_POST['vendor_meta_name']));
+      $vendor_id = sanitize_text_field( $_POST['vendor_meta_name']);
+      update_post_meta($post_id, '_vendor_id', $vendor_id);
+      #// Assuming the vendor name is stored in another custom field, adjust the field name accordingly
+      $vendor_name = get_vendor_name_by_id( $vendor_id ); // Replace with your actual function to get vendor name
+      update_post_meta( $post_id, '_vendor_name', sanitize_text_field( $vendor_name ) );
   }
 
 }
 add_action('save_post', 'greeting_change_vendor_show_meta_action');
+
+/**
+ * Function for getting the vendor name from a vendor ID.
+ *
+ * @param $vendor_id
+ * @return string
+ */
+function get_vendor_name_by_id($vendor_id) {
+    $vendor_user = get_userdata($vendor_id);
+    return $vendor_user ? $vendor_user->display_name : '';
+}
 
 /**
  * Add a custom action to order actions select box on edit order page.
