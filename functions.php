@@ -4949,43 +4949,32 @@ function custom_orders_list_column_content( $column, $post_id )
     switch ( $column )
     {
         case 'store_vendor_id_name' :
-            print $vendor_name;
-
-            // Initialize an array to store suborder IDs and corresponding vendor IDs
-            $suborders = array();
+            print $vendor_name.' (#'.$vendor_id.')';
 
             // Check if it's a parent order with suborders
             if ($order && $order->get_id() > 0 && $order->get_type() === 'shop_order') {
-                // Get the suborder IDs
-                $suborder_ids = wc_get_orders(array('parent_id' => $post_id, 'post_status' => 'any', 'posts_per_page' => -1));
+                // Get the first suborder (assuming there is always only one suborder)
+                $suborder_id = current(wc_get_orders(array('parent_id' => $post_id, 'post_status' => 'any', 'posts_per_page' => 1)));
 
-                // Loop through each suborder
-                foreach ($suborder_ids as $suborder_id) {
+                if ($suborder_id) {
                     $suborder = wc_get_order($suborder_id);
                     // Get the vendor ID from the suborder's metadata
                     $suborder_vendor_id = $suborder->get_meta('_vendor_id', true);
                     $suborder_vendor_name = get_vendor_name_by_id($suborder_vendor_id);
 
-                    // Store the suborder ID and corresponding vendor ID in the array
-                    $suborders[] = array('order_id' => $suborder->get_id(), 'vendor_name' => $suborder_vendor_name, 'vendor_id' => $suborder_vendor_id);
-                }
-            }
-
-            if(!empty($suborders[0])){
-                if($suborders[0]['vendor_id'] != $vendor_id){
-                    print '<ul class="wcmp-order-vendor" style="margin:0px;"><li>';
-                    print '<small class="wcmp-order-for-vendor"> –  tidl.: '.$suborders[0]['vendor_name'].'</small>';
-                    print '</li></ul>';
+                    // Check if the vendor ID of the suborder is different from the parent order's vendor ID
+                    if ($suborder_vendor_id && $suborder_vendor_id != $vendor_id) {
+                        echo '<ul class="wcmp-order-vendor" style="margin:0px;"><li>';
+                        echo '<small class="wcmp-order-for-vendor"> – tidl.: ' . $suborder_vendor_name . '</small>';
+                        echo '</li></ul>';
+                    }
                 }
             }
 
             break;
         case 'delivery-date' :
             // Get custom post meta data
-            if(has_post_parent($post_id)){
-                $post_id = get_post_parent($post_id);
-            }
-
+            $post_id = has_post_parent($post_id) ? get_post_parent($post_id) : $post_id;
 
             $del_date_unix = get_post_meta( $post_id, '_delivery_unixdate', true );
             $del_date = get_post_meta( $post_id, '_delivery_date', true );
@@ -4999,50 +4988,34 @@ function custom_orders_list_column_content( $column, $post_id )
                     }
                 }
             }
-            $del_type = (get_field('delivery_type', 'user_'.$vendor_id) != '' ? get_field('delivery_type', 'user_'.$vendor_id) : array());
 
-            if(is_array($del_type) && array_key_exists(0, $del_type) && $del_type[0]['value'] == '0')
-            {
-                // freight store
-                print '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-truck" viewBox="0 0 16 16">
-                    <path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h9A1.5 1.5 0 0 1 12 3.5V5h1.02a1.5 1.5 0 0 1 1.17.563l1.481 1.85a1.5 1.5 0 0 1 .329.938V10.5a1.5 1.5 0 0 1-1.5 1.5H14a2 2 0 1 1-4 0H5a2 2 0 1 1-3.998-.085A1.5 1.5 0 0 1 0 10.5v-7zm1.294 7.456A1.999 1.999 0 0 1 4.732 11h5.536a2.01 2.01 0 0 1 .732-.732V3.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .294.456zM12 10a2 2 0 0 1 1.732 1h.768a.5.5 0 0 0 .5-.5V8.35a.5.5 0 0 0-.11-.312l-1.48-1.85A.5.5 0 0 0 13.02 6H12v4zm-9 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm9 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
-                </svg> ';
-            } else {
-                // personal delivery
-                print '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bicycle" viewBox="0 0 16 16">
-                    <path d="M4 4.5a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1v.5h4.14l.386-1.158A.5.5 0 0 1 11 4h1a.5.5 0 0 1 0 1h-.64l-.311.935.807 1.29a3 3 0 1 1-.848.53l-.508-.812-2.076 3.322A.5.5 0 0 1 8 10.5H5.959a3 3 0 1 1-1.815-3.274L5 5.856V5h-.5a.5.5 0 0 1-.5-.5zm1.5 2.443-.508.814c.5.444.85 1.054.967 1.743h1.139L5.5 6.943zM8 9.057 9.598 6.5H6.402L8 9.057zM4.937 9.5a1.997 1.997 0 0 0-.487-.877l-.548.877h1.035zM3.603 8.092A2 2 0 1 0 4.937 10.5H3a.5.5 0 0 1-.424-.765l1.027-1.643zm7.947.53a2 2 0 1 0 .848-.53l1.026 1.643a.5.5 0 1 1-.848.53L11.55 8.623z"/>
-                </svg> ';
-            }
+            $del_type = (get_field('delivery_type', 'user_'.$vendor_id) != '' ? get_field('delivery_type', 'user_'.$vendor_id) : array());
+            $del_type_value = is_array($del_type) && isset($del_type[0]['value']) ? $del_type[0]['value'] : '';
+
+            // Generate Delivery icons
+            $personal_icon_path = 'M4 4.5a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1v.5h4.14l.386-1.158A.5.5 0 0 1 11 4h1a.5.5 0 0 1 0 1h-.64l-.311.935.807 1.29a3 3 0 1 1-.848.53l-.508-.812-2.076 3.322A.5.5 0 0 1 8 10.5H5.959a3 3 0 1 1-1.815-3.274L5 5.856V5h-.5a.5.5 0 0 1-.5-.5zm1.5 2.443-.508.814c.5.444.85 1.054.967 1.743h1.139L5.5 6.943zM8 9.057 9.598 6.5H6.402L8 9.057zM4.937 9.5a1.997 1.997 0 0 0-.487-.877l-.548.877h1.035zM3.603 8.092A2 2 0 1 0 4.937 10.5H3a.5.5 0 0 1-.424-.765l1.027-1.643zm7.947.53a2 2 0 1 0 .848-.53l1.026 1.643a.5.5 0 1 1-.848.53L11.55 8.623z';
+            $freight_icon_path = 'M0 3.5A1.5 1.5 0 0 1 1.5 2h9A1.5 1.5 0 0 1 12 3.5V5h1.02a1.5 1.5 0 0 1 1.17.563l1.481 1.85a1.5 1.5 0 0 1 .329.938V10.5a1.5 1.5 0 0 1-1.5 1.5H14a2 2 0 1 1-4 0H5a2 2 0 1 1-3.998-.085A1.5 1.5 0 0 1 0 10.5v-7zm1.294 7.456A1.999 1.999 0 0 1 4.732 11h5.536a2.01 2.01 0 0 1 .732-.732V3.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .294.456zM12 10a2 2 0 0 1 1.732 1h.768a.5.5 0 0 0 .5-.5V8.35a.5.5 0 0 0-.11-.312l-1.48-1.85A.5.5 0 0 0 13.02 6H12v4zm-9 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm9 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z';
+            $delivery_icon_path = ($del_type_value == 0) ? $freight_icon_path : $personal_icon_path;
+            // Output delivery type icon
+            echo '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi ';
+            echo $del_type_value == '0' ? 'bi-truck' : 'bi-bicycle';
+            echo '" viewBox="0 0 16 16"><path d="'.$delivery_icon_path.'"></path></svg> ';
 
             if(!empty($del_date_unix)){
-                if(empty($del_date)){
-                    // The user didnt choose "delivery date", but it was calculated
-                    $dateobj = new DateTime();
-                    $dateobj->setTimestamp($del_date_unix);
-                    $date_format = $dateobj->format('D, j. M \'y');
+                // The user didnt choose "delivery date", but it was calculated
+                $dateobj = new DateTime();
+                $dateobj->setTimestamp($del_date_unix);
+                $date_format = $dateobj->format('D, j. M \'y');
 
-                    echo '<small><em>Hurtigst muligt (senest '.$date_format.')</em></small>';
-                } else {
-                    // The user didnt choose "delivery date", but it was calculated
-                    $dateobj = new DateTime();
-                    $dateobj->setTimestamp($del_date_unix);
-                    $date_format = $dateobj->format('D, j. M \'y');
-
-                    echo $date_format;
-                }
+                echo (empty($del_date) ? '<small><em>Hurtigst muligt (senest '.$date_format.')</em></small>' : $date_format);
             } else if(!empty($del_date)){
                 $date_d = substr($del_date, 0, 2);
                 $month_d = substr($del_date, 3, 2);
                 $year_d = substr($del_date, 6, 4);
 
-                if(validateDate($year_d.'-'.$month_d.'-'.$date_d)){
-                    $date_old = new DateTime($year_d.'-'.$month_d.'-'.$date_d);
-                    $date_old_format = $date_old->format('D, j. M \'y');
+                $old_date = DateTime::createFromFormat('d-m-Y', $del_date);
 
-                    echo $date_old_format;
-                } else {
-                    echo '<small>(Hurtigst muligt - <em>'.$del_date.'</em>)</small>';
-                }
+                echo ($old_date instanceof DateTime ? $old_date->format('D, j. M \'y') : '<small>(Hurtigst muligt - <em>'.$del_date.'</em>)</small>');
             } else {
                 // The user chose a delivery date.
                 echo '<small>(<em>Hurtigst muligt</em>)</small>';
