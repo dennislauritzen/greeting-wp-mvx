@@ -4954,7 +4954,8 @@ function custom_orders_list_column_content( $column, $post_id )
             // Check if it's a parent order with suborders
             if ($order && $order->get_id() > 0 && $order->get_type() === 'shop_order') {
                 // Get the first suborder (assuming there is always only one suborder)
-                $suborder_id = current(wc_get_orders(array('parent_id' => $post_id, 'post_status' => 'any', 'posts_per_page' => 1)));
+                $suborders = wc_get_orders(array('parent_id' => $post_id, 'post_status' => 'any', 'posts_per_page' => 1));
+                $suborder_id = !empty($suborders) ? current($suborders)->get_id() : 0;
 
                 if ($suborder_id) {
                     $suborder = wc_get_order($suborder_id);
