@@ -3808,13 +3808,15 @@ function get_vendor_dates_new($vendor_id, $date_format = 'd-m-Y', $open_close = 
             && !in_array($today->format('d-m-Y'), $open_days_extraordinary))
         ){
 
-            $cutoff_datetime = false;
+            $cutoff_datetime_val = false;
             $is_open = false;
+        } else {
+            $cutoff_datetime_val = $cutoff_datetime->format('d-m-Y H:i:s');
         }
 
         $dates[$datekey] = array(
             'date' => $date,
-            'cutoff_datetime' => $cutoff_datetime, // the exact time you can order for this date.
+            'cutoff_datetime' => $cutoff_datetime_val, // the exact time you can order for this date.
             'cutoff_time' => $cutoff, // the value from the cutoff field based on the type of the date
             'is_open' => $is_open, // true or false - is this date closed at the time?
             'is_closed' => !$is_open, // true or false - is this date open at the time?
@@ -3835,7 +3837,7 @@ function get_vendor_dates_new($vendor_id, $date_format = 'd-m-Y', $open_close = 
     }
 
     foreach ($dates as $key => $value) {
-        $cutoffDatetime = $value['cutoff_datetime'];
+        $cutoffDatetime_static = $value['cutoff_datetime'];
         $date = DateTime::createFromFormat('d-m-Y', $value['date']);
 
         if($value['is_global_closed_date'] === true){
@@ -3843,16 +3845,20 @@ function get_vendor_dates_new($vendor_id, $date_format = 'd-m-Y', $open_close = 
             continue;
         }
 
-        if (isset($cutoffDatetime) && $cutoffDatetime instanceof DateTime) {
-            if ($cutoffDatetime->format('d-m-Y H:i:s') >= $now->format('d-m-Y H:i:s')) {
+        if ($cutoffDatetime_static) {
+
+            $cutoffDatetime = DateTime::createFromFormat('d-m-Y H:i:s', $cutoffDatetime_static);
+
+            if ($cutoffDatetime >= $now) {
                 $open_days_arr[$key] = $date->format('d-m-Y');
+                echo "Åben";
             } else {
+                echo "Lukket";
                 $closed_days_arr[$key] = $date->format('d-m-Y');
             }
-        } else if ($cutoffDatetime === false) {
-            $closed_days_arr[$key] = $date->format('d-m-Y');
         } else {
-
+            echo "Lukket - ingen cutoff";
+            $closed_days_arr[$key] = $date->format('d-m-Y');
         }
     }
 
@@ -5534,6 +5540,12 @@ function groupDates($input) {
 		$result[] = $entry;
 	}
 	return $result;
+}
+
+function rephraseMonth($month){
+    $months = ['januar', 'februar', 'marts', 'april', 'maj', 'juni', 'juli', 'august', 'september', 'oktober', 'november', 'december'];
+
+    return $months[$month-1];
 }
 
 function rephraseDate($weekday, $date, $month, $year) {
