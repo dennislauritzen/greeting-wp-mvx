@@ -3581,12 +3581,22 @@ function get_global_days($type = 'closed') {
     if ($type == 'holidays') {
         $holidays = get_field('global_holidays', 'option');
 
+        // Check if $closed_dates is empty
+        if (empty($holidays)) {
+            return []; // Return an empty array
+        }
+
         return array_map(function ($item) {
             $closingDate = DateTime::createFromFormat('d/m/Y', $item['holiday_date']);
             return $closingDate ? $closingDate->format('d-m-Y') : null;
         }, $holidays);
     } else {
         $closed_dates = get_field('global_closed_dates', 'option');
+
+        // Check if $closed_dates is empty
+        if (empty($closed_dates)) {
+            return []; // Return an empty array
+        }
 
         return array_map(function ($item) {
             $closingDate = DateTime::createFromFormat('d-m-Y', $item['closed_date']);
@@ -5404,16 +5414,23 @@ function get_vendor_delivery_days_from_today($vendor_id, $prepend_text = '', $de
     $now = new DateTime();
 
     foreach ($vendor_days as $p => $c) {
+
+
+
         if(isset($c['cutoff_datetime'])
-        && $c['cutoff_datetime'] !== false
-        && $c['cutoff_datetime']->format('d-m-Y H:i:s') > $now->format('d-m-Y H:i:s')){
-            $result = array(
-                'date' => $c['date'],
-                'cutoff_datetime' => $c['cutoff_datetime'],
-                'cutoff_time' => $c['cutoff_time'],
-                'type' => $c['type']
-            );
-            break; // Break out of the inner loop once a non-false 'cutoff_time' is found
+        && $c['cutoff_datetime'] !== false){
+            $cutofftime = $c['cutoff_datetime'];
+            $cutoff_time = DateTime::createFromFormat('d-m-Y H:i:s', $cutofftime);
+
+            if($cutoff_time->format('d-m-Y H:i:s') > $now->format('d-m-Y H:i:s')){
+                $result = array(
+                    'date' => $c['date'],
+                    'cutoff_datetime' => $c['cutoff_datetime'],
+                    'cutoff_time' => $c['cutoff_time'],
+                    'type' => $c['type']
+                );
+                break; // Break out of the inner loop once a non-false 'cutoff_time' is found
+            }
         }
     }
 
