@@ -3861,13 +3861,10 @@ function get_vendor_dates_new($vendor_id, $date_format = 'd-m-Y', $open_close = 
 
             if ($cutoffDatetime >= $now) {
                 $open_days_arr[$key] = $date->format('d-m-Y');
-                echo "Åben";
             } else {
-                echo "Lukket";
                 $closed_days_arr[$key] = $date->format('d-m-Y');
             }
         } else {
-            echo "Lukket - ingen cutoff";
             $closed_days_arr[$key] = $date->format('d-m-Y');
         }
     }
