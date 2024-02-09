@@ -6173,7 +6173,7 @@ function vendor_remove_fields_from_admin($contactmethods, $user) {
     if (current_user_can('administrator')
         && is_array($contactmethods) && $user
         && $user
-        && is_object($user),,,,,,,,,,,,
+        && is_object($user)
         && in_array('dc_vendor', $user->roles)) {
         // Replace 'field-id' with the actual ID or name of the field you want to unset
         $fields_to_unset = array(
