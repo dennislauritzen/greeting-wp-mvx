@@ -14,12 +14,9 @@
  * @package WooCommerce\Templates
  * @version 3.5.0
  */
-
 defined( 'ABSPATH' ) || exit;
 
-
 global $woocommerce, $wpdb, $WCMp;
-print microtime(true)."<br>";
 $postId = get_the_ID();
 
 $checkout_postalcode = WC()->customer->get_shipping_postcode();
@@ -27,7 +24,6 @@ $checkout_postalcode = WC()->customer->get_shipping_postcode();
   #print 'postnumre afviger';
 #  $woocommerce->cart->empty_cart();
 #}
-
 
 // Get header designs.
 get_header();
@@ -42,11 +38,8 @@ if (isset($cat->term_id)) {
 	$image = wp_get_attachment_url($thumbnail_id);
 }
 
-
 /**
- *
  * Data of the category
- *
  */
 $cat = $wp_query->get_queried_object();
 $category_id = $cat->term_id;
@@ -76,7 +69,7 @@ $args = array(
 
 // Create a new instance of WP_Query
 $query = get_posts( $args );
-print microtime(true)."<br>";
+
 // Get an array of unique user IDs who are authors of the products in the query results
 $authors = array_unique( wp_list_pluck( $query, 'post_author' ) );
 
@@ -115,7 +108,7 @@ foreach($vendor_arr as $v){
 // The maximum dropoff time today - for filtering.
 $DropOffTimes = (count($DropOffTimes) > 0) ? max($DropOffTimes) : 0;
 
-print microtime(true)."<br>";
+
 // pass to backend
 $categoryDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode);
 
@@ -189,7 +182,6 @@ $categoryDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode);
 
   $categoryTermListArray = array_unique($categoryTermListArray);
   $occasionTermListArray = array_unique($occasionTermListArray);
-print microtime(true)."<br>";
 ?>
 <input type="hidden" name="_hid_cat_id" id="_hid_cat_id" value="<?php echo $category_id; ?>">
 <input type="hidden" name="_hid_default_user_id" id="categoryDefaultUserIdAsString" value="<?php echo $categoryDefaultUserIdAsString; ?>">
@@ -249,7 +241,6 @@ print microtime(true)."<br>";
     ?>
 
     <?php
-    print microtime(true)."<br>";
     // Check if category/occassions exists.
     if(count($occasion_featured_list) > 0){
     ?>
@@ -1196,5 +1187,4 @@ get_footer( );
 		<!-- BOTTOM END -->
 
 <?php
-print microtime(true)."<br>";
 get_footer('shop');
