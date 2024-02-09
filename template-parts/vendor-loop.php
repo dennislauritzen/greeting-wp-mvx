@@ -74,7 +74,11 @@ if($args['vendor']){
           #var_dump($store_type);
           if(!empty($store_type)){
             foreach($store_type as $k => $v){
-                if(isset($v['label']) && !in_array($v['label'], array("1","2","3","4","5","6","7")) && $v['label'] != "1" && $v['label'] != "0"){
+                if( isset($v['label'])
+                    && !in_array($v['label'], array("1","2","3","4","5","6","7"))
+                    && $v['label'] != "1"
+                    && $v['label'] != "0"
+                ){
                 ?>
                 <span class="badge text-dark border border-dark fw-light shadow-none "><?php echo $v['label']; ?></span>
                 <?php
