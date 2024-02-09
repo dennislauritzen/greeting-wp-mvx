@@ -2004,9 +2004,9 @@ function categoryPageFilterAction() {
 
 	wp_die();
 }
-if(	false === is_cart() && false === !is_checkout()){
-	add_action( 'wp_ajax_categoryPageFilterAction', 'categoryPageFilterAction' );
-	add_action( 'wp_ajax_nopriv_categoryPageFilterAction', 'categoryPageFilterAction' );
+if ( !is_cart() && !is_checkout() ) {
+    add_action( 'wp_ajax_categoryPageFilterAction', 'categoryPageFilterAction' );
+    add_action( 'wp_ajax_nopriv_categoryPageFilterAction', 'categoryPageFilterAction' );
 }
 
 /**
@@ -6170,7 +6170,11 @@ function get_customer_order( $customer_id, $billing_email, $first_or_last )
 function vendor_remove_fields_from_admin($contactmethods, $user) {
     // Check if the current user is an administrator and if the user being edited has the 'dc_vendor' role
     $current_user = wp_get_current_user();
-    if (current_user_can('administrator') && is_array($contactmethods) && $user && in_array('dc_vendor', $user->roles)) {
+    if (current_user_can('administrator')
+        && is_array($contactmethods) && $user
+        && $user
+        && is_object($user),,,,,,,,,,,,
+        && in_array('dc_vendor', $user->roles)) {
         // Replace 'field-id' with the actual ID or name of the field you want to unset
         $fields_to_unset = array(
             'facebook',
