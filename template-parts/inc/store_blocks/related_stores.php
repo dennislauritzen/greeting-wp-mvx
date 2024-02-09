@@ -107,7 +107,7 @@ $results = $query->get_results();
         }
 
         // call the template with pass $vendor variable
-  			get_template_part('dc-product-vendor/vendor-loop', null, array('vendor' => $vendor_page_slug, 'cityName' => $city_name, 'postalCode' => $user_postal));
+  			get_template_part('template-parts/vendor-loop', null, array('vendor' => $vendor_page_slug, 'cityName' => $city_name, 'postalCode' => $user_postal));
       } // endforeach
       ?>
     </div>
