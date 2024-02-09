@@ -701,10 +701,10 @@ $categoryDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode);
 	            <div id="categoryDescription" style="max-height: 400px; overflow: hidden;">
                     <?php
                     $description = category_description($category_id);
-                    $description = add_links_to_keywords(
-                        wp_kses_post( $description ),
-                        array('product_cat', 'occasion')
-                    );
+                    #$description = add_links_to_keywords(
+                    #    wp_kses_post( $description ),
+                    #    array('product_cat', 'occasion')
+                    #);
                     $collapsed = false;
 
                     // Check if the content exceeds the max-height
