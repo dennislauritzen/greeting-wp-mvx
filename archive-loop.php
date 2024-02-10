@@ -2,6 +2,7 @@
 /**
  * The template for displaying the archive loop.
  */
+
 greeting2_content_nav( 'nav-above' );
 
 if ( have_posts() ) :

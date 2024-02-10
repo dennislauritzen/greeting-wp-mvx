@@ -14,13 +14,12 @@
  * @package WooCommerce\Templates
  * @version 3.5.0
  */
-// Remove unnecessary hooks from archive-product.php
-
 
 defined( 'ABSPATH' ) || exit;
 
 
 global $woocommerce, $wpdb, $WCMp;
+
 $postId = get_the_ID();
 
 $checkout_postalcode = WC()->customer->get_shipping_postcode();
@@ -28,6 +27,7 @@ $checkout_postalcode = WC()->customer->get_shipping_postcode();
   #print 'postnumre afviger';
 #  $woocommerce->cart->empty_cart();
 #}
+
 
 // Get header designs.
 get_header();
@@ -42,8 +42,11 @@ if (isset($cat->term_id)) {
 	$image = wp_get_attachment_url($thumbnail_id);
 }
 
+
 /**
+ *
  * Data of the category
+ *
  */
 $cat = $wp_query->get_queried_object();
 $category_id = $cat->term_id;
@@ -80,12 +83,12 @@ $authors = array_unique( wp_list_pluck( $query, 'post_author' ) );
 // Get an array of user objects based on the unique user IDs
 $user_args = array(
 		'role' => 'dc_vendor',
-        'include' => $authors,
+    'include' => $authors,
 		'posts_per_page' => -1,
 		'fields' => 'all',
 		'meta_key' => 'delivery_type',
-        'orderby' => 'meta_value',
-        'order' => 'DESC'
+    'orderby' => 'meta_value',
+    'order' => 'DESC'
 );
 $user_query = new WP_User_Query( $user_args );
 $vendor_arr = $user_query->get_results();
@@ -705,10 +708,10 @@ $categoryDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode);
 	            <div id="categoryDescription" style="max-height: 400px; overflow: hidden;">
                     <?php
                     $description = category_description($category_id);
-                    #$description = add_links_to_keywords(
-                    #    wp_kses_post( $description ),
-                    #    array('product_cat', 'occasion')
-                    #);
+                    $description = add_links_to_keywords(
+                        wp_kses_post( $description ),
+                        array('product_cat', 'occasion')
+                    );
                     $collapsed = false;
 
                     // Check if the content exceeds the max-height
