@@ -14,7 +14,11 @@
  * @package WooCommerce\Templates
  * @version 3.5.0
  */
+// Remove unnecessary hooks from archive-product.php
+
+
 defined( 'ABSPATH' ) || exit;
+
 
 global $woocommerce, $wpdb, $WCMp;
 $postId = get_the_ID();
