@@ -64,7 +64,7 @@ if(!empty($category_name_plural)){
 
 $args = array(
     'post_type' => 'product',
-		'posts_per_page' => -1,
+    'posts_per_page' => -1,
     'tax_query' => array(
         array(
             'taxonomy' => 'product_cat',
@@ -85,7 +85,7 @@ $user_args = array(
 		'role' => 'dc_vendor',
         'include' => $authors,
 		'posts_per_page' => -1,
-		'fields' => 'all',
+		'fields' => 'all_with_meta',
 		'meta_key' => 'delivery_type',
         'orderby' => 'meta_value',
         'order' => 'DESC'
@@ -93,31 +93,25 @@ $user_args = array(
 $user_query = new WP_User_Query( $user_args );
 $vendor_arr = $user_query->get_results();
 
+// Initialize arrays
+$UserIdArrayForCityPostalcode = wp_list_pluck($vendor_arr, 'ID'); // Extract vendor IDs
+
+// Filter vendors where require_delivery_day is equal to 0
+$filtered_vendors = array_filter($vendor_arr, function($vendor) {
+    return $vendor->require_delivery_day == 0;
+});
+
+// Extract dropoff times for filtered vendors
+$dropoff_times = array_map(function($vendor) {
+    return (int) strstr($vendor->dropoff_time, ':', true);
+}, $filtered_vendors);
+
+// Get the maximum dropoff time
+$max_dropoff_time = !empty($dropoff_times) ? max($dropoff_times) : 0;
 
 
-$UserIdArrayForCityPostalcode = array();
-$DropOffTimes = array();
-foreach($vendor_arr as $v){
-	# Get the vendor ID
-	$vendor_id = (isset($v->data) ? $v->data->ID : $v->ID);
-
-	# Add ID to arrya and get vendors user meta
-	$UserIdArrayForCityPostalcode[] = $vendor_id;
-	$days = get_user_meta($vendor_id, 'require_delivery_day');
-	$hours = get_user_meta($vendor_id, 'dropoff_time');
-
-	# If 0 days for delivery, then
-	if($days == 0){
-		$DropOffTimes[] = (int) strstr($hours,':',true);
-	}
-}
-
-// The maximum dropoff time today - for filtering.
-$DropOffTimes = (count($DropOffTimes) > 0) ? max($DropOffTimes) : 0;
-
-
-// pass to backend
-$categoryDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode);
+    // pass to backend
+    $categoryDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode);
 
   /////////////////////////
   // Data for the filtering.
