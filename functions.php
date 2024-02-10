@@ -733,7 +733,7 @@ function register_product_rewrite_rules( $wp_rewrite ) {
  */
 add_filter( 'loop_shop_per_page', 'greeting_remove_pagination', 20 );
 function greeting_remove_pagination( $cols ) {
-	$cols = 99999999999;
+	$cols = 1;
 	return $cols;
 }
 

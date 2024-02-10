@@ -83,12 +83,12 @@ $authors = array_unique( wp_list_pluck( $query, 'post_author' ) );
 // Get an array of user objects based on the unique user IDs
 $user_args = array(
 		'role' => 'dc_vendor',
-    'include' => $authors,
+        'include' => $authors,
 		'posts_per_page' => -1,
 		'fields' => 'all',
 		'meta_key' => 'delivery_type',
-    'orderby' => 'meta_value',
-    'order' => 'DESC'
+        'orderby' => 'meta_value',
+        'order' => 'DESC'
 );
 $user_query = new WP_User_Query( $user_args );
 $vendor_arr = $user_query->get_results();
