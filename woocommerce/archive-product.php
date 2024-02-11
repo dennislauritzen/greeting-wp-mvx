@@ -61,24 +61,36 @@ if(!empty($category_name_plural)){
 	$filtering_title .= ', der kan levere '.$category_name_plural;
 }
 
+// Retrieve unique author (vendor) IDs and prices of products directly from the database using a custom SQL query
+$sql = "
+    SELECT p.post_author AS author_id, pm.meta_value AS price
+    FROM {$wpdb->posts} p
+    INNER JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id
+    INNER JOIN {$wpdb->term_relationships} tr ON p.ID = tr.object_id
+    INNER JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+    WHERE p.post_type = 'product'
+    AND p.post_status = 'publish'
+    AND tt.taxonomy = 'product_cat'
+    AND tt.term_id = %d
+    AND pm.meta_key = '_price'
+";
+$sql = $wpdb->prepare($sql, $category_id);
 
-$args = array(
-    'post_type' => 'product',
-    'posts_per_page' => -1,
-    'tax_query' => array(
-        array(
-            'taxonomy' => 'product_cat',
-            'field' => 'term_id',
-            'terms' => $category_id,
-        ),
-    ),
-);
+// Execute the SQL query
+$results = $wpdb->get_results($sql);
 
-// Create a new instance of WP_Query
-$query = get_posts( $args );
+// Initialize arrays
+$authors = array();
+$priceArray = array();
 
-// Get an array of unique user IDs who are authors of the products in the query results
-$authors = array_unique( wp_list_pluck( $query, 'post_author' ) );
+// Extract unique author IDs and prices
+foreach ($results as $result) {
+    $authors[] = $result->author_id;
+    $priceArray[] = $result->price;
+}
+
+// Deduplicate author IDs and prices
+$authors_new = array_unique($authors);
 
 // Get an array of user objects based on the unique user IDs
 $user_args = array(
@@ -110,79 +122,63 @@ $dropoff_times = array_map(function($vendor) {
 $max_dropoff_time = !empty($dropoff_times) ? max($dropoff_times) : 0;
 
 
-    // pass to backend
-    $categoryDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode);
+// pass to backend
+$categoryDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode);
 
-  /////////////////////////
-  // Data for the filtering.
-  // This data is used for the filters and for the stores.
-  // It is also used for the featuring of categories and occasions in the top.
+/////////////////////////
+// Data for the filtering.
+// This data is used for the filters and for the stores.
+// It is also used for the featuring of categories and occasions in the top.
+$productPriceArray = array(); // for price filter
+$categoryTermListArray = array(); // for cat term filter
+$occasionTermListArray = array();
 
-  $productPriceArray = array(); // for price filter
-  $categoryTermListArray = array(); // for cat term filter
-  $occasionTermListArray = array();
+// for price filter
 
-  // for price filter
+// Get all vendor product IDs
+$vendorProductIds = array();
 
-  // Get all vendor product IDs
-  $vendorProductIds = array();
+foreach ($UserIdArrayForCityPostalcode as $vendorId) {
+    $vendor = get_wcmp_vendor($vendorId);
+    $vendorProductIds = array_merge($vendorProductIds, $vendor->get_products(array('fields' => 'ids')));
+}
+$vendorProductIds = array_unique($vendorProductIds);
 
-  foreach ($UserIdArrayForCityPostalcode as $vendorId) {
-      $vendor = get_wcmp_vendor($vendorId);
-      $vendorProductIds = array_merge($vendorProductIds, $vendor->get_products(array('fields' => 'ids')));
-  }
-  $vendorProductIds = array_unique($vendorProductIds);
-
-  // Use a custom SQL query to fetch the prices of those products
-  $where = array();
-  foreach($vendorProductIds as $pv){
+// Use a custom SQL query to fetch the prices of those products
+$where = array();
+foreach($vendorProductIds as $pv){
     if(is_numeric($pv)){
       $where[] = $pv;
     }
-  }
+}
 
-	$sql = "
-      SELECT meta_value
-      FROM {$wpdb->postmeta}
-      WHERE meta_key = '_price'
-      AND post_id IN (".implode(', ', array_fill(0, count($vendorProductIds), '%s')).")
-  ";
-  $prices = $wpdb->prepare($sql, $where);
+// Use min and max to get the minimum and maximum prices
+$minPrice = min($priceArray);
+$maxPrice = max($priceArray);
 
-  $prices = $wpdb->get_results($prices);
-  // Convert the results to an array of prices
-  $priceArray = array();
-  foreach ($prices as $price) {
-      $priceArray[] = $price->meta_value;
-  }
+// Use array_push to add the prices to the $productPriceArray
+array_push($productPriceArray, $minPrice, $maxPrice);
 
-  // Use min and max to get the minimum and maximum prices
-  $minPrice = min($priceArray);
-  $maxPrice = max($priceArray);
+// Use get_the_terms to fetch all the terms for all products belonging to the vendors
+$terms = wp_get_object_terms($vendorProductIds, array('product_cat', 'occasion'));
 
-  // Use array_push to add the prices to the $productPriceArray
-  array_push($productPriceArray, $minPrice, $maxPrice);
+$categoryTermListArray = array();
+$occasionTermListArray = array();
 
-  // Use get_the_terms to fetch all the terms for all products belonging to the vendors
-  $terms = wp_get_object_terms($vendorProductIds, array('product_cat', 'occasion'));
-
-  $categoryTermListArray = array();
-  $occasionTermListArray = array();
-
-  if ($terms && !is_wp_error($terms)) {
-      foreach ($terms as $term) {
-          if ($term->taxonomy === 'product_cat') {
-              if ($term->term_id != 15 && $term->term_id != 16) {
-                  $categoryTermListArray[] = $term->term_id;
-              }
-          } else if ($term->taxonomy === 'occasion') {
-              $occasionTermListArray[] = $term->term_id;
+if ($terms && !is_wp_error($terms)) {
+  foreach ($terms as $term) {
+      if ($term->taxonomy === 'product_cat') {
+          if ($term->term_id != 15 && $term->term_id != 16) {
+              $categoryTermListArray[] = $term->term_id;
           }
+      } else if ($term->taxonomy === 'occasion') {
+          $occasionTermListArray[] = $term->term_id;
       }
   }
+}
 
-  $categoryTermListArray = array_unique($categoryTermListArray);
-  $occasionTermListArray = array_unique($occasionTermListArray);
+$categoryTermListArray = array_unique($categoryTermListArray);
+$occasionTermListArray = array_unique($occasionTermListArray);
 ?>
 <input type="hidden" name="_hid_cat_id" id="_hid_cat_id" value="<?php echo $category_id; ?>">
 <input type="hidden" name="_hid_default_user_id" id="categoryDefaultUserIdAsString" value="<?php echo $categoryDefaultUserIdAsString; ?>">
