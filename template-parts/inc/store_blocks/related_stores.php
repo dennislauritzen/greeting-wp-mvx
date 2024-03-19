@@ -88,7 +88,7 @@ $results = $query->get_results();
       <?php
       foreach($results as $k => $v){
         $vendor = get_user_meta($v->ID);
-        $vendor_page_slug = get_wcmp_vendor($v->ID);
+        $vendor_page_slug = get_mvx_vendor($v->ID);
 
         $image = (!empty($vendor['_vendor_profile_image'])? $vendor['_vendor_profile_image'][0] : '');
         $banner = (!empty($vendor['_vendor_banner'])? $vendor['_vendor_banner'][0] : '');

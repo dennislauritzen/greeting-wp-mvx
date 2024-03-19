@@ -9,14 +9,6 @@
 	<link rel='stylesheet' id='main-css' href='https://www.greeting.dk/wp-content/themes/greeting2/assets/css/main.css?ver=3.0.4' media='all' />
 
   <style type="text/css">
-
-
-
-
-
-
-
-
 	/*
 	*	Frontpage video
 	*/

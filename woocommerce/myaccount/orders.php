@@ -27,7 +27,7 @@ do_action( 'woocommerce_before_account_orders', $has_orders ); ?>
 		<thead>
 			<tr>
 				<?php foreach ( wc_get_account_orders_columns() as $column_id => $column_name ) :
-					if($column_id === 'wcmp_suborder') : continue; endif;
+					if($column_id === 'mvx_suborder') : continue; endif;
 					?>
 					<th class="woocommerce-orders-table__header woocommerce-orders-table__header-<?php echo esc_attr( $column_id ); ?>"><span class="nobr"><?php echo esc_html( $column_name ); ?></span></th>
 				<?php endforeach; ?>
@@ -43,7 +43,7 @@ do_action( 'woocommerce_before_account_orders', $has_orders ); ?>
 				<tr class="woocommerce-orders-table__row woocommerce-orders-table__row--status-<?php echo esc_attr( $order->get_status() ); ?> order">
 					<?php
 					foreach ( wc_get_account_orders_columns() as $column_id => $column_name ) :
-						if($column_id === 'wcmp_suborder') : continue; endif;
+						if($column_id === 'mvx_suborder') : continue; endif;
 					?>
 						<td class="woocommerce-orders-table__cell woocommerce-orders-table__cell-<?php echo esc_attr( $column_id ); ?>" data-title="<?php echo esc_attr( $column_name ); ?>">
 							<?php if ( has_action( 'woocommerce_my_account_my_orders_column_' . $column_id ) ) : ?>

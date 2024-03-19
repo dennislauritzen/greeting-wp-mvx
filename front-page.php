@@ -487,93 +487,99 @@ if (have_rows('frontpage_full_width_boxes', $this_post_id) ){
 $frontpage_desc = get_field('front_description', $this_post_id);
 
 if(!empty($frontpage_desc)){
-?>
+    ?>
 
-<section id="description" class="mt-3 mb-5 pb-4">
-  <style type="text/css">
-      .fp-content-block h1,
-      .fp-content-block h2,
-      .fp-content-block h3,
-      .fp-content-block h4,
-      .fp-content-block h5,
-      .fp-content-block h6
-      {
-          font-family: 'Inter','MS Trebuchet', 'Rubik',sans-serif;
-      }
-      .fp-content-block h1 { font-size: 24px; }
-      .fp-content-block h2 { font-size: 23px; }
-      .fp-content-block h3 { font-size: 22px; }
-      .fp-content-block h4 { font-size: 20px; }
-      .fp-content-block h5 { font-size: 18px; }
-      .fp-content-block h6 { font-size: 16px; }
+    <section id="description" class="mt-3 mb-5 pb-4">
+        <style type="text/css">
+            .fp-content-block h1,
+            .fp-content-block h2,
+            .fp-content-block h3,
+            .fp-content-block h4,
+            .fp-content-block h5,
+            .fp-content-block h6
+            {
+                font-family: 'Inter','Rubik',sans-serif;
+                font-weight: 400;
+            }
+            .fp-content-block h1 { font-size: 24px; }
+            .fp-content-block h2 { font-size: 23px; }
+            .fp-content-block h3 { font-size: 22px; }
+            .fp-content-block h4 { font-size: 20px; }
+            .fp-content-block h5 { font-size: 18px; }
+            .fp-content-block h6 { font-size: 16px; }
 
-      .fp-content-block p {
-          font-size: 14px;
-      }
-      .fp-content-block a {
-          color: #000000;
-          text-decoration: underline;
-      }
-  </style>
-  <div class="container">
-    <div class="description fp-content-block row ">
-        <div class="col-12 col-lg-10 col-xl-8 offset-0 offset-lg-1 offset-xl-2">
-            <div style="position: relative;">
-              <div id="categoryDescription" style="max-height: 500px; overflow: hidden;">
-                <?php
-                $description = $frontpage_desc;
-                $collapsed = false;
+            .fp-content-block p {
+                font-size: 14px;
+            }
+            .fp-content-block a {
+                color: #000000;
+                text-decoration: underline;
+            }
+        </style>
+        <div class="container">
+            <div class="description fp-content-block row ">
+                <div class="col-12">
+                    <h1 style="font-family: 'Rubik', 'Inter', sans-serif; font-size: 28px; font-weight: 500;">
+                        <?php echo get_field('header_h1', $this_post_id); ?>
+                    </h1>
+                    <div style="position: relative;">
+                        <div id="categoryDescription" style="max-height: 500px; overflow: hidden;">
+                            <?php
+                            $description = $frontpage_desc;
+                            $collapsed = false;
 
-                // Check if the content exceeds the max-height
-                if (strlen($description) > 400) {
-                    $collapsed = true;
-                }
+                            // Check if the content exceeds the max-height
+                            if (strlen($description) > 400) {
+                                $collapsed = true;
+                            }
 
-                echo $description;
+                            echo '<div style="column-count: 2;">';
+                            echo $description;
+                            echo '</div>';
 
-                if ($collapsed) {
-                    echo '<div class="overlay" id="ctaOverlayWhite"></div>';
-                    echo '<div class="button-line col-12 text-center py-2">';
-                    echo '<button class="btn bg-teal text-white rounded-pill border-teal border-1" id="toggleDescription" style="z-index: 1 !important;">Læs mere</button>';
-                    echo '</div>';
-                }
-                ?>
-              </div>
-              <style>
-                .overlay {
-                  position: absolute;
-                  bottom: 0;
-                  left: 0;
-                  width: 100%;
-                  height: 100%;
-                  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.33) 20%, rgba(255, 255, 255, 1) 100%);
-                  pointer-events: none;
-                }
-                .button-line {
-                  position: absolute;
-                  bottom: -40px;
-                  width: 100%;
-                  z-index: 1 !important;
-                }
-              </style>
-          </div>
+                            if ($collapsed) {
+                                echo '<div class="overlay" id="ctaOverlayWhite"></div>';
+                                echo '<div class="button-line col-12 text-center py-2">';
+                                echo '<button class="btn bg-teal text-white rounded-pill border-teal border-1" id="toggleDescription" style="z-index: 1 !important;">Læs mere</button>';
+                                echo '</div>';
+                            }
+                            ?>
+                        </div>
+                        <style>
+                            .overlay {
+                                position: absolute;
+                                bottom: 0;
+                                left: 0;
+                                width: 100%;
+                                height: 50%;
+                                background: linear-gradient(to bottom, rgba(255, 255, 255, 0.33) 25%, rgba(255, 255, 255, 1) 100%);
+                                pointer-events: none;
+                            }
+                            .button-line {
+                                position: absolute;
+                                bottom: -40px;
+                                width: 100%;
+                                z-index: 1 !important;
+                            }
+                        </style>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-  </div>
-  <script>
-    var categoryDescription = document.getElementById('categoryDescription');
-    var descriptionOverlay = document.getElementById('ctaOverlayWhite');
-    var showMoreButton = document.getElementById('toggleDescription');
+        <script>
+            var categoryDescription = document.getElementById('categoryDescription');
+            var descriptionOverlay = document.getElementById('ctaOverlayWhite');
+            var showMoreButton = document.getElementById('toggleDescription');
 
-    if (showMoreButton) {
-        showMoreButton.addEventListener('click', function () {
-            categoryDescription.style.maxHeight = 'none'; // Allow the container to expand
-            descriptionOverlay.style.display = 'none';
-            showMoreButton.style.display = 'none'; // Hide the "Show More" button
-        });
-    }
-  </script>
-</section>
+            if (showMoreButton) {
+                showMoreButton.addEventListener('click', function () {
+                    categoryDescription.style.maxHeight = 'none'; // Allow the container to expand
+                    descriptionOverlay.style.display = 'none';
+                    showMoreButton.style.display = 'none'; // Hide the "Show More" button
+                });
+            }
+        </script>
+    </section>
 
 <?php
 }

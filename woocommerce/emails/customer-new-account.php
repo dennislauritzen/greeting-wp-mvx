@@ -127,4 +127,4 @@ do_action( 'woocommerce_email_header', $email_heading, $email ); ?>
 
 <?php
 #do_action( 'woocommerce_email_footer', $email );
-do_action('wcmp_email_footer');
+do_action('mvx_email_footer');

@@ -1,5 +1,5 @@
 <?php
-global $WCMp;
+global $MVX, $product;
 
 $cart_count = WC()->cart->cart_contents_count; // Set variable for cart item count
 $cart_url = wc_get_cart_url();  // Set Cart URL
@@ -9,17 +9,27 @@ $cart_url = wc_get_cart_url();  // Set Cart URL
  * For product pages top.
  */
 
-global $product;
-$product_id = $product->get_id();
-$product_meta = get_post($product_id);
-$vendor_id = $product_meta->post_author;
-$vendor = get_wcmp_vendor($vendor_id);
+if(is_object($product)){
+    // This is a product page
+    $product_id = $product->get_id();
+    $product_meta = get_post($product_id);
+    $vendor_id = $product_meta->post_author;
+} else {
+    // Not a product page
+    $vendor_id = mvx_find_shop_page_vendor();
+}
+
+$vendor = get_mvx_vendor($vendor_id);
 
 $vendor2 = get_user_meta($vendor_id);
 $banner = (!empty($vendor2['_vendor_banner'])? $vendor2['_vendor_banner'][0] : '');
 $vendor_banner = (!empty(wp_get_attachment_image_src($banner)) ? wp_get_attachment_image_src($banner, 'full')[0] : '');
 
-$image = !empty($vendor->get_image('image', array(125, 125))) ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
+$image = $MVX->plugin_url . 'assets/images/WP-stdavatar.png';
+if(!empty($vendor_id) && is_object($vendor)){
+    $image = $vendor->get_image('image', array(125, 125));
+}
+#OLD v2: $image = !empty($vendor->get_image('image', array(125, 125))) ? $vendor->get_image('image', array(125, 125)) : $MVX->plugin_url . 'assets/images/WP-stdavatar.png';
 #OLD: $image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
 
 $cart_count = WC()->cart->cart_contents_count; // Set variable for cart item count
@@ -34,10 +44,6 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
   $del_type = (empty($delivery_type['label']) ? $delivery_type : $delivery_type['label']);
 }
 ?>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Merriweather:wght@300;400;700;900&family=Roboto+Slab:wght@100;200;300;400;500;600;700;800;900&family=Rubik:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
  <section id="top" class="vendor pt-1" style="min-height: 275px; background-size: cover; background-position: center center; background-image: linear-gradient(rgba(0, 0, 0, 0.35),rgba(0, 0, 0, 0.35)),url('<?php echo (empty($vendor_banner) ? 'https://www.greeting.dk/wp-content/uploads/2022/04/pexels-furkanfdemir-6309844-1-scaled.jpg' : esc_url($vendor_banner)); ?>');">
   <div class="container py-4">
@@ -160,10 +166,10 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
       <div class="col-12 ">
         <div class="rating pb-2">
           <?php
-          if (get_wcmp_vendor_settings('is_sellerreview', 'general') == 'Enable') {
-            $vendor_term_id = get_user_meta( wcmp_find_shop_page_vendor(), '_vendor_term_id', true );
-            $rating_val_array = wcmp_get_vendor_review_info($vendor_term_id);
-            $WCMp->template->get_template('review/rating.php', array('rating_val_array' => $rating_val_array));
+          if (get_mvx_vendor_settings('is_sellerreview', 'general') == 'Enable') {
+            $vendor_term_id = get_user_meta( mvx_find_shop_page_vendor(), '_vendor_term_id', true );
+            $rating_val_array = mvx_get_vendor_review_info($vendor_term_id);
+            $MVX->template->get_template('review/rating.php', array('rating_val_array' => $rating_val_array));
           }
           ?>
         </div>

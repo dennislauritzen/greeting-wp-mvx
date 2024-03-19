@@ -27,7 +27,7 @@ global $WCMp, $product;
 $product_id = $product->get_id();
 $product_meta = get_post($product_id);
 $vendor_id = $product_meta->post_author;
-$vendor = get_wcmp_vendor($vendor_id);
+$vendor = get_mvx_vendor($vendor_id);
 
 if(!is_object($vendor)){
   return;

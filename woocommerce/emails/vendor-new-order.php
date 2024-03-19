@@ -11,7 +11,7 @@
 if (!defined('ABSPATH'))
     exit; // Exit if accessed directly
 global $WCMp;
-$vendor = get_wcmp_vendor(absint($vendor_id));
+$vendor = get_mvx_vendor(absint($vendor_id));
 
 do_action( 'woocommerce_email_header', $email_heading, $email );
 ?>
@@ -22,11 +22,11 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
 <table cellspacing="0" cellpadding="6" style="width: 100%; border: 1px solid #eee;" border="1" bordercolor="#eee">
     <thead>
         <tr>
-            <?php do_action('wcmp_before_vendor_order_table_header', $order, $vendor->term_id); ?>
+            <?php do_action('mvx_before_vendor_order_table_header', $order, $vendor->term_id); ?>
             <th scope="col" style="text-align:<?php echo $text_align; ?>; border: 1px solid #eee;"><?php _e('Product', 'dc-woocommerce-multi-vendor'); ?></th>
             <th scope="col" style="text-align:<?php echo $text_align; ?>; border: 1px solid #eee;"><?php _e('Quantity', 'dc-woocommerce-multi-vendor'); ?></th>
             <th scope="col" style="text-align:<?php echo $text_align; ?>; border: 1px solid #eee;"><?php _e('Commission', 'dc-woocommerce-multi-vendor'); ?></th>
-            <?php do_action('wcmp_after_vendor_order_table_header', $order, $vendor->term_id); ?>
+            <?php do_action('mvx_after_vendor_order_table_header', $order, $vendor->term_id); ?>
         </tr>
     </thead>
     <tbody>
@@ -40,7 +40,7 @@ if (apply_filters('show_cust_order_calulations_field', true, $vendor->id)) {
     ?>
     <table cellspacing="0" cellpadding="6" style="width: 100%; border: 1px solid #eee;" border="1" bordercolor="#eee">
         <?php
-        $totals = $vendor->wcmp_vendor_get_order_item_totals($order, $vendor->term_id);
+        $totals = $vendor->mvx_vendor_get_order_item_totals($order, $vendor->term_id);
         if ($totals) {
             foreach ($totals as $total_key => $total) {
                 ?><tr>
@@ -120,4 +120,4 @@ if (apply_filters('show_cust_order_calulations_field', true, $vendor->id)) {
 	</tr>
     </table>
 
-<?php do_action('wcmp_email_footer'); ?>
+<?php do_action('mvx_email_footer'); ?>

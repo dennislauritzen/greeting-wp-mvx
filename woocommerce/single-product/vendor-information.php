@@ -13,7 +13,7 @@ global $WCMp, $product;
 $product_id = $product->get_id();
 $product_meta = get_post($product_id);
 $vendor_id = $product_meta->post_author;
-$vendor = get_wcmp_vendor($vendor_id);
+$vendor = get_mvx_vendor($vendor_id);
 
 if(!is_object($vendor)){
   return;
@@ -79,7 +79,7 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor_id))){
           } ?>
         </p>
         <?php
-				$vendor_hide_description = apply_filters('wcmp_vendor_store_header_hide_description', get_user_meta($vendor_id, '_vendor_hide_description', true), $vendor_id);
+				$vendor_hide_description = apply_filters('mvx_vendor_store_header_hide_description', get_user_meta($vendor_id, '_vendor_hide_description', true), $vendor_id);
 				$description = get_user_meta($vendor_id, '_vendor_description', true);
 				if (!$vendor_hide_description && !empty($description)) { ?>
         <div>

@@ -12,7 +12,7 @@ if($args['vendor']){
 
                   <div class="col-3 text-center">
                     <img class="img-fluid rounded-start" src="<?php echo $image;?>" style="max-width: 100px;">
-                    <?php $button_text = apply_filters('wcmp_vendor_lists_single_button_text', $vendor->page_title); ?>
+                    <?php $button_text = apply_filters('mvx_vendor_lists_single_button_text', $vendor->page_title); ?>
                     <h6><?php echo esc_html($button_text); ?></h6>
                     <a href="<?php echo esc_url($vendor->get_permalink()); ?>" class="cta rounded-pill bg-teal text-white d-inline-block my-1 py-2 px-3 px-md-4">
                       Gå til butik<span class="d-none d-md-inline"> ></span>
@@ -83,32 +83,32 @@ if($args['vendor']){
 	$image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
 	$banner = $vendor->get_image('banner') ? $vendor->get_image('banner') : '';
 
-	do_action('wcmp_vendor_lists_single_before_image', $vendor->term_id, $vendor->id); ?>
+	do_action('mvx_vendor_lists_single_before_image', $vendor->term_id, $vendor->id); ?>
 	<div class="wcmp-profile-wrap">
 		<div class="wcmp-cover-picture" style="background-image: url('<?php if($banner) echo $banner; ?>');"></div>
 		<div class="store-badge-wrap">
-			<?php do_action('wcmp_vendor_lists_vendor_store_badges', $vendor); ?>
+			<?php do_action('mvx_vendor_lists_vendor_store_badges', $vendor); ?>
 		</div>
 		<div class="wcmp-store-info">
 			<div class="wcmp-store-picture">
 				<img class="vendor_img" src="<?php echo esc_url($image); ?>" id="vendor_image_display">
 			</div>
 			<?php
-				$rating_info = wcmp_get_vendor_review_info($vendor->term_id);
+				$rating_info = mvx_get_vendor_review_info($vendor->term_id);
 				$WCMp->template->get_template('review/rating_vendor_lists.php', array('rating_val_array' => $rating_info));
 			?>
 		</div>
 	</div>
-	<?php do_action('wcmp_vendor_lists_single_after_image', $vendor->term_id, $vendor->id); ?>
+	<?php do_action('mvx_vendor_lists_single_after_image', $vendor->term_id, $vendor->id); ?>
 	<div class="wcmp-store-detail-wrap">
-		<?php do_action('wcmp_vendor_lists_vendor_before_store_details', $vendor); ?>
+		<?php do_action('mvx_vendor_lists_vendor_before_store_details', $vendor); ?>
 		<ul class="wcmp-store-detail-list">
 			<li>
 				<i class="wcmp-font ico-store-icon"></i>
-				<?php $button_text = apply_filters('wcmp_vendor_lists_single_button_text', $vendor->page_title); ?>
+				<?php $button_text = apply_filters('mvx_vendor_lists_single_button_text', $vendor->page_title); ?>
 				<a href="<?php echo esc_url($vendor->get_permalink()); ?>" class="store-name"><?php echo esc_html($button_text); ?></a>
-				<?php do_action('wcmp_vendor_lists_single_after_button', $vendor->term_id, $vendor->id); ?>
-				<?php do_action('wcmp_vendor_lists_vendor_after_title', $vendor); ?>
+				<?php do_action('mvx_vendor_lists_single_after_button', $vendor->term_id, $vendor->id); ?>
+				<?php do_action('mvx_vendor_lists_vendor_after_title', $vendor); ?>
 			</li>
 			<?php if($vendor->get_formatted_address()) : ?>
 			<li>
@@ -117,6 +117,6 @@ if($args['vendor']){
 			</li>
 			<?php endif; ?>
 		</ul>
-		<?php do_action('wcmp_vendor_lists_vendor_after_store_details', $vendor); ?>
+		<?php do_action('mvx_vendor_lists_vendor_after_store_details', $vendor); ?>
 	</div>
 </div>

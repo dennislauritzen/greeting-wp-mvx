@@ -1267,7 +1267,7 @@ function catocca_landing_data_fetch(){
  		foreach ($return_arr as $filteredUser) {
  			$vendor_int = (int) $filteredUser;
 
- 			$vendor = get_wcmp_vendor($vendor_int);
+ 			$vendor = get_mvx_vendor($vendor_int);
  			$cityName = $_POST['cityName'];
 
  			// Get the delivery type for the vendor so we know if it is local or freight.
@@ -1471,7 +1471,7 @@ function catOccaDeliveryAction() {
 	// FILTER: Delivery
 	// Prepare the statement for delivery array
 	$where = array();
-	$placeholder_arr = array_fill(0, count($deliveryIdArray), '%s');
+    $placeholder_arr = (is_countable($deliveryIdArray) ? array_fill(0, count($deliveryIdArray), '%s') : array());
 
 	if(!empty($deliveryIdArray)){
 		$args = array(
@@ -1549,7 +1549,7 @@ function catOccaDeliveryAction() {
 		foreach ($return_arr as $filteredUser) {
 			$vendor_int = (int) $filteredUser;
 
-			$vendor = get_wcmp_vendor($vendor_int);
+			$vendor = get_mvx_vendor($vendor_int);
 			$cityName = $_POST['cityName'];
 
 			// Get the delivery type for the vendor so we know if it is local or freight.
@@ -1877,7 +1877,7 @@ function lpFilterAction() {
 		foreach ($return_arr as $filteredUser) {
 			$vendor_int = (int) $filteredUser;
 
-			$vendor = get_wcmp_vendor($vendor_int);
+			$vendor = get_mvx_vendor($vendor_int);
 			$cityName = $_POST['cityName'];
 
 			// Get the delivery type for the vendor so we know if it is local or freight.
@@ -1990,7 +1990,7 @@ function categoryPageFilterAction() {
 
 	if(count($filteredCatOccaDeliveryArrayUnique) > 0 ){
 		foreach ($filteredCatOccaDeliveryArrayUnique as $filteredUser) {
-			$vendor = get_wcmp_vendor($filteredUser);
+			$vendor = get_mvx_vendor($filteredUser);
 
 			// call the template with pass $vendor variable
 			get_template_part('template-parts/vendor-loop', null, array('vendor' => $vendor));
@@ -2303,7 +2303,7 @@ function greeting_check_delivery_postcode( $fields, $errors ){
 
 	$vendor_id = get_post_field( 'post_author', $storeProductId );
 	#print "<p>Vendor ID: ";var_dump($vendor_id);print "</p>";
-	$vendor = get_wcmp_vendor($vendor_id);
+	$vendor = get_mvx_vendor($vendor_id);
 
 	// get vendor delivery zips
 	$vendorDeliveryZipsRow = $wpdb->get_row( "
@@ -2547,7 +2547,7 @@ function greeting_save_custom_fields_with_order( $order_id ) {
 	#	}
 }
 
-#add_action( 'wcmp_checkout_vendor_order_processed' , 'update_sub_order_meta' ,10 , 3);
+#add_action( 'mvx_checkout_vendor_order_processed' , 'update_sub_order_meta' ,10 , 3);
 function update_sub_order_meta($vendor_order_id, $posted_data, $order){
 	global $WCMp;
 
@@ -2700,7 +2700,7 @@ function custom_woocommerce_email_order_meta_fields( $fields, $sent_to_admin, $o
     return $fields;
 }
 add_filter( 'woocommerce_email_order_meta_fields', 'custom_woocommerce_email_order_meta_fields', 10, 3 );
-#do_action('wcmp_checkout_vendor_order_processed', $vendor_order_id, $posted_data, $order);
+#do_action('mvx_checkout_vendor_order_processed', $vendor_order_id, $posted_data, $order);
 
 
 
@@ -2829,7 +2829,7 @@ function custom_display_order_receiver_info_data_in_admin(){
 add_action( 'woocommerce_admin_order_preview_start', 'custom_display_order_receiver_info_data_in_admin' );
 
 // Display receiver info in vendor dashboard  order preview
-// add_action( 'wcmp_vendor_dashboard_content', 'vendor_custom_display_order_receiver_info_data_in_admin' );
+// add_action( 'mvx_vendor_dashboard_content', 'vendor_custom_display_order_receiver_info_data_in_admin' );
 // function vendor_custom_display_order_receiver_info_data_in_admin(){
 //     echo '<p style="text-align:center"><strong>Receiver Info:</strong> test action hook</p>';
 // }
@@ -2911,7 +2911,7 @@ function greeting_shop_only_one_store_same_time() {
 			$length = count($cart_data);
 			foreach ($cart_data as $cart_item_key => $cart_item) {
 				$product_id = $cart_item['product_id'];
-				$vendor_data = get_wcmp_product_vendors($product_id);
+				$vendor_data = get_mvx_product_vendors($product_id);
 				if(is_object($vendor_data)){
 					$vendor_id = $vendor_data->user_data->ID;
 					$vendor_id_array[] = $vendor_id;
@@ -2930,7 +2930,7 @@ function greeting_shop_only_one_store_same_time() {
 		remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_add_to_cart', 30 );
 		remove_action('woocommerce_proceed_to_checkout', 'woocommerce_button_proceed_to_checkout', 20);
 		// add actions
-		add_action( 'after_wcmp_vendor_description', 'show_shop_only_one_store_same_time_notice', 5 );
+		add_action( 'after_mvx_vendor_description', 'show_shop_only_one_store_same_time_notice', 5 );
 		add_action( 'woocommerce_before_single_product', 'show_shop_only_one_store_same_time_notice', 5 );
 		add_action('woocommerce_before_cart', 'show_shop_only_one_store_same_time_notice', 5);
 		add_action('woocommerce_before_checkout_form', 'show_shop_only_one_store_same_time_notice', 5);
@@ -2968,7 +2968,7 @@ function show_shop_only_one_store_same_time_notice(){
  *
  * @author Dennis Lauritzen
  */
-add_filter('wcmp_show_report_abuse_link', '__return_false');
+add_filter('mvx_show_report_abuse_link', '__return_false');
 
 /**
  * Trigger Holiday Mode
@@ -3089,6 +3089,14 @@ function get_the_variation_price_html( $product, $name, $term_slug ){
     }
 }
 
+function get_the_variation_price( $product, $name, $term_slug ){
+    foreach ( $product->get_available_variations() as $variation ){
+        if($variation['attributes'][$name] == $term_slug ){
+            $price = $variation['display_price'];
+            return strip_tags( $price );
+        }
+    }
+}
 
 /**
  * Function for showing the price in the attribute dropdown on product pages
@@ -3101,53 +3109,76 @@ function show_price_in_attribute_dropdown( $html, $args ) {
     // Only if there is a unique variation attribute (one dropdown)
     if( sizeof($args['product']->get_variation_attributes()) == 1 ) :
 
-    $options               = $args['options'];
-    $product               = $args['product'];
-    $attribute             = $args['attribute'];
-    $name                  = $args['name'] ? $args['name'] : 'attribute_' . sanitize_title( $attribute );
-    $id                    = $args['id'] ? $args['id'] : sanitize_title( $attribute );
-    $class                 = $args['class'];
-    $show_option_none      = $args['show_option_none'] ? true : false;
-    $show_option_none_text = $args['show_option_none'] ? $args['show_option_none'] : __( 'Choose an option', 'woocommerce' );
+        $options               = $args['options'];
+        $product               = $args['product'];
+        $attribute             = $args['attribute'];
+        $name                  = $args['name'] ? $args['name'] : 'attribute_' . sanitize_title( $attribute );
+        $id                    = $args['id'] ? $args['id'] : sanitize_title( $attribute );
+        $class                 = $args['class'];
+        $show_option_none      = (bool) $args['show_option_none'];
+        $show_option_none_text = $args['show_option_none'] ? $args['show_option_none'] : __( 'Choose an option', 'woocommerce' );
 
-    if ( empty( $options ) && ! empty( $product ) && ! empty( $attribute ) ) {
-        $attributes = $product->get_variation_attributes();
-        $options    = $attributes[ $attribute ];
-    }
+        if ( empty( $options ) && ! empty( $product ) && ! empty( $attribute ) ) {
+            $attributes = $product->get_variation_attributes();
+            $options    = $attributes[ $attribute ];
+        }
 
-    $html = '<select id="' . esc_attr( $id ) . '" class="' . esc_attr( $class ) . '" name="' . esc_attr( $name ) . '" data-attribute_name="attribute_' . esc_attr( sanitize_title( $attribute ) ) . '" data-show_option_none="' . ( $show_option_none ? 'yes' : 'no' ) . '">';
-    $html .= '<option value="">' . esc_html( $show_option_none_text ) . '</option>';
+        $html = '<select id="' . esc_attr( $id ) . '" class="' . esc_attr( $class ) . '" name="' . esc_attr( $name ) . '" data-attribute_name="attribute_' . esc_attr( sanitize_title( $attribute ) ) . '" data-show_option_none="' . ( $show_option_none ? 'yes' : 'no' ) . '">';
+        $html .= '<option value="">' . esc_html( $show_option_none_text ) . '</option>';
 
-    if ( ! empty( $options ) ) {
-        if ( $product && taxonomy_exists( $attribute ) ) {
-            $terms = wc_get_product_terms( $product->get_id(), $attribute, array( 'fields' => 'all' ) );
+        if ( ! empty( $options ) ) {
+            $option_value_arr = array();
 
-            foreach ( $terms as $term ) {
-                if ( in_array( $term->slug, $options ) ) {
+            if ( $product && taxonomy_exists( $attribute ) ) {
+                $terms = wc_get_product_terms( $product->get_id(), $attribute, array( 'fields' => 'all' ) );
+
+                foreach ( $terms as $term ) {
+                    if ( in_array( $term->slug, $options ) ) {
+                        // Get and inserting the price
+                        $price_html = get_the_variation_price_html( $product, $name, $term->slug );
+                        $price_raw = get_the_variation_price($product, $name, $term->slug);
+
+                        $price_title_text = (empty($price_html) ? esc_html( apply_filters( 'woocommerce_variation_option_name', $term->name ) ) : esc_html( apply_filters( 'woocommerce_variation_option_name', $term->name ) . ' (' . $price_html . ')' ) );
+                        $content = '<option value="' . esc_attr( $term->slug ) . '" ' . selected( sanitize_title( $args['selected'] ), $term->slug, false ) . '>' . $price_title_text  . '</option>';
+                        $option_value_arr[$term->slug] = array('price' => $price_raw, 'title_text' => $price_title_text, 'html' => $content);
+                    }
+                }
+            } else {
+                foreach ( $options as $option ) {
+                    $selected = sanitize_title( $args['selected'] ) === $args['selected'] ? selected( $args['selected'], sanitize_title( $option ), false ) : selected( $args['selected'], $option, false );
                     // Get and inserting the price
-                    $price_html = get_the_variation_price_html( $product, $name, $term->slug );
+                    $price_html = get_the_variation_price_html( $product, $name, $option->slug );
+                    $price_raw = get_the_variation_price($product, $name, $option->slug);
 
-                    $price_title_text = (empty($price_html) ? esc_html( apply_filters( 'woocommerce_variation_option_name', $term->name ) ) : esc_html( apply_filters( 'woocommerce_variation_option_name', $term->name ) . ' (' . $price_html . ')' ) );
-                    $html .= '<option value="' . esc_attr( $term->slug ) . '" ' . selected( sanitize_title( $args['selected'] ), $term->slug, false ) . '>' . $price_title_text  . '</option>';
+                    $option_title_text = ( empty($price_html) ? esc_html(apply_filters( 'woocommerce_variation_option_name', $option )) : esc_html( apply_filters( 'woocommerce_variation_option_name', $option ) . ' (' . $price_html . ')' ) );
+                    $content = '<option value="' . esc_attr( $option ) . '" ' . $selected . '>' . $option_title_text . '</option>';
+
+                    $option_value_arr[$option->slug] = array('price' => $price_raw, 'title_text' => $option_title_text, 'html' => $content);
                 }
             }
-        } else {
-            foreach ( $options as $option ) {
-                $selected = sanitize_title( $args['selected'] ) === $args['selected'] ? selected( $args['selected'], sanitize_title( $option ), false ) : selected( $args['selected'], $option, false );
-                // Get and inserting the price
-                $price_html = get_the_variation_price_html( $product, $name, $term->slug );
-                $option_title_text = ( empty($price_html) ? esc_html(apply_filters( 'woocommerce_variation_option_name', $option )) : esc_html( apply_filters( 'woocommerce_variation_option_name', $option ) . ' (' . $price_html . ')' ) );
-                $html .= '<option value="' . esc_attr( $option ) . '" ' . $selected . '>' . $option_title_text . '</option>';
+
+            // Sort the array by price using an anonymous function
+            usort($option_value_arr, function($a, $b) {
+                if ($a['price'] == $b['price']) {
+                    return 0;
+                }
+                return ($a['price'] < $b['price']) ? -1 : 1;
+            });
+
+            foreach($option_value_arr as $k => $v){
+                $html .= $v['html'];
             }
+
         }
-    }
-    $html .= '</select>';
+
+        $html .= '</select>';
 
     endif;
 
     return $html;
 }
 add_filter( 'woocommerce_dropdown_variation_attribute_options_html', 'show_price_in_attribute_dropdown', 10, 2);
+
 
 /**
  * Add javascript and some styles to header only on cart page
@@ -3427,6 +3458,10 @@ function get_vendor_closed_dates($vendor_id){
     && is_array($vendor_closed_days_repeater)
     && $vendor_closed_days_text != $vendor_closed_days_repeater){
         return array_map(function($item) {
+            if(empty($item) || empty($item['closing_dates'])){
+                return;
+            }
+
             $closingDate = DateTime::createFromFormat('d/m/Y', $item['closing_dates']);
             return $closingDate->format('d-m-Y');
         }, $vendor_closed_days_repeater);
@@ -3482,7 +3517,7 @@ function get_vendor_name($vendor_id){
 
     global $WCMp;
 
-    $vendor = get_wcmp_vendor($vendor_id);
+    $vendor = get_mvx_vendor($vendor_id);
 
     return ucfirst(esc_html($vendor->page_title));
 }
@@ -3566,6 +3601,10 @@ function get_vendor_delivery_dates_extraordinary($vendor_id){
     }
 
     return array_map(function ($item) {
+        if(empty($item) || empty($item['opening_date'])){
+            return;
+        }
+
         $openingDate = DateTime::createFromFormat('d/m/Y', $item['opening_date']);
         return $openingDate ? $openingDate->format('d-m-Y') : null;
     }, $extraordinary_dates);
@@ -3599,6 +3638,10 @@ function get_global_days($type = 'closed') {
         }
 
         return array_map(function ($item) {
+            if(empty($item) || empty($item['closed_date'])){
+                return;
+            }
+
             $closingDate = DateTime::createFromFormat('d-m-Y', $item['closed_date']);
             return $closingDate ? $closingDate->format('d-m-Y') : null;
         }, $closed_dates);
@@ -3775,7 +3818,7 @@ function get_vendor_dates_new($vendor_id, $date_format = 'd-m-Y', $open_close = 
         $is_global_closed_date = in_array($date, $global_closed_dates) ? true : false;
 
         $type = 'weekday';
-        if ($$date_weekday >= 1 && $date_weekday <= 5) {
+        if ($date_weekday >= 1 && $date_weekday <= 5) {
             $type = 'weekday';
         } elseif ($date_weekday >= 6 && $date_weekday <= 7) {
             $type = 'weekend';
@@ -4284,7 +4327,7 @@ function get_close_stores(){
 	foreach($results as $k => $v){
 
 		$vendor = get_user_meta($v->ID);
-		$vendor_page_slug = get_wcmp_vendor($v->ID);
+		$vendor_page_slug = get_mvx_vendor($v->ID);
 		// call the template with pass $vendor variable
 		get_template_part('template-parts/vendor-loop', null, array('vendor' => $vendor_page_slug, 'cityName' => $cityName, 'postalCode' => $postal_code));
 	}
@@ -4428,8 +4471,8 @@ function get_featured_postal_codes(){
  *
  */
 
-add_filter( 'wcmp_vendor_order_statuses', 'wcmp_change_default_status', 10, 2);
-function wcmp_change_default_status( $order_status, $order ){
+add_filter( 'mvx_vendor_order_statuses', 'mvx_change_default_status', 10, 2);
+function mvx_change_default_status( $order_status, $order ){
 	unset($order_status['wc-pending']);
 	unset($order_status['wc-on-hold']);
 	unset($order_status['wc-cancelled']);
@@ -4466,7 +4509,7 @@ add_filter( 'woocommerce_email_order_items_args', 'greeting_modify_wc_order_emai
  * @since v1.0
  * @author Dennis Lauritzen
  */
-apply_filters('wcmp_is_disable_store_visitors_stats', '__return_false');
+apply_filters('mvx_is_disable_store_visitors_stats', '__return_false');
 
 
 add_action( 'init', 'register_order_seen_order_status' );
@@ -4604,8 +4647,8 @@ function custom_email_subject_completed( $formated_subject, $order ){
  *
  *
  */
-add_filter( 'woocommerce_display_item_meta','wcmp_email_change_sold_by_text', 10, 3 );
-function wcmp_email_change_sold_by_text($html, $item, $args ){
+add_filter( 'woocommerce_display_item_meta','mvx_email_change_sold_by_text', 10, 3 );
+function mvx_email_change_sold_by_text($html, $item, $args ){
     $strings = array();
     $html    = '';
     foreach ( $item->get_formatted_meta_data() as $meta_id => $meta ) {
@@ -4628,7 +4671,7 @@ function wcmp_email_change_sold_by_text($html, $item, $args ){
 * Remove vendor details / information in mails
 *
 */
-add_filter ( 'wcmp_display_vendor_message_to_buyer','__return_false');
+add_filter ( 'mvx_display_vendor_message_to_buyer','__return_false');
 
 /**
  * Add product image heading to e-mail new vendor order #mails #transactional
@@ -4637,7 +4680,7 @@ add_filter ( 'wcmp_display_vendor_message_to_buyer','__return_false');
  * @author Dennis Lauritzen
  * @return void
  */
-add_action('wcmp_before_vendor_order_table_header', 'add_prod_img_heading_to_vendor_email', 10, 4);
+add_action('mvx_before_vendor_order_table_header', 'add_prod_img_heading_to_vendor_email', 10, 4);
 function add_prod_img_heading_to_vendor_email() {
 		$str = '<th scope="col" style="text-align: left; width: 10%; border: 1px solid #eee;">';
 		$str .= '';
@@ -4653,12 +4696,12 @@ function add_prod_img_heading_to_vendor_email() {
  * @author Dennis Lauritzen
  * @return void
  */
-add_action('wcmp_before_vendor_order_item_table', 'add_prod_img_to_vendor_email', 10, 4);
+add_action('mvx_before_vendor_order_item_table', 'add_prod_img_to_vendor_email', 10, 4);
 function add_prod_img_to_vendor_email($item, $order, $vendor_id, $is_ship) {
 		$product = wc_get_product( $item['product_id'] );
-		$wcmp_product_img = $product->get_image( array( 100, 100 ));
+		$mvx_product_img = $product->get_image( array( 100, 100 ));
 		$str = '<td scope="col" style="width: 20%; text-align:left; border: 1px solid #eee;">';
-		$str .= $wcmp_product_img;
+		$str .= $mvx_product_img;
 		$str .= '</td>';
 
 		echo wp_kses_post( $str  );
@@ -4718,21 +4761,19 @@ function woo_order_status_change_custom( $order_id, $from_status, $to_status ) {
 }
 
 
-
-
 /**
  * Add new column to the order table on WCMP frontend order table
  * This is the Parent Order ID / Hoved ordre nr.
  *
  * @author Dennis Lauritzen
  */
-add_filter('wcmp_datatable_order_list_table_headers', 'wcmp_add_order_table_column_callback', 10, 2);
-function wcmp_add_order_table_column_callback($orders_list_table_headers, $current_user_id) {
-	$wcmp_custom_columns = array(
+add_filter('mvx_datatable_order_list_table_headers', 'mvx_add_order_table_column_callback', 10, 2);
+function mvx_add_order_table_column_callback($orders_list_table_headers, $current_user_id) {
+	$mvx_custom_columns = array(
 		'order_p_id'    => array('label' => __( 'Hoved ordre nr.', 'dc-woocommerce-multi-vendor' ))
 	);
 
-	return (array_slice($orders_list_table_headers, 0, 2) + $wcmp_custom_columns + array_slice($orders_list_table_headers, 2));
+	return (array_slice($orders_list_table_headers, 0, 2) + $mvx_custom_columns + array_slice($orders_list_table_headers, 2));
 }
 
 /**
@@ -4741,8 +4782,8 @@ function wcmp_add_order_table_column_callback($orders_list_table_headers, $curre
  *
  * @author Dennis Lauritzen
  */
-add_filter('wcmp_datatable_order_list_row_data', 'wcmp_add_order_table_row_data', 10, 2);
-function wcmp_add_order_table_row_data($vendor_rows, $order) {
+add_filter('mvx_datatable_order_list_row_data', 'mvx_add_order_table_row_data', 10, 2);
+function mvx_add_order_table_row_data($vendor_rows, $order) {
 	$item_sku = array();
 	$vendor = get_current_vendor();
 	if($vendor){
@@ -4838,11 +4879,11 @@ add_action( 'pre_get_posts', 'action_pre_get_posts', 10, 1 );
  *
  * @return void
  */
-function wcmp_admin_filter_by_vendor() {
+function mvx_admin_filter_by_vendor() {
 	global $typenow;
 	if ($typenow == 'shop_order') {
 		$admin_dd_html = '<select name="admin_order_vendor" id="dropdown_admin_order_vendor"><option value="">'.__("Show All Vendors", "dc-woocommerce-multi-vendor").'</option>';
-		$vendors = get_wcmp_vendors();
+		$vendors = get_mvx_vendors();
 
 		if($vendors){
 			$vendor_arr = array();
@@ -4862,7 +4903,7 @@ function wcmp_admin_filter_by_vendor() {
 		echo $admin_dd_html;
 	}
 }
-add_action( 'restrict_manage_posts', 'wcmp_admin_filter_by_vendor');
+add_action( 'restrict_manage_posts', 'mvx_admin_filter_by_vendor');
 
 
 /**
@@ -4874,7 +4915,7 @@ add_action( 'restrict_manage_posts', 'wcmp_admin_filter_by_vendor');
 function filter_orders_by_vendor_in_admin_dashboard( $query ) {
     if (current_user_can('administrator') && !empty($_REQUEST['admin_order_vendor'])) {
         $vendor_term_id = isset($_GET['admin_order_vendor']) ? $_GET['admin_order_vendor'] : '';
-        $vendor =  get_wcmp_vendor_by_term($vendor_term_id);
+        $vendor =  get_mvx_vendor_by_term($vendor_term_id);
         #var_dump($vendor);
 
         $parent_orders = get_vendor_parent_order($vendor->id);
@@ -4883,7 +4924,7 @@ function filter_orders_by_vendor_in_admin_dashboard( $query ) {
     }
     return $query;
 }
-add_filter( 'wcmp_shop_order_query_request', 'filter_orders_by_vendor_in_admin_dashboard');
+add_filter( 'mvx_shop_order_query_request', 'filter_orders_by_vendor_in_admin_dashboard');
 
 
 function get_vendor_parent_order($id) {
@@ -4911,7 +4952,7 @@ function get_vendor_parent_order($id) {
 
 /**
  * ADDING 2 NEW COLUMNS WITH THEIR TITLES (keeping "Total" and "Actions" columns at the end)
- * Possible values: cborder_number, wcmp_suborder, order_date, order_status, billing_address, shipping_address, pensopay_transaction_info, order_total, woe_export_status,
+ * Possible values: cborder_number, mvx_suborder, order_date, order_status, billing_address, shipping_address, pensopay_transaction_info, order_total, woe_export_status,
  * wc_actions, store_own_order_reference
  *
  * Also - Removing the suborder column and the export column.
@@ -4926,8 +4967,8 @@ function custom_shop_order_column($columns)
     // Inserting columns to a specific location
     foreach( $columns as $key => $column){
         $reordered_columns[$key] = $column;
-        if( $key == 'wcmp_suborder' || $key == 'woe_export_status'){
-            unset($reordered_columns['wcmp_suborder']);
+        if( $key == 'mvx_suborder' || $key == 'woe_export_status'){
+            unset($reordered_columns['mvx_suborder']);
             unset($reordered_columns['woe_export_status']);
         }
         if( $key ==  'order_status' ){
@@ -5411,9 +5452,6 @@ function get_vendor_delivery_days_from_today($vendor_id, $prepend_text = '', $de
     $now = new DateTime();
 
     foreach ($vendor_days as $p => $c) {
-
-
-
         if(isset($c['cutoff_datetime'])
         && $c['cutoff_datetime'] !== false){
             $cutofftime = $c['cutoff_datetime'];
@@ -5440,6 +5478,7 @@ function get_vendor_delivery_days_from_today($vendor_id, $prepend_text = '', $de
         $date_obj =  DateTime::createFromFormat('d-m-Y', $date_str);
         $date = $date_obj->format('d-m-Y'); // Construct from the date.
 
+        $str = '';
         if($del_type == "1"){
             $str .= 'Levere ';
         } else if($del_type == "0"){
@@ -5716,7 +5755,7 @@ function greeting_wc_process_order_meta_box_action_test_mail( $order ) {
 		# customer_invoice, customer_note, customer_reset_password, customer_new_account, woocommerce_pensopay_payment_link, vendor_new_account, admin_new_vendor,
 		# approved_vendor_new_account, rejected_vendor_new_account, vendor_new_order, notify_shipped, admin_new_vendor_product, vendor_new_question, admin_new_question,
 		# customer_answer, admin_added_new_product_to_vendor, vendor_commissions_transaction, vendor_direct_bank, admin_widthdrawal_request, vendor_orders_stats_report,
-		# vendor_contact_widget_email, wcmp_send_report_abuse, vendor_new_announcement, customer_order_refund_request, admin_vendor_product_rejected,
+		# vendor_contact_widget_email, mvx_send_report_abuse, vendor_new_announcement, customer_order_refund_request, admin_vendor_product_rejected,
 		# suspend_vendor_new_account, review_vendor_alert, vendor_followed, admin_change_order_status, admin_new_vendor_coupon
 
 		$mailer = WC()->mailer();
@@ -6140,18 +6179,33 @@ function get_customer_order( $customer_id, $billing_email, $first_or_last )
     }
 
 
-    $order = $wpdb->get_var(
-    // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
+    #$order = $wpdb->get_var(
+    #// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
+    #    "SELECT posts.ID
+    #		FROM $wpdb->posts AS posts
+	#		LEFT JOIN {$wpdb->postmeta} AS meta on posts.ID = meta.post_id
+	#		WHERE meta.meta_key = '" . $meta_key . "'
+	#		AND   meta.meta_value = '" . esc_sql($meta_value) . "'
+	#		AND   posts.post_type = 'shop_order'
+	#		AND   posts.post_status IN ( '" . implode("','", array_map('esc_sql', array_keys(wc_get_order_statuses()))) . "' )
+	#		ORDER BY posts.ID {$direction}"
+    #// phpcs:enable
+    #);
+
+    $prepared_query = $wpdb->prepare(
         "SELECT posts.ID
-			FROM $wpdb->posts AS posts
-			LEFT JOIN {$wpdb->postmeta} AS meta on posts.ID = meta.post_id
-			WHERE meta.meta_key = '" . $meta_key . "'
-			AND   meta.meta_value = '" . esc_sql($meta_value) . "'
-			AND   posts.post_type = 'shop_order'
-			AND   posts.post_status IN ( '" . implode("','", array_map('esc_sql', array_keys(wc_get_order_statuses()))) . "' )
-			ORDER BY posts.ID {$direction}"
-    // phpcs:enable
+    FROM $wpdb->posts AS posts
+    LEFT JOIN {$wpdb->postmeta} AS meta on posts.ID = meta.post_id
+    WHERE meta.meta_key = %s
+    AND meta.meta_value = %s
+    AND posts.post_type = 'shop_order'
+    AND posts.post_status IN ( '" . implode("','", array_map('esc_sql', array_keys(wc_get_order_statuses()))) . "' )
+    ORDER BY posts.ID {$direction}",
+        $meta_key,
+        $meta_value
     );
+
+    $order = $wpdb->get_var($prepared_query);
 
     if (!$order) {
         return false;
@@ -6170,34 +6224,35 @@ function get_customer_order( $customer_id, $billing_email, $first_or_last )
 function vendor_remove_fields_from_admin($contactmethods, $user) {
     // Check if the current user is an administrator and if the user being edited has the 'dc_vendor' role
     $current_user = wp_get_current_user();
-    if (current_user_can('administrator')
-        && is_array($contactmethods) && $user
-        && $user
-        && is_object($user)
-        && in_array('dc_vendor', $user->roles)) {
-        // Replace 'field-id' with the actual ID or name of the field you want to unset
-        $fields_to_unset = array(
-            'facebook',
-            'instagram',
-            'linkedin',
-            'twitter',
-            'youtube',
-            'wikipedia',
-            'myspace',
-            'pinterest',
-            'soundcloud',
-            'tumblr',
-            'facebook_profile',
-            'twitter_profile',
-            'linkedin_profile',
-            'github_profile',
-            'vendor_csd_return_address1',
-            'vendor_csd_return_address2'
-        );
 
-        // Unset each shipping address field
-        foreach ($fields_to_unset as $field) {
-            unset($contactmethods[$field]);
+    if (current_user_can('administrator') && is_array($contactmethods) && $user && is_object($user)) {
+        // Check if the user has roles and if 'dc_vendor' is among them
+        $user_roles = $user->roles;
+        if (is_array($user_roles) && in_array('dc_vendor', $user_roles)) {
+            // Replace 'field-id' with the actual ID or name of the field you want to unset
+            $fields_to_unset = array(
+                'facebook',
+                'instagram',
+                'linkedin',
+                'twitter',
+                'youtube',
+                'wikipedia',
+                'myspace',
+                'pinterest',
+                'soundcloud',
+                'tumblr',
+                'facebook_profile',
+                'twitter_profile',
+                'linkedin_profile',
+                'github_profile',
+                'vendor_csd_return_address1',
+                'vendor_csd_return_address2'
+            );
+
+            // Unset each shipping address field
+            foreach ($fields_to_unset as $field) {
+                unset($contactmethods[$field]);
+            }
         }
     }
 
@@ -6280,3 +6335,107 @@ function vendor_hide_fields_css() {
     }
 }
 add_action('admin_head', 'vendor_hide_fields_css');
+
+/**
+ * Function to redirect a vendors products to frontpage if the vendor is not active
+ *
+ * @return void
+ */
+function redirect_deactivated_vendor_product() {
+    // Check if it's a single product page
+    if (is_product()) {
+        global $post, $product;
+
+        // Get the product ID
+        $product_id = $post->ID;
+
+        // Get the vendor ID associated with the product
+        $vendor_id = get_post_field('post_author', $product_id);
+
+        // Get the user object for the vendor
+        $vendor_user = get_user_by('ID', $vendor_id);
+
+        // Check if the user is a vendor
+        if ($vendor_user && !in_array('dc_vendor', $vendor_user->roles, true)) {
+            // Redirect to the front page
+            wp_redirect(home_url());
+            exit;
+        }
+    }
+}
+add_action('template_redirect', 'redirect_deactivated_vendor_product');
+
+/**
+ * Function for updating the "Clear transients" in the Vendor Dashboard on MultiVendorX.
+ *
+ * @param $vendor_nav
+ * @return mixed
+ */
+function remove_mvx_vendor_dashboard_nav($vendor_nav){
+    unset($vendor_nav['vendor-tools']);
+    #unset($vendor_nav['store-settings']['submenu']['vendor-billing']);
+    unset($vendor_nav['vendor-payments']);
+    unset($vendor_nav['vendor-report']['submenu']['banking-overview']);
+    #echo'<pre>';print_r($vendor_nav);echo'</pre>';
+    return $vendor_nav;
+}
+add_filter('woocommerce_should_load_paypal_standard', '__return_true' );
+add_filter('mvx_vendor_dashboard_nav', 'remove_mvx_vendor_dashboard_nav', 99);
+
+/**
+ * Function to add Custom menu to Vendor Dashboard
+ * This adds the endpoint and gives the page a name (also the H1 name on the page)
+ *
+ * @param $endpoints
+ * @return mixed
+ */
+function add_mvx_endpoints_query_vars_new($endpoints) {
+    $endpoints['custom-mvx-menu'] = array(
+        'label' => __('Greeting.dk Opgørelser', 'multivendorx'),
+        'endpoint' => get_mvx_vendor_settings('mvx_custom_endpoint', 'seller_dashboard', 'custom-mvx-menu')
+    );
+    return $endpoints;
+}
+// add custom endpoint
+add_filter('mvx_endpoints_query_vars', 'add_mvx_endpoints_query_vars_new');
+
+/**
+ * Function to add Custom menu to Vendor Dashboard
+ * This adds a tab to the dashboard.
+ *
+ * @param $nav
+ * @return mixed
+ */
+function add_tab_to_vendor_dashboard($nav) {
+    $nav['custom_mvx_menu'] = array(
+        'label' => __('Opgørelser', 'multivendorx'), // menu label
+        'url' => mvx_get_vendor_dashboard_endpoint_url( get_mvx_vendor_settings( 'mvx_custom_endpoint', 'seller_dashboard', 'custom-mvx-menu' ) ), // menu url
+        'capability' => true, // capability if any
+        'position' => 75, // position of the menu
+        'submenu' => array(), // submenu if any
+        'link_target' => '_self',
+        'nav_icon' => 'mvx-font ico-tools-icon', // menu icon
+    );
+    return $nav;
+}
+// add custom menu to vendor dashboard
+add_filter('mvx_vendor_dashboard_nav', 'add_tab_to_vendor_dashboard');
+
+/**
+ * Function to add Custom menu to Vendor Dashboard
+ * This adds content to the custom menu point
+ *
+ * @return void
+ */
+function custom_menu_endpoint_content(){
+    echo '<div class="col-md-12 all-products-wrapper">
+    <div class="panel panel-default panel-pading">
+        <div class="product-list-filter-wrap">';
+    echo '<table style="width: 350px;">';
+    echo '<tr><th style="width: 250px;">Periode</th><th style="width: 100px;">Link</th></th>';
+    echo '<tr><td>Periode</td><td>Link</td></tr>';
+    echo '</table>';
+    echo '</div></div></div>';
+}
+// display content of custom endpoint
+add_action('mvx_vendor_dashboard_custom-mvx-menu_endpoint', 'custom_menu_endpoint_content');

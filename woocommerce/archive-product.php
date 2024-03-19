@@ -17,17 +17,11 @@
 
 defined( 'ABSPATH' ) || exit;
 
-
-global $woocommerce, $wpdb, $WCMp;
+global $woocommerce, $wpdb, $MVX;
 
 $postId = get_the_ID();
 
 $checkout_postalcode = WC()->customer->get_shipping_postcode();
-#if($cityPostalcode != $checkout_postalcode){
-  #print 'postnumre afviger';
-#  $woocommerce->cart->empty_cart();
-#}
-
 
 // Get header designs.
 get_header();
@@ -41,7 +35,6 @@ if (isset($cat->term_id)) {
 	$thumbnail_id = get_term_meta($cat->term_id, 'thumbnail_id', true);
 	$image = wp_get_attachment_url($thumbnail_id);
 }
-
 
 /**
  *
@@ -94,13 +87,13 @@ $authors_new = array_unique($authors);
 
 // Get an array of user objects based on the unique user IDs
 $user_args = array(
-		'role' => 'dc_vendor',
-        'include' => $authors,
-		'posts_per_page' => -1,
-		'fields' => 'all_with_meta',
-		'meta_key' => 'delivery_type',
-        'orderby' => 'meta_value',
-        'order' => 'DESC'
+    'role' => 'dc_vendor',
+    'include' => $authors,
+    'posts_per_page' => -1,
+    'fields' => 'all_with_meta',
+    'meta_key' => 'delivery_type',
+    'orderby' => 'meta_value',
+    'order' => 'DESC'
 );
 $user_query = new WP_User_Query( $user_args );
 $vendor_arr = $user_query->get_results();
@@ -125,7 +118,9 @@ $max_dropoff_time = !empty($dropoff_times) ? max($dropoff_times) : 0;
 // pass to backend
 $categoryDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode);
 
+
 /////////////////////////
+// ######################
 // Data for the filtering.
 // This data is used for the filters and for the stores.
 // It is also used for the featuring of categories and occasions in the top.
@@ -133,13 +128,12 @@ $productPriceArray = array(); // for price filter
 $categoryTermListArray = array(); // for cat term filter
 $occasionTermListArray = array();
 
-// for price filter
-
+// FILTERING FOR PRICES
 // Get all vendor product IDs
 $vendorProductIds = array();
 
 foreach ($UserIdArrayForCityPostalcode as $vendorId) {
-    $vendor = get_wcmp_vendor($vendorId);
+    $vendor = get_mvx_vendor($vendorId);
     $vendorProductIds = array_merge($vendorProductIds, $vendor->get_products(array('fields' => 'ids')));
 }
 $vendorProductIds = array_unique($vendorProductIds);
@@ -148,7 +142,7 @@ $vendorProductIds = array_unique($vendorProductIds);
 $where = array();
 foreach($vendorProductIds as $pv){
     if(is_numeric($pv)){
-      $where[] = $pv;
+        $where[] = $pv;
     }
 }
 
@@ -159,6 +153,7 @@ $maxPrice = max($priceArray);
 // Use array_push to add the prices to the $productPriceArray
 array_push($productPriceArray, $minPrice, $maxPrice);
 
+// FILTERING FOR CATS AND OCCASIONS
 // Use get_the_terms to fetch all the terms for all products belonging to the vendors
 $terms = wp_get_object_terms($vendorProductIds, array('product_cat', 'occasion'));
 
@@ -166,15 +161,15 @@ $categoryTermListArray = array();
 $occasionTermListArray = array();
 
 if ($terms && !is_wp_error($terms)) {
-  foreach ($terms as $term) {
-      if ($term->taxonomy === 'product_cat') {
-          if ($term->term_id != 15 && $term->term_id != 16) {
-              $categoryTermListArray[] = $term->term_id;
-          }
-      } else if ($term->taxonomy === 'occasion') {
-          $occasionTermListArray[] = $term->term_id;
-      }
-  }
+    foreach ($terms as $term) {
+        if ($term->taxonomy === 'product_cat') {
+            if ($term->term_id != 15 && $term->term_id != 16) {
+                $categoryTermListArray[] = $term->term_id;
+            }
+        } else if ($term->taxonomy === 'occasion') {
+            $occasionTermListArray[] = $term->term_id;
+        }
+    }
 }
 
 $categoryTermListArray = array_unique($categoryTermListArray);
@@ -659,102 +654,106 @@ $occasionTermListArray = array_unique($occasionTermListArray);
 	<!-- Loading heartbeat END -->
 
 
-	<!-- Category description -->
-	<?php
-	if( category_description($category_id) ){
-	?>
-	<style type="text/css">
-      .lp-content-block h1,
-      .lp-content-block h2,
-      .lp-content-block h3,
-      .lp-content-block h4,
-      .lp-content-block h5,
-      .lp-content-block h6
-      {
-          font-family: 'Inter','MS Trebuchet', 'Rubik',sans-serif;
-      }
-      .lp-content-block h1 { font-size: 24px; }
-      .lp-content-block h2 { font-size: 23px; }
-      .lp-content-block h3 { font-size: 22px; }
-      .lp-content-block h4 { font-size: 20px; }
-      .lp-content-block h5 { font-size: 18px; }
-      .lp-content-block h6 { font-size: 16px; }
+    <!-- Category description -->
+    <?php
+    if( category_description($category_id) ){
+        ?>
+        <style type="text/css">
+            .lp-content-block h1,
+            .lp-content-block h2,
+            .lp-content-block h3,
+            .lp-content-block h4,
+            .lp-content-block h5,
+            .lp-content-block h6
+            {
+                font-family: 'Inter','Rubik',sans-serif;
+                font-weight: 400;
+            }
+            .lp-content-block h1 { font-size: 28px; }
+            .lp-content-block h2 { font-size: 26px; }
+            .lp-content-block h3 { font-size: 23px; }
+            .lp-content-block h4 { font-size: 20px; }
+            .lp-content-block h5 { font-size: 18px; }
+            .lp-content-block h6 { font-size: 16px; }
 
-      .lp-content-block p {
-          font-size: 14px;
-      }
-      .lp-content-block a {
-          color: #000000;
-          text-decoration: underline;
-      }
-  </style>
-	<section id="description" class="description row lp-content-block mt-3 mb-5 pb-4">
-	  <div class="description lp-content-block row">
-	      <div class="col-12">
-	          <h2 style="font-family: 'MS Trebuchet', 'Rubik', 'Inter',sans-serif;">
-	              <?php echo get_field('header_h2', 'category_'.$category_id); ?>
-	          </h2>
-	          <div style="position: relative;">
-	            <div id="categoryDescription" style="max-height: 400px; overflow: hidden;">
-                    <?php
-                    $description = category_description($category_id);
-                    $description = add_links_to_keywords(
-                        wp_kses_post( $description ),
-                        array('product_cat', 'occasion')
-                    );
-                    $collapsed = false;
+            .lp-content-block p {
+                font-size: 14px;
+            }
+            .lp-content-block a {
+                color: #000000;
+                text-decoration: underline;
+            }
+        </style>
+        <section id="description" class="description row lp-content-block mt-5 mb-5 pb-4">
+            <div class="description lp-content-block row">
+                <div class="col-12">
+                    <h2 style="font-family: 'Inter', 'Rubik', sans-serif; font-size: 29px; font-weight: 600;">
+                        <?php echo get_field('header_h2', 'category_'.$category_id); ?>
+                    </h2>
+                    <div style="position: relative;">
+                        <div id="categoryDescription" style="max-height: 400px; overflow: hidden;">
+                            <?php
+                            $description = category_description($category_id);
+                            $description = add_links_to_keywords(
+                                wp_kses_post( $description ),
+                                array('product_cat', 'occasion')
+                            );
+                            $collapsed = false;
 
-                    // Check if the content exceeds the max-height
-                    if (strlen($description) > 300) {
-                        $collapsed = true;
-                    }
+                            // Check if the content exceeds the max-height
+                            if (strlen($description) > 300) {
+                                $collapsed = true;
+                            }
 
-                    echo $description;
+                            echo '<div style="column-count: 2;">';
+                            echo $description;
+                            echo '</div>';
 
-                    if ($collapsed) {
-                    echo '<div class="overlay" id="ctaOverlayWhite"></div>';
-                    echo '<div class="button-line col-12 text-center py-2">';
-                        echo '<button class="btn bg-teal text-white rounded-pill border-teal border-1" id="toggleDescription" style="z-index: 1 !important;">Læs mere</button>';
-                        echo '</div>';
-                    }
-                    ?>
-	            </div>
-	            <style>
-	              .overlay {
-	                position: absolute;
-	                bottom: 0;
-	                left: 0;
-	                width: 100%;
-	                height: 100%;
-	                background: linear-gradient(to bottom, rgba(255, 255, 255, 0.33) 20%, rgba(255, 255, 255, 1) 100%);
-	                pointer-events: none;
-	              }
-	              .button-line {
-	                position: absolute;
-	                bottom: -40px;
-	                width: 100%;
-	                z-index: 1 !important;
-	              }
-	            </style>
-	        </div>
-	      </div>
-	  </div>
-	  <script>
-	    var categoryDescription = document.getElementById('categoryDescription');
-	    var descriptionOverlay = document.getElementById('ctaOverlayWhite');
-	    var showMoreButton = document.getElementById('toggleDescription');
+                            if ($collapsed) {
+                                echo '<div class="overlay" id="ctaOverlayWhite"></div>';
+                                echo '<div class="button-line col-12 text-center py-2">';
+                                echo '<button class="btn bg-teal text-white rounded-pill border-teal border-1" id="toggleDescription" style="z-index: 1 !important;">Læs mere</button>';
+                                echo '</div>';
+                            }
+                            ?>
+                        </div>
+                        <style>
+                            .overlay {
+                                position: absolute;
+                                bottom: 0;
+                                left: 0;
+                                width: 100%;
+                                height: 50%;
+                                background: linear-gradient(to bottom, rgba(255, 255, 255, 0.33) 25%, rgba(255, 255, 255, 1) 100%);
+                                pointer-events: none;
+                            }
+                            .button-line {
+                                position: absolute;
+                                bottom: -40px;
+                                width: 100%;
+                                z-index: 1 !important;
+                            }
+                        </style>
+                    </div>
+                </div>
+            </div>
+            <script>
+                var categoryDescription = document.getElementById('categoryDescription');
+                var descriptionOverlay = document.getElementById('ctaOverlayWhite');
+                var showMoreButton = document.getElementById('toggleDescription');
 
-	    if (showMoreButton) {
-	        showMoreButton.addEventListener('click', function () {
-	            categoryDescription.style.maxHeight = 'none'; // Allow the container to expand
-	            descriptionOverlay.style.display = 'none';
-	            showMoreButton.style.display = 'none'; // Hide the "Show More" button
-	        });
-	    }
-	  </script>
-	</section>
+                if (showMoreButton) {
+                    showMoreButton.addEventListener('click', function () {
+                        categoryDescription.style.maxHeight = 'none'; // Allow the container to expand
+                        descriptionOverlay.style.display = 'none';
+                        showMoreButton.style.display = 'none'; // Hide the "Show More" button
+                    });
+                }
+            </script>
+        </section>
 
-	<?php
+
+        <?php
 	}
 	?>
 	<!-- Category description END -->

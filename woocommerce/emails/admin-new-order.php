@@ -28,7 +28,7 @@ $order_hash2 = hash('md4', 'vvkrne12onrtnFG_:____'.$latestOrderId);
 
 // Get vendor ID
 $vendor_id = greeting_get_vendor_id_from_order( $order );
-$vendor = get_wcmp_vendor(absint($vendor_id));
+$vendor = get_mvx_vendor(absint($vendor_id));
 
 // Generate QR code.
 $tracking_url = site_url() . '/shop-order-status/?order_id=' . $latestOrderId . '&oh=' . $order_hash . '&sshh=' . $order_hash2;
@@ -292,7 +292,7 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                 <tr>
                     <td colspan="2" style="background: #f8f9fa; padding: 20px;">
                         <?php
-                        $vendor = get_wcmp_vendor($vendor_id);
+                        $vendor = get_mvx_vendor($vendor_id);
                         if($vendor){
                             ?>
                             <div class="text-center">
@@ -390,7 +390,7 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
 <!-- THE CONTENT END -->
 
 
-<?php do_action('wcmp_email_footer'); ?>
+<?php do_action('mvx_email_footer'); ?>
 
 <?php
 /*

@@ -137,7 +137,7 @@ get_header();
                         $occasionTermListArray = array();
 
                         foreach ($UserIdArrayForDeliveryZip as $vendorId) {
-                            $vendor = get_wcmp_vendor($vendorId);
+                            $vendor = get_mvx_vendor($vendorId);
                             $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
                             foreach ($vendorProducts as $productId) {
                                 $occasionTermList = wp_get_post_terms($productId, 'occasion', array('fields' => 'ids'));
@@ -218,12 +218,12 @@ get_header();
                 global $WCMp;
                 $frontend_assets_path = $WCMp->plugin_url . 'assets/frontend/';
                 $frontend_assets_path = str_replace(array('http:', 'https:'), '', $frontend_assets_path);
-                $suffix = defined('WCMP_SCRIPT_DEBUG') && WCMP_SCRIPT_DEBUG ? '' : '.min';
-                wp_register_style('wcmp_vendor_list', $frontend_assets_path . 'css/vendor-list' . $suffix . '.css', array(), $WCMp->version);
-                wp_style_add_data('wcmp_vendor_list', 'rtl', 'replace');
-                wp_enqueue_style('wcmp_vendor_list');
-                $block_vendors = wp_list_pluck(wcmp_get_all_blocked_vendors(), 'id');
-                $vendors = get_wcmp_vendors( array('exclude'   => $block_vendors), $return = 'id');
+                $suffix = defined('mvx_SCRIPT_DEBUG') && mvx_SCRIPT_DEBUG ? '' : '.min';
+                wp_register_style('mvx_vendor_list', $frontend_assets_path . 'css/vendor-list' . $suffix . '.css', array(), $WCMp->version);
+                wp_style_add_data('mvx_vendor_list', 'rtl', 'replace');
+                wp_enqueue_style('mvx_vendor_list');
+                $block_vendors = wp_list_pluck(mvx_get_all_blocked_vendors(), 'id');
+                $vendors = get_mvx_vendors( array('exclude'   => $block_vendors), $return = 'id');
                 $verified_vendor_list = array();
                 ?>
 
@@ -293,38 +293,38 @@ get_header();
                         <?php
                         if ($userserIdArray) {
                             foreach ($userserIdArray as $user) {
-                                $vendor = get_wcmp_vendor($user);
+                                $vendor = get_mvx_vendor($user);
                                 $image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
                                 $banner = $vendor->get_image('banner') ? $vendor->get_image('banner') : '';
                                 ?>
 
                                 <div class="wcmp-store-list">
-                                    <?php do_action('wcmp_vendor_lists_single_before_image', $vendor->term_id, $vendor->id); ?>
+                                    <?php do_action('mvx_vendor_lists_single_before_image', $vendor->term_id, $vendor->id); ?>
                                     <div class="wcmp-profile-wrap">
                                         <div class="wcmp-cover-picture" style="background-image: url('<?php if($banner) echo $banner; ?>');"></div>
                                         <div class="store-badge-wrap">
-                                            <?php do_action('wcmp_vendor_lists_vendor_store_badges', $vendor); ?>
+                                            <?php do_action('mvx_vendor_lists_vendor_store_badges', $vendor); ?>
                                         </div>
                                         <div class="wcmp-store-info">
                                             <div class="wcmp-store-picture">
                                                 <img class="vendor_img" src="<?php echo esc_url($image); ?>" id="vendor_image_display">
                                             </div>
                                             <?php
-                                                $rating_info = wcmp_get_vendor_review_info($vendor->term_id);
+                                                $rating_info = mvx_get_vendor_review_info($vendor->term_id);
                                                 $WCMp->template->get_template('review/rating_vendor_lists.php', array('rating_val_array' => $rating_info));
                                             ?>
                                         </div>
                                     </div>
-                                    <?php do_action('wcmp_vendor_lists_single_after_image', $vendor->term_id, $vendor->id); ?>
+                                    <?php do_action('mvx_vendor_lists_single_after_image', $vendor->term_id, $vendor->id); ?>
                                     <div class="wcmp-store-detail-wrap">
-                                        <?php do_action('wcmp_vendor_lists_vendor_before_store_details', $vendor); ?>
+                                        <?php do_action('mvx_vendor_lists_vendor_before_store_details', $vendor); ?>
                                         <ul class="wcmp-store-detail-list">
                                             <li>
                                                 <i class="wcmp-font ico-store-icon"></i>
-                                                <?php $button_text = apply_filters('wcmp_vendor_lists_single_button_text', $vendor->page_title); ?>
+                                                <?php $button_text = apply_filters('mvx_vendor_lists_single_button_text', $vendor->page_title); ?>
                                                 <a href="<?php echo esc_url($vendor->get_permalink()); ?>" class="store-name"><?php echo esc_html($button_text); ?></a>
-                                                <?php do_action('wcmp_vendor_lists_single_after_button', $vendor->term_id, $vendor->id); ?>
-                                                <?php do_action('wcmp_vendor_lists_vendor_after_title', $vendor); ?>
+                                                <?php do_action('mvx_vendor_lists_single_after_button', $vendor->term_id, $vendor->id); ?>
+                                                <?php do_action('mvx_vendor_lists_vendor_after_title', $vendor); ?>
                                             </li>
                                             <?php if($vendor->get_formatted_address()) : ?>
                                             <li>
@@ -333,7 +333,7 @@ get_header();
                                             </li>
                                             <?php endif; ?>
                                         </ul>
-                                        <?php do_action('wcmp_vendor_lists_vendor_after_store_details', $vendor); ?>
+                                        <?php do_action('mvx_vendor_lists_vendor_after_store_details', $vendor); ?>
                                     </div>
                                 </div>
 

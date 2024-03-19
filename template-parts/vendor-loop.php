@@ -10,7 +10,7 @@ $postalCode = (isset($args['postalCode']) ? $args['postalCode'] : '');
 if($args['vendor']){
   $vendor = $args['vendor'];
   $vendor_id = $vendor->id;
-  // $vendor = get_wcmp_vendor($user);
+  // $vendor = get_mvx_vendor($user);
   // $image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
   $image = $vendor->get_image('image') ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
   $banner = $vendor->get_image('banner') ? $vendor->get_image('banner', 'woocommerce_single') : 'https://www.greeting.dk/wp-content/uploads/2022/05/pexels-maria-orlova-4947386-1-scaled.jpg';
@@ -20,7 +20,7 @@ if($args['vendor']){
   $delivery_type = (!empty($delivery_type['0']['value']) ? $delivery_type['0']['value'] : 0);
 
   // Header text.
-  $button_text = apply_filters('wcmp_vendor_lists_single_button_text', $vendor->page_title);
+  $button_text = apply_filters('mvx_vendor_lists_single_button_text', $vendor->page_title);
 
   // Delivery text for the card-footer
   $delivery_text = ($delivery_type == 0) ? 'Sender med fragtfirma' : 'Personlig levering';

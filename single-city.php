@@ -111,7 +111,7 @@ $occasionTermListArray = array();
 $vendorProductIds = array();
 
 foreach ($UserIdArrayForCityPostalcode as $vendorId) {
-    $vendor = get_wcmp_vendor($vendorId);
+    $vendor = get_mvx_vendor($vendorId);
     $vendorProductIds = array_merge($vendorProductIds, $vendor->get_products(array('fields' => 'ids')));
 }
 $vendorProductIds = array_unique($vendorProductIds);

@@ -133,7 +133,7 @@ $occasionTermListArray = array();
   $vendorProductIds = array();
 
   foreach ($UserIdArrayForCityPostalcode as $vendorId) {
-      $vendor = get_wcmp_vendor($vendorId);
+      $vendor = get_mvx_vendor($vendorId);
       $vendorProductIds = array_merge($vendorProductIds, $vendor->get_products(array('fields' => 'ids')));
   }
   $vendorProductIds = array_unique($vendorProductIds);
@@ -655,101 +655,104 @@ $occasionTermListArray = array();
 	<!-- Postal code search box START -->
 
 
-  <!-- Loading heartbeat START -->
+    <!-- Loading heartbeat START -->
 	<?php get_template_part('template-parts/inc/blocks/loading-heartbeat'); ?>
 	<!-- Loading heartbeat END -->
 
 
-	<!-- Category description -->
-	<?php
-	if( category_description($category_id) ){
-	?>
-  <style type="text/css">
-      .lp-content-block h1,
-      .lp-content-block h2,
-      .lp-content-block h3,
-      .lp-content-block h4,
-      .lp-content-block h5,
-      .lp-content-block h6
-      {
-          font-family: 'Inter','MS Trebuchet', 'Rubik',sans-serif;
-      }
-      .lp-content-block h1 { font-size: 24px; }
-      .lp-content-block h2 { font-size: 23px; }
-      .lp-content-block h3 { font-size: 22px; }
-      .lp-content-block h4 { font-size: 20px; }
-      .lp-content-block h5 { font-size: 18px; }
-      .lp-content-block h6 { font-size: 16px; }
+    <!-- Category description -->
+    <?php
+    if( category_description($category_id) ){
+        ?>
+        <style type="text/css">
+            .lp-content-block h1,
+            .lp-content-block h2,
+            .lp-content-block h3,
+            .lp-content-block h4,
+            .lp-content-block h5,
+            .lp-content-block h6
+            {
+                font-family: 'Inter','Rubik',sans-serif;
+                font-weight: 400;
+            }
+            .lp-content-block h1 { font-size: 28px; }
+            .lp-content-block h2 { font-size: 26px; }
+            .lp-content-block h3 { font-size: 23px; }
+            .lp-content-block h4 { font-size: 20px; }
+            .lp-content-block h5 { font-size: 18px; }
+            .lp-content-block h6 { font-size: 16px; }
 
-      .lp-content-block p {
-          font-size: 14px;
-      }
-      .lp-content-block a {
-          color: #000000;
-          text-decoration: underline;
-      }
-  </style>
-	<section id="description" class="description row lp-content-block mt-3 mb-5 pb-4">
-	  <div class="description lp-content-block row">
-	      <div class="col-12">
-	          <h2>
-	              <?php echo $category_bottomtitle; ?>
-	          </h2>
-	          <div style="position: relative;">
-	            <div id="categoryDescription" style="max-height: 400px; overflow: hidden;">
-								<?php
-	              $description = category_description($category_id);
-	              $collapsed = false;
+            .lp-content-block p {
+                font-size: 14px;
+            }
+            .lp-content-block a {
+                color: #000000;
+                text-decoration: underline;
+            }
+        </style>
+        <section id="description" class="description row lp-content-block mt-3 mb-5 pb-4">
+            <div class="description lp-content-block row">
+                <div class="col-12">
+                    <h2 style="font-family: 'Inter', 'Rubik', sans-serif; font-size: 29px; font-weight: 600;">
+                        <?php echo $category_bottomtitle; ?>
+                    </h2>
+                    <div style="position: relative;">
+                        <div id="categoryDescription" style="max-height: 400px; overflow: hidden;">
+                            <?php
+                            $description = category_description($category_id);
+                            $collapsed = false;
 
-	              // Check if the content exceeds the max-height
-	              if (strlen($description) > 300) {
-	                  $collapsed = true;
-	              }
+                            // Check if the content exceeds the max-height
+                            if (strlen($description) > 300) {
+                                $collapsed = true;
+                            }
 
-	              echo $description;
+                            echo '<div style="column-count: 2;">';
+                            echo $description;
+                            echo '</div>';
 
-	              if ($collapsed) {
-	                  echo '<div class="overlay" id="ctaOverlayWhite"></div>';
-	                  echo '<div class="button-line col-12 text-center py-2">';
-	                  echo '<button class="btn bg-teal text-white rounded-pill border-teal border-1" id="toggleDescription" style="z-index: 1 !important;">Læs mere</button>';
-	                  echo '</div>';
-	              }
-	              ?>
-	            </div>
-	            <style>
-	              .overlay {
-	                position: absolute;
-	                bottom: 0;
-	                left: 0;
-	                width: 100%;
-	                height: 100%;
-	                background: linear-gradient(to bottom, rgba(255, 255, 255, 0.33) 20%, rgba(255, 255, 255, 1) 100%);
-	                pointer-events: none;
-	              }
-	              .button-line {
-	                position: absolute;
-	                bottom: -40px;
-	                width: 100%;
-	                z-index: 1 !important;
-	              }
-	            </style>
-	        </div>
-	      </div>
-	  </div>
-	  <script>
-	    var categoryDescription = document.getElementById('categoryDescription');
-	    var descriptionOverlay = document.getElementById('ctaOverlayWhite');
-	    var showMoreButton = document.getElementById('toggleDescription');
+                            if ($collapsed) {
+                                echo '<div class="overlay" id="ctaOverlayWhite"></div>';
+                                echo '<div class="button-line col-12 text-center py-2">';
+                                echo '<button class="btn bg-teal text-white rounded-pill border-teal border-1" id="toggleDescription" style="z-index: 1 !important;">Læs mere</button>';
+                                echo '</div>';
+                            }
+                            ?>
+                        </div>
+                        <style>
+                            .overlay {
+                                position: absolute;
+                                bottom: 0;
+                                left: 0;
+                                width: 100%;
+                                height: 50%;
+                                background: linear-gradient(to bottom, rgba(255, 255, 255, 0.33) 25%, rgba(255, 255, 255, 1) 100%);
+                                pointer-events: none;
+                            }
+                            .button-line {
+                                position: absolute;
+                                bottom: -40px;
+                                width: 100%;
+                                z-index: 1 !important;
+                            }
+                        </style>
+                    </div>
+                </div>
+            </div>
+            <script>
+                var categoryDescription = document.getElementById('categoryDescription');
+                var descriptionOverlay = document.getElementById('ctaOverlayWhite');
+                var showMoreButton = document.getElementById('toggleDescription');
 
-	    if (showMoreButton) {
-	        showMoreButton.addEventListener('click', function () {
-	            categoryDescription.style.maxHeight = 'none'; // Allow the container to expand
-	            descriptionOverlay.style.display = 'none';
-	            showMoreButton.style.display = 'none'; // Hide the "Show More" button
-	        });
-	    }
-	  </script>
-	</section>
+                if (showMoreButton) {
+                    showMoreButton.addEventListener('click', function () {
+                        categoryDescription.style.maxHeight = 'none'; // Allow the container to expand
+                        descriptionOverlay.style.display = 'none';
+                        showMoreButton.style.display = 'none'; // Hide the "Show More" button
+                    });
+                }
+            </script>
+        </section>
 
 	<?php
 	}

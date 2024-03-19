@@ -301,7 +301,7 @@ get_header('checkout');
             </div><!-- /.col -->
             <div class="col-12 col-lg-4 bg-light p-5">
                 <?php
-                $vendor = get_wcmp_vendor($vendor_id);
+                $vendor = get_mvx_vendor($vendor_id);
                 if($vendor){
                 ?>
                 <div class="text-center">

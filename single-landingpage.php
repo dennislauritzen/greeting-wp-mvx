@@ -111,7 +111,7 @@ $vendor_arr = $wpdb->get_results($sql_prepare);
 
 $userForThisCategory = array();
 foreach ($users_from_postcode as $queryUserId) {
-    $vendor = get_wcmp_vendor($queryUserId);
+    $vendor = get_mvx_vendor($queryUserId);
 
     $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
     #var_dump($vendorProducts);
@@ -191,7 +191,7 @@ $occasionTermListArray = array();
 $vendorProductIds = array();
 
 foreach ($defaultUserArray as $vendorId) {
-    $vendor = get_wcmp_vendor($vendorId);
+    $vendor = get_mvx_vendor($vendorId);
     $vendorProductIds = array_merge($vendorProductIds, $vendor->get_products(array('fields' => 'ids')));
 }
 $vendorProductIds = array_unique($vendorProductIds);
@@ -480,37 +480,39 @@ $occasionTermListArray = array_unique($occasionTermListArray);
              * ---------------------
             **/
 
-            $minProductPrice;
-            $maxProductPrice;
+            $minProductPrice = 0;
+            $maxProductPrice = 0;
+            $step = 250;
 
             if(count($productPriceArray) == 0){
-              $minProductPrice = 0;
-              $maxProductPrice = 0;
               $topProductPrice = (max($productPriceArray) > 1000) ? '1000' : max($productPriceArray);
             }
             elseif(min($productPriceArray) == max($productPriceArray)){
-              $minProductPrice = 0;
               $maxProductPrice = max($productPriceArray);
               $topProductPrice = (max($productPriceArray) > 1000) ? '1000' : max($productPriceArray);
             }
             else {
-              $minProductPrice = 0;
               $maxProductPrice = max($productPriceArray);
               $topProductPrice = (max($productPriceArray) > 1000) ? '1000' : max($productPriceArray);
             }
 
-            $priceIntArray = range($minProductPrice, $topProductPrice, 250);
+            if($topProductPrice < $step){
+                $price = $step;
+                $priceIntArray = array($price);
+            } else {
+                $priceIntArray = range($minProductPrice, $topProductPrice, $step);
+            }
 
             $start_val = $minProductPrice;
             $end_val = $maxProductPrice;
             if(isset($_GET['price'])){
-              $price_arr = explode(',',$_GET['price']);
-              if(is_numeric($price_arr['0']) && $price_arr['0'] >= $minProductPrice){
-                $start_val = $price_arr['0'];
-              }
-              if(is_numeric($price_arr['1']) && $price_arr['1'] <= $maxProductPrice){
-                $end_val = $price_arr['1'];
-              }
+                $price_arr = explode(',',$_GET['price']);
+                if(is_numeric($price_arr['0']) && $price_arr['0'] >= $minProductPrice){
+                    $start_val = $price_arr['0'];
+                }
+                if(is_numeric($price_arr['1']) && $price_arr['1'] <= $maxProductPrice){
+                    $end_val = $price_arr['1'];
+                }
             }
             ?>
 

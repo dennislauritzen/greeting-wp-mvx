@@ -182,7 +182,7 @@ jQuery(document).ready(function(){
       // for price filter
 
       foreach ($UserIdArrayForCityPostalcode as $vendorId) {
-          $vendor = get_wcmp_vendor($vendorId);
+          $vendor = get_mvx_vendor($vendorId);
           // Denne fejler i seneste version.
           $vendorProducts = $vendor->get_products(array('fields' => 'ids'));
           foreach ($vendorProducts as $productId) {
@@ -749,7 +749,7 @@ jQuery(document).ready(function(){
         <div class="row">
       <?php
       foreach ($UserIdArrayForCityPostalcode as $user) {
-        $vendor = get_wcmp_vendor($user);
+        $vendor = get_mvx_vendor($user);
         $vendor_id = $vendor->get_id();
         $image = $vendor->get_image('image') ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
         $banner = $vendor->get_image('banner') ? $vendor->get_image('banner', array(400, 200)) : 'https://www.greeting.dk/wp-content/uploads/2022/05/pexels-maria-orlova-4947386-1-scaled.jpg';
@@ -774,7 +774,7 @@ jQuery(document).ready(function(){
               <div class="card shadow border-0 mb-3">
                 <img src="<?php echo $banner; ?>" class="card-img-top" alt="...">
                 <div class="card-body">
-                  <?php $button_text = apply_filters('wcmp_vendor_lists_single_button_text', $vendor->page_title); ?>
+                  <?php $button_text = apply_filters('mvx_vendor_lists_single_button_text', $vendor->page_title); ?>
                   <a href="<?php echo esc_url($vendor->get_permalink()); ?>" class="text-dark">
                     <h5 class="card-title"><?php echo esc_html($button_text); ?></h5>
                   </a>
@@ -855,7 +855,7 @@ jQuery(document).ready(function(){
                         </a>
                       </div>
                       <div class="col-8 col-md-12">
-                        <?php $button_text = apply_filters('wcmp_vendor_lists_single_button_text', $vendor->page_title); ?>
+                        <?php $button_text = apply_filters('mvx_vendor_lists_single_button_text', $vendor->page_title); ?>
                         <a href="<?php echo esc_url($vendor->get_permalink()); ?>" class="text-dark">
                           <h6><?php echo esc_html($button_text); ?></h6>
                         </a>

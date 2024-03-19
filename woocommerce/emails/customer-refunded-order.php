@@ -28,7 +28,7 @@ $order_hash2 = hash('md4', 'vvkrne12onrtnFG_:____'.$latestOrderId);
 
 // Get vendor ID
 $vendor_id = greeting_get_vendor_id_from_order( $order );
-$vendor = get_wcmp_vendor(absint($vendor_id));
+$vendor = get_mvx_vendor(absint($vendor_id));
 
 /**
 * Get variables for use in the template
@@ -389,4 +389,4 @@ do_action( 'woocommerce_email_header', $email_heading, $email ); ?>
  * @hooked WC_Emails::email_footer() Output the email footer
  */
 #do_action( 'woocommerce_email_footer', $email );
-do_action('wcmp_email_footer');
+do_action('mvx_email_footer');
