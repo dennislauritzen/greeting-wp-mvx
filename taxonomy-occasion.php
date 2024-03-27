@@ -1143,7 +1143,6 @@ get_footer( );
 					mainAndFilterContent.style.display = 'block';
 					pcFormContent.style.display = 'none';
 
-
 					setFilterBadgeCity(
 						get_postalcode+' '+get_city,
 						'postalcode_page'+get_postalcode,

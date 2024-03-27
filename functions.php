@@ -514,12 +514,14 @@ if ( is_readable( $custom_walker_footer ) ) {
  *
  * @since v1.0
  */
-function greeting2_scripts_loader() {
+function greeting3_scripts_loader() {
 	$theme_version = wp_get_theme()->get( 'Version' );
 
 	// 1. Styles.
 	wp_enqueue_style( 'style', get_template_directory_uri() . '/style.css', array(), $theme_version, 'all' );
-	//wp_enqueue_style( 'main', get_template_directory_uri() . '/assets/css/main.css', array(), $theme_version, 'all' ); // main.scss: Compiled Framework source + custom styles.
+
+    // 2. Main style.
+	wp_enqueue_style( 'main', get_template_directory_uri() . '/assets/css/main.css', array(), $theme_version, 'all' ); // main.scss: Compiled Framework source + custom styles.
 
 	if ( is_rtl() ) {
 		wp_enqueue_style( 'rtl', get_template_directory_uri() . '/assets/css/rtl.css', array(), $theme_version, 'all' );
@@ -532,7 +534,7 @@ function greeting2_scripts_loader() {
 		wp_enqueue_script( 'comment-reply' );
 	}
 }
-add_action( 'wp_enqueue_scripts', 'greeting2_scripts_loader' );
+add_action( 'wp_enqueue_scripts', 'greeting3_scripts_loader' );
 
 
 
@@ -5500,8 +5502,13 @@ function get_date_diff_text($date){
         return;
     }
 
+
     $today = new DateTime();
     $date_diff = $today->diff($date);
+
+    echo "DATOEN=>".var_dump($date);
+    echo "I DAG=>".var_dump($today);
+    echo "DIFF=>".var_dump($date_diff);
 
     if($date_diff->format('%R%a') == '0'){
         return 'i dag';
