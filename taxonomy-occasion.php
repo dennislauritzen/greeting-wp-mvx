@@ -56,8 +56,83 @@ if(!empty($category_name_plural)){
 
 
 
+
+// Get author IDs of users with products in $category_id
+$author_ids_query = $wpdb->prepare("
+    SELECT DISTINCT p.post_author
+    FROM {$wpdb->posts} p
+    INNER JOIN {$wpdb->term_relationships} tr ON p.ID = tr.object_id
+    INNER JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+    WHERE p.post_type = 'product'
+    AND p.post_status = 'publish'
+    AND tt.taxonomy = 'occasion'
+    AND tt.term_id = %d
+", $category_id);
+
+$vendor_arr = $wpdb->get_col($author_ids_query);
+var_dump($vendor_arr);
+// Get the minimum and maximum prices of products in $category_id
+
+// Get the minimum and maximum prices of products and their variations in $category_id
+$price_query = $wpdb->prepare("
+    SELECT MIN(meta_value) AS min_price, MAX(meta_value) AS max_price
+    FROM (
+        SELECT meta_value
+        FROM {$wpdb->postmeta}
+        WHERE meta_key = '_price'
+        AND post_id IN (
+            SELECT DISTINCT p.ID
+            FROM {$wpdb->posts} p
+            LEFT JOIN {$wpdb->term_relationships} tr ON p.ID = tr.object_id
+            LEFT JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+            WHERE p.post_type IN ('product', 'product_variation')
+            AND p.post_status = 'publish'
+            AND (tt.taxonomy = 'occasion' AND tt.term_id = %d OR p.ID IN (
+                SELECT DISTINCT post_parent
+                FROM {$wpdb->posts} p2
+                INNER JOIN {$wpdb->term_relationships} tr2 ON p2.ID = tr2.object_id
+                INNER JOIN {$wpdb->term_taxonomy} tt2 ON tr2.term_taxonomy_id = tt2.term_taxonomy_id
+                WHERE p2.post_type = 'product_variation'
+                AND p2.post_status = 'publish'
+                AND tt2.taxonomy = 'occasion'
+                AND tt2.term_id = %d
+            ))
+        )
+    ) AS price_table
+", $category_id, $category_id);
+
+$price_results = $wpdb->get_row($price_query);
+
+var_dump($price_results);
+
+// Minimum price
+$min_price = isset($price_results->min_price) ? $price_results->min_price : 0;
+
+// Maximum price
+$max_price = isset($price_results->max_price) ? $price_results->max_price : 0;
+var_dump($min_price);
+var_dump($max_price);
+
+
+
+
+// Retrieve unique author (vendor) IDs and prices of products directly from the database using a custom SQL query
+$sql = "
+    SELECT p.post_author AS author_id, pm.meta_value AS price
+    FROM {$wpdb->posts} p
+    INNER JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id
+    INNER JOIN {$wpdb->term_relationships} tr ON p.ID = tr.object_id
+    INNER JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+    WHERE p.post_type = 'product'
+    AND p.post_status = 'publish'
+    AND tt.taxonomy = 'occasion'
+    AND tt.term_id = %d
+    AND pm.meta_key = '_price'
+";
+$sql = $wpdb->prepare($sql, $category_id);
+
 // Execute the SQL query
-$results = array();
+$results = $wpdb->get_results($sql);
 
 // Initialize arrays
 $authors = array();
@@ -68,9 +143,27 @@ foreach ($results as $result) {
     $authors[] = $result->author_id;
     $priceArray[] = $result->price;
 }
-
 // Deduplicate author IDs and prices
 $authors_new = array_unique($authors);
+
+// Get the products connected to this category/occasion.
+$args = array(
+    'post_type' => 'product',
+		'posts_per_page' => -1,
+    'tax_query' => array(
+        array(
+            'taxonomy' => 'occasion',
+            'field' => 'term_id',
+            'terms' => array($category_id)
+        ),
+    ),
+);
+
+// Create a new instance of WP_Query
+$query = new WP_Query( $args );
+
+// Get an array of unique user IDs who are authors of the products in the query results
+$authors = array_unique( wp_list_pluck( $query->posts, 'post_author' ) );
 
 // Get an array of user objects based on the unique user IDs
 $user_args = array(
@@ -84,9 +177,10 @@ $user_args = array(
 );
 $user_query = new WP_User_Query( $user_args );
 $vendor_arr = $user_query->get_results();
-
+var_dump($authors);
 // Initialize arrays
 $UserIdArrayForCityPostalcode = wp_list_pluck($vendor_arr, 'ID'); // Extract vendor IDs
+
 
 // Filter vendors where require_delivery_day is equal to 0
 $filtered_vendors = array_filter($vendor_arr, function($vendor) {
@@ -135,7 +229,9 @@ foreach($vendorProductIds as $pv){
 // Use min and max to get the minimum and maximum prices
 $minPrice = min($priceArray);
 $maxPrice = max($priceArray);
-
+var_dump($priceArray);
+var_dump($minPrice);
+var_dump($maxPrice);
 // Use array_push to add the prices to the $productPriceArray
 array_push($productPriceArray, $minPrice, $maxPrice);
 
@@ -179,7 +275,29 @@ $occasionTermListArray = array_unique($occasionTermListArray);
 	<div class="row main-and-filter-content" style="display: none;">
 		<?php
     // get user meta query
-    $occasion_featured_list = array();
+    $occasion_featured_list = $wpdb->get_results( "
+    SELECT
+      tt.term_id as term_id,
+      tt.taxonomy,
+		  t.name,
+      t.slug,
+      (SELECT tm.meta_value FROM {$wpdb->prefix}termmeta tm WHERE tm.term_id = tt.term_id AND tm.meta_key = 'featured') as featured,
+      (SELECT tm.meta_value FROM {$wpdb->prefix}termmeta tm WHERE tm.term_id = tt.term_id AND tm.meta_key = 'featured_image') as image_src
+    FROM
+      {$wpdb->prefix}term_taxonomy tt
+    INNER JOIN
+      {$wpdb->prefix}terms t
+    ON
+      t.term_id = tt.term_id
+    WHERE
+      tt.taxonomy IN ('product_cat')
+    ORDER BY
+      CASE featured
+        WHEN 1 THEN 1
+        ELSE 0
+      END DESC,
+      t.Name ASC
+    ");
     $placeHolderImage = wc_placeholder_img_src();
     ?>
 
