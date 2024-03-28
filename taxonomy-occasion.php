@@ -34,8 +34,6 @@ get_header('green', array());
 
 $delivery_zip_chosen = (isset($args['delivery_zip_chosen']) ? $args['delivery_zip_chosen'] : '');
 
-global ;
-
 /**
  *
  * Data of the category
