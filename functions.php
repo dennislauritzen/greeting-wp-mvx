@@ -5460,7 +5460,7 @@ function get_vendor_delivery_days_from_today($vendor_id, $prepend_text = '', $de
         && $c['cutoff_datetime'] !== false){
             $cutofftime = $c['cutoff_datetime'];
             $cutoff_time = DateTime::createFromFormat('d-m-Y H:i:s', $cutofftime);
-            var_dump($cutoff_time);
+            var_dump($cutoff_time->format('d-m-Y H:i:s'));
             var_dump($now->format('d-m-Y H:i:s'));
             if($cutoff_time->format('d-m-Y H:i:s') > $now->format('d-m-Y H:i:s')){
                 $result = array(
