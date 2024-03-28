@@ -1002,8 +1002,11 @@ function catocca_landing_data_fetch(){
  	$defaultUserArray = explode(",", $cityDefaultUserIdAsString);
 
  	// category & occasion filter data
-	$catOccaArray = is_array($_POST['catOccaIdArray']) ? $_POST['catOccaIdArray'] : (empty($_POST['catOccaIdArray']) ? array() : explode(',', $_POST['catOccaIdArray']));
-	$catOccaDeliveryIdArray = is_array($catOccaArray) ? $catOccaArray : array();
+     $catOccaArray = array();
+     if(isset($_POST['catOccaIdArray']) && !empty($_POST['catOccaIdArray'])){
+         $catOccaArray = $_POST['catOccaIdArray'];
+     }
+     $catOccaDeliveryIdArray = is_array($catOccaArray) ? $catOccaArray : array();
 
 	// The default ID from the category / occasion (the "base" landing page cat / occa)
 	$defaultIdCatOcca = $_POST['defaultIdCatOcca'];
@@ -1592,8 +1595,11 @@ function lpFilterAction() {
 	$defaultUserArray = explode(",", $cityDefaultUserIdAsString);
 
 	// category & occasion filter data
-	$catOccaArray = is_array($_POST['catOccaIdArray']) ? $_POST['catOccaIdArray'] : (empty($_POST['catOccaIdArray']) ? array() : explode(',', $_POST['catOccaIdArray']));
-	$catOccaDeliveryIdArray = is_array($catOccaArray) ? $catOccaArray : array();
+    $catOccaArray = array();
+    if(isset($_POST['catOccaIdArray']) && !empty($_POST['catOccaIdArray'])){
+        $catOccaArray = $_POST['catOccaIdArray'];
+    }
+    $catOccaDeliveryIdArray = is_array($catOccaArray) ? $catOccaArray : array();
 
 	// delivery filter data
 	$deliveryIdArray = empty($_POST['deliveryIdArray']) ? array() : $_POST['deliveryIdArray'];
