@@ -88,6 +88,7 @@ endif;
 
 
 /**
+/**
  * Fire the wp_body_open action.
  *
  * Added for backwards compatibility to support pre 5.2.0 WordPress versions.
