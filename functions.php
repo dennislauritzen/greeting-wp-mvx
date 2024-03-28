@@ -994,30 +994,34 @@ function catocca_landing_data_fetch(){
   * Vendor filter on City Page
   * city filter
   */
- function categoryAndOccasionVendorFilterAction() {
- 	global $wpdb;
+function categoryAndOccasionVendorFilterAction() {
+    global $wpdb;
 
- 	// default user array come from front end
- 	$cityDefaultUserIdAsString = $_POST['cityDefaultUserIdAsString'];
- 	$defaultUserArray = explode(",", $cityDefaultUserIdAsString);
+    // default user array come from front end
+    $cityDefaultUserIdAsString = $_POST['cityDefaultUserIdAsString'];
+    $defaultUserArray = explode(",", $cityDefaultUserIdAsString);
 
- 	// category & occasion filter data
-     $catOccaArray = array();
-     if(isset($_POST['catOccaIdArray']) && !empty($_POST['catOccaIdArray'])){
-         $catOccaArray = $_POST['catOccaIdArray'];
-     }
-     $catOccaDeliveryIdArray = is_array($catOccaArray) ? $catOccaArray : array();
+    // category & occasion filter data
+    $catOccaArray = array();
+    if(isset($_POST['catOccaIdArray']) && !empty($_POST['catOccaIdArray'])){
+        $catOccaArray = $_POST['catOccaIdArray'];
+    }
+    $catOccaDeliveryIdArray = is_array($catOccaArray) ? $catOccaArray : array();
 
-	// The default ID from the category / occasion (the "base" landing page cat / occa)
-	$defaultIdCatOcca = $_POST['defaultIdCatOcca'];
+    // The default ID from the category / occasion (the "base" landing page cat / occa)
+    $idCatOccaArray = array();
+    if(isset($_POST['defaultIdCatOcca']) && !empty($_POST['defaultIdCatOcca'])){
+        $idCatOccaArray = $_POST['defaultIdCatOcca'];
+    }
+    $defaultIdCatOcca = is_array($idCatOccaArray) ? $idCatOccaArray : array();
 
- 	// delivery date
- 	$deliveryDate = (int) $_POST['delDate'];
- 	if(empty($deliveryDate) && $deliveryDate !== 0){
- 		$deliveryDate = 8;
- 	} else if(!is_numeric($deliveryDate) || $deliveryDate < 0){
- 		$deliveryDate = 0;
- 	}
+    // delivery date
+    $deliveryDate = empty($_POST['delDate']) ? (int) $_POST['delDate'] : 8;
+    if(empty($deliveryDate) && $deliveryDate != 0){
+        $deliveryDate = 8;
+    } else if(!is_numeric($deliveryDate) || $deliveryDate < 0){
+        $deliveryDate = 0;
+    }
 
  	// Calculate Selected Date
  	$filteredDate = new DateTime();
