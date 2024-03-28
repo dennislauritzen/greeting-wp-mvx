@@ -180,20 +180,6 @@ $occasionTermListArray = array_unique($occasionTermListArray);
 <!-- Filter content -->
 <div id="categorycontent" class="container">
 	<div class="row">
-		<div class="col-12 mt-3">
-			<?php
-			/**
-			 * Hook: woocommerce_before_main_content.
-			 *
-			 * @hooked woocommerce_output_content_wrapper - 10 (outputs opening divs for the content)
-			 * @hooked woocommerce_breadcrumb - 20 - removed
-			 * @hooked WC_Structured_Data::generate_website_data() - 30
-			 */
-			#do_action('woocommerce_before_main_content');
-			?>
-		</div>
-	</div>
-	<div class="row">
 		<div class="row">
       <div class="col-12">
         <h1 class="d-block my-0 my-xs-2 my-sm-1 my-md-1 mt-2 mt-lg-2 pt-lg-1 mb-lg-1" style="font-family: Rubik;">
@@ -399,8 +385,8 @@ $occasionTermListArray = array_unique($occasionTermListArray);
 						 * ---------------------
 						**/
 
-						$minProductPrice;
-						$maxProductPrice;
+						$minProductPrice = 0;
+						$maxProductPrice = 0;
 
 						if(count($productPriceArray) == 0){
 							$minProductPrice = 0;
@@ -532,7 +518,9 @@ $occasionTermListArray = array_unique($occasionTermListArray);
 							?>
 							<div class="form-check">
 									<input type="checkbox" name="filter_catocca_city" class="form-check-input filter-on-city-page" id="filter_occ_<?php echo $occasion->term_id; ?>" value="<?php echo $occasion->term_id; ?>">
-									<label class="form-check-label" for="filter_occ_<?php echo $occasion->term_id; ?>"><?php echo $occasion->name; ?></label>
+									<label class="form-check-label" for="filter_occ_<?php echo $occasion->term_id; ?>">
+                                        <?php echo $occasion->name; ?>
+                                    </label>
 							</div>
 						<?php
 						}
