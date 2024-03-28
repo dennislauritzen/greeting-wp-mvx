@@ -17,7 +17,6 @@
 
 defined( 'ABSPATH' ) || exit;
 
-
 global $woocommerce, $wpdb, $MVX, $wp_query;
 
 $postId = get_the_ID();
@@ -55,7 +54,6 @@ if(!empty($category_name_plural)){
 	$filtering_title .= ', der kan levere '.$category_name_plural;
 }
 
-
 // Retrieve unique author (vendor) IDs and prices of products directly from the database using a custom SQL query
 $sql = "
     SELECT p.post_author AS author_id, pm.meta_value AS price
@@ -86,27 +84,6 @@ foreach ($results as $result) {
 
 // Deduplicate author IDs and prices
 $authors_new = array_unique($authors);
-
-
-
-// Get the products connected to this category/occasion.
-$args = array(
-    'post_type' => 'product',
-		'posts_per_page' => -1,
-    'tax_query' => array(
-        array(
-            'taxonomy' => 'occasion',
-            'field' => 'term_id',
-            'terms' => array($category_id)
-        ),
-    ),
-);
-
-// Create a new instance of WP_Query
-$query = new WP_Query( $args );
-
-// Get an array of unique user IDs who are authors of the products in the query results
-$authors = array_unique( wp_list_pluck( $query->posts, 'post_author' ) );
 
 // Get an array of user objects based on the unique user IDs
 $user_args = array(

@@ -21,7 +21,11 @@ global $woocommerce, $wpdb, $MVX, $wp_query;
 
 $postId = get_the_ID();
 
-$checkout_postalcode = WC()->customer->get_shipping_postcode();
+#$checkout_postalcode = WC()->customer->get_shipping_postcode();
+#if($cityPostalcode != $checkout_postalcode){
+#print 'postnumre afviger';
+#  $woocommerce->cart->empty_cart();
+#}
 
 // Get header designs.
 get_header();
@@ -29,18 +33,15 @@ get_header('green', array());
 
 $delivery_zip_chosen = (isset($args['delivery_zip_chosen']) ? $args['delivery_zip_chosen'] : '');
 
-$cat = $wp_query->get_queried_object();
-if (isset($cat->term_id)) {
-	$thumbnail_id = get_term_meta($cat->term_id, 'thumbnail_id', true);
-	$image = wp_get_attachment_url($thumbnail_id);
-}
-
 /**
- *
  * Data of the category
- *
  */
 $cat = $wp_query->get_queried_object();
+if (isset($cat->term_id)) {
+    $thumbnail_id = get_term_meta($cat->term_id, 'thumbnail_id', true);
+    $image = wp_get_attachment_url($thumbnail_id);
+}
+
 $category_id = $cat->term_id;
 $category_name = $cat->name;
 $category_name_plural = get_field('name_plural', 'category_'.$category_id);
