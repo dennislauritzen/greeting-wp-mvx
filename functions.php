@@ -5453,6 +5453,7 @@ function get_vendor_delivery_days_from_today($vendor_id, $prepend_text = '', $de
     $result = [];
 
     $now = new DateTime();
+    var_dump($now);
 
     foreach ($vendor_days as $p => $c) {
         if(isset($c['cutoff_datetime'])
