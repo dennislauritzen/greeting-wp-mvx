@@ -1065,6 +1065,7 @@ function categoryAndOccasionVendorFilterAction() {
  			}
  		}
 
+
  		$sql = "SELECT
  			p.post_author
  		FROM ".$wpdb->prefix."posts p

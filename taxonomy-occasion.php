@@ -130,6 +130,7 @@ $author_ids = $wpdb->get_col($wpdb->prepare($sql, $category_id));
 $authors_with_delivery_type_personal = array();
 $authors_with_other_delivery_types = array();
 
+
 // Loop through the results and separate authors based on their delivery type
 foreach (array_unique($author_ids) as $v) {
     $vendor_id = (int) $v;
