@@ -17,8 +17,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-
-global $woocommerce, $wpdb, $MVX, $wp_query;
+global $woocommerce, $wpdb, $WCMp, $wp_query;
 
 $postId = get_the_ID();
 
@@ -27,6 +26,7 @@ $checkout_postalcode = WC()->customer->get_shipping_postcode();
   #print 'postnumre afviger';
 #  $woocommerce->cart->empty_cart();
 #}
+
 
 // Get header designs.
 get_header();
