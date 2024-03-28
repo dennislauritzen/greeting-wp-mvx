@@ -17,7 +17,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-global $woocommerce, $wpdb, $MVX;
+global $woocommerce, $wpdb, $MVX, $wp_query;
 
 $postId = get_the_ID();
 
@@ -29,7 +29,6 @@ get_header('green', array());
 
 $delivery_zip_chosen = (isset($args['delivery_zip_chosen']) ? $args['delivery_zip_chosen'] : '');
 
-global $wp_query;
 $cat = $wp_query->get_queried_object();
 if (isset($cat->term_id)) {
 	$thumbnail_id = get_term_meta($cat->term_id, 'thumbnail_id', true);

@@ -28,7 +28,6 @@ $postId = get_the_ID();
 #  $woocommerce->cart->empty_cart();
 #}
 
-
 // Get header designs.
 get_header();
 get_header('green', array());
@@ -36,9 +35,7 @@ get_header('green', array());
 $delivery_zip_chosen = (isset($args['delivery_zip_chosen']) ? $args['delivery_zip_chosen'] : '');
 
 /**
- *
  * Data of the category
- *
  */
 $cat = $wp_query->get_queried_object();
 if (isset($cat->term_id)) {
@@ -57,6 +54,40 @@ $filtering_title = 'Filtrér butikker';
 if(!empty($category_name_plural)){
 	$filtering_title .= ', der kan levere '.$category_name_plural;
 }
+
+
+// Retrieve unique author (vendor) IDs and prices of products directly from the database using a custom SQL query
+$sql = "
+    SELECT p.post_author AS author_id, pm.meta_value AS price
+    FROM {$wpdb->posts} p
+    INNER JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id
+    INNER JOIN {$wpdb->term_relationships} tr ON p.ID = tr.object_id
+    INNER JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+    WHERE p.post_type = 'product'
+    AND p.post_status = 'publish'
+    AND tt.taxonomy = 'occasion'
+    AND tt.term_id = %d
+    AND pm.meta_key = '_price'
+";
+$sql = $wpdb->prepare($sql, $category_id);
+
+// Execute the SQL query
+$results = $wpdb->get_results($sql);
+
+// Initialize arrays
+$authors = array();
+$priceArray = array();
+
+// Extract unique author IDs and prices
+foreach ($results as $result) {
+    $authors[] = $result->author_id;
+    $priceArray[] = $result->price;
+}
+
+// Deduplicate author IDs and prices
+$authors_new = array_unique($authors);
+
+
 
 // Get the products connected to this category/occasion.
 $args = array(
@@ -79,20 +110,20 @@ $authors = array_unique( wp_list_pluck( $query->posts, 'post_author' ) );
 
 // Get an array of user objects based on the unique user IDs
 $user_args = array(
-		'role' => 'dc_vendor',
+    'role' => 'dc_vendor',
     'include' => $authors,
-		'posts_per_page' => -1,
-		'fields' => 'all',
-		'meta_key' => 'delivery_type',
+    'posts_per_page' => -1,
+    'fields' => 'all_with_meta',
+    'meta_key' => 'delivery_type',
     'orderby' => 'meta_value',
     'order' => 'DESC'
 );
 $user_query = new WP_User_Query( $user_args );
 $vendor_arr = $user_query->get_results();
 
+// Initialize arrays
+$UserIdArrayForCityPostalcode = wp_list_pluck($vendor_arr, 'ID'); // Extract vendor IDs
 
-
-$UserIdArrayForCityPostalcode = array();
 $DropOffTimes = array();
 foreach($vendor_arr as $v){
 	# Get the vendor ID
