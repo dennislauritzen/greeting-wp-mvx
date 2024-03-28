@@ -124,99 +124,78 @@ $vendor_arr = $user_query->get_results();
 // Initialize arrays
 $UserIdArrayForCityPostalcode = wp_list_pluck($vendor_arr, 'ID'); // Extract vendor IDs
 
-$DropOffTimes = array();
-foreach($vendor_arr as $v){
-	# Get the vendor ID
-	$vendor_id = (isset($v->data) ? $v->data->ID : $v->ID);
+// Filter vendors where require_delivery_day is equal to 0
+$filtered_vendors = array_filter($vendor_arr, function($vendor) {
+    return $vendor->require_delivery_day == 0;
+});
 
-	# Add ID to arrya and get vendors user meta
-	$UserIdArrayForCityPostalcode[] = $vendor_id;
-	$days = get_user_meta($vendor_id, 'require_delivery_day');
-	$hours = get_user_meta($vendor_id, 'dropoff_time');
+// Extract dropoff times for filtered vendors
+$dropoff_times = array_map(function($vendor) {
+    return (int) strstr($vendor->dropoff_time, ':', true);
+}, $filtered_vendors);
 
-	# If 0 days for delivery, then
-	if($days == 0){
-		$DropOffTimes[] = (int) strstr($hours,':',true);
-	}
-}
-
-// The maximum dropoff time today - for filtering.
-$DropOffTimes = (count($DropOffTimes) > 0) ? max($DropOffTimes) : 0;
+// Get the maximum dropoff time
+$max_dropoff_time = !empty($dropoff_times) ? max($dropoff_times) : 0;
 
 
 // pass to backend
 $categoryDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode);
 
 /////////////////////////
+// ######################
 // Data for the filtering.
 // This data is used for the filters and for the stores.
 // It is also used for the featuring of categories and occasions in the top.
-
 $productPriceArray = array(); // for price filter
 $categoryTermListArray = array(); // for cat term filter
 $occasionTermListArray = array();
 
-  // for price filter
+// FILTERING FOR PRICES
+// Get all vendor product IDs
+$vendorProductIds = array();
 
-  // Get all vendor product IDs
-  $vendorProductIds = array();
+foreach ($UserIdArrayForCityPostalcode as $vendorId) {
+    $vendor = get_mvx_vendor($vendorId);
+    $vendorProductIds = array_merge($vendorProductIds, $vendor->get_products(array('fields' => 'ids')));
+}
+$vendorProductIds = array_unique($vendorProductIds);
 
-  foreach ($UserIdArrayForCityPostalcode as $vendorId) {
-      $vendor = get_mvx_vendor($vendorId);
-      $vendorProductIds = array_merge($vendorProductIds, $vendor->get_products(array('fields' => 'ids')));
-  }
-  $vendorProductIds = array_unique($vendorProductIds);
-
-  // Use a custom SQL query to fetch the prices of those products
-  $where = array();
-  foreach($vendorProductIds as $pv){
+// Use a custom SQL query to fetch the prices of those products
+$where = array();
+foreach($vendorProductIds as $pv){
     if(is_numeric($pv)){
-      $where[] = $pv;
+        $where[] = $pv;
     }
-  }
+}
 
-	$sql = "
-      SELECT meta_value
-      FROM {$wpdb->postmeta}
-      WHERE meta_key = '_price'
-      AND post_id IN (".implode(', ', array_fill(0, count($vendorProductIds), '%s')).")
-  ";
-  $prices = $wpdb->prepare($sql, $where);
+// Use min and max to get the minimum and maximum prices
+$minPrice = min($priceArray);
+$maxPrice = max($priceArray);
 
-  $prices = $wpdb->get_results($prices);
-  // Convert the results to an array of prices
-  $priceArray = array();
-  foreach ($prices as $price) {
-      $priceArray[] = $price->meta_value;
-  }
+// Use array_push to add the prices to the $productPriceArray
+array_push($productPriceArray, $minPrice, $maxPrice);
 
-  // Use min and max to get the minimum and maximum prices
-  $minPrice = min($priceArray);
-  $maxPrice = max($priceArray);
+// FILTERING FOR CATS AND OCCASIONS
+// Use get_the_terms to fetch all the terms for all products belonging to the vendors
+$terms = wp_get_object_terms($vendorProductIds, array('product_cat', 'occasion'));
 
-  // Use array_push to add the prices to the $productPriceArray
-  array_push($productPriceArray, $minPrice, $maxPrice);
+$categoryTermListArray = array();
+$occasionTermListArray = array();
 
-  // Use get_the_terms to fetch all the terms for all products belonging to the vendors
-  $terms = wp_get_object_terms($vendorProductIds, array('product_cat', 'occasion'));
+if ($terms && !is_wp_error($terms)) {
+    foreach ($terms as $term) {
+        if ($term->taxonomy === 'product_cat') {
+            if ($term->term_id != 15 && $term->term_id != 16) {
+                $categoryTermListArray[] = $term->term_id;
+            }
+        } else if ($term->taxonomy === 'occasion') {
+            $occasionTermListArray[] = $term->term_id;
+        }
+    }
+}
 
-  $categoryTermListArray = array();
-  $occasionTermListArray = array();
-
-  if ($terms && !is_wp_error($terms)) {
-      foreach ($terms as $term) {
-          if ($term->taxonomy === 'product_cat') {
-              if ($term->term_id != 15 && $term->term_id != 16) {
-                  $categoryTermListArray[] = $term->term_id;
-              }
-          } else if ($term->taxonomy === 'occasion') {
-              $occasionTermListArray[] = $term->term_id;
-          }
-      }
-  }
-
-  $categoryTermListArray = array_unique($categoryTermListArray);
-  $occasionTermListArray = array_unique($occasionTermListArray);
+$categoryTermListArray = array_unique($categoryTermListArray);
+$occasionTermListArray = array_unique($occasionTermListArray);
 ?>
 <input type="hidden" name="_hid_cat_id" id="_hid_cat_id" value="<?php echo $category_id; ?>">
 <input type="hidden" name="_hid_default_user_id" id="categoryDefaultUserIdAsString" value="<?php echo $categoryDefaultUserIdAsString; ?>">
