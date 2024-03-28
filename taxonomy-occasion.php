@@ -54,23 +54,10 @@ if(!empty($category_name_plural)){
 	$filtering_title .= ', der kan levere '.$category_name_plural;
 }
 
-// Retrieve unique author (vendor) IDs and prices of products directly from the database using a custom SQL query
-$sql = "
-    SELECT p.post_author AS author_id, pm.meta_value AS price
-    FROM {$wpdb->posts} p
-    INNER JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id
-    INNER JOIN {$wpdb->term_relationships} tr ON p.ID = tr.object_id
-    INNER JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
-    WHERE p.post_type = 'product'
-    AND p.post_status = 'publish'
-    AND tt.taxonomy = 'occasion'
-    AND tt.term_id = %d
-    AND pm.meta_key = '_price'
-";
-$sql = $wpdb->prepare($sql, $category_id);
+
 
 // Execute the SQL query
-$results = $wpdb->get_results($sql);
+$results = array();
 
 // Initialize arrays
 $authors = array();
@@ -192,29 +179,7 @@ $occasionTermListArray = array_unique($occasionTermListArray);
 	<div class="row main-and-filter-content" style="display: none;">
 		<?php
     // get user meta query
-    $occasion_featured_list = $wpdb->get_results( "
-    SELECT
-      tt.term_id as term_id,
-      tt.taxonomy,
-		  t.name,
-      t.slug,
-      (SELECT tm.meta_value FROM {$wpdb->prefix}termmeta tm WHERE tm.term_id = tt.term_id AND tm.meta_key = 'featured') as featured,
-      (SELECT tm.meta_value FROM {$wpdb->prefix}termmeta tm WHERE tm.term_id = tt.term_id AND tm.meta_key = 'featured_image') as image_src
-    FROM
-      {$wpdb->prefix}term_taxonomy tt
-    INNER JOIN
-      {$wpdb->prefix}terms t
-    ON
-      t.term_id = tt.term_id
-    WHERE
-      tt.taxonomy IN ('product_cat')
-    ORDER BY
-      CASE featured
-        WHEN 1 THEN 1
-        ELSE 0
-      END DESC,
-      t.Name ASC
-    ");
+    $occasion_featured_list = array();
     $placeHolderImage = wc_placeholder_img_src();
     ?>
 
