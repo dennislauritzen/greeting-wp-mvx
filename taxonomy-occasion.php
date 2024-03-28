@@ -17,7 +17,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-global $woocommerce, $wpdb, $WCMp, $wp_query;
+global $woocommerce, $wpdb, $MVX, $wp_query;
 
 $postId = get_the_ID();
 
