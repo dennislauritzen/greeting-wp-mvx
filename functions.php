@@ -5449,6 +5449,7 @@ function get_vendor_delivery_days_from_today($vendor_id, $prepend_text = '', $de
     #}
 
     $vendor_days = get_vendor_dates_new($vendor_id, 'd-m-Y', 'all', 60);
+    var_dump($vendor_days);
     $result = [];
 
     $now = new DateTime();
@@ -5506,9 +5507,9 @@ function get_date_diff_text($date){
     $today = new DateTime();
     $date_diff = $today->diff($date);
 
-    echo "DATOEN=>".var_dump($date);
-    echo "I DAG=>".var_dump($today);
-    echo "DIFF=>".var_dump($date_diff);
+    #echo "DATOEN=>".var_dump($date);
+    #echo "I DAG=>".var_dump($today);
+    #echo "DIFF=>".var_dump($date_diff);
 
     if($date_diff->format('%R%a') == '0'){
         return 'i dag';
