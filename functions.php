@@ -37,9 +37,11 @@ if ( ! isset( $content_width ) ) {
  *
  * @since v1.0
  */
-if ( ! function_exists( 'greeting2_setup_theme' ) ) :
-	function greeting2_setup_theme() {
+if ( ! function_exists( 'greeting3_setup_theme' ) ) :
+	function greeting3_setup_theme() {
 		// Make theme available for translation: Translations can be filed in the /languages/ directory.
+
+        # We keep the greeting2 text-domain
 		load_theme_textdomain( 'greeting2', get_template_directory() . '/languages' );
 
 		// Theme Support.
