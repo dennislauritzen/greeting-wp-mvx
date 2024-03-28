@@ -1878,6 +1878,7 @@ function lpFilterAction() {
 
 	$return_arr = $defaultUserArray;
 
+    $first = 0;
 	if(!empty($return_arr)){
 		foreach ($return_arr as $filteredUser) {
 			$vendor_int = (int) $filteredUser;
@@ -3816,7 +3817,7 @@ function get_vendor_dates_new($vendor_id, $date_format = 'd-m-Y', $open_close = 
 
         $is_open = true; // true or false - is this date open at the time?
         $is_closed = !$is_open; // true or false - is this date closed at the time? Will always be the opposite of $is_open
-        $is_open_extraordinary_day = in_array($today->format('d-m-Y',), $open_days_extraordinary) ? true : false; // true or false
+        $is_open_extraordinary_day = in_array($today->format('d-m-Y'), $open_days_extraordinary) ? true : false; // true or false
         $is_closed_date = in_array($today->format('d-m-Y',), $closed_dates_arr);
         $is_open_day_weekdays = in_array($today->format('N'), $opening_days) ? true : false;
         $is_holiday = in_array($date, $global_holidays) ? true : false;
