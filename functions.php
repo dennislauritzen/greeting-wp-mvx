@@ -41,7 +41,7 @@ if ( ! function_exists( 'greeting3_setup_theme' ) ) :
 	function greeting3_setup_theme() {
 		// Make theme available for translation: Translations can be filed in the /languages/ directory.
 
-        # We keep the greeting2 text-domain
+        ## WE KEEP THE greeting2 text domain to avoid making a new translation
 		load_theme_textdomain( 'greeting2', get_template_directory() . '/languages' );
 
 		// Theme Support.
@@ -79,7 +79,7 @@ if ( ! function_exists( 'greeting3_setup_theme' ) ) :
 		// Custom CSS-Styles of Wordpress Gallery.
 		add_filter( 'use_default_gallery_style', '__return_false' );
 	}
-	add_action( 'after_setup_theme', 'greeting2_setup_theme' );
+	add_action( 'after_setup_theme', 'greeting3_setup_theme' );
 
 	// Disable Block Directory: https://github.com/WordPress/gutenberg/blob/trunk/docs/reference-guides/filters/editor-filters.md#block-directory
 	remove_action( 'enqueue_block_editor_assets', 'wp_enqueue_editor_block_directory_assets' );
