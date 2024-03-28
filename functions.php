@@ -4335,7 +4335,7 @@ function get_close_stores(){
 		$vendor = get_user_meta($v->ID);
 		$vendor_page_slug = get_mvx_vendor($v->ID);
 		// call the template with pass $vendor variable
-		get_template_part('template-parts/vendor-loop', null, array('vendor' => $vendor_page_slug, 'cityName' => $cityName, 'postalCode' => $postal_code));
+		get_template_part('template-parts/vendor-loop', null, array('vendor' => $vendor_page_slug, 'cityName' => '', 'postalCode' => $postal_code));
 	}
 
 	wp_die();
