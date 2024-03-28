@@ -70,12 +70,11 @@ $author_ids_query = $wpdb->prepare("
 ", $category_id);
 
 $vendor_arr = $wpdb->get_col($author_ids_query);
-var_dump($vendor_arr);
 // Get the minimum and maximum prices of products in $category_id
 
 // Get the minimum and maximum prices of products and their variations in $category_id
 $price_query = $wpdb->prepare("
-    SELECT MIN(meta_value) AS min_price, MAX(meta_value) AS max_price
+    SELECT MIN(CAST(meta_value AS DECIMAL(10,2))) AS min_price, MAX(CAST(meta_value AS DECIMAL(10,2))) AS max_price
     FROM (
         SELECT meta_value
         FROM {$wpdb->postmeta}
@@ -98,27 +97,20 @@ $price_query = $wpdb->prepare("
                 AND tt2.term_id = %d
             ))
         )
-    ) AS price_table
+    ) AS price_table 
 ", $category_id, $category_id);
-
 $price_results = $wpdb->get_row($price_query);
 
-var_dump($price_results);
-
 // Minimum price
-$min_price = isset($price_results->min_price) ? $price_results->min_price : 0;
+$min_price = isset($price_results->min_price) ? (int) $price_results->min_price : 0;
 
 // Maximum price
-$max_price = isset($price_results->max_price) ? $price_results->max_price : 0;
-var_dump($min_price);
-var_dump($max_price);
-
-
-
+$max_price = isset($price_results->max_price) ? (int) $price_results->max_price : 0;
 
 // Retrieve unique author (vendor) IDs and prices of products directly from the database using a custom SQL query
+// Extract unique author IDs directly within the SQL query using GROUP BY
 $sql = "
-    SELECT p.post_author AS author_id, pm.meta_value AS price
+    SELECT p.post_author AS author_id
     FROM {$wpdb->posts} p
     INNER JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id
     INNER JOIN {$wpdb->term_relationships} tr ON p.ID = tr.object_id
@@ -128,76 +120,55 @@ $sql = "
     AND tt.taxonomy = 'occasion'
     AND tt.term_id = %d
     AND pm.meta_key = '_price'
+    GROUP BY p.post_author
 ";
-$sql = $wpdb->prepare($sql, $category_id);
 
-// Execute the SQL query
-$results = $wpdb->get_results($sql);
+// Execute the optimized SQL query to fetch unique author IDs directly
+$author_ids = $wpdb->get_col($wpdb->prepare($sql, $category_id));
 
-// Initialize arrays
-$authors = array();
-$priceArray = array();
+// Initialize arrays to store authors with delivery type 1 and other delivery types
+$authors_with_delivery_type_personal = array();
+$authors_with_other_delivery_types = array();
 
-// Extract unique author IDs and prices
-foreach ($results as $result) {
-    $authors[] = $result->author_id;
-    $priceArray[] = $result->price;
+// Loop through the results and separate authors based on their delivery type
+foreach (array_unique($author_ids) as $v) {
+    $vendor_id = (int) $v;
+    $delivery_type = get_field('delivery_type', 'user_'.$vendor_id);
+
+    // Check if delivery type is 1
+    if (!empty($delivery_type) && $delivery_type[0]['value'] == '1') {
+        $authors_with_delivery_type_personal[] = $vendor_id;
+    } else {
+        $authors_with_other_delivery_types[] = $vendor_id;
+    }
 }
-// Deduplicate author IDs and prices
-$authors_new = array_unique($authors);
 
-// Get the products connected to this category/occasion.
-$args = array(
-    'post_type' => 'product',
-		'posts_per_page' => -1,
-    'tax_query' => array(
-        array(
-            'taxonomy' => 'occasion',
-            'field' => 'term_id',
-            'terms' => array($category_id)
-        ),
-    ),
-);
+// Convert the result to an array
+$authors_new = (array) array_merge($authors_with_delivery_type_personal, $authors_with_other_delivery_types);
 
-// Create a new instance of WP_Query
-$query = new WP_Query( $args );
-
-// Get an array of unique user IDs who are authors of the products in the query results
-$authors = array_unique( wp_list_pluck( $query->posts, 'post_author' ) );
-
-// Get an array of user objects based on the unique user IDs
-$user_args = array(
-    'role' => 'dc_vendor',
-    'include' => $authors,
-    'posts_per_page' => -1,
-    'fields' => 'all_with_meta',
-    'meta_key' => 'delivery_type',
-    'orderby' => 'meta_value',
-    'order' => 'DESC'
-);
-$user_query = new WP_User_Query( $user_args );
-$vendor_arr = $user_query->get_results();
-var_dump($authors);
 // Initialize arrays
-$UserIdArrayForCityPostalcode = wp_list_pluck($vendor_arr, 'ID'); // Extract vendor IDs
-
-
-// Filter vendors where require_delivery_day is equal to 0
-$filtered_vendors = array_filter($vendor_arr, function($vendor) {
-    return $vendor->require_delivery_day == 0;
-});
-
-// Extract dropoff times for filtered vendors
-$dropoff_times = array_map(function($vendor) {
-    return (int) strstr($vendor->dropoff_time, ':', true);
-}, $filtered_vendors);
-
-// Get the maximum dropoff time
-$max_dropoff_time = !empty($dropoff_times) ? max($dropoff_times) : 0;
-
-
 // pass to backend
+$UserIdArrayForCityPostalcode = $authors_new; // Extract vendor IDs
 $categoryDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode);
+
+// Prepare placeholders for each user ID
+$placeholders = array_fill(0, count($authors_new), '%d');
+$placeholders_str = implode(',', $placeholders);
+
+// Construct the SQL query to get all dropoff times for the specified authors
+$query = $wpdb->prepare("
+    SELECT MAX(um.meta_value) as dropoff_time
+    FROM wp_usermeta AS um
+    INNER JOIN wp_usermeta AS um2 ON um.user_id = um2.user_id
+    WHERE um.meta_key = 'vendor_drop_off_time'
+    AND um.user_id IN ($placeholders_str)
+    AND um2.meta_key = 'vendor_require_delivery_day'
+    AND um2.meta_value = '0'
+", $authors_new);
+
+// Execute the query
+$dropoff_times = $max_dropoff_time = $wpdb->get_col($query);
+$max_dropoff_time = ( empty($dropoff_times) ? 23 : (int) strstr($dropoff_times[0], ':', true) );
 
 /////////////////////////
 // ######################
@@ -212,28 +183,8 @@ $occasionTermListArray = array();
 // Get all vendor product IDs
 $vendorProductIds = array();
 
-foreach ($UserIdArrayForCityPostalcode as $vendorId) {
-    $vendor = get_mvx_vendor($vendorId);
-    $vendorProductIds = array_merge($vendorProductIds, $vendor->get_products(array('fields' => 'ids')));
-}
-$vendorProductIds = array_unique($vendorProductIds);
-
-// Use a custom SQL query to fetch the prices of those products
-$where = array();
-foreach($vendorProductIds as $pv){
-    if(is_numeric($pv)){
-        $where[] = $pv;
-    }
-}
-
-// Use min and max to get the minimum and maximum prices
-$minPrice = min($priceArray);
-$maxPrice = max($priceArray);
-var_dump($priceArray);
-var_dump($minPrice);
-var_dump($maxPrice);
 // Use array_push to add the prices to the $productPriceArray
-array_push($productPriceArray, $minPrice, $maxPrice);
+array_push($productPriceArray, $min_price, $max_price);
 
 // FILTERING FOR CATS AND OCCASIONS
 // Use get_the_terms to fetch all the terms for all products belonging to the vendors
@@ -444,7 +395,7 @@ $occasionTermListArray = array_unique($occasionTermListArray);
 						<?php
 						foreach($dates as $k => $v){
 							$closed_for_today = 0;
-							if($k == 0 && $DropOffTimes <= date("H")){
+							if($k == 0 && $max_dropoff_time <= date("H")){
 								$closed_for_today = 1;
 							}
 						?>
@@ -469,8 +420,8 @@ $occasionTermListArray = array_unique($occasionTermListArray);
 						 * ---------------------
 						**/
 
-						$minProductPrice = 0;
-						$maxProductPrice = 0;
+						$minProductPrice;
+						$maxProductPrice;
 
 						if(count($productPriceArray) == 0){
 							$minProductPrice = 0;

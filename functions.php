@@ -1055,6 +1055,9 @@ function categoryAndOccasionVendorFilterAction() {
  	$where = array();
  	$placeholder_arr = (is_countable($catOccaDeliveryIdArray) ? array_fill(0, count($catOccaDeliveryIdArray), '%s') : array());
 
+    #### TEST INITIAL ARRAY
+    #highlight_string("\n\$defaultUserArrayInit =\n" . var_export($defaultUserArray, true) . ";\n");
+
  	if(!empty($catOccaDeliveryIdArray) && is_array($placeholder_arr) && !empty($placeholder_arr)){
  		foreach($catOccaDeliveryIdArray as $catOccaDeliveryId){
  			if(is_numeric($catOccaDeliveryId)){
@@ -1140,6 +1143,7 @@ function categoryAndOccasionVendorFilterAction() {
  				}
  			}
  		}
+
 
  		// Remove all the stores that doesnt match from default array
  		// Normally we would check if the userIdArray is empty, but not here,
@@ -1232,6 +1236,7 @@ function categoryAndOccasionVendorFilterAction() {
  		$defaultUserArray = $userIdArrayGetFromDelivery;
  	}
 
+
  	////////////////
  	// Filter: Price
  	// Location: City Page
@@ -1239,15 +1244,15 @@ function categoryAndOccasionVendorFilterAction() {
  	$userIdArrayGetFromPriceFilter = array();
  	$inputPriceRangeArray = $_POST['inputPriceRangeArray'];
  	$inputMinPrice = (int) $inputPriceRangeArray[0];
- 	$inputMaxPrice = (int) $inputPriceRangeArray[1];
+    $inputMaxPrice = (int) $inputPriceRangeArray[1];
 
- 	$author_ids = $wpdb->get_col(
+   $author_ids = $wpdb->get_col(
  	    $wpdb->prepare(
  	        "
- 	        SELECT DISTINCT p.post_author
+ 	        SELECT DISTINCT(p.post_author)
  	        FROM {$wpdb->prefix}posts p
  	        INNER JOIN {$wpdb->prefix}postmeta pm ON p.ID = pm.post_id
- 	        WHERE p.post_type = 'product'
+ 	        WHERE (p.post_type = 'product' OR p.post_type = 'product_variation')
  	        AND p.post_status = 'publish'
  	        AND pm.meta_key = '_price'
  	        AND pm.meta_value BETWEEN %d AND %d
@@ -1259,14 +1264,14 @@ function categoryAndOccasionVendorFilterAction() {
 
  	$userIdArrayGetFromPriceFilter = array_unique($author_ids);
 
- 	// Remove all the stores that doesnt match from default array
+     // Remove all the stores that doesnt match from default array
  	if(!empty($userIdArrayGetFromPriceFilter)){
  		$userIdArrayGetFromPriceFilter = array_intersect($defaultUserArray, $userIdArrayGetFromPriceFilter);
 
  		$defaultUserArray = $userIdArrayGetFromPriceFilter;
  	}
 
- 	// three array is
+    // three array is
  	// $userIdArrayGetFromCatOcca
  	// $userIdArrayGetFromDelivery
  	// $userIdArrayGetFromPriceFilter
@@ -1284,9 +1289,9 @@ function categoryAndOccasionVendorFilterAction() {
 
  			// Get the delivery type for the vendor so we know if it is local or freight.
  			// The delivery type of the store
- 		  $delivery_type = get_field('delivery_type','user_'.$vendor->id);
+ 		    $delivery_type = get_field('delivery_type','user_'.$vendor->id);
 
- 		  $delivery_type = (!empty($delivery_type['0']['value']) ? $delivery_type['0']['value'] : 0);
+            $delivery_type = (!empty($delivery_type['0']['value']) ? $delivery_type['0']['value'] : 0);
 
  			if($delivery_type == 0 && $first == 0){
  				get_template_part('template-parts/vendor-freight-heading', null, array('cityName' => $cityName));
