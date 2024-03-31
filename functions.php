@@ -452,8 +452,145 @@ if ( ! function_exists( 'greeting2_comment' ) ) :
 
 endif;
 
-
 /**
+ * Deregister MultiVendorX MVX Boodstrap
+ * Deregister Woocommerce styles
+ */
+function remove_plugin_bootstrap_styles() {
+
+
+    ################
+    # MVX STYLES
+    ################
+    ## --- JS
+    wp_dequeue_script('frontend_js');
+    wp_deregister_script('frontend_js');
+
+    wp_dequeue_script('mvx_single_product_multiple_vendors');
+    wp_deregister_script('mvx_single_product_multiple_vendors');
+
+    wp_dequeue_script('mvx_customer_qna_js');
+    wp_deregister_script('mvx_customer_qna_js');
+
+    wp_dequeue_script('mvx-bootstrap-script');
+    wp_deregister_script('mvx-bootstrap-script');
+
+    wp_dequeue_script('mvx_customer_qna_js');
+    wp_deregister_script('mvx_customer_qna_js');
+
+    wp_dequeue_script('mvx-bootstrap-script');
+    wp_deregister_script('mvx-bootstrap-script');
+
+    ## --- CSS
+    // MVX BOOTSTRAP: mvx-bootstrap-style
+    wp_dequeue_style('mvx-bootstrap-style');
+    wp_deregister_style('mvx-bootstrap-style');
+
+    // MVX SELLER SHOP PAGE: mvx_seller_shop_page_css
+    wp_dequeue_style('mvx_seller_shop_page_css');
+    wp_deregister_style('mvx_seller_shop_page_css');
+
+    // MVX SELLER SHOP PAGE: frontend_css
+    wp_dequeue_style('frontend_css');
+    wp_deregister_style('frontend_css');
+
+    // MVX SELLER SHOP PAGE: mvx_seller_shop_page_css
+    wp_dequeue_style('multiple_vendor');
+    wp_deregister_style('multiple_vendor');
+
+    // MVX SELLER SHOP PAGE: mvx_seller_shop_page_css
+    wp_dequeue_style('product_css');
+    wp_deregister_style('product_css');
+
+    // MVX SELLER SHOP PAGE: mvx_seller_shop_page_css
+    wp_dequeue_style('multiple_vendor');
+    wp_deregister_style('multiple_vendor');
+
+    ################
+    # WooCommerce STYLES & JAVASCIPT
+    ################
+
+
+    // --- CSS
+    // MVX SELLER SHOP PAGE: mvx_seller_shop_page_css
+    wp_dequeue_style('woocommerce-smallscreen');
+    wp_deregister_style('woocommerce-smallscreen');
+
+    // MVX SELLER SHOP PAGE: mvx_seller_shop_page_css
+    wp_dequeue_style('woocommerce-inline');
+    wp_deregister_style('woocommerce-inline');
+
+
+    // MVX SELLER SHOP PAGE: mvx_seller_shop_page_css
+    wp_dequeue_style('woocommerce-general');
+    wp_deregister_style('woocommerce-general');
+    // MVX SELLER SHOP PAGE: mvx_seller_shop_page_css
+    wp_dequeue_style('woocommerce-layout');
+    wp_deregister_style('woocommerce-layout');
+
+    $pagespeed_debug_dl_set_global_var = 0;
+    if($pagespeed_debug_dl_set_global_var === 1) {
+
+        #### LIST ENQUEUED CSS
+
+        // Get the list of enqueued stylesheets
+        $enqueued_styles = wp_styles()->queue;
+
+        // Output the list of enqueued stylesheets
+        echo "<h2>Enqueued Stylesheets:</h2>";
+        echo "<ul>";
+
+        foreach ($enqueued_styles as $style) {
+            // Get the details of the registered stylesheet
+            $style_details = wp_styles()->registered[$style];
+
+            // Check if the source of the stylesheet contains the plugin directory path
+            if (strpos($style_details->src, '/wp-content/plugins/') !== false) {
+                // Extract plugin name from the source URL
+                $plugin_name = explode('/wp-content/plugins/', $style_details->src)[1];
+                $plugin_name = explode('/', $plugin_name)[0];
+                echo "<li><strong>$plugin_name:</strong> $style</li>";
+            } else {
+                // If it's not from a plugin, just display the stylesheet name
+                echo "<li>$style</li>";
+            }
+        }
+
+        echo "</ul>";
+
+        #### LIST ENQUEUED JAVASCRIPT
+        // Get the list of enqueued JavaScript files
+        $enqueued_scripts = wp_scripts()->queue;
+
+        // Output the list of enqueued JavaScript files
+        echo "<h2>Enqueued JavaScript Files:</h2>";
+        echo "<ul>";
+
+        foreach ($enqueued_scripts as $script) {
+            // Get the details of the registered JavaScript file
+            $script_details = wp_scripts()->registered[$script];
+
+            // Check if the source of the JavaScript file contains the plugin directory path
+            if (strpos($script_details->src, '/wp-content/plugins/') !== false) {
+                // Extract plugin name from the source URL
+                $plugin_name = explode('/wp-content/plugins/', $script_details->src)[1];
+                $plugin_name = explode('/', $plugin_name)[0];
+                echo "<li><strong>$plugin_name:</strong> $script</li>";
+            } else {
+                // If it's not from a plugin, just display the JavaScript file name
+                echo "<li>$script</li>";
+            }
+        }
+
+        echo "</ul>";
+    }
+}
+add_action('wp_enqueue_scripts', 'remove_plugin_bootstrap_styles', 99999);
+
+
+
+
+        /**
  * Nav menus.
  *
  * @since v1.0
@@ -464,6 +601,8 @@ if ( function_exists( 'register_nav_menus' ) ) {
 			'main-menu-mobile'   => 'Main Menu Mobile - Hamburger menu',
 			'main-menu-desktop'   => 'Main Navigation Menu (Top)',
 			'footer-menu' => 'Footer Menu',
+            'footer-menu-occasions' => 'Footer Menu (Occasions)',
+            'footer-menu-categories' => 'Footer Menu (Categories)'
 		)
 	);
 }
@@ -898,6 +1037,7 @@ function ajax_fetch() { ?>
 // the ajax function
 add_action('wp_ajax_data_fetch' , 'data_fetch');
 add_action('wp_ajax_nopriv_data_fetch','data_fetch');
+
 
 function data_fetch(){
 	$search_query = esc_attr( $_POST['keyword'] );

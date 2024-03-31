@@ -1,8 +1,6 @@
 <?php
 defined( 'ABSPATH' ) || exit;
 
-get_header( 'shop' );
-
 /**
  * Hook: mvx_before_main_content.
  *

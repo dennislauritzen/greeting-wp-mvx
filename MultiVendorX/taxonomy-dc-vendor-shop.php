@@ -14,9 +14,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
+
 // Get vendor
 $vendor_id = mvx_find_shop_page_vendor();
 $vendor = get_mvx_vendor($vendor_id);
+
+
 if(!$vendor){
   // Redirect if not vendor
   #wp_safe_redirect(get_permalink( woocommerce_get_page_id( 'shop' ) ));
