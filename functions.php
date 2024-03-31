@@ -522,11 +522,11 @@ function remove_plugin_bootstrap_styles() {
 
 
     // MVX SELLER SHOP PAGE: mvx_seller_shop_page_css
-    wp_dequeue_style('woocommerce-general');
-    wp_deregister_style('woocommerce-general');
+    #wp_dequeue_style('woocommerce-general');
+    #wp_deregister_style('woocommerce-general');
     // MVX SELLER SHOP PAGE: mvx_seller_shop_page_css
-    wp_dequeue_style('woocommerce-layout');
-    wp_deregister_style('woocommerce-layout');
+    #wp_dequeue_style('woocommerce-layout');
+    #wp_deregister_style('woocommerce-layout');
 
     $pagespeed_debug_dl_set_global_var = 0;
     if($pagespeed_debug_dl_set_global_var === 1) {
