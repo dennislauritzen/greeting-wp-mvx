@@ -476,17 +476,14 @@ function remove_plugin_bootstrap_styles() {
     wp_dequeue_script('mvx_customer_qna_js');
     wp_deregister_script('mvx_customer_qna_js');
 
-    wp_dequeue_script('mvx-bootstrap-script');
-    wp_deregister_script('mvx-bootstrap-script');
-
     ## --- CSS
     // MVX BOOTSTRAP: mvx-bootstrap-style
     wp_dequeue_style('mvx-bootstrap-style');
     wp_deregister_style('mvx-bootstrap-style');
 
     // MVX SELLER SHOP PAGE: mvx_seller_shop_page_css
-    wp_dequeue_style('mvx_seller_shop_page_css');
-    wp_deregister_style('mvx_seller_shop_page_css');
+    #wp_dequeue_style('mvx_seller_shop_page_css');
+    #wp_deregister_style('mvx_seller_shop_page_css');
 
     // MVX SELLER SHOP PAGE: frontend_css
     wp_dequeue_style('frontend_css');
