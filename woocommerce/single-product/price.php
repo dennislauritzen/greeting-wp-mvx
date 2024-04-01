@@ -21,5 +21,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 global $product;
 
+$product_id = $product->get_id(); // Get the product ID
+$unique_id = 'price-' . $product_id; // Create a unique ID using the product ID
+
+
 ?>
-<p class="mt-3 price <?php echo esc_attr( apply_filters( 'woocommerce_product_price_class', 'price' ) ); ?>"><?php echo $product->get_price_html(); ?></p>
+<p id="<?php echo esc_attr( $unique_id ); ?>" class="mt-3 price <?php echo esc_attr( apply_filters( 'woocommerce_product_price_class', 'price' ) ); ?>">
+    <?php echo $product->get_price_html(); ?>
+</p>
