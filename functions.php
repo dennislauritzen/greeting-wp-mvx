@@ -457,8 +457,6 @@ endif;
  * Deregister Woocommerce styles
  */
 function remove_plugin_bootstrap_styles() {
-
-
     ################
     # MVX STYLES
     ################

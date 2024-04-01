@@ -13,4 +13,3 @@ global $MVX;
 get_header();
 get_header('vendor');
 
-
