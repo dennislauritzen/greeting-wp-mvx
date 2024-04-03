@@ -5962,6 +5962,57 @@ function greeting_duplicate_custom_taxonomies( WC_Product $duplicate, WC_Product
     }
 }
 
+// Hook into the action that fires when a product is duplicated
+add_action('woocommerce_product_duplicate', 'woocommerce_product_new_slug_for_duplicate', 10, 2);
+function woocommerce_product_new_slug_for_duplicate(WC_Product $duplicate, WC_Product $product) {
+    // Get the original product's slug
+    $original_slug = $product->get_slug();
+
+    // Get the original product's post ID
+    $original_id = $product->get_id();
+
+    // Get the number of duplicates for the original product
+    $duplicate_count = 1;
+    while (get_page_by_path($original_slug . '-' . $duplicate_count, OBJECT, 'product')) {
+        $duplicate_count++;
+    }
+
+    // Append the sequential number to the original slug
+    $new_slug = $original_slug . '-' . $duplicate_count;
+
+    // Set the new slug for the duplicated product
+    $duplicate->set_slug($new_slug);
+
+    // Set the original name for the duplicated product
+    $duplicate->set_name($product->get_name());
+
+    // Save the changes to the duplicated product
+    $duplicate->save();
+}
+
+/***
+ * Function for securing that WooCommerce doesn't add "Copy" / "Kopier" to product name
+ * When duplication product
+ *
+ *
+ */
+// Hook into the action that fires when a product is duplicated
+add_action('woocommerce_product_duplicate_before_save', 'greeting_name_product_as_original', 9, 2);
+function greeting_name_product_as_original($duplicate, $product) {
+    // Get the original product's name
+    $original_name = $product->get_name();
+
+    // Set the original name for the duplicated product
+    $duplicate->set_name($original_name);
+
+    // Save the changes to the duplicated product
+    $duplicate->save();
+}
+
+function greeting_duplicate_product_unique_names(){
+
+}
+
 /**
  * Function for using order object to get Vendor ID.
  *
