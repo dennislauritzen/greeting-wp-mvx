@@ -28,12 +28,10 @@ $vendor2 = get_user_meta($vendor_id);
 # BANNER SETUP
 $banner = 'https://www.greeting.dk/wp-content/uploads/2022/05/pexels-maria-orlova-4947386-1-scaled.jpg';
 if(!empty($vendor_id)){
-    if(empty($banner)) {
-        if(!empty( $image = $vendor->get_image('image', 'full') )){
-            $banner = $vendor->get_image('banner', 'full');
-        } else {
-            $banner = (!empty($vendor2['_vendor_banner']) ? $vendor2['_vendor_banner'][0] : '');
-        }
+    if(!empty( $image = $vendor->get_image('banner') )){
+        $banner = $vendor->get_image('banner');
+    } else {
+        $banner = (!empty($vendor2['_vendor_banner']) ? $vendor2['_vendor_banner'][0] : '');
     }
 }
 $vendor_banner = $banner;
