@@ -29,10 +29,14 @@ $vendor2 = get_user_meta($vendor_id);
 $banner = 'https://www.greeting.dk/wp-content/uploads/2022/05/pexels-maria-orlova-4947386-1-scaled.jpg';
 if(!empty($vendor_id)){
     if(empty($banner)) {
-        $banner = (!empty($vendor2['_vendor_banner']) ? $vendor2['_vendor_banner'][0] : '');
+        if(!empty( $image = $vendor->get_image('image', 'full') )){
+            $banner = $vendor->get_image('banner', 'full');
+        } else {
+            $banner = (!empty($vendor2['_vendor_banner']) ? $vendor2['_vendor_banner'][0] : '');
+        }
     }
 }
-$vendor_banner = (!empty(wp_get_attachment_image_src($banner)) ? wp_get_attachment_image_src($banner, 'full')[0] : '');
+$vendor_banner = $banner;
 
 # PROFILE IMAGE SETUP
 $image = $MVX->plugin_url . 'assets/images/WP-stdavatar.png';
@@ -55,7 +59,7 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
 }
 ?>
 
- <section id="top" class="vendor pt-1" style="min-height: 275px; background-size: cover; background-position: center center; background-image: linear-gradient(rgba(0, 0, 0, 0.35),rgba(0, 0, 0, 0.35)),url('<?php echo (empty($vendor_banner) ? 'https://www.greeting.dk/wp-content/uploads/2022/04/pexels-furkanfdemir-6309844-1-scaled.jpg' : esc_url($vendor_banner)); ?>');">
+ <section id="top" class="vendor pt-1" style="min-height: 275px; background-size: cover; background-position: center center; background-image: linear-gradient(rgba(0, 0, 0, 0.35),rgba(0, 0, 0, 0.35)),url('<?php echo esc_url($vendor_banner); ?>');">
   <div class="container py-4">
     <div class="row">
 			<div class="d-flex pb-3 pb-lg-0 pb-xl-0 position-relative justify-content-center justify-content-lg-start justify-content-xl-start col-md-12 col-lg-3">
