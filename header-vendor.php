@@ -4,6 +4,8 @@ global $MVX, $product;
 $cart_count = WC()->cart->cart_contents_count; // Set variable for cart item count
 $cart_url = wc_get_cart_url();  // Set Cart URL
 
+
+
 /**
  * Handle all vendor information
  * For product pages top.
@@ -22,9 +24,17 @@ if(is_object($product)){
 $vendor = get_mvx_vendor($vendor_id);
 
 $vendor2 = get_user_meta($vendor_id);
-$banner = (!empty($vendor2['_vendor_banner'])? $vendor2['_vendor_banner'][0] : '');
+
+# BANNER SETUP
+$banner = 'https://www.greeting.dk/wp-content/uploads/2022/05/pexels-maria-orlova-4947386-1-scaled.jpg';
+if(!empty($vendor_id)){
+    if(empty($banner)) {
+        $banner = (!empty($vendor2['_vendor_banner']) ? $vendor2['_vendor_banner'][0] : '');
+    }
+}
 $vendor_banner = (!empty(wp_get_attachment_image_src($banner)) ? wp_get_attachment_image_src($banner, 'full')[0] : '');
 
+# PROFILE IMAGE SETUP
 $image = $MVX->plugin_url . 'assets/images/WP-stdavatar.png';
 if(!empty($vendor_id) && is_object($vendor)){
     $image = $vendor->get_image('image', array(125, 125));
