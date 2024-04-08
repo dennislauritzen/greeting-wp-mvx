@@ -292,6 +292,8 @@ $occasionTermListArray = array_unique($occasionTermListArray);
       t.Name ASC
     ", $catocca_query_type);
     $occasion_featured_list = $wpdb->get_results($occasion_query);
+
+
     $placeHolderImage = wc_placeholder_img_src();
     ?>
 

@@ -21,12 +21,6 @@ global $woocommerce, $wpdb, $MVX, $wp_query;
 
 $postId = get_the_ID();
 
-#$checkout_postalcode = WC()->customer->get_shipping_postcode();
-#if($cityPostalcode != $checkout_postalcode){
-  #print 'postnumre afviger';
-#  $woocommerce->cart->empty_cart();
-#}
-
 // Get header designs.
 get_header();
 get_header('green', array());
@@ -53,9 +47,6 @@ $filtering_title = 'Filtrér butikker';
 if(!empty($category_name_plural)){
 	$filtering_title .= ', der kan levere '.$category_name_plural;
 }
-
-
-
 
 // Get author IDs of users with products in $category_id
 $author_ids_query = $wpdb->prepare("
@@ -152,6 +143,7 @@ $authors_new = (array) array_merge($authors_with_delivery_type_personal, $author
 $UserIdArrayForCityPostalcode = $authors_new; // Extract vendor IDs
 $categoryDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode);
 
+
 // Prepare placeholders for each user ID
 $placeholders = array_fill(0, count($authors_new), '%d');
 $placeholders_str = implode(',', $placeholders);
@@ -182,6 +174,20 @@ $occasionTermListArray = array();
 
 // FILTERING FOR PRICES
 // Get all vendor product IDs
+// Query to get all products associated with the vendor IDs (authors)
+$args = array(
+    'post_type'      => 'product',
+    'posts_per_page' => -1,
+    'author__in'     => $UserIdArrayForCityPostalcode, // Query for products with authors matching the vendor IDs
+    'fields'         => 'ids'
+);
+$products_query = new WP_Query( $args );
+
+// Get product IDs associated with the vendors
+$vendorProductIds = $products_query->posts;
+
+// Use get_the_terms to fetch all the terms for all products belonging to the vendors
+$terms = wp_get_object_terms( $vendorProductIds, array( 'product_cat', 'occasion' ) );
 $vendorProductIds = array();
 
 // Use array_push to add the prices to the $productPriceArray
@@ -189,8 +195,6 @@ array_push($productPriceArray, $min_price, $max_price);
 
 // FILTERING FOR CATS AND OCCASIONS
 // Use get_the_terms to fetch all the terms for all products belonging to the vendors
-$terms = wp_get_object_terms($vendorProductIds, array('product_cat', 'occasion'));
-
 $categoryTermListArray = array();
 $occasionTermListArray = array();
 
@@ -205,9 +209,6 @@ if ($terms && !is_wp_error($terms)) {
         }
     }
 }
-
-$categoryTermListArray = array_unique($categoryTermListArray);
-$occasionTermListArray = array_unique($occasionTermListArray);
 ?>
 <input type="hidden" name="_hid_cat_id" id="_hid_cat_id" value="<?php echo $category_id; ?>">
 <input type="hidden" name="_hid_default_user_id" id="categoryDefaultUserIdAsString" value="<?php echo $categoryDefaultUserIdAsString; ?>">
@@ -250,6 +251,7 @@ $occasionTermListArray = array_unique($occasionTermListArray);
       END DESC,
       t.Name ASC
     ");
+
     $placeHolderImage = wc_placeholder_img_src();
     ?>
 
@@ -260,8 +262,8 @@ $occasionTermListArray = array_unique($occasionTermListArray);
     <div class="mt-2 mt-xs-2 mt-sm-0 mb-4" id="topoccassions">
       <div class="d-flex align-items-center mb-1">
         <h3 class="mt-1" style="font-family: Inter; font-size: 17px;">
-					Kategorier
-				</h3>
+            Kategorier
+        </h3>
         <div class="button-cont ms-auto">
           <button id="backButton" type="button" class="btn btn-light rounded-circle">
             <div class="align-items-center justify-content-center">
