@@ -219,7 +219,7 @@ if ($terms && !is_wp_error($terms)) {
 	<div class="row">
 		<div class="row">
              <div class="col-12">
-                <h1 class="d-block my-0 my-xs-2 my-sm-1 my-md-1 mt-4 mt-lg-5 pt-lg-1 mb-lg-1" style="font-family: Rubik;">
+                <h1 class="d-block my-0 my-xs-2 my-sm-1 my-md-1 mt-2 mt-lg-2 pt-lg-1 mb-lg-1" style="font-family: Rubik;">
 					<?php print $category_title; ?>
 				</h1>
 			</div>
