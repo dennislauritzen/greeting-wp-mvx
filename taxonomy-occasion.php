@@ -213,7 +213,6 @@ if ($terms && !is_wp_error($terms)) {
 <input type="hidden" name="_hid_cat_id" id="_hid_cat_id" value="<?php echo $category_id; ?>">
 <input type="hidden" name="_hid_default_user_id" id="categoryDefaultUserIdAsString" value="<?php echo $categoryDefaultUserIdAsString; ?>">
 
-
 <!-- Filter content -->
 <div id="categorycontent" class="container">
 	<div class="row">

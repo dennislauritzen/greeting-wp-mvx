@@ -5290,7 +5290,7 @@ function shop_order_display_callback( $post ) {
 			}
 		} // end foreach
 
-		$vendor_delivery_day_required = get_field('vendor_require_delivery_day', 'user_'.$vendor_id);
+		$vendor_delivery_day_required = (int) get_field('vendor_require_delivery_day', 'user_'.$vendor_id);
 		$vendor_drop_off_time = get_field('vendor_drop_off_time', 'user_'.$vendor_id);
 		if(strpos($vendor_drop_off_time,':') === false && strpos($vendor_drop_off_time,'.')){
 			$vendor_drop_off_time = $vendor_drop_off_time.':00';
@@ -5299,7 +5299,7 @@ function shop_order_display_callback( $post ) {
 		}
 
 		if($vendor_drop_off_time < date('H:i')){
-			$vendor_delivery_day_required = $vendor_delivery_day_required+1;
+			$vendor_delivery_day_required = $vendor_delivery_day_required + 1;
 		}
 
 		// BEWARE: Not used because then we cant change date according to our needs
