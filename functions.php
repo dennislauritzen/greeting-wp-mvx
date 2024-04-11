@@ -5937,33 +5937,35 @@ add_action( 'woocommerce_order_action_wc_custom_order_action_delivery_notice', '
  * @param \WC_Order $order
  */
 function greeting_wc_process_order_meta_box_action_test_mail( $order ) {
-		# Possible mail values:
-		# ----
-		# ARRAY: new_order, cancelled_order, failed_order, customer_on_hold_order, customer_processing_order, customer_completed_order, customer_refunded_order,
-		# customer_invoice, customer_note, customer_reset_password, customer_new_account, woocommerce_pensopay_payment_link, vendor_new_account, admin_new_vendor,
-		# approved_vendor_new_account, rejected_vendor_new_account, vendor_new_order, notify_shipped, admin_new_vendor_product, vendor_new_question, admin_new_question,
-		# customer_answer, admin_added_new_product_to_vendor, vendor_commissions_transaction, vendor_direct_bank, admin_widthdrawal_request, vendor_orders_stats_report,
-		# vendor_contact_widget_email, mvx_send_report_abuse, vendor_new_announcement, customer_order_refund_request, admin_vendor_product_rejected,
-		# suspend_vendor_new_account, review_vendor_alert, vendor_followed, admin_change_order_status, admin_new_vendor_coupon
+    # Possible mail values:
+    # ----
+    # ARRAY: new_order, cancelled_order, failed_order, customer_on_hold_order, customer_processing_order, customer_completed_order, customer_refunded_order,
+    # customer_invoice, customer_note, customer_reset_password, customer_new_account, woocommerce_pensopay_payment_link, vendor_new_account, admin_new_vendor,
+    # approved_vendor_new_account, rejected_vendor_new_account, vendor_new_order, notify_shipped, admin_new_vendor_product, vendor_new_question, admin_new_question,
+    # customer_answer, admin_added_new_product_to_vendor, vendor_commissions_transaction, vendor_direct_bank, admin_widthdrawal_request, vendor_orders_stats_report,
+    # vendor_contact_widget_email, mvx_send_report_abuse, vendor_new_announcement, customer_order_refund_request, admin_vendor_product_rejected,
+    # suspend_vendor_new_account, review_vendor_alert, vendor_followed, admin_change_order_status, admin_new_vendor_coupon
 
-		$mailer = WC()->mailer();
-		$mails = $mailer->get_emails();
+    $mailer = WC()->mailer();
+    $mails = $mailer->get_emails();
 
-		if ( !empty( $mails ) ) {
-				foreach ( $mails as $mail ) {
-						if ( $mail->id == 'customer_completed_order' ) {
-							add_filter('woocommerce_new_order_email_allows_resend', '__return_true' );
-							$mail->trigger( $order->get_id() );
-						}
-				 }
-		}
+    if ( !empty( $mails ) ) {
+        foreach ( $mails as $mail ) {
+            if ( $mail->id == 'customer_completed_order' ) {
+                add_filter('woocommerce_new_order_email_allows_resend', '__return_true' );
+                $mail->trigger( $order->get_id() );
+            }
+        }
+    }
 
-		#$user_id = (empty(get_current_user_id()) ? wp_get_current_user()->ID : get_current_user_id() );
-		#$mailer->customer_new_account($user_id);
-		#exit;
+    #$user_id = (empty(get_current_user_id()) ? wp_get_current_user()->ID : get_current_user_id() );
+    #$mailer->customer_new_account($user_id);
+    #exit;
 }
 add_action( 'woocommerce_order_action_wc_custom_order_action_test_mail', 'greeting_wc_process_order_meta_box_action_test_mail' );
 
+
+add_filter( 'wp_image_editors', function() { return array( 'WP_Image_Editor_GD' ); } );
 
 /**
  * Function for duplicating taxonomies when duplicating a product.
