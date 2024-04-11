@@ -5270,7 +5270,6 @@ add_action( 'add_meta_boxes', 'add_shop_order_meta_box' );
 // For displaying the delivery date edit field
 function shop_order_display_callback( $post ) {
         $value = get_post_meta( $post->ID, '_delivery_date', true );
-
 		$order = wc_get_order($post->ID);
 
 		$vendor_id = 0;
@@ -5338,7 +5337,7 @@ function shop_order_display_callback( $post ) {
 				});
 		 </script>
 		 <?php
-        #print $post->ID;
+
 		woocommerce_form_field( 'delivery_date', array(
 			'type'          => 'text',
 			'class'         => array(),
@@ -5882,6 +5881,7 @@ function greeting_wc_add_order_meta_box_action( $actions ) {
 
 	// add "mark printed" custom action
 	$actions['wc_custom_order_action'] = __( 'Gensend mail til butikken', 'greeting2' );
+    $actions['wc_custom_order_action_delivery_notice'] = __( 'Gensend leveringsbekræftelse til kunde', 'greeting2' );
     $actions['wc_custom_order_action_test_mail'] = __( 'SEND TEST MAIL', 'greeting2' );
 	return $actions;
 }
@@ -5907,6 +5907,27 @@ function greeting_wc_process_order_meta_box_action( $order ) {
 	}
 }
 add_action( 'woocommerce_order_action_wc_custom_order_action', 'greeting_wc_process_order_meta_box_action' );
+
+/**
+ * Add an order note when custom action is clicked
+ * Add a flag on the order to show it's been run
+ *
+ * @author Dennis Lauritzen
+ * @param \WC_Order $order
+ */
+function greeting_wc_completed_order_resend_order_notice_to_customer( $order ) {
+    $mailer = WC()->mailer();
+    $mails = $mailer->get_emails();
+
+    if ( !empty( $mails ) ) {
+        foreach ( $mails as $mail ) {
+            if ( $mail->id == 'order_completed' ) {
+                $mail->trigger( $order->get_id() );
+            }
+        }
+    }
+}
+add_action( 'woocommerce_order_action_wc_custom_order_action_delivery_notice', 'greeting_wc_completed_order_resend_order_notice_to_customer' );
 
 /**
  * Add an order note when custom action is clicked
