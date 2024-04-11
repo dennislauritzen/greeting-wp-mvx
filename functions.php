@@ -5921,7 +5921,7 @@ function greeting_wc_completed_order_resend_order_notice_to_customer( $order ) {
 
     if ( !empty( $mails ) ) {
         foreach ( $mails as $mail ) {
-            if ( $mail->id == 'order_completed' ) {
+            if ( $mail->id == 'customer_completed_order' ) {
                 $mail->trigger( $order->get_id() );
             }
         }
