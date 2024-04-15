@@ -92,7 +92,7 @@ global $product, $WCMp;
                 </div>
                 <div class="row">
                   <div class="col-12 py-1">
-                    <small>🏷️ Du betaler 59,- for levering - lige til din modtagers dør.</small>
+                    <small>🏷️ Du betaler 69,- for levering - lige til din modtagers dør.</small>
                   </div>
                 </div>
                 <div class="row">
