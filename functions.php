@@ -5964,9 +5964,6 @@ function greeting_wc_process_order_meta_box_action_test_mail( $order ) {
 }
 add_action( 'woocommerce_order_action_wc_custom_order_action_test_mail', 'greeting_wc_process_order_meta_box_action_test_mail' );
 
-
-add_filter( 'wp_image_editors', function() { return array( 'WP_Image_Editor_GD' ); } );
-
 /**
  * Function for duplicating taxonomies when duplicating a product.
  *
@@ -6680,3 +6677,10 @@ function custom_menu_endpoint_content(){
 }
 // display content of custom endpoint
 add_action('mvx_vendor_dashboard_custom-mvx-menu_endpoint', 'custom_menu_endpoint_content');
+
+
+/**
+ * Filter for update image_editors added
+ * wp_image_editors
+ */
+add_filter( 'wp_image_editors', function() { return array( 'WP_Image_Editor_GD' ); } );
