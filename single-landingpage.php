@@ -774,14 +774,15 @@ $occasionTermListArray = array_unique($occasionTermListArray);
     .lp-content-block h5,
     .lp-content-block h6
     {
-        font-family: 'Inter','MS Trebuchet', 'Rubik',sans-serif;
+        font-family: 'MS Trebuchet', 'Trebuchet MS', 'Inter', 'Rubik', sans-serif !important;
     }
-    .lp-content-block h1 { font-size: 24px; }
-    .lp-content-block h2 { font-size: 23px; }
-    .lp-content-block h3 { font-size: 22px; }
-    .lp-content-block h4 { font-size: 20px; }
-    .lp-content-block h5 { font-size: 18px; }
-    .lp-content-block h6 { font-size: 16px; }
+    .lp-content-block h1 { font-size: 24px !important; font-weight: 400 !important; }
+    .lp-content-block h2 { font-size: 20px !important; font-weight: 400 !important; }
+    .lp-content-block h3 { font-size: 19px !important; font-weight: 300 !important; }
+    .lp-content-block h4 { font-size: 18px !important; font-weight: 300 !important; }
+    .lp-content-block h5 { font-size: 16px !important; font-weight: 300 !important; }
+    .lp-content-block h6 { font-size: 14px !important; font-weight: 300 !important; }
+
 
     .lp-content-block p {
         font-size: 14px;
@@ -790,13 +791,20 @@ $occasionTermListArray = array_unique($occasionTermListArray);
         color: #000000;
         text-decoration: underline;
     }
+
+    .lp-content-block div.short_description {
+        column-count: 2;
+    }
+    @media only screen
+    and (max-width: 876px) {
+        .lp-content-block div.short_description {
+            column-count: 1;
+        }
+    }
 </style>
-<section id="description" class="mt-3 mb-5 pb-4">
+<section id="description" class="mt-4 mb-5 pb-4">
   <div class="description lp-content-block row">
       <div class="col-12">
-          <h2>
-              <?php #echo $category_bottomtitle; ?>
-          </h2>
           <div style="position: relative;">
             <div id="categoryDescription" style="max-height: 400px; overflow: hidden;">
               <?php
@@ -814,7 +822,9 @@ $occasionTermListArray = array_unique($occasionTermListArray);
                   $collapsed = true;
               }
 
-              print $description;
+              echo '<div class="short_description">';
+              echo $description;
+              echo '</div>';
               #the_content();
 
               if ($collapsed) {
@@ -860,65 +870,6 @@ $occasionTermListArray = array_unique($occasionTermListArray);
     }
   </script>
 </section>
-
-<!--<section id="description" class="mt-4 mb-5 pt-5">
-  <div class="container">
-    <div class="row">
-      <div class="col-12">
-        <style type="text/css">
-        div.lpdesc h1,
-        div.lpdesc h2,
-        div.lpdesc h3,
-        div.lpdesc h4 {
-          font-family: 'Rubik', 'Inter', sans-serif;
-        }
-        div.lpdesc h2 {
-          font-size: 20px;
-        }
-        div.lpdesc h3 {
-          font-size: 18px;
-        }
-        div.lpdesc h4 {
-          font-size: 16px;
-        }
-
-        h3.altheader  {
-          font-family: 'Rubik', 'Inter', sans-serif;
-          font-size: 20px;
-        }
-        </style>
-        <div class="lpdesc">
-          <?php echo the_content(); ?>
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-12">
-        <?php
-          $var_plural_array = explode(' ', the_title('','',false) );
-        ?>
-        <h3 class="altheader pt-3">Vil du sende sende andet end <?php echo strtolower($var_plural_array[0]); ?>? Se alle butikker i <?php echo get_field('city_name', $page_id); ?></h3>
-      </div>
-      <div class="col-sm-12 col-md-3">
-      <?php
-      $i++;
-      $num = count($postalcodesForFilter);
-      $num4 = ceil($num / 4);
-      $i = 0;
-      foreach($postalcodesForFilter as $postcode){
-        echo '<a href="'.get_permalink($postcode['id']).'" class="text-dark fs-6 fw-light py-1">';
-        print $postcode['title'];
-        echo '</a>';
-        echo '<br>';
-        if(($i % $num4) == 0){
-          print '</div><div class="col-sm-12 col-md-3">';
-        }
-      }
-      ?>
-      </div>
-    </div>
-  </div>
-</section>-->
 </main>
 
 

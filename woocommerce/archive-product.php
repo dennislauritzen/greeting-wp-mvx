@@ -654,15 +654,15 @@ $occasionTermListArray = array_unique($occasionTermListArray);
             .lp-content-block h5,
             .lp-content-block h6
             {
-                font-family: 'Inter','Rubik',sans-serif;
-                font-weight: 400;
+                font-family: 'MS Trebuchet', 'Trebuchet MS', 'Inter', 'Rubik', sans-serif !important;
             }
-            .lp-content-block h1 { font-size: 28px; }
-            .lp-content-block h2 { font-size: 26px; }
-            .lp-content-block h3 { font-size: 23px; }
-            .lp-content-block h4 { font-size: 20px; }
-            .lp-content-block h5 { font-size: 18px; }
-            .lp-content-block h6 { font-size: 16px; }
+            .lp-content-block h1 { font-size: 24px !important; font-weight: 400 !important; }
+            .lp-content-block h2 { font-size: 20px !important; font-weight: 400 !important; }
+            .lp-content-block h3 { font-size: 19px !important; font-weight: 300 !important; }
+            .lp-content-block h4 { font-size: 18px !important; font-weight: 300 !important; }
+            .lp-content-block h5 { font-size: 16px !important; font-weight: 300 !important; }
+            .lp-content-block h6 { font-size: 14px !important; font-weight: 300 !important; }
+
 
             .lp-content-block p {
                 font-size: 14px;
@@ -670,6 +670,16 @@ $occasionTermListArray = array_unique($occasionTermListArray);
             .lp-content-block a {
                 color: #000000;
                 text-decoration: underline;
+            }
+
+            .lp-content-block div.short_description {
+                column-count: 2;
+            }
+            @media only screen
+            and (max-width: 876px) {
+                .lp-content-block div.short_description {
+                    column-count: 1;
+                }
             }
         </style>
         <section id="description" class="description row lp-content-block mt-5 mb-5 pb-4">
@@ -693,7 +703,7 @@ $occasionTermListArray = array_unique($occasionTermListArray);
                                 $collapsed = true;
                             }
 
-                            echo '<div style="column-count: 2;">';
+                            echo '<div class="short_description">';
                             echo $description;
                             echo '</div>';
 

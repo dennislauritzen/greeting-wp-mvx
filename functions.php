@@ -5606,11 +5606,9 @@ function get_vendor_delivery_days_from_today($vendor_id, $prepend_text = '', $de
     #}
 
     $vendor_days = get_vendor_dates_new($vendor_id, 'd-m-Y', 'all', 60);
-    #var_dump($vendor_days);
     $result = [];
 
     $now = new DateTime();
-    #var_dump($now);
 
     foreach ($vendor_days as $p => $c) {
         if(isset($c['cutoff_datetime'])
@@ -5635,9 +5633,13 @@ function get_vendor_delivery_days_from_today($vendor_id, $prepend_text = '', $de
     if(empty($result)){
         return;
     } else {
-        $date_str = $result['date'];
-        $date_obj =  DateTime::createFromFormat('d-m-Y', $date_str);
+        // Create a fallback date object.
+        $date_str = $result['date'].' 00:00:00';
+        $date_obj =  DateTime::createFromFormat('d-m-Y H:i:s', $date_str);
         $date = $date_obj->format('d-m-Y'); // Construct from the date.
+
+        // Current date
+        #$today = new DateTime();
 
         $str = '';
         if($del_type == "1"){
@@ -5661,19 +5663,18 @@ function get_date_diff_text($date){
         return;
     }
 
+    $today = new DateTime('today');
+    $date = new DateTime($date->format('Y-m-d')); // Extracting only the date portion
 
-    $today = new DateTime();
     $date_diff = $today->diff($date);
 
-    #echo "DATOEN=>".var_dump($date);
-    #echo "I DAG=>".var_dump($today);
-    #echo "DIFF=>".var_dump($date_diff);
+    $diff_days = $date_diff->format('%R%a'); // Convert to integer
 
-    if($date_diff->format('%R%a') == '0'){
+    if($diff_days == '0' || $diff_days == '+0'){
         return 'i dag';
-    } else if($date_diff->format('%R%a') == '+1'){
+    } else if($diff_days == '1' || $diff_days == '+1'){
         return 'i morgen';
-    } else if($date_diff->format('%R%a') == '+2'){
+    } else if($diff_days == '2' || $diff_days == '+2'){
         return 'i overmorgen';
     } else {
         return 'om '.$date_diff->format('%a').' dage';
