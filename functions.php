@@ -457,6 +457,7 @@ endif;
  * Deregister Woocommerce styles
  */
 function remove_plugin_bootstrap_styles() {
+    $user = wp_get_current_user();
     ################
     # MVX STYLES
     ################
@@ -470,16 +471,20 @@ function remove_plugin_bootstrap_styles() {
     wp_dequeue_script('mvx_customer_qna_js');
     wp_deregister_script('mvx_customer_qna_js');
 
-    wp_dequeue_script('mvx-bootstrap-script');
-    wp_deregister_script('mvx-bootstrap-script');
+    if ( !in_array('dc_vendor', $user->roles) ) {
+        wp_dequeue_script('mvx-bootstrap-script');
+        wp_deregister_script('mvx-bootstrap-script');
+    }
 
     wp_dequeue_script('mvx_customer_qna_js');
     wp_deregister_script('mvx_customer_qna_js');
 
     ## --- CSS
     // MVX BOOTSTRAP: mvx-bootstrap-style
-    wp_dequeue_style('mvx-bootstrap-style');
-    wp_deregister_style('mvx-bootstrap-style');
+    if ( !in_array('dc_vendor', $user->roles) ) {
+        wp_dequeue_style('mvx-bootstrap-style');
+        wp_deregister_style('mvx-bootstrap-style');
+    }
 
     // MVX SELLER SHOP PAGE: mvx_seller_shop_page_css
     #wp_dequeue_style('mvx_seller_shop_page_css');
@@ -5047,8 +5052,9 @@ function mvx_admin_filter_by_vendor() {
 
 		if($vendors){
 			$vendor_arr = array();
+
 			foreach ($vendors as $vendor) {
-				$vendor_arr[$vendor->term_id] = $vendor->page_title;
+				$vendor_arr[$vendor->term_id] = $vendor->page_title . ' ('. $vendor->user_data->data->display_name . ' - ID :#'.$vendor->id.')';
 			}
 
 		 	asort($vendor_arr);
@@ -5634,6 +5640,7 @@ function get_vendor_delivery_days_from_today($vendor_id, $prepend_text = '', $de
         return;
     } else {
         // Create a fallback date object.
+        // NOTE: Maybe we shouldnt add the '00:00:00'-part... Test it :-)
         $date_str = $result['date'].' 00:00:00';
         $date_obj =  DateTime::createFromFormat('d-m-Y H:i:s', $date_str);
         $date = $date_obj->format('d-m-Y'); // Construct from the date.
@@ -6685,3 +6692,39 @@ add_action('mvx_vendor_dashboard_custom-mvx-menu_endpoint', 'custom_menu_endpoin
  * wp_image_editors
  */
 add_filter( 'wp_image_editors', function() { return array( 'WP_Image_Editor_GD' ); } );
+
+/**
+ * Add a custom quantity text to e-mails
+ *
+ * @param $quantity_html
+ * @param $item
+ * @param $item_id
+ * @param $order
+ * @return string
+ */
+function custom_order_item_quantity_html($quantity_html) {
+    $quantity = $quantity_html . ' stk.';
+    // Return the modified quantity HTML
+    return $quantity;
+}
+add_filter('mvx_order_item_quantity_text', 'custom_order_item_quantity_html', 10, 4);
+
+
+/**
+ * Disable autocreate vendor shipping class
+*/
+add_filter('mvx_add_vendor_shipping_class', '__return_false');
+
+/**
+ * Disable automatic VendorX reports
+ */
+apply_filters('mvx_do_schedule_cron_vendor_monthly_order_stats', true);
+add_filter('mvx_enabled_vendor_weekly_report_mail', '__return_false');
+
+/* Allow vendors to view/choose admin created shipping classes */
+add_filter('mvx_allowed_only_vendor_shipping_class', '__return_false');
+add_action('init', 'init_mvx');
+function init_mvx(){
+   global $MVX;
+   remove_filter('woocommerce_product_options_shipping', array($MVX->vendor_dashboard, 'mvx_product_options_shipping'), 5);
+}

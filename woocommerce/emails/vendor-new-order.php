@@ -2,15 +2,16 @@
 /**
  * The template for displaying demo plugin content.
  *
- * Override this template by copying it to yourtheme/dc-product-vendor/emails-old/vendor-new-order.php
+ * Override this template by copying it to yourtheme/MultiVendorX/emails/vendor-new-order.php
  *
- * @author 		WC Marketplace
- * @package 	dc-product-vendor/Templates
- * @version   0.0.1
+ * @author 		MultiVendorX
+ * @package     MultiVendorX/Templates
+ * @version     0.0.1
  */
 if (!defined('ABSPATH'))
     exit; // Exit if accessed directly
-global $WCMp;
+
+global $MVX;
 $vendor = get_mvx_vendor(absint($vendor_id));
 
 do_action( 'woocommerce_email_header', $email_heading, $email );
@@ -36,8 +37,8 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
     </tbody>
 </table>
 <?php
-if (apply_filters('show_cust_order_calulations_field', true, $vendor->id)) {
-    ?>
+if (apply_filters('show_cust_order_calulations_field', true, $vendor->id)){
+?>
     <table cellspacing="0" cellpadding="6" style="width: 100%; border: 1px solid #eee;" border="1" bordercolor="#eee">
         <?php
         $totals = $vendor->mvx_vendor_get_order_item_totals($order, $vendor->term_id);
@@ -46,7 +47,8 @@ if (apply_filters('show_cust_order_calulations_field', true, $vendor->id)) {
                 ?><tr>
                     <th scope="row" colspan="2" style="text-align:left; border: 1px solid #eee;"><?php echo $total['label']; ?></th>
                     <td style="text-align:<?php echo $text_align; ?>; border: 1px solid #eee;"><?php echo $total['value']; ?></td>
-                </tr><?php
+                </tr>
+        <?php
             }
         }
         if ( $order->get_customer_note() ) {
@@ -59,9 +61,9 @@ if (apply_filters('show_cust_order_calulations_field', true, $vendor->id)) {
         }
         ?>
     </table>
-    <?php
-    }
-    ?>
+<?php
+}
+?>
 
     <h2><?php __('Delivery Details', 'dc-woocommerce-multi-vendor'); ?></h2>
     <?php if ( !empty(get_post_meta($order->get_id(), '_delivery_date', true)) ) { $delivery_date = get_post_meta( $order_id, '_delivery_date', true ); } else { $delivery_date = 'Hurtigst muligt'; } ?>

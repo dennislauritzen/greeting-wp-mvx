@@ -17,7 +17,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-global $product, $WCMp;
+global $product, $MVX;
 
 
 
@@ -73,6 +73,7 @@ global $product, $WCMp;
                  */
                 do_action( 'woocommerce_single_product_summary' );
             ?>
+
             <div class="col-12 bg-light-grey">
               <div class="container py-3">
                 <div class="row">
@@ -102,6 +103,45 @@ global $product, $WCMp;
                 </div>
               </div>
             </div>
+
+
+            <?php
+            // Get the product categories
+            $categories = get_the_terms( get_the_ID(), 'product_cat' );
+
+            // Check if categories exist
+            if ( $categories && !is_wp_error( $categories ) ) {
+                $default_category_id = get_option( 'default_product_cat' );
+
+                echo '<div class="product-categories mt-3 mb-2">';
+                echo '<span style="font-size: 14px;">Kategorier: </span>';
+                foreach ( $categories as $category ) {
+                    if(!empty($default_category_id) && !empty($category->term_id) && $category->term_id == $default_category_id){
+                        continue;
+                    }
+                    $category_link = get_term_link( $category );
+                    echo '<a href="' . esc_url( $category_link ) . '" class="badge border border-grey text-dark me-1 mb-1 px-2 py-2 fw-normal">' . esc_html( $category->name ) . '</a>';
+                }
+                echo '</div>';
+            }
+            ?>
+
+            <?php
+            // Get the product occasions
+            $categories = get_the_terms( get_the_ID(), 'occasion' );
+
+            // Check if categories exist
+            if ( $categories && ! is_wp_error( $categories ) ) {
+                echo '<div class="product-categories mb-2">';
+                echo '<span style="font-size: 14px;">Anledninger: </span>';
+                foreach ( $categories as $category ) {
+                    $category_link = get_term_link( $category );
+                    echo '<a href="' . esc_url( $category_link ) . '" class="badge border border-grey text-dark me-1 mb-1 px-2 py-2 fw-normal">' . esc_html( $category->name ) . '</a>';
+                }
+                echo '</div>';
+            }
+            ?>
+
         </div>
       </div><!-- .row -->
 	</div><!-- closing div of content-holder -->
