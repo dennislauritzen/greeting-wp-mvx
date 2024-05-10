@@ -1140,6 +1140,8 @@ function catocca_landing_data_fetch(){
 function categoryAndOccasionVendorFilterAction() {
     global $wpdb;
 
+    print "TEST";
+
     // default user array come from front end
     $cityDefaultUserIdAsString = $_POST['cityDefaultUserIdAsString'];
     $defaultUserArray = explode(",", $cityDefaultUserIdAsString);
