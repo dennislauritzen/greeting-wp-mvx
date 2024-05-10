@@ -1140,8 +1140,6 @@ function catocca_landing_data_fetch(){
 function categoryAndOccasionVendorFilterAction() {
     global $wpdb;
 
-    print "TEST";
-
     // default user array come from front end
     $cityDefaultUserIdAsString = $_POST['cityDefaultUserIdAsString'];
     $defaultUserArray = explode(",", $cityDefaultUserIdAsString);
@@ -1172,6 +1170,7 @@ function categoryAndOccasionVendorFilterAction() {
  	$filteredDate = new DateTime();
  	$filteredDate->modify('+'.$deliveryDate.' days');
  	$selectedDate = $filteredDate->format('d-m-Y');
+    $selectedDate2 = $filteredDate->format('dmY');
  	$selectedDay = $filteredDate->format('N');
 
  	// delivery filter data
@@ -1314,10 +1313,10 @@ function categoryAndOccasionVendorFilterAction() {
  				$closedThisDate = 1;
  			}
 
-             var_dump($selectedDate);
-             var_dump($vendor_extraordinary_dates);
+            var_dump($selectedDate);
+            var_dump($vendor_extraordinary_dates);
 
-            if(in_array($selectedDate, $vendor_extraordinary_dates)){
+            if(in_array($selectedDate, $vendor_extraordinary_dates) |){
                 $open_this_day = 1;
                 $closedThisDate = 0;
             }
