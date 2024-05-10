@@ -1316,7 +1316,7 @@ function categoryAndOccasionVendorFilterAction() {
             var_dump($selectedDate);
             var_dump($vendor_extraordinary_dates);
 
-            if(in_array($selectedDate, $vendor_extraordinary_dates) |){
+            if(in_array($selectedDate, $vendor_extraordinary_dates) || in_array($selectedDate2, $vendor_extraordinary_dates)){
                 $open_this_day = 1;
                 $closedThisDate = 0;
             }
