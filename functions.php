@@ -1241,22 +1241,26 @@ function categoryAndOccasionVendorFilterAction() {
 
         $meta_key = 'vendor_require_delivery_day';
 
-        if($deliveryDate < 8){
-            $date_calc = new DateTime();
-            $date_calc->modify('+'.$deliveryDate. 'days');
+        ###########
+        ## Calculate the date type.
+        ## Used in the rest of the function
+        ## ----
+        $date_calc = new DateTime();
+        $date_calc->modify('+'.$deliveryDate. 'days');
 
-            $date_weekday = $date_calc->format('N');
-            $global_holidays = get_global_days('holidays');
+        $date_weekday = $date_calc->format('N');
+        $global_holidays = get_global_days('holidays');
 
+        $type = 'weekday';
+        if ($date_weekday >= 1 && $date_weekday <= 5) {
             $type = 'weekday';
-            if ($date_weekday >= 1 && $date_weekday <= 5) {
-                $type = 'weekday';
-            } elseif ($date_weekday >= 6 && $date_weekday <= 7) {
-                $type = 'weekend';
-            }
-            $date_type = in_array($date_calc->format('d-m-Y'), $global_holidays) ? 'holiday' : $type;
+        } elseif ($date_weekday >= 6 && $date_weekday <= 7) {
+            $type = 'weekend';
+        }
+        $date_type = in_array($date_calc->format('d-m-Y'), $global_holidays) ? 'holiday' : $type;
 
 
+        if($deliveryDate < 8){
             if($date_type == 'weekday' || $deliveryDate >= 8){
                 $meta_key = 'order_days_before_weekday';
             } else if ($date_type == 'weekend'){
@@ -1286,10 +1290,13 @@ function categoryAndOccasionVendorFilterAction() {
  		$delDateArr = $usersByDelDateFilter->get_results();
 
  		foreach($delDateArr as $v){
- 			$dropoff_time 		= get_field('vendor_drop_off_time','user_'.$v->ID);
- 			$delDate 			= get_field('vendor_require_delivery_day','user_'.$v->ID);
+ 			#$dropoff_time 		= get_field('vendor_drop_off_time','user_'.$v->ID);
+            $dropoff_time       = get_vendor_dropoff_time($v->ID, $date_type);
+ 			#$delDate 			= get_field('vendor_require_delivery_day','user_'.$v->ID);
+            $delDate            = get_vendor_delivery_days_required($v->ID, $date_type);
  			$closedDatesArr		= get_vendor_closed_dates($v->ID);
  			$delWeekDays	    = get_field('openning','user_'.$v->ID);
+            $vendor_extraordinary_dates = get_vendor_delivery_dates_extraordinary($v->ID);
 
  			$open_iso_days = array();
  			foreach($delWeekDays as $key => $val){
@@ -1304,6 +1311,11 @@ function categoryAndOccasionVendorFilterAction() {
  			if(in_array($selectedDate, $closedDatesArr)){
  				$closedThisDate = 1;
  			}
+
+            if(in_array($selectedDate, $vendor_extraordinary_dates)){
+                $open_this_day = 1;
+                $closedThisDate = 0;
+            }
 
  			if($deliveryDate < $delDate){
  				// Can't delivery on selected date.
