@@ -1237,20 +1237,52 @@ function categoryAndOccasionVendorFilterAction() {
  	// FILTER: Delivery DATE
  	// Prepare the statement for delivery array
  	if($deliveryDate >= 0 && $deliveryDate < 8){
+        $chosen_delivery_date = $deliveryDate;
+
+        $meta_key = 'vendor_require_delivery_day';
+
+        if($deliveryDate < 8){
+            $date_calc = new DateTime();
+            $date_calc->modify('+'.$deliveryDate. 'days');
+
+            $date_weekday = $date_calc->format('N');
+            $global_holidays = get_global_days('holidays');
+
+            $type = 'weekday';
+            if ($date_weekday >= 1 && $date_weekday <= 5) {
+                $type = 'weekday';
+            } elseif ($date_weekday >= 6 && $date_weekday <= 7) {
+                $type = 'weekend';
+            }
+            $date_type = in_array($date_calc->format('d-m-Y'), $global_holidays) ? 'holiday' : $type;
+
+
+            if($date_type == 'weekday' || $deliveryDate >= 8){
+                $meta_key = 'order_days_before_weekday';
+            } else if ($date_type == 'weekend'){
+                $meta_key = 'order_days_before_weekend';
+            } else if($date_type == 'holiday'){
+                $meta_key = 'order_days_before_holiday';
+            }
+        } else {
+            $meta_key = 'order_days_before_weekday';
+        }
+
+
  		$args = array(
  			'role' => 'dc_vendor',
  			'meta_query' => array(
- 						'key' => 'vendor_require_delivery_day',
- 						'value' => $deliveryDate,
- 						'compare' => '<=',
- 						'type' => 'NUMERIC'
- 				)
+                'key' => $meta_key,
+                'value' => $deliveryDate,
+                'compare' => '<=',
+                'type' => 'NUMERIC'
+            )
  		);
 
  		// (v) @todo: Move cut-off time out of the query and into PHP.
  		// (v) @todo: Make sure the store is not closed on the given date!!!! Make a PHP check.
 
- 		$usersByDelDateFilter = new WP_User_Query( $args	);
+ 		$usersByDelDateFilter = new WP_User_Query( $args );
  		$delDateArr = $usersByDelDateFilter->get_results();
 
  		foreach($delDateArr as $v){
