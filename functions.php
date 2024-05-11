@@ -1159,7 +1159,7 @@ function categoryAndOccasionVendorFilterAction() {
     $defaultIdCatOcca = is_array($idCatOccaArray) ? $idCatOccaArray : array();
 
     // delivery date
-    $deliveryDate = empty($_POST['delDate']) ? (int) $_POST['delDate'] : 8;
+    $deliveryDate = empty($_POST['delDate']) ? 8 : $_POST['delDate'];
     if(empty($deliveryDate) && $deliveryDate != 0){
         $deliveryDate = 8;
     } else if(!is_numeric($deliveryDate) || $deliveryDate < 0){
@@ -1170,6 +1170,7 @@ function categoryAndOccasionVendorFilterAction() {
     $filteredDate = new DateTime();
     $filteredDate->modify('+'.$deliveryDate.' days');
     $selectedDate = $filteredDate->format('d-m-Y');
+    $selectedDate2 = $filteredDate->format('dmY');
     $selectedDay = $filteredDate->format('N');
 
     // delivery filter data
@@ -1207,17 +1208,17 @@ function categoryAndOccasionVendorFilterAction() {
 
 
         $sql = "SELECT
- 			p.post_author
- 		FROM ".$wpdb->prefix."posts p
- 		WHERE
- 			p.ID IN (
- 				SELECT
- 					tm.object_id
- 				FROM ".$wpdb->prefix."term_relationships tm
- 				WHERE tm.term_taxonomy_id IN (".implode(", ",$placeholder_arr).")
- 		  )
- 			AND p.post_status = 'publish'
- 		GROUP BY p.post_author";
+                    p.post_author
+                FROM ".$wpdb->prefix."posts p
+                WHERE
+                    p.ID IN (
+                        SELECT
+                            tm.object_id
+                        FROM ".$wpdb->prefix."term_relationships tm
+                        WHERE tm.term_taxonomy_id IN (".implode(", ",$placeholder_arr).")
+                  )
+                    AND p.post_status = 'publish'
+                GROUP BY p.post_author";
 
         $getStoreUserDataBasedOnProduct = $wpdb->prepare($sql, $where);
         $storeUserCatOccaResults = $wpdb->get_results($getStoreUserDataBasedOnProduct);
@@ -1258,6 +1259,7 @@ function categoryAndOccasionVendorFilterAction() {
             $delDate 			= get_field('vendor_require_delivery_day','user_'.$v->ID);
             $closedDatesArr		= get_vendor_closed_dates($v->ID);
             $delWeekDays	    = get_field('openning','user_'.$v->ID);
+            $vendor_extraordinary_dates = get_vendor_delivery_dates_extraordinary($v->ID);
 
             $open_iso_days = array();
             foreach($delWeekDays as $key => $val){
@@ -1273,7 +1275,14 @@ function categoryAndOccasionVendorFilterAction() {
                 $closedThisDate = 1;
             }
 
-            if($deliveryDate < $delDate){
+            if (in_array($selectedDate, $vendor_extraordinary_dates) || in_array($selectedDate2, $vendor_extraordinary_dates)) {
+                $open_this_day = 1;
+                $closedThisDate = 0;
+            }
+
+            if (in_array($selectedDate, $vendor_extraordinary_dates) || in_array($selectedDate2, $vendor_extraordinary_dates)) {
+                array_push($userIdArrayGetFromDelDate, (string) $v->ID);
+            } else if($deliveryDate < $delDate){
                 // Can't delivery on selected date.
             } else if($deliveryDate == $delDate && $dropoff_time < date("H")){
                 // Can't deliver on selected date because time has passed cutoff.
@@ -1299,35 +1308,35 @@ function categoryAndOccasionVendorFilterAction() {
     // Filter Postal Code
     //
     $sql = "SELECT u.ID, umm1.meta_value AS dropoff_time, umm2.meta_value AS require_delivery_day, umm3.meta_value AS delivery_type
-	          FROM {$wpdb->prefix}users u
-	          LEFT JOIN {$wpdb->prefix}usermeta umm1 ON u.ID = umm1.user_id AND umm1.meta_key = 'vendor_drop_off_time'
-	          LEFT JOIN {$wpdb->prefix}usermeta umm2 ON u.ID = umm2.user_id AND umm2.meta_key = 'vendor_require_delivery_day'
-	          LEFT JOIN {$wpdb->prefix}usermeta umm3 ON u.ID = umm3.user_id AND umm3.meta_key = 'delivery_type'
-	          WHERE EXISTS (
-	              SELECT 1
-	              FROM {$wpdb->prefix}usermeta um
-	              WHERE um.user_id = u.ID AND um.meta_key = 'delivery_zips' AND um.meta_value LIKE %s
-	          )
-	          AND NOT EXISTS (
-	              SELECT 1
-	              FROM {$wpdb->prefix}usermeta um2
-	              WHERE um2.user_id = u.ID AND um2.meta_key = 'vendor_turn_off'
-	          )
-	          AND EXISTS (
-	              SELECT 1
-	              FROM {$wpdb->prefix}usermeta um5
-	              WHERE um5.user_id = u.ID AND um5.meta_key = 'wp_capabilities' AND um5.meta_value LIKE %s
-	          )
-	          ORDER BY
-	          umm3.meta_value DESC,
-	          CASE u.ID
-	              WHEN 38 THEN 0
-	              WHEN 76 THEN 0
-	              ELSE 1
-	          END DESC,
-	          umm2.meta_value ASC,
-	          umm2.meta_value DESC
-	        	";
+          FROM {$wpdb->prefix}users u
+          LEFT JOIN {$wpdb->prefix}usermeta umm1 ON u.ID = umm1.user_id AND umm1.meta_key = 'vendor_drop_off_time'
+          LEFT JOIN {$wpdb->prefix}usermeta umm2 ON u.ID = umm2.user_id AND umm2.meta_key = 'vendor_require_delivery_day'
+          LEFT JOIN {$wpdb->prefix}usermeta umm3 ON u.ID = umm3.user_id AND umm3.meta_key = 'delivery_type'
+          WHERE EXISTS (
+              SELECT 1
+              FROM {$wpdb->prefix}usermeta um
+              WHERE um.user_id = u.ID AND um.meta_key = 'delivery_zips' AND um.meta_value LIKE %s
+          )
+          AND NOT EXISTS (
+              SELECT 1
+              FROM {$wpdb->prefix}usermeta um2
+              WHERE um2.user_id = u.ID AND um2.meta_key = 'vendor_turn_off'
+          )
+          AND EXISTS (
+              SELECT 1
+              FROM {$wpdb->prefix}usermeta um5
+              WHERE um5.user_id = u.ID AND um5.meta_key = 'wp_capabilities' AND um5.meta_value LIKE %s
+          )
+          ORDER BY
+          umm3.meta_value DESC,
+          CASE u.ID
+              WHEN 38 THEN 0
+              WHEN 76 THEN 0
+              ELSE 1
+          END DESC,
+          umm2.meta_value ASC,
+          umm2.meta_value DESC";
+
     $vendor_query = $wpdb->prepare($sql, '%'.$postal_code.'%', '%dc_vendor%');
     $vendor_arr = $wpdb->get_results($vendor_query);
 
@@ -1390,14 +1399,14 @@ function categoryAndOccasionVendorFilterAction() {
     $author_ids = $wpdb->get_col(
         $wpdb->prepare(
             "
- 	        SELECT DISTINCT(p.post_author)
- 	        FROM {$wpdb->prefix}posts p
- 	        INNER JOIN {$wpdb->prefix}postmeta pm ON p.ID = pm.post_id
- 	        WHERE (p.post_type = 'product' OR p.post_type = 'product_variation')
- 	        AND p.post_status = 'publish'
- 	        AND pm.meta_key = '_price'
- 	        AND pm.meta_value BETWEEN %d AND %d
- 	        ",
+        SELECT DISTINCT(p.post_author)
+        FROM {$wpdb->prefix}posts p
+        INNER JOIN {$wpdb->prefix}postmeta pm ON p.ID = pm.post_id
+        WHERE (p.post_type = 'product' OR p.post_type = 'product_variation')
+        AND p.post_status = 'publish'
+        AND pm.meta_key = '_price'
+        AND pm.meta_value BETWEEN %d AND %d
+        ",
             $inputMinPrice,
             $inputMaxPrice
         )
@@ -1422,7 +1431,6 @@ function categoryAndOccasionVendorFilterAction() {
     //Variable holding the boolean controlling if it is the first freight store.
     $first = 0;
     if(!empty($return_arr)){
-
         foreach ($return_arr as $filteredUser) {
             $vendor_int = (int) $filteredUser;
 
