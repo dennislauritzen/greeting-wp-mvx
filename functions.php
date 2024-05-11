@@ -1422,7 +1422,7 @@ function categoryAndOccasionVendorFilterAction() {
     //Variable holding the boolean controlling if it is the first freight store.
     $first = 0;
     if(!empty($return_arr)){
-        print "test";
+
         foreach ($return_arr as $filteredUser) {
             $vendor_int = (int) $filteredUser;
 
@@ -1452,8 +1452,8 @@ function categoryAndOccasionVendorFilterAction() {
     }
     wp_die();
 }
-add_action( 'wp_ajax_catOccaDeliveryAction', 'catOccaDeliveryAction' );
-add_action( 'wp_ajax_nopriv_catOccaDeliveryAction', 'catOccaDeliveryAction' );
+add_action( 'wp_ajax_catOccaDeliveryAction', 'categoryAndOccasionVendorFilterAction' );
+add_action( 'wp_ajax_nopriv_catOccaDeliveryAction', 'categoryAndOccasionVendorFilterAction' );
 
 
 /**

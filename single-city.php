@@ -343,10 +343,21 @@ document.addEventListener("DOMContentLoaded", function() {
              * ---------------------
             **/
             $dates = array();
+            setlocale(LC_TIME, 'da_DK.UTF-8'); // Set the locale to Danish
             $date_today = new DateTime('now');
+
+            $danish_month_names = array(
+                'jan' => 'jan', 'feb' => 'feb', 'mar' => 'mar', 'apr' => 'apr',
+                'may' => 'maj', 'jun' => 'jun', 'jul' => 'jul', 'aug' => 'aug',
+                'sep' => 'sep', 'oct' => 'okt', 'nov' => 'nov', 'dec' => 'dec'
+            );
+
             for($i=0;$i<7;$i++){
-              $dates[$i] = strtolower($date_today->format('d. M'));
-              $date_today->modify('+1 day');
+                $formatted_date = strtolower($date_today->format('d. M'));
+                $month_abbr = strtolower($date_today->format('M'));
+                $formatted_date = str_replace($month_abbr, $danish_month_names[$month_abbr], $formatted_date);
+                $dates[$i] = $formatted_date;
+                $date_today->modify('+1 day');
             }
             $dates[8] = 'Vis alle';
 
