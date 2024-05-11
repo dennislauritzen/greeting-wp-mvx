@@ -1065,7 +1065,7 @@ get_footer( );
 				}
 
 				var data = {
-					'action': 'categoryAndOccasionVendorFilterAction',
+					action: 'categoryAndOccasionVendorFilterAction',
 					cityDefaultUserIdAsString: jQuery("#categoryDefaultUserIdAsString").val(),
 					delDate: delDate,
 					catOccaIdArray: catOccaIdArray,

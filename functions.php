@@ -1454,7 +1454,8 @@ function categoryAndOccasionVendorFilterAction() {
 }
 add_action( 'wp_ajax_catOccaDeliveryAction', 'categoryAndOccasionVendorFilterAction' );
 add_action( 'wp_ajax_nopriv_catOccaDeliveryAction', 'categoryAndOccasionVendorFilterAction' );
-
+add_action( 'wp_ajax_categoryAndOccasionVendorFilterAction', 'categoryAndOccasionVendorFilterAction' );
+add_action( 'wp_ajax_nopriv_categoryAndOccasionVendorFilterAction', 'categoryAndOccasionVendorFilterAction' );
 
 /**
  * Vendor filter on Landing Page
