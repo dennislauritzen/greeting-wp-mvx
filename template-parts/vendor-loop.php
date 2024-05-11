@@ -152,8 +152,24 @@ if($args['vendor']){
               $interval = $today->diff($openingDate);
               return $interval->days >= 0 && $interval->days < 10;
             });
+
+            // Replace English month abbreviations with Danish ones
+            $danish_month_names = array(
+              'jan' => 'jan', 'feb' => 'feb', 'mar' => 'mar', 'apr' => 'apr',
+              'may' => 'maj', 'jun' => 'jun', 'jul' => 'jul', 'aug' => 'aug',
+              'sep' => 'sep', 'oct' => 'okt', 'nov' => 'nov', 'dec' => 'dec'
+            );
+
+            // Format filtered dates to Danish format "d. M"
+            $formatted_dates = array_map(function ($date_str) use ($danish_month_names) {
+              $openingDate = DateTime::createFromFormat('d-m-Y', $date_str);
+              $month_abbr = strtolower($openingDate->format('M'));
+              $danish_month = isset($danish_month_names[$month_abbr]) ? $danish_month_names[$month_abbr] : $month_abbr;
+              return str_replace($openingDate->format('M'), $danish_month, $openingDate->format('d. M'));
+            }, $filtered_dates);
+
             // Join the filtered dates with commas
-            $dates_string = implode(', ', $filtered_dates);
+            $dates_string = implode(', ', $formatted_dates);
 
             $opening = get_field('openning', 'user_'.$vendor_id);
             $str = get_del_days_text($opening, $delivery_type);
