@@ -144,8 +144,24 @@ if($args['vendor']){
             <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
           </svg>
           <?php
+            $extraordinary_dates = get_vendor_delivery_dates_extraordinary($vendor_id);
+            // Filter dates within the next 10 days
+            $filtered_dates = array_filter($extraordinary_dates, function ($date_str) {
+              $openingDate = DateTime::createFromFormat('d-m-Y', $date_str);
+              $today = new DateTime('today');
+              $interval = $today->diff($openingDate);
+              return $interval->days >= 0 && $interval->days < 10;
+            });
+            // Join the filtered dates with commas
+            $dates_string = implode(', ', $filtered_dates);
+
             $opening = get_field('openning', 'user_'.$vendor_id);
-            echo get_del_days_text($opening, $delivery_type);
+            $str = get_del_days_text($opening, $delivery_type);
+            if(count($filtered_dates) > 0) {
+                $str .= ' (og ' . $dates_string . ')';
+            }
+
+            echo $str;
           ?>
         </div>
       </small>
