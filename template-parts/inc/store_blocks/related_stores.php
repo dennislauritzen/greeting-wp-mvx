@@ -13,7 +13,7 @@ if(!empty($ip_detail_ipinfo) AND (isset($ip_detail_ipinfo->postal) || isset($ip_
 } else if(!empty($_SESSION['get_user_postal'])){
   $user_postal = $_SESSION['get_user_postal'];
 } else {
-  $user_postal = '';
+  $user_postal = !empty(get_user_meta($vendor_id2, '_vendor_postcode', true)) ? get_user_meta($vendor_id2, '_vendor_postcode', true) : '';
 }
 
 if(!empty($user_postal)){
