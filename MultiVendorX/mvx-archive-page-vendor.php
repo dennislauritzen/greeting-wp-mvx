@@ -676,8 +676,8 @@ do_action('after_mvx_vendor_description', $vendorId);
           print '<ul>'.$list.'</ul>';
         }
 
-				// --- END of CLOSED DATES --- Dennis.
-				?>
+        // --- END of CLOSED DATES --- Dennis.
+        ?>
       </div>
     </div>
   </div>

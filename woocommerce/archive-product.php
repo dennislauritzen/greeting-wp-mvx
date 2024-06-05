@@ -951,11 +951,11 @@ get_footer( );
 			            var city = v.city;
 
 			            var div_elm = jQuery("<li>", {"class": "list-inline-item pb-1 me-0 ms-0 pe-1"});
-									var card_link = jQuery("<a>",{"class": "ip-recomms-link btn btn-link rounded-pill pb-2 border-1 border-white text-white",
-																								"href": "#",
-																								"data-postal": postal,
-																								"data-city": city,
-																								"data-city-link": link}).text(postal+' '+city).css('font-size','15px');
+                        var card_link = jQuery("<a>",{"class": "ip-recomms-link btn btn-link rounded-pill pb-2 border-1 border-white text-white",
+                                                                                    "href": "#",
+                                                                                    "data-postal": postal,
+                                                                                    "data-city": city,
+                                                                                    "data-city-link": link}).text(postal+' '+city).css('font-size','15px');
 			            div_elm.append(card_link);
 
 			            jQuery("ul#lp-postalcodelist").append(div_elm);
@@ -981,204 +981,203 @@ get_footer( );
 			    });
 				});
 		  });
-			// Filter badges on the vendor page.
-			function setFilterBadgeCity(label, id, dataRemove){
-				const elm = document.createElement('div');
-				elm.id = 'filter'+dataRemove;
-				elm.classList.add('badge', 'rounded-pill', 'border-yellow', 'py-2', 'pe-2', 'my-1', 'me-1', 'text-dark', 'dynamic-filters');
-				elm.href = '#';
-				elm.innerHTML = label;
+// Filter badges on the vendor page.
+function setFilterBadgeCity(label, id, dataRemove){
+    const elm = document.createElement('div');
+    elm.id = 'filter'+dataRemove;
+    elm.classList.add('badge', 'rounded-pill', 'border-yellow', 'py-2', 'pe-2', 'my-1', 'me-1', 'text-dark', 'dynamic-filters');
+    elm.href = '#';
+    elm.innerHTML = label;
 
-				const elmbtn = document.createElement('button');
-				elmbtn.type = 'button';
-				elmbtn.classList.add('btn-close', 'filter-btn-delete', 'ms-1');
-				elmbtn.dataset.filterId = id;
-				var useableLabel = label.replace(/ /g,'').replace(/(?:\r\n|\r|\n)/g,'').replace(/\./g,'');
-				elmbtn.dataset.label = useableLabel;
+    const elmbtn = document.createElement('button');
+    elmbtn.type = 'button';
+    elmbtn.classList.add('btn-close', 'filter-btn-delete', 'ms-1');
+    elmbtn.dataset.filterId = id;
+    var useableLabel = label.replace(/ /g,'').replace(/(?:\r\n|\r|\n)/g,'').replace(/\./g,'');
+    elmbtn.dataset.label = useableLabel;
 
-				if(id !='filterpostalcode_id'){
-					elmbtn.onclick = function(){removeFilterBadgeCity('"'+useableLabel+'"', id, dataRemove, true);};
-				}
-				elmbtn.dataset.filterRemove = dataRemove;
-				elm.appendChild(elmbtn);
+    if(id !='filterpostalcode_id'){
+        elmbtn.onclick = function(){removeFilterBadgeCity('"'+useableLabel+'"', id, dataRemove, true);};
+    }
+    elmbtn.dataset.filterRemove = dataRemove;
+    elm.appendChild(elmbtn);
 
-				jQuery('div.filter-list').prepend(elm);
-			}
-			function removeFilterBadgeCity(label, id, dataRemove, updateVendors){
-				jQuery('#filter'+dataRemove).remove();
+    jQuery('div.filter-list').prepend(elm);
+}
+function removeFilterBadgeCity(label, id, dataRemove, updateVendors){
+    jQuery('#filter'+dataRemove).remove();
 
-				// Check if dataRemove is delivery date, then erase checks and check the defauls.
-				if (dataRemove.includes("filter_delivery_date")){
-					jQuery("input#filter_delivery_date_8").prop('checked',true);
-					jQuery('#'+dataRemove).prop('checked',false);
-				}
+    // Check if dataRemove is delivery date, then erase checks and check the defauls.
+    if (dataRemove.includes("filter_delivery_date")){
+        jQuery("input#filter_delivery_date_8").prop('checked',true);
+        jQuery('#'+dataRemove).prop('checked',false);
+    }
 
-				if(updateVendors === true){
-					var elmId = dataRemove;
-					document.getElementById(elmId).checked = false;
-					update();
-				}
-			}
+    if(updateVendors === true){
+        var elmId = dataRemove;
+        document.getElementById(elmId).checked = false;
+        update();
+    }
+}
 
-			function update(){
-				var ajaxurl = "<?php echo admin_url('admin-ajax.php');?>";
+function update(){
+    var ajaxurl = "<?php echo admin_url('admin-ajax.php');?>";
 
-				var cityName = window.localStorage.getItem('city');
-				var postalCode = window.localStorage.getItem('postalcode');
+    var cityName = window.localStorage.getItem('city');
+    var postalCode = window.localStorage.getItem('postalcode');
 
-				if(!cityName || !postalCode){
-					return;
-				}
+    if(!cityName || !postalCode){
+        return;
+    }
 
-				var categoryId = jQuery("#_hid_cat_id").val();
-				catOccaIdArray = [];
-				deliveryIdArray = [];
-				inputPriceRangeArray = [];
+    var categoryId = jQuery("#_hid_cat_id").val();
+    catOccaIdArray = [];
+    deliveryIdArray = [];
+    inputPriceRangeArray = [];
 
-				// Make the loading...
-				jQuery('.loadingHeartBeat').show();
-				jQuery('#defaultStore').hide();
-				jQuery('.filteredStore').hide();
+    // Make the loading...
+    jQuery('.loadingHeartBeat').show();
+    jQuery('#defaultStore').hide();
+    jQuery('.filteredStore').hide();
 
-				// Chosen delivery date
-				var delDate = jQuery('input[name=filter_del_days_city]:checked').val();
+    // Chosen delivery date
+    var delDate = jQuery('input[name=filter_del_days_city]:checked').val();
 
-				jQuery("input:checkbox[name=filter_catocca_city]:checked").each(function(){
-					catOccaIdArray.push(jQuery(this).val());
-				});
-				//catOccaIdArray.push(categoryId);
-				jQuery("input:checkbox[name=filter_del_city]:checked").each(function(){
-					deliveryIdArray.push(jQuery(this).val());
-				});
+    jQuery("input:checkbox[name=filter_catocca_city]:checked").each(function(){
+        catOccaIdArray.push(jQuery(this).val());
+    });
+    //catOccaIdArray.push(categoryId);
+    jQuery("input:checkbox[name=filter_del_city]:checked").each(function(){
+        deliveryIdArray.push(jQuery(this).val());
+    });
 
 
-				if(jQuery('input[name=filter_del_price]').is(':checked')){
-					var pricearray = [];
-					jQuery("input:checkbox[name=filter_del_price]:checked").each(function(){
-						var price = jQuery(this).val().split("-");
-						pricearray.push(price[0]);
-						pricearray.push(price[1]);
-					});
-					var inputPriceRange = [Math.min.apply(Math,pricearray), Math.max.apply(Math,pricearray)];
-				} else {
-					var inputPriceRange = jQuery('input[name=filter_del_price_default]').val().split("-");
-				}
+    if(jQuery('input[name=filter_del_price]').is(':checked')){
+        var pricearray = [];
+        jQuery("input:checkbox[name=filter_del_price]:checked").each(function(){
+            var price = jQuery(this).val().split("-");
+            pricearray.push(price[0]);
+            pricearray.push(price[1]);
+        });
+        var inputPriceRange = [Math.min.apply(Math,pricearray), Math.max.apply(Math,pricearray)];
+    } else {
+        var inputPriceRange = jQuery('input[name=filter_del_price_default]').val().split("-");
+    }
 
-				var data = {
-					action: 'categoryAndOccasionVendorFilterAction',
-					cityDefaultUserIdAsString: jQuery("#categoryDefaultUserIdAsString").val(),
-					delDate: delDate,
-					catOccaIdArray: catOccaIdArray,
-					deliveryIdArray: deliveryIdArray,
-					inputPriceRangeArray: inputPriceRange,
-					cityName: cityName,
-					postalCode: postalCode
-				};
-				jQuery.post(ajaxurl, data, function(response) {
-					jQuery('#defaultStore').hide();
-					jQuery('.filteredStore').show();
-					jQuery('.filteredStore').html(response);
-					jQuery('.loadingHeartBeat').hide();
+    var data = {
+        action: 'categoryAndOccasionVendorFilterAction',
+        cityDefaultUserIdAsString: jQuery("#categoryDefaultUserIdAsString").val(),
+        delDate: delDate,
+        catOccaIdArray: catOccaIdArray,
+        deliveryIdArray: deliveryIdArray,
+        inputPriceRangeArray: inputPriceRange,
+        cityName: cityName,
+        postalCode: postalCode
+    };
+    jQuery.post(ajaxurl, data, function(response) {
+        jQuery('#defaultStore').hide();
+        jQuery('.filteredStore').show();
+        jQuery('.filteredStore').html(response);
+        jQuery('.loadingHeartBeat').hide();
 
-					if(catOccaIdArray.length == 0 && deliveryIdArray.length == 0 && priceChange == 1){
-						jQuery('#defaultStore').show();
-						jQuery('.filteredStore').hide();
-						jQuery('#noVendorFound').hide();
-					} else if(catOccaIdArray.length == 0 && deliveryIdArray.length == 0 && priceChange == 0){
-						jQuery('#defaultStore').show();
-						jQuery('.filteredStore').hide();
-						jQuery('#noVendorFound').hide();
-					}
+        if(catOccaIdArray.length == 0 && deliveryIdArray.length == 0 && priceChange == 1){
+            jQuery('#defaultStore').show();
+            jQuery('.filteredStore').hide();
+            jQuery('#noVendorFound').hide();
+        } else if(catOccaIdArray.length == 0 && deliveryIdArray.length == 0 && priceChange == 0){
+            jQuery('#defaultStore').show();
+            jQuery('.filteredStore').hide();
+            jQuery('#noVendorFound').hide();
+        }
 
-					var state = { 'd': deliveryIdArray, 'c': catOccaIdArray, 'p': inputPriceRange }
-					var url = '';
-					if(deliveryIdArray.length > 0){
-						if(url){ 	url += '&'; }
-						url += 'd='+deliveryIdArray;
-					}
-					if(catOccaIdArray.length > 0){
-						if(url){ 	url += '&'; }
-						url += 'c='+catOccaIdArray;
-					}
+        var state = { 'd': deliveryIdArray, 'c': catOccaIdArray, 'p': inputPriceRange }
+        var url = '';
+        if(deliveryIdArray.length > 0){
+            if(url){ 	url += '&'; }
+            url += 'd='+deliveryIdArray;
+        }
+        if(catOccaIdArray.length > 0){
+            if(url){ 	url += '&'; }
+            url += 'c='+catOccaIdArray;
+        }
 
-					if(inputPriceRange.length > 0){
-						if(url){ 	url += '&'; }
-						url += 'price='+inputPriceRange;
-					}
-					if(url.length > 0){
-						url = '?'+url;
-					}
+        if(inputPriceRange.length > 0){
+            if(url){ 	url += '&'; }
+            url += 'price='+inputPriceRange;
+        }
+        if(url.length > 0){
+            url = '?'+url;
+        }
 
-					if(url){
-						history.pushState(state, '', url);
-					} else {
-						window.history.replaceState({}, '', location.pathname);
-					}
-				});
-			}
+        if(url){
+            history.pushState(state, '', url);
+        } else {
+            window.history.replaceState({}, '', location.pathname);
+        }
+    });
+}
 		</script>
 		<!-- Loading and showing the content Javascript -->
-		<script type="text/javascript">
-		// @todo - listen to the localStorage - if there is a postalcode all ready, then lets just use that. Else show formula.
-		function addToLocalStorage(key, val) {
-		  window.localStorage.setItem(key, val);
-		}
+<script type="text/javascript">
+function addToLocalStorage(key, val) {
+    window.localStorage.setItem(key, val);
+}
 
-		function check_for_postalcode(){
-			const get_postalcode = window.localStorage.getItem('postalcode');
-			const get_city = window.localStorage.getItem('city');
-			const get_pc_link = window.localStorage.getItem('city_link');
+function check_for_postalcode(){
+    const get_postalcode = window.localStorage.getItem('postalcode');
+    const get_city = window.localStorage.getItem('city');
+    const get_pc_link = window.localStorage.getItem('city_link');
 
-			const mainAndFilterContent = document.querySelector('.main-and-filter-content');
-			const pcFormContent = document.querySelector('.pc-form-content');
+    const mainAndFilterContent = document.querySelector('.main-and-filter-content');
+    const pcFormContent = document.querySelector('.pc-form-content');
 
-			if (mainAndFilterContent || pcFormContent) {
-				if (get_postalcode && get_city) {
-					mainAndFilterContent.style.display = 'block';
-					pcFormContent.style.display = 'none';
+    if (mainAndFilterContent || pcFormContent) {
+        if (get_postalcode && get_city) {
+            mainAndFilterContent.style.display = 'block';
+            pcFormContent.style.display = 'none';
 
 
-					setFilterBadgeCity(
-						get_postalcode+' '+get_city,
-						'postalcode_page'+get_postalcode,
-						'postalcode_id'
-					);
+            setFilterBadgeCity(
+                get_postalcode+' '+get_city,
+                'postalcode_page'+get_postalcode,
+                'postalcode_id'
+            );
 
-					update();
-				} else {
-					mainAndFilterContent.style.display = 'none';
-					pcFormContent.style.display = 'block';
-				}
-			}
-		}
+            update();
+        } else {
+            mainAndFilterContent.style.display = 'none';
+            pcFormContent.style.display = 'block';
+        }
+    }
+}
 
-		document.addEventListener('DOMContentLoaded', function() {
-			check_for_postalcode();
-		});
+document.addEventListener('DOMContentLoaded', function() {
+    check_for_postalcode();
+});
 
-		// If you delete postal code
-		jQuery(document).on('click', "#filterpostalcode_id button.btn-close", function(){
-			jQuery(this).remove();
-			window.localStorage.removeItem('city');
-			window.localStorage.removeItem('postalcode');
+// If you delete postal code
+jQuery(document).on('click', "#filterpostalcode_id button.btn-close", function(){
+    jQuery(this).remove();
+    window.localStorage.removeItem('city');
+    window.localStorage.removeItem('postalcode');
 
-			check_for_postalcode();
-		});
-		jQuery(document).on('click', '#lp-datafetch_wrapper a', function(event) {
-			event.preventDefault();
+    check_for_postalcode();
+});
+jQuery(document).on('click', '#lp-datafetch_wrapper a', function(event) {
+    event.preventDefault();
 
-			var this_link_postal = this.getAttribute("data-postal");
-			var this_link_city = this.getAttribute("data-city");
-			var this_link_citylink = this.getAttribute("data-city-link");
+    var this_link_postal = this.getAttribute("data-postal");
+    var this_link_city = this.getAttribute("data-city");
+    var this_link_citylink = this.getAttribute("data-city-link");
 
-			addToLocalStorage('postalcode', this_link_postal);
-			addToLocalStorage('city', this_link_city);
-			addToLocalStorage('city_link', this_link_citylink);
+    addToLocalStorage('postalcode', this_link_postal);
+    addToLocalStorage('city', this_link_city);
+    addToLocalStorage('city_link', this_link_citylink);
 
-			check_for_postalcode();
-		});
-		</script>
-		<!-- BOTTOM END -->
+    check_for_postalcode();
+});
+</script>
+<!-- BOTTOM END -->
 
 <?php
 get_footer('shop');
