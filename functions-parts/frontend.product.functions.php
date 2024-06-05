@@ -96,6 +96,37 @@ add_action( 'woocommerce_single_product_summary', 'include_greeting_benefits_to_
 add_filter( 'woocommerce_show_variation_price', '__return_true');
 
 /**
+ * Function to redirect from product page if the vendor is deleted or not active
+ *
+ * @return void
+ */
+function redirect_if_vendor_inactive_or_nonexistent() {
+    if (is_singular('product')) {
+        global $post;
+
+        // Get the vendor ID (post author ID)
+        $vendor_id = $post->post_author;
+
+        // Check if the vendor exists in the database
+        $vendor = get_userdata($vendor_id);
+        if (!$vendor) {
+            // Vendor doesn't exist, redirect to a custom page
+            wp_redirect(home_url());
+            exit;
+        }
+
+        // Check if the vendor is of type 'dc_vendor'
+        if (!in_array('dc_vendor', $vendor->roles)) {
+            // Vendor is not active, redirect to a custom page
+            wp_redirect(home_url());
+            exit;
+        }
+    }
+}
+add_action('template_redirect', 'redirect_if_vendor_inactive_or_nonexistent');
+
+
+/**
  * Function for getting the price for the current variation for the select dropdown
  *
  * @param $product
