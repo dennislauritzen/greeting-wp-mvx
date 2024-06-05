@@ -581,6 +581,7 @@ function get_vendor_dates_new($vendor_id, $date_format = 'd-m-Y', $open_close = 
     $default_days = ['1','2','3','4','5','6','7'];
 
     // Get the opening days string/array from the database and handle it.
+    var_dump($vendor_id);
     $opening_days = !empty(get_user_meta($vendor_id, 'openning')) ? get_user_meta($vendor_id, 'openning', true) : get_field('openning', 'user_'.$vendor_id); // true for not array return
     $closed_days = (is_array($opening_days) ? array_diff($default_days, $opening_days) : array());
 
