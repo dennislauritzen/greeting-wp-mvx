@@ -9,7 +9,7 @@ $postalCode = (isset($args['postalCode']) ? $args['postalCode'] : '');
 
 if($args['vendor']){
   $vendor = $args['vendor'];
-  $vendor_id = $vendor->id;
+  $vendor_id = $vendor->ID;
   // $vendor = get_mvx_vendor($user);
   // $image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
   $image = $vendor->get_image('image') ? $vendor->get_image('image', array(125, 125)) : $MVX->plugin_url . 'assets/images/WP-stdavatar.png';
@@ -275,7 +275,7 @@ if($args['vendor']){
         } else {
           ///////////////////////////
           // Days until delivery
-          $delivery_days 		= get_vendor_delivery_days_from_today($vendor_id, 'Kan ');
+          #$delivery_days 		= get_vendor_delivery_days_from_today($vendor_id, 'Kan ');
           ?>
             <span class="badge text-dark border border-dark text-dark fw-light shadow-none "><?php echo $delivery_days; ?></span>
           <?php

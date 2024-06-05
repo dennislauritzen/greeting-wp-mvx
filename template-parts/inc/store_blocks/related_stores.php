@@ -92,6 +92,8 @@ $results = $query->get_results();
         $vendor = get_user_meta($v->ID);
         $vendor_page_slug = get_mvx_vendor($v->ID);
 
+        var_dump($vendor_page_slug);
+
         $image = (!empty($vendor['_vendor_profile_image'])? $vendor['_vendor_profile_image'][0] : '');
         $banner = (!empty($vendor['_vendor_banner'])? $vendor['_vendor_banner'][0] : '');
 
@@ -109,7 +111,7 @@ $results = $query->get_results();
         }
 
         // call the template with pass $vendor variable
-  			get_template_part('template-parts/vendor-loop', null, array('vendor' => $vendor_page_slug, 'cityName' => $city_name, 'postalCode' => $user_postal));
+        get_template_part('template-parts/vendor-loop', null, array('vendor' => $vendor_page_slug, 'cityName' => $city_name, 'postalCode' => $user_postal));
       } // endforeach
       ?>
     </div>
