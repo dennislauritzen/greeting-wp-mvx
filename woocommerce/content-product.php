@@ -33,7 +33,7 @@ $classes = array('prod_hold');
 	 *
 	 * @hooked woocommerce_template_loop_product_link_open - 10 - removed
 	 */
-    //do_action('woocommerce_before_shop_loop_item'); ?>
+    #do_action('woocommerce_before_shop_loop_item'); ?>
 		<div class="col-6 col-xs-6 col-sm-6 col-md-6 col-lg-4 col-xl-3">
 			<div class="card mb-4 border-0">
 					<a href="<?php the_permalink(); ?>">
@@ -80,5 +80,5 @@ $classes = array('prod_hold');
 		 *
 		 * @author Dennis Lauritzen - Removed this action since we don't want add to cart button on related products
 		 */
-		//do_action('woocommerce_after_shop_loop_item');
+		#do_action('woocommerce_after_shop_loop_item');
 		?>

@@ -1,12 +1,12 @@
 <?php
-global $product, $WCMp;
+global $product, $MVX;
 
 $product_id2 = $product->get_id();
 $product_meta2 = get_post($product_id2);
 $vendor_id2 = $product_meta2->post_author;
 $vendor = get_user_meta($vendor_id2);
 
-$ip_detail_ipinfo = call_ip_apis(get_client_ip());
+$ip_detail_ipinfo = (!empty(call_ip_apis(get_client_ip())) ? call_ip_apis(get_client_ip()) : 0);
 
 if(!empty($ip_detail_ipinfo) AND (isset($ip_detail_ipinfo->postal) || isset($ip_detail_ipinfo->zip))){
   $user_postal = (!empty($ip_detail_ipinfo->postal) ? $ip_detail_ipinfo->postal : $ip_detail_ipinfo->zip);
@@ -51,6 +51,7 @@ if(!empty($user_postal)){
   );
 }
 
+
 $query = new WP_User_Query($args);
 $results = $query->get_results();
 ?>
@@ -86,6 +87,7 @@ $results = $query->get_results();
 
     <div class="row">
       <?php
+
       foreach($results as $k => $v){
         $vendor = get_user_meta($v->ID);
         $vendor_page_slug = get_mvx_vendor($v->ID);

@@ -6,12 +6,57 @@
 ## for the Product Page.
 ##
 
+function list_hooked_functions($hook_name) {
+    global $wp_filter;
+
+    if (!isset($wp_filter[$hook_name])) {
+        echo "No actions found for hook: {$hook_name}";
+        return;
+    }
+
+    $hook = $wp_filter[$hook_name];
+
+    // WordPress 4.7+ stores hooks in an array instead of WP_Hook object
+    if (is_object($hook) && isset($hook->callbacks)) {
+        $hook = $hook->callbacks;
+    }
+
+    if (is_array($hook)) {
+        echo '<pre>';
+        echo "Actions for hook: {$hook_name}\n";
+        foreach ($hook as $priority => $functions) {
+            echo "Priority: {$priority}\n";
+            foreach ($functions as $function) {
+                if (is_string($function['function'])) {
+                    echo "Function: {$function['function']}\n";
+                } elseif (is_array($function['function'])) {
+                    $class = is_object($function['function'][0]) ? get_class($function['function'][0]) : $function['function'][0];
+                    $method = $function['function'][1];
+                    echo "Class Method: {$class}::{$method}\n";
+                } elseif (is_object($function['function']) && ($function['function'] instanceof Closure)) {
+                    echo "Function: Closure\n";
+                } else {
+                    echo "Function: Unknown type\n";
+                }
+            }
+        }
+        echo '</pre>';
+    } else {
+        echo "No actions found for hook: {$hook_name}";
+    }
+}
+
+// Example usage
+#('wp_head', function() {
+#    list_hooked_functions('woocommerce_single_product_summary');
+#});
+
+
 function reorder_product_page_hooks(){
     remove_action('woocommerce_single_product_summary','woocommerce_template_single_rating', 10);
     remove_action('woocommerce_single_product_summary','woocommerce_template_single_excerpt', 20);
     remove_action('woocommerce_single_product_summary','woocommerce_template_single_price', 10);
     remove_action('woocommerce_single_product_summary','woocommerce_template_single_add_to_cart', 30);
-    remove_action('woocommerce_single_product_summary','woocommerce_template_single_meta', 40);
     remove_action('woocommerce_single_product_summary','woocommerce_template_single_sharing', 50);
 
     add_action('woocommerce_single_product_summary','woocommerce_template_single_title', 5);
@@ -31,6 +76,15 @@ function reorder_product_page_after_product_hooks(){
 }
 add_action( 'woocommerce_after_single_product_summary', 'reorder_product_page_after_product_hooks', 1 );
 
+
+// Function to include custom template part in woocommerce_single_product_summary hook
+function include_greeting_benefits_to_product_page() {
+    // Include the template part in the woocommerce_single_product_summary hook
+    wc_get_template_part( 'template-parts/inc/blocks/greeting-benefits' );
+}
+
+// Hook the function to woocommerce_single_product_summary
+add_action( 'woocommerce_single_product_summary', 'include_greeting_benefits_to_product_page', 30 );
 
 
 /**

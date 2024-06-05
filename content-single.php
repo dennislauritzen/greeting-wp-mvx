@@ -45,7 +45,6 @@ if(!is_product()){
 
 	get_template_part('template-parts/inc/blocks/how-it-works');
 	get_template_part('template-parts/inc/store_blocks/related_stores');
-
 }
 ?>
 

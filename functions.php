@@ -697,7 +697,7 @@ add_action( 'wp_enqueue_scripts', 'greeting3_scripts_loader' );
 function get_client_ip() {
     $ipaddress = isset($_SERVER['HTTP_CF_CONNECTING_IP']) ? $_SERVER['HTTP_CF_CONNECTING_IP'] : $_SERVER['REMOTE_ADDR'];
 
-    if(home_url() == 'http://greeting'){
+    if(home_url() == 'http://greeting' || home_url() == 'http://greeting.local'){
         $ipaddress = '212.10.115.191';
     }
     return $ipaddress;
@@ -718,27 +718,35 @@ function call_ip_apis($ip){
         '2' => 'http://ipinfo.io/'.$ip.'/json' // return HTTP=429 if usage limit reached
     );
 
+
     $curl = curl_init();
-    curl_setopt($curl, CURLOPT_URL, $urls['0']);
+
+    if ($curl === false) {
+        die('Curl initialization failed. Please check your cURL installation.');
+    }
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-    $jsonData = json_decode(curl_exec($curl));
 
-    # If error, try no. 2
-    if(curl_getinfo($curl, CURLINFO_RESPONSE_CODE) != '200'){
-        curl_setopt($curl, CURLOPT_URL, $urls['1']);
-    }
-    #curl_setopt($curl, CURLOPT_GET, true);
-    $jsonData = json_decode(curl_exec($curl));
+    foreach ($urls as $url) {
+        curl_setopt($curl, CURLOPT_URL, $url);
+        $response = curl_exec($curl);
 
-    # If error, try no. 3
-    if(curl_getinfo($curl, CURLINFO_RESPONSE_CODE) != '200'){
-        curl_setopt($curl, CURLOPT_URL, $urls['2']);
+        if ($response === false) {
+            continue;
+        }
+
+        $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+        if ($http_code == 200) {
+            $jsonData = json_decode($response);
+            curl_close($curl);
+            return $jsonData;
+        }
     }
-    $jsonData = json_decode(curl_exec($curl));
+
     curl_close($curl);
-
-    return $jsonData;
+    return null; // Return null if all API calls fail
 }
+
 
 add_action('wp_ajax_get_close_stores' , 'get_close_stores');
 add_action('wp_ajax_nopriv_get_close_stores','get_close_stores');
@@ -950,6 +958,7 @@ include('functions-parts/email.order.functions.php');
 include('functions-parts/frontend.general.functions.php');
 include('functions-parts/frontend.category.functions.php');
 include('functions-parts/frontend.city.functions.php');
+include('functions-parts/frontend.product.functions.php');
 include('functions-parts/frontend.landingpage.functions.php');
 include('functions-parts/frontend.user.functions.php');
 include('functions-parts/frontend.vendor.functions.php');
