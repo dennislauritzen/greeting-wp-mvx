@@ -17,7 +17,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-global $WCMp;
+global $MVX;
 
 $parent_order_id = (empty(wp_get_post_parent_id($order->get_id())) ? $order->get_id() : wp_get_post_parent_id($order->get_id()));
 
@@ -273,7 +273,7 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                             ?>
                             <div class="text-center">
                                 <?php
-                                $image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
+                                $image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $MVX->plugin_url . 'assets/images/WP-stdavatar.png';
                                 ?>
                                 <img class="img-fuid pb-3" style="max-height:75px;"
                                      src="<?php echo esc_attr($image); ?>">

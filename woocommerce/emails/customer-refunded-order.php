@@ -17,7 +17,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-global $WCMp;
+global $MVX;
 
 $parent_order_id = (empty(wp_get_post_parent_id($order->get_id())) ? $order->get_id() : wp_get_post_parent_id($order->get_id()));
 
