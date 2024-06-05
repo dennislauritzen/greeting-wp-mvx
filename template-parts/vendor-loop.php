@@ -9,7 +9,7 @@ $postalCode = (isset($args['postalCode']) ? $args['postalCode'] : '');
 
 if($args['vendor']){
   $vendor = $args['vendor'];
-  $vendor_id = $vendor->ID;
+  $vendor_id = $vendor->id;
   // $vendor = get_mvx_vendor($user);
   // $image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
   $image = $vendor->get_image('image') ? $vendor->get_image('image', array(125, 125)) : $MVX->plugin_url . 'assets/images/WP-stdavatar.png';
