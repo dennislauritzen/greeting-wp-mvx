@@ -9,7 +9,8 @@
  * @version   	2.7.3
  */
 
-global $WCMp;
+global $MVX;
+
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 ?>
 <!--[if gte mso 9]>
@@ -17,10 +18,12 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
   </tr>
 </table>
 <![endif]-->
-<table width="100%" id="greeting-footer" style="width: 100%;">
-    <tr style="background-color: #4d696b;">
-        <td align="center" style=" padding: 0 0 25px 0;">
-            <table width="800" style="width:800px;">
+
+
+<table width="100%" id="greeting-footer" style="width: 100%; text-align: center; border-collapse: collapse;">
+    <tr style="background-color: #4d696b; text-align: center;">
+        <td align="center" style="text-align: center; padding: 0 0 25px 0;">
+            <table width="800" style="text-align: center; width:800px;">
                 <tr>
                     <td width="100%" colspan="2" style="width: 100%; padding: 50px 0 30px 0; text-align: center;">
                         <svg viewBox="0 0 524 113" class="greeting-footer-logo"  fill="#fecbca"  xmlns="http://www.w3.org/2000/svg">
@@ -78,7 +81,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
                         );
                         ?>
                     </td>
-                    <td valign="top" class="right-col" width="50%"style="vertical-align: top; text-align: right;">
+                    <td valign="top" class="right-col" width="50%" style="vertical-align: top; text-align: right;">
                         <h4 class="" style="font-family: 'Rubik', 'Inter', sans-serif; font-size: 20px; color: #1b4949;">GAVEHILSNER FRA DANSKE<br>SPECIALBUTIKKER</h4>
                         <p style="color: #ffffff;">
                             <?php echo get_field('greeting_info_text', 'options'); ?>

@@ -12,7 +12,8 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
-global $WCMp;
+global $MVX;
+
 $text_align = is_rtl() ? 'right' : 'left';
 $t_sale = isset($report_data['stats']['sales_total']) ? $report_data['stats']['sales_total'] : 0;
 $t_earning = isset($report_data['stats']['earning']) ? $report_data['stats']['earning'] : 0;

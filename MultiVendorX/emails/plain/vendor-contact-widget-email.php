@@ -12,7 +12,8 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
-global $WCMp;
+global $MVX;
+
 $name = isset( $object['name'] ) ? $object['name'] : '';
 $message = isset( $object['message'] ) ? $object['message'] : '';
 echo $email_heading . "\n\n"; 

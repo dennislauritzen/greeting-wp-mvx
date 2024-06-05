@@ -11,7 +11,7 @@
  
  
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly 
-global  $WCMp;
+global  $MVX;
 $vendor = get_mvx_vendor_by_term($vendor_id);
 ?>
 

@@ -10,7 +10,7 @@
  */
 
 if ( !defined( 'ABSPATH' ) ) exit; 
-global  $WCMp;
+global  $MVX;
 
 if($post->post_type == 'shop_coupon') $title = esc_html__( 'Coupon', 'dc-woocommerce-multi-vendor' );
 else  $title = esc_html__( 'Product', 'dc-woocommerce-multi-vendor' );

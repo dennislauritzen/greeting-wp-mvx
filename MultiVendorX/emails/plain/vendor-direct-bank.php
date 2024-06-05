@@ -11,7 +11,8 @@
 
  
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
-global $WCMp;
+global $MVX;
+
 echo $email_heading . "\n\n"; 
 $amount = floatval(get_post_meta($transaction_id, 'amount', true)) - floatval(get_post_meta($transaction_id, 'transfer_charge', true)) - floatval(get_post_meta($transaction_id, 'gateway_charge', true));		
 echo apply_filters( 'mvx_thankyou_transaction_received_text', sprintf(__( 'Hello,<br>We have received a new withdrawal request for %s from you and your request is being processed.The order details are as follows:', 'dc-woocommerce-multi-vendor'), get_woocommerce_currency().$amount), $transaction_id );
@@ -21,7 +22,7 @@ echo "****************************************************\n\n";
 
 
 
-$commission_details  = $WCMp->transaction->get_transaction_item_details($transaction_id); 
+$commission_details  = $MVX->transaction->get_transaction_item_details($transaction_id);
 if(!empty($commission_details['body'])) {
 	foreach ( $commission_details['body'] as $commission_detail ) {	
 		foreach($commission_detail as $details) {
@@ -32,7 +33,7 @@ if(!empty($commission_details['body'])) {
 	}
 }
 echo "----------\n\n";
-if ( $totals =  $WCMp->transaction->get_transaction_item_totals($transaction_id, $vendor) ) {
+if ( $totals =  $MVX->transaction->get_transaction_item_totals($transaction_id, $vendor) ) {
 	foreach ( $totals as $total ) {
 		echo $total['label'] .' : '. $total['value'].'\n';
 	}

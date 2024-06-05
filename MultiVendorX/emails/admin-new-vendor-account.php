@@ -9,7 +9,8 @@
  * @version   0.0.1
  */
  
-global $WCMp;
+global $MVX;
+
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly 
 $vendor_application_admin_url = apply_filters('mvx_admin_new_vendor_email_vendor_application_url', admin_url( 'admin.php?page=vendors&s='.$user_object->user_login ));
 ?>

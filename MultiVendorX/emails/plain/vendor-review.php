@@ -11,7 +11,8 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
-global $WCMp;
+global $MVX;
+
 $review = isset( $review ) ? $review : '';
 $rating = isset( $rating ) ? absint($rating) : 0;
 echo $email_heading . "\n"; 

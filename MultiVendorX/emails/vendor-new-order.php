@@ -13,7 +13,7 @@
 if (!defined('ABSPATH'))
     exit; // Exit if accessed directly
 
-global $WCMp;
+global $MVX;
 $vendor = get_mvx_vendor(absint($vendor_id));
 
 $parent_order_id = (empty(wp_get_post_parent_id($order->get_id())) ? $order->get_id() : wp_get_post_parent_id($order->get_id()));
@@ -26,7 +26,8 @@ $order_hash2 = hash('md4', 'vvkrne12onrtnFG_:____'.$latestOrderId);
 // Generate QR code.
 $tracking_url = site_url() . '/shop-order-status/?order_id=' . $latestOrderId . '&oh=' . $order_hash . '&sshh=' . $order_hash2;
 $code_contents = urlencode( $tracking_url );
-$qrcode = 'https://chart.googleapis.com/chart?chs=135x135&cht=qr&chl='.$code_contents;
+$qrcode_deprecated = 'https://chart.googleapis.com/chart?cht=qr&chs=135x135&chl='.$code_contents;
+$qrcode = 'https://api.qrserver.com/v1/create-qr-code/?size=135x135&data='.$code_contents;
 
 // Calculate order IDs
 $main_order = $parent_order_id;
@@ -267,30 +268,11 @@ do_action( 'woocommerce_email_header', $email_heading );
                         </p>
                     </td>
                 </tr>
-                <!--<tr>
-                    <td valign="top" class="your-options-cell-mobile">
-                        <h3>Afsenders oplysninger</h3>
-                        <p>
-                            <?php echo '<span id="bill_fullname">'.$order->get_formatted_billing_full_name().'</span>'; ?>
-                            <?php echo ($order->get_billing_company()) ? '<span id="bill_company"><br>'.$order->get_billing_company().'</span>' : ''; ?>
-
-                            <?php echo ($order->get_billing_address_1()) ? '<br><span id="bill_address">'.$order->get_billing_address_1().'</span>' : ''; ?>
-
-                            <?php echo ($order->get_billing_postcode()) ? '<br><span id="bill_postcode">'.$order->get_billing_postcode().'</span>' : ''; ?>
-                            <?php echo ($order->get_billing_city()) ? ' <span id="bill_city">'.$order->get_billing_city().'</span>' : ''; ?>
-
-                            <?php echo ($order->get_billing_country()) ? '<br><span id="bill_country">'.$order->get_billing_country().'</span>' : ''; ?>
-
-
-                            <?php echo ($order->get_billing_email()) ? '<br><br><span id="bill_email">'.$order->get_billing_email().'</span>' : ''; ?>
-                            <?php echo ($order->get_billing_phone()) ? '<br><span id="bill_phone">'.$order->get_billing_phone().'</span>' : ''; ?>
-                        </p>
-                    </td>
-                </tr>-->
             </table>
         </td>
     </tr>
 </table>
+
 <table width="100%" align="center" border="0" cellspacing="0" cellpadding="0" style="width: 100%; text-align: center; border-collapse: collapse;">
     <tr>
         <td align="center" style="text-align: center; padding: 0 15px;">

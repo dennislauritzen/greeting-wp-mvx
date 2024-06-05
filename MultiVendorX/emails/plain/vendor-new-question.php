@@ -13,7 +13,8 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
-global $WCMp;
+global $MVX;
+
 $question = isset( $question ) ? $question : '';
 echo $email_heading . "\n\n"; 
 echo sprintf(  __( "Hi %s,",  'dc-woocommerce-multi-vendor' ), $vendor->page_title ); 
