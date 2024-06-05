@@ -10,7 +10,7 @@
  */
 
 if ( !defined( 'ABSPATH' ) ) exit; 
-global $WCMp;
+global $MVX;
 
 
 echo "= " . $email_heading . " =\n\n";

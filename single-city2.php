@@ -751,7 +751,7 @@ jQuery(document).ready(function(){
       foreach ($UserIdArrayForCityPostalcode as $user) {
         $vendor = get_mvx_vendor($user);
         $vendor_id = $vendor->get_id();
-        $image = $vendor->get_image('image') ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
+        $image = $vendor->get_image('image') ? $vendor->get_image('image', array(125, 125)) : $MVX->plugin_url . 'assets/images/WP-stdavatar.png';
         $banner = $vendor->get_image('banner') ? $vendor->get_image('banner', array(400, 200)) : 'https://www.greeting.dk/wp-content/uploads/2022/05/pexels-maria-orlova-4947386-1-scaled.jpg';
 
         // Generate location

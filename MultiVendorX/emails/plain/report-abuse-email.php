@@ -12,7 +12,7 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
-global $WCMp;
+global $MVX;
 $name = isset( $object['name'] ) ? $object['name'] : '';
 $from_email = isset( $object['email'] ) ? $object['email'] : '';
 $user_message = isset( $object['msg'] ) ? $object['msg'] : '';

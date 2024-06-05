@@ -10,7 +10,7 @@
  */
  
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
-global $WCMp;
+global $MVX;
 echo $email_heading . "\n\n";
 echo sprintf( __( 'Some of the items you had ordered have been shipped. The items that have been shipped are as follows:',  'dc-woocommerce-multi-vendor' ), $order->get_billing_first_name() . ' ' . $order->get_billing_last_name() ) . "\n\n";
 

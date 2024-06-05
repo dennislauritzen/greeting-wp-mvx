@@ -2038,7 +2038,7 @@ function attach_pdf_to_email ( $attachments, $email_id , $order ) {
  */
 add_action( 'woocommerce_after_checkout_validation', 'greeting_check_delivery_postcode', 10, 2);
 function greeting_check_delivery_postcode( $fields, $errors ){
-	global $wpdb, $wcmp;
+	global $wpdb, $MVX;
 
 	$storeProductId = 0;
 	// Get $product object from Cart object
@@ -2309,7 +2309,7 @@ function greeting_save_custom_fields_with_order( $order_id ) {
 
 #add_action( 'mvx_checkout_vendor_order_processed' , 'update_sub_order_meta' ,10 , 3);
 function update_sub_order_meta($vendor_order_id, $posted_data, $order){
-	global $WCMp;
+	global $MVX;
 
 	$vendor_order = wc_get_order($vendor_order_id);
 	$vendor_id = get_post_meta($vendor_order_id, '_vendor_id', true);
@@ -3584,7 +3584,7 @@ add_action('wp_ajax_nopriv_get_close_stores','get_close_stores');
 function get_close_stores(){
 	$postal_code = esc_attr($_POST['postal_code'] );
 
-	global $wpdb, $WCMp;
+	global $wpdb, $MVX;
 
 	$uploadDir = wp_upload_dir();
 	$uploadDirBaseUrl = $uploadDir['baseurl'];

@@ -10,7 +10,7 @@
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
-global $WCMp;
+global $MVX;
 echo $email_heading . "\n\n"; 
 $amount = get_post_meta($transaction_id, 'amount', true) - get_post_meta($transaction_id, 'transfer_charge', true) - get_post_meta($transaction_id, 'gateway_charge', true);
 if($transaction_mode == 'direct_bank') {
@@ -21,7 +21,7 @@ if($transaction_mode == 'direct_bank') {
 
 echo "****************************************************\n\n";
 
-$commission_details  = $WCMp->transaction->get_transaction_item_details($transaction_id); 
+$commission_details  = $MVX->transaction->get_transaction_item_details($transaction_id);
 if(!empty($commission_details['body'])) {
 	foreach ( $commission_details['body'] as $commission_detail ) {	
 		foreach($commission_detail as $details) {
@@ -32,7 +32,7 @@ if(!empty($commission_details['body'])) {
 	}
 }
 echo "----------\n\n";
-if ( $totals =  $WCMp->transaction->get_transaction_item_totals($transaction_id, $vendor) ) {
+if ( $totals =  $MVX->transaction->get_transaction_item_totals($transaction_id, $vendor) ) {
 	foreach ( $totals as $total ) {
 		echo $total['label'] .' : '. $total['value'].'\n';
 	}

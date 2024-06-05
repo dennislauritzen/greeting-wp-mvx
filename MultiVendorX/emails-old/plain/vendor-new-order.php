@@ -11,7 +11,7 @@
  
  
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
-global $WCMp;
+global $MVX;
 $vendor = get_mvx_vendor( absint( $vendor_id ) );
 echo $email_heading . "\n\n";
 

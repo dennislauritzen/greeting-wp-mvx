@@ -199,3 +199,26 @@ function productFilterAction() {
 }
 add_action( 'wp_ajax_productFilterAction', 'productFilterAction' );
 add_action( 'wp_ajax_nopriv_productFilterAction', 'productFilterAction' );
+
+
+function get_vendor_lowest_price($vendor_id) {
+    global $wpdb;
+
+    // SQL query to get the lowest price of active products for the vendor
+    $query = $wpdb->prepare("
+        SELECT MIN(CAST(pm.meta_value AS DECIMAL(10,2))) AS lowest_price
+        FROM {$wpdb->posts} AS p
+        INNER JOIN {$wpdb->postmeta} AS pm ON p.ID = pm.post_id
+        WHERE p.post_type = 'product'
+        AND p.post_status = 'publish'
+        AND p.post_author = %d
+        AND pm.meta_key = '_price'
+        AND pm.meta_value != ''
+        AND pm.meta_value IS NOT NULL
+    ", $vendor_id);
+
+    // Execute the query and get the result
+    $lowest_price = $wpdb->get_var($query);
+
+    return $lowest_price ? number_format($lowest_price, 0) : null;
+}

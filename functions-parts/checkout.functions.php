@@ -576,7 +576,7 @@ function greeting_enable_datepicker() { ?>
  */
 add_action( 'woocommerce_after_checkout_validation', 'greeting_check_delivery_postcode', 10, 2);
 function greeting_check_delivery_postcode( $fields, $errors ){
-    global $wpdb, $WCMp;
+    global $wpdb, $MVX;
 
     $storeProductId = 0;
     // Get $product object from Cart object
@@ -836,7 +836,7 @@ add_action('woocommerce_review_order_before_submit', 'greeting_marketplace_check
  * @return void
  */
 function update_sub_order_meta($vendor_order_id, $posted_data, $order){
-    global $WCMp;
+    global $MVX;
 
     $vendor_order = wc_get_order($vendor_order_id);
     $vendor_id = get_post_meta($vendor_order_id, '_vendor_id', true);

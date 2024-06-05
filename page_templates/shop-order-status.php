@@ -3,7 +3,7 @@
   Template Name: Shop Order Status
  */
 
-global $WCMp;
+global $MVX;
 
 //get path
 $urlPath = $_SERVER["REQUEST_URI"];

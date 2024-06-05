@@ -622,7 +622,7 @@ $vendor_id = 0;
                             ?>
                             <div class="text-center">
                                 <?php
-                                $image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
+                                $image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $MVX->plugin_url . 'assets/images/WP-stdavatar.png';
                                 ?>
                                 <img class="img-fuid pb-3" style="max-height:75px;"
                                      src="<?php echo esc_attr($image); ?>">

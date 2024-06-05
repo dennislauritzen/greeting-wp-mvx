@@ -215,11 +215,11 @@ get_header();
             <div class="content_holder">
 
                 <?php
-                global $WCMp;
-                $frontend_assets_path = $WCMp->plugin_url . 'assets/frontend/';
+                global $MVX;
+                $frontend_assets_path = $MVX->plugin_url . 'assets/frontend/';
                 $frontend_assets_path = str_replace(array('http:', 'https:'), '', $frontend_assets_path);
                 $suffix = defined('mvx_SCRIPT_DEBUG') && mvx_SCRIPT_DEBUG ? '' : '.min';
-                wp_register_style('mvx_vendor_list', $frontend_assets_path . 'css/vendor-list' . $suffix . '.css', array(), $WCMp->version);
+                wp_register_style('mvx_vendor_list', $frontend_assets_path . 'css/vendor-list' . $suffix . '.css', array(), $MVX->version);
                 wp_style_add_data('mvx_vendor_list', 'rtl', 'replace');
                 wp_enqueue_style('mvx_vendor_list');
                 $block_vendors = wp_list_pluck(mvx_get_all_blocked_vendors(), 'id');
@@ -294,7 +294,7 @@ get_header();
                         if ($userserIdArray) {
                             foreach ($userserIdArray as $user) {
                                 $vendor = get_mvx_vendor($user);
-                                $image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
+                                $image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $MVX->plugin_url . 'assets/images/WP-stdavatar.png';
                                 $banner = $vendor->get_image('banner') ? $vendor->get_image('banner') : '';
                                 ?>
 
@@ -311,7 +311,7 @@ get_header();
                                             </div>
                                             <?php
                                                 $rating_info = mvx_get_vendor_review_info($vendor->term_id);
-                                                $WCMp->template->get_template('review/rating_vendor_lists.php', array('rating_val_array' => $rating_info));
+                                                $MVX->template->get_template('review/rating_vendor_lists.php', array('rating_val_array' => $rating_info));
                                             ?>
                                         </div>
                                     </div>

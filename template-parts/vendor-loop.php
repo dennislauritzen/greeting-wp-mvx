@@ -1,6 +1,6 @@
 <?php
 
-global $WCMp;
+global $MVX;
 
 
 $cityName = (isset($args['cityName']) ? $args['cityName'] : '');
@@ -12,7 +12,7 @@ if($args['vendor']){
   $vendor_id = $vendor->id;
   // $vendor = get_mvx_vendor($user);
   // $image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
-  $image = $vendor->get_image('image') ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
+  $image = $vendor->get_image('image') ? $vendor->get_image('image', array(125, 125)) : $MVX->plugin_url . 'assets/images/WP-stdavatar.png';
   $banner = $vendor->get_image('banner') ? $vendor->get_image('banner', 'woocommerce_single') : 'https://www.greeting.dk/wp-content/uploads/2022/05/pexels-maria-orlova-4947386-1-scaled.jpg';
 
   // The delivery type of the stores
@@ -251,7 +251,7 @@ if($args['vendor']){
         <div class="card-footer border-0 px-4 bg-transparent">
             <div class="row pt-3 pb-4">
                 <div class="col-6">Priser fra</div>
-                <div class="col-6 text-end">kun <span class="fw-bold" style="color: #5F082B">225,-</span> kr.</div>
+                <div class="col-6 text-end">kun <span class="fw-bold" style="color: #5F082B"><?php echo get_vendor_lowest_price($vendor_id); ?>,-</span> kr.</div>
             </div>
         </div>
     </div>

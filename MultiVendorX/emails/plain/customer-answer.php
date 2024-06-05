@@ -13,7 +13,7 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
-global $WCMp;
+global $MVX;
 $answer = isset( $answer ) ? $answer : '';
 $product_id = isset( $product_id ) ? $product_id : '';
 $product = wc_get_product($product_id);

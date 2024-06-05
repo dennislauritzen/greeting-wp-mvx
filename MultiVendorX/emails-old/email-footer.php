@@ -9,7 +9,7 @@
  * @version   	2.7.3
  */
  
-global $WCMp;
+global $MVX;
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly 
 ?>
 <table width="100%" id="greeting-footer" style="width: 100%;">

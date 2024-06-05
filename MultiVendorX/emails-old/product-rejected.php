@@ -11,7 +11,7 @@
 
 
 if ( !defined( 'ABSPATH' ) ) exit; 
-global  $WCMp;
+global  $MVX;
 
 $title = esc_html__( 'Product', 'dc-woocommerce-multi-vendor' );
 	

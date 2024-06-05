@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-global $WCMp;
+global $MVX;
 $text_align = is_rtl() ? 'right' : 'left';
 
 do_action( 'woocommerce_email_header', $email_heading, $email ); ?>

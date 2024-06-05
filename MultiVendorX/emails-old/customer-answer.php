@@ -12,7 +12,7 @@
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
 }
-global $WCMp;
+global $MVX;
 $text_align = is_rtl() ? 'right' : 'left';
 $answer = isset( $answer ) ? $answer : '';
 $product_id = isset( $product_id ) ? $product_id : '';

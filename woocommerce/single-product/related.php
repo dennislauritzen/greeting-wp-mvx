@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 if ( $related_products ) :
 
-global $WCMp, $product;
+global $MVX, $product;
 
 $product_id = $product->get_id();
 $product_meta = get_post($product_id);

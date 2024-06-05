@@ -2,12 +2,11 @@
 
 global $MVX;
 
-if(isset($args['cityName'])){
-  $cityName = $args['cityName'];
-}
-if(isset($args['postalCode'])){
-  $postalCode = $args['postalCode'];
-}
+
+$cityName = (isset($args['cityName']) ? $args['cityName'] : '');
+$postalCode = (isset($args['postalCode']) ? $args['postalCode'] : '');
+
+
 if($args['vendor']){
   $vendor = $args['vendor'];
   $vendor_id = $vendor->id;
@@ -22,6 +21,11 @@ if($args['vendor']){
 
   // Header text.
   $button_text = apply_filters('mvx_vendor_lists_single_button_text', $vendor->page_title);
+
+  // Delivery text for the card-footer
+  $delivery_text = ($delivery_type == 0) ? 'Sender med fragtfirma' : 'Personlig levering';
+  $delivery_preposition = ($delivery_type == 0) ? ' fra ' : ' i ';
+  $delivery_text = (!empty($cityName)) ? $delivery_text.$delivery_preposition.$cityName : $delivery_text;
 
   // Generate location
   $vendor_address = !empty(get_user_meta($vendor_id, '_vendor_address_1', true)) ? get_user_meta($vendor_id, '_vendor_address_1', true) : '';
@@ -39,8 +43,6 @@ if($args['vendor']){
   }
   $location = (in_array($vendor_id, array(38,76)) ? str_replace(array('{{city_name}}','{{postalcode}}'),array($cityName,$postalCode), get_field('adress_text_for_greeting_stores', 'option')) : $location);
 }
-
-
 ?>
 <div class="col-12 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4 mb-2 d-flex align-items-stretch store">
   <div class="card shadow border-0 mb-3">
@@ -60,36 +62,25 @@ if($args['vendor']){
         } else {
           ///////////////////////////
           // Days until delivery
-          $delivery_days 		= get_vendor_days_until_delivery($vendor_id);
-
-          if($delivery_days == 0){
-            ?>
-            <span class="badge text-dark border border-dark text-dark fw-light shadow-none ">Kan levere i dag</span>
-            <?php
-          } else if($delivery_days == 1){
-            ?>
-            <span class="badge text-dark border border-dark text-dark fw-light shadow-none ">Kan levere i morgen</span>
-            <?php
-          } else if($delivery_days == 2){
-            ?>
-            <span class="badge text-dark border border-dark text-dark fw-light shadow-none ">Kan levere i overmorgen</span>
-            <?php
-          }
+          $delivery_days 		= get_vendor_delivery_days_from_today($vendor_id, 'Kan ');
           ?>
-
+            <span class="badge text-dark border border-dark text-dark fw-light shadow-none "><?php echo $delivery_days; ?></span>
           <?php
           ///////////////////////////
           // STORE TYPE TAG
           $store_type = get_field('store_type','user_'.$vendor_id);
+          #var_dump($store_type);
           if(!empty($store_type)){
-              if( isset($v['label'])
-                  && !in_array($v['label'], array("1","2","3","4","5","6","7"))
-                  && $v['label'] != "1"
-                  && $v['label'] != "0"
-              ){
-            ?>
-              <span class="badge text-dark border border-dark fw-light shadow-none "><?php echo $v['label']; ?></span>
-            <?php
+            foreach($store_type as $k => $v){
+                if( isset($v['label'])
+                    && !in_array($v['label'], array("1","2","3","4","5","6","7"))
+                    && $v['label'] != "1"
+                    && $v['label'] != "0"
+                ){
+                ?>
+                <span class="badge text-dark border border-dark fw-light shadow-none "><?php echo $v['label']; ?></span>
+                <?php
+                }
             } // endforeach store_type
           } // endif $store_type
         }
@@ -107,7 +98,6 @@ if($args['vendor']){
       ///////////////////////////
       // Get product categories
       //
-
       ?>
       <!--<div>
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#e1e1e1" class="bi bi-tags" viewBox="0 0 16 16">
@@ -142,22 +132,9 @@ if($args['vendor']){
     <div class="card-footer">
       <small class="text-muted">
         <div style="col-12">
-          <?php
-          if($delivery_type == 1){
-          ?>
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bicycle" viewBox="0 0 16 16">
             <path d="M4 4.5a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1v.5h4.14l.386-1.158A.5.5 0 0 1 11 4h1a.5.5 0 0 1 0 1h-.64l-.311.935.807 1.29a3 3 0 1 1-.848.53l-.508-.812-2.076 3.322A.5.5 0 0 1 8 10.5H5.959a3 3 0 1 1-1.815-3.274L5 5.856V5h-.5a.5.5 0 0 1-.5-.5zm1.5 2.443-.508.814c.5.444.85 1.054.967 1.743h1.139L5.5 6.943zM8 9.057 9.598 6.5H6.402L8 9.057zM4.937 9.5a1.997 1.997 0 0 0-.487-.877l-.548.877h1.035zM3.603 8.092A2 2 0 1 0 4.937 10.5H3a.5.5 0 0 1-.424-.765l1.027-1.643zm7.947.53a2 2 0 1 0 .848-.53l1.026 1.643a.5.5 0 1 1-.848.53L11.55 8.623z"/>
-          </svg> Personlig levering i <?php print $cityName; ?>
-          <?php
-          } else if($delivery_type == 0) {
-          ?>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-truck" viewBox="0 0 16 16">
-            <path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h9A1.5 1.5 0 0 1 12 3.5V5h1.02a1.5 1.5 0 0 1 1.17.563l1.481 1.85a1.5 1.5 0 0 1 .329.938V10.5a1.5 1.5 0 0 1-1.5 1.5H14a2 2 0 1 1-4 0H5a2 2 0 1 1-3.998-.085A1.5 1.5 0 0 1 0 10.5v-7zm1.294 7.456A1.999 1.999 0 0 1 4.732 11h5.536a2.01 2.01 0 0 1 .732-.732V3.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .294.456zM12 10a2 2 0 0 1 1.732 1h.768a.5.5 0 0 0 .5-.5V8.35a.5.5 0 0 0-.11-.312l-1.48-1.85A.5.5 0 0 0 13.02 6H12v4zm-9 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm9 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
-          </svg>
-            Sender med fragtfirma til <?php print $cityName; ?>
-          <?php
-          }
-          ?>
+          </svg> <?php echo $delivery_text; ?>
           <input type="hidden" id="cityName" value="<?php echo the_title();?>">
           <span style="width: 15px;">&nbsp;&nbsp;</span>
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar-range" viewBox="0 0 16 16">
@@ -165,8 +142,40 @@ if($args['vendor']){
             <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
           </svg>
           <?php
+            $extraordinary_dates = get_vendor_delivery_dates_extraordinary($vendor_id);
+            // Filter dates within the next 10 days
+            $filtered_dates = array_filter($extraordinary_dates, function ($date_str) {
+              $openingDate = DateTime::createFromFormat('d-m-Y', $date_str);
+              $today = new DateTime('today');
+              $interval = $today->diff($openingDate);
+              return $interval->days >= 0 && $interval->days < 10;
+            });
+
+            // Replace English month abbreviations with Danish ones
+            $danish_month_names = array(
+              'jan' => 'jan', 'feb' => 'feb', 'mar' => 'mar', 'apr' => 'apr',
+              'may' => 'maj', 'jun' => 'jun', 'jul' => 'jul', 'aug' => 'aug',
+              'sep' => 'sep', 'oct' => 'okt', 'nov' => 'nov', 'dec' => 'dec'
+            );
+
+            // Format filtered dates to Danish format "d. M"
+            $formatted_dates = array_map(function ($date_str) use ($danish_month_names) {
+              $openingDate = DateTime::createFromFormat('d-m-Y', $date_str);
+              $month_abbr = strtolower($openingDate->format('M'));
+              $danish_month = isset($danish_month_names[$month_abbr]) ? $danish_month_names[$month_abbr] : $month_abbr;
+              return str_replace($openingDate->format('M'), $danish_month, $openingDate->format('d. M'));
+            }, $filtered_dates);
+
+            // Join the filtered dates with commas
+            $dates_string = implode(', ', $formatted_dates);
+
             $opening = get_field('openning', 'user_'.$vendor_id);
-            echo get_del_days_text($opening, $delivery_type);
+            $str = get_del_days_text($opening, $delivery_type);
+            if(count($filtered_dates) > 0) {
+                $str .= ' (og ' . $dates_string . ')';
+            }
+
+            echo $str;
           ?>
         </div>
       </small>

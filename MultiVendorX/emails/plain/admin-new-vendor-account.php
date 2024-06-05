@@ -9,7 +9,7 @@
  * @version   0.0.1
  */
  
-global $WCMp;
+global $MVX;
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly 
 

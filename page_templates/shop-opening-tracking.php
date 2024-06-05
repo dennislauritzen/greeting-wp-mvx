@@ -3,7 +3,7 @@
   Template Name: Shop Opening Tracking
  */
 
-global $WCMp;
+global $MVX;
 
 //get path
 $urlPath = $_SERVER["REQUEST_URI"];
@@ -32,7 +32,7 @@ if(empty($order_id) || !isset($order_id)
 } else {
   $order = wc_get_order( $order_id );
   $order_data = $order->get_data();
-  #$suborder_id = $WCMp->order->get_suborders($order_id);
+  #$suborder_id = $MVX->order->get_suborders($order_id);
   $__order_id       = '';
   $__order_id_child = '';
   if($order && $order_data){

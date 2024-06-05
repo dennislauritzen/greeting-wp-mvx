@@ -12,7 +12,7 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
-global $WCMp;
+global $MVX;
 $t_sale = isset($report_data['stats']['sales_total']) ? $report_data['stats']['sales_total'] : 0;
 $t_earning = isset($report_data['stats']['earning']) ? $report_data['stats']['earning'] : 0;
 $t_withdrawal = isset($report_data['stats']['withdrawal']) ? $report_data['stats']['withdrawal'] : 0;

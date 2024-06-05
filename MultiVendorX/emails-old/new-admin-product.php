@@ -11,7 +11,7 @@
 
 
 if ( !defined( 'ABSPATH' ) ) exit; 
-global $WCMp;
+global $MVX;
 ?>
 
 <?php do_action( 'woocommerce_email_header', $email_heading, $email ); ?>

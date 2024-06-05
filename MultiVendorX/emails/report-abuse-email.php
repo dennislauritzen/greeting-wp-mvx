@@ -12,7 +12,7 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
-global $WCMp;
+global $MVX;
 $text_align = is_rtl() ? 'right' : 'left';
 $name = isset( $object['name'] ) ? $object['name'] : '';
 $message = isset( $object['msg'] ) ? $object['msg'] : '';

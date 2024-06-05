@@ -9,12 +9,12 @@
  * @package 	WCMp/Templates
  * @version   2.4.3
  */
-global $WCMp;
+global $MVX;
 if (!empty($mvx_vendor_registration_form_data) && is_array($mvx_vendor_registration_form_data)) {
 	if(isset($_POST) && is_array($_POST) && count($_POST) > 0) $form_data = $_POST;
     $sep_count = 0;
     // load tooltip librery
-    $WCMp->library->load_qtip_lib();
+    $MVX->library->load_qtip_lib();
     foreach ($mvx_vendor_registration_form_data as $key => $value) {
         switch ($value['type']) {
             case 'separator':

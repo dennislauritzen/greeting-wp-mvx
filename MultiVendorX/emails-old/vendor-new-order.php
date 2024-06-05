@@ -14,7 +14,7 @@ if (!defined('ABSPATH'))
     exit; // Exit if accessed directly
 
 
-global $WCMp;
+global $MVX;
 $vendor = get_mvx_vendor(absint($vendor_id));
 
 do_action( 'woocommerce_email_header', $email_heading, $email );

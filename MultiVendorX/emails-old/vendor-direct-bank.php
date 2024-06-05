@@ -12,7 +12,7 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
-global $WCMp;
+global $MVX;
 
 
 do_action( 'woocommerce_email_header', $email_heading, $email );
@@ -23,7 +23,7 @@ $amount = floatval(get_post_meta($transaction_id, 'amount', true)) - floatval(ge
 
 <table cellspacing="0" cellpadding="6" style="width: 100%; border: 1px solid #eee;"  border="1" bordercolor="#eee">
 	<thead>
-		<?php $commission_details  = $WCMp->transaction->get_transaction_item_details($transaction_id); 
+		<?php $commission_details  = $MVX->transaction->get_transaction_item_details($transaction_id);
 		?>
 		<tr>
 			<?php
@@ -55,7 +55,7 @@ $amount = floatval(get_post_meta($transaction_id, 'amount', true)) - floatval(ge
 					</tr><?php
 				}
 			}
-			if ( $totals =  $WCMp->transaction->get_transaction_item_totals($transaction_id, $vendor) ) {
+			if ( $totals =  $MVX->transaction->get_transaction_item_totals($transaction_id, $vendor) ) {
 				foreach ( $totals as $total ) {
 					?><tr>
 						<td style="text-align:left; vertical-align:middle; border: 1px solid #eee; word-wrap:break-word;"  class="td" scope="col" colspan="2" ><?php echo $total['label']; ?></td>

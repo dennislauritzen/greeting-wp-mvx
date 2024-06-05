@@ -79,8 +79,8 @@ if($args['vendor']){
 
 <div class="wcmp-store-list">
 	<?php				
-	global $WCMp;
-	$image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
+	global $MVX;
+	$image = $vendor->get_image() ? $vendor->get_image('image', array(125, 125)) : $MVX->plugin_url . 'assets/images/WP-stdavatar.png';
 	$banner = $vendor->get_image('banner') ? $vendor->get_image('banner') : '';
 
 	do_action('mvx_vendor_lists_single_before_image', $vendor->term_id, $vendor->id); ?>
@@ -95,7 +95,7 @@ if($args['vendor']){
 			</div>
 			<?php
 				$rating_info = mvx_get_vendor_review_info($vendor->term_id);
-				$WCMp->template->get_template('review/rating_vendor_lists.php', array('rating_val_array' => $rating_info));
+                $MVX->template->get_template('review/rating_vendor_lists.php', array('rating_val_array' => $rating_info));
 			?>
 		</div>
 	</div>

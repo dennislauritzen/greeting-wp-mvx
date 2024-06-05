@@ -8,7 +8,7 @@
 *
 */
 
-global $WCMp, $product;
+global $MVX, $product;
 
 $product_id = $product->get_id();
 $product_meta = get_post($product_id);
@@ -40,11 +40,11 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor_id))){
       <div class="col-lg-2">
 				<?php
           if(!is_object($vendor)){
-            $image = $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
+            $image = $MVX->plugin_url . 'assets/images/WP-stdavatar.png';
             $link = '#';
           } else {
-  					$image = $vendor->get_image() ? $vendor->get_image('image', array(175,175)) : $WCMp->plugin_url . 'assets/images/WP-stdavatar.png';
-            $link = $vendor->get_permalink();
+              $image = $vendor->get_image() ? $vendor->get_image('image', array(175,175)) : $MVX->plugin_url . 'assets/images/WP-stdavatar.png';
+              $link = $vendor->get_permalink();
           }
 				?>
         <a href="<?php echo $link; ?>">

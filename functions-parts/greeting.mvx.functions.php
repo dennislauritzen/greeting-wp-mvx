@@ -6,7 +6,7 @@ function get_vendor_name($vendor_id){
         return;
     }
 
-    global $WCMp;
+    global $MVX;
 
     $vendor = get_mvx_vendor($vendor_id);
 

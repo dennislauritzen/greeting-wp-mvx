@@ -753,7 +753,7 @@ add_action('wp_ajax_nopriv_get_close_stores','get_close_stores');
 function get_close_stores(){
     $postal_code = esc_attr($_POST['postal_code'] );
 
-    global $wpdb, $WCMp;
+    global $wpdb, $MVX;
 
     $uploadDir = wp_upload_dir();
     $uploadDirBaseUrl = $uploadDir['baseurl'];
