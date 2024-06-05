@@ -28,6 +28,9 @@ function greeting_get_vendor_id_from_order( $order ){
     foreach ($order->get_items() as $item_key => $item) {
         $product = get_post($item['product_id']);
         $vendor_id = $product->post_author;
+        if(!empty($vendor_id) && $vendor_id != 0){
+            break;
+        }
     }
 
     return $vendor_id;

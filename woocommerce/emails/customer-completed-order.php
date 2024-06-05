@@ -30,6 +30,9 @@ $order_hash2 = hash('md4', 'vvkrne12onrtnFG_:____'.$latestOrderId);
 $vendor_id = greeting_get_vendor_id_from_order( $order );
 $vendor = get_mvx_vendor(absint($vendor_id));
 
+var_dump($vendor_id);
+var_dump($vendor);
+
 /**
  * Get variables for use in the template
  */
@@ -68,10 +71,6 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
 <!--<p><?php printf( esc_html__( 'Hi %s,', 'woocommerce' ), esc_html( $order->get_billing_first_name() ) ); ?></p>-->
 
 
-
-
-
-
 <!-- THE CONTENT -->
 <table width="100%" align="center" border="0" cellspacing="0" cellpadding="0" style="width: 100%; text-align: center; border-collapse: collapse;">
     <tr style="text-align: center;">
@@ -88,9 +87,9 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                                       &nbsp; <?php echo $additional_content; ?>
                                    	</small>
                                 </td>
-																<td width="25%" style="width: 25%">
-																		&nbsp;
-																</td>
+                                <td width="25%" style="width: 25%">
+                                        &nbsp;
+                                </td>
                             </tr>
                         </table>
                     </td>
@@ -246,7 +245,6 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                 if (apply_filters('show_cust_order_calulations_field', true, $vendor->id)) {
                     $order_total = $order->get_total();
                     $order_ship_total = $order->get_shipping_total() + $order->get_shipping_tax();
-
 
                     $order_new_subtotal = $order_total - $order_ship_total;
                     $order_ship_new = 39;
