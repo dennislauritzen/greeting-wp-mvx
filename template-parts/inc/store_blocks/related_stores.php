@@ -46,7 +46,12 @@ if(!empty($user_postal)){
         'key' => 'delivery_zips',
         'value' => $user_postal,
         'compare' => 'LIKE'
-      )
+      ),
+        array(
+            'key' => 'openning',
+            'value' => '',
+            'compare' => '!='  // Ensures the 'openning' field has a value
+        )
     )
   );
 }
