@@ -1,5 +1,7 @@
 <?php
 
+// Set the timezone to Copenhagen
+date_default_timezone_set('Europe/Copenhagen');
 
 /**
  * Function for validation a date has the correct format
@@ -26,6 +28,7 @@ function validateDate($date, $format = 'Y-m-d')
 function get_date_diff_text($date){
     // Set the timezone to Copenhagen
     date_default_timezone_set('Europe/Copenhagen');
+
     // Ensure $date is a DateTime object
     if(!($date instanceof DateTime)){
         try {

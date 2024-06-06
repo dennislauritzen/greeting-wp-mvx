@@ -8,6 +8,9 @@
 ##
 
 
+// Set the timezone to Copenhagen
+date_default_timezone_set('Europe/Copenhagen');
+
 function get_vendor_delivery_days_required($vendor_id, $type = 'weekday'){
     $get_deliveryday_required_repeater = get_field('vendor_require_order_days_before', 'user_'.$vendor_id);
 
@@ -287,6 +290,9 @@ function get_vendor_days_until_delivery($vendor_id, $for_vendor_header_with_cuto
  */
 function get_vendor_delivery_days_from_today($vendor_id, $prepend_text = '', $del_type = "1", $long_or_short_text = 0)
 {
+    // Set the timezone to Copenhagen
+    date_default_timezone_set('Europe/Copenhagen');
+
     #if(!($comparison_date instanceof DateTime)){
     #   $comparison_date = DateTime::createFromFormat('d-m-Y', now());
     #}
@@ -429,9 +435,6 @@ function groupDates($input) {
     return $result;
 }
 
-
-
-
 /**
  *  Function for building the intervals of delivery days.
  *  E.g. "monday-friday & sunday" etc.
@@ -556,6 +559,9 @@ function estimateDeliveryDate($days = 1, $cut_off = 15, $iso_opening_days = arra
 
 function get_vendor_dates_new($vendor_id, $date_format = 'd-m-Y', $open_close = 'close', $num_dates = 60)
 {
+    // Set the timezone to Copenhagen
+    date_default_timezone_set('Europe/Copenhagen');
+
     if(empty($vendor_id)){
         return false;
     }
@@ -747,6 +753,9 @@ function get_vendor_dates_new($vendor_id, $date_format = 'd-m-Y', $open_close = 
  */
 function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'close'){
     global $wpdb;
+
+    // Set the timezone to Copenhagen
+    date_default_timezone_set('Europe/Copenhagen');
 
     #var_dump(get_field('vendor_require_order_days_before','user_'.$vendor_id));
     #var_dump(get_vendor_dates_new($vendor_id, $date_format, $open_close, 60));
