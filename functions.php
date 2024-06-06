@@ -924,16 +924,6 @@ function get_featured_postal_codes(){
 ######
 
 
-/**
- * Add the vendor information block to the product page
- *
- * @author Dennis Lauritzen
- * @return void
- */
-function add_vendor_info_to_product_page(){
-    wc_get_template( 'single-product/vendor-information.php' );
-}
-
 ## Include Greeting specific functions (also the dates).
 include('functions-parts/greeting.functions.php');
 include('functions-parts/greeting.mvx.functions.php');

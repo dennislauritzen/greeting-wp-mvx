@@ -266,3 +266,15 @@ function show_price_in_attribute_dropdown( $html, $args ) {
     return $html;
 }
 add_filter( 'woocommerce_dropdown_variation_attribute_options_html', 'show_price_in_attribute_dropdown', 10, 2);
+
+
+
+/**
+ * Add the vendor information block to the product page
+ *
+ * @author Dennis Lauritzen
+ * @return void
+ */
+function add_vendor_info_to_product_page(){
+    wc_get_template( 'single-product/vendor-information.php' );
+}

@@ -34,7 +34,9 @@ function get_date_diff_text($date){
     $date_diff = $today->diff($date);
 
     $diff_days = $date_diff->format('%R%a'); // Convert to integer
-
+var_dump($date);
+var_dump($today);
+var_dump($date_diff);
     if($diff_days == '0' || $diff_days == '+0'){
         return 'i dag';
     } else if($diff_days == '1' || $diff_days == '+1'){
