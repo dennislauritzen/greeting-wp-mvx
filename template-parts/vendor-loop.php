@@ -125,7 +125,7 @@ if($args['vendor']){
                         $vendor_user_id_array = $row['vendor'];
 
                         // Check if the vendor user ID exists and matches the specific vendor ID
-                        if( in_array($vendor_id, $vendor_user_id_array) ) {
+                        if( $row['all_vendors'] == 1 || in_array($vendor_id, $vendor_user_id_array) ) {
                             // Get the start and end dates
                             $start_date = DateTime::createFromFormat('d-m-Y H:i:s', $row['startdatetime']);
                             $end_date = DateTime::createFromFormat('d-m-Y H:i:s', $row['enddatetime']);
