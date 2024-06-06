@@ -239,8 +239,7 @@ function get_vendor_days_until_delivery($vendor_id, $for_vendor_header_with_cuto
         return;
     }
 
-    $dropoff_time 		= get_field('vendor_drop_off_time','user_'.$vendor_id);
-    $dropoff_time		= (int) substr($dropoff_time, 0, 2);
+    $dropoff_time 		= get_vendor_dropoff_time($vendor_id)
     $delDate 			= get_field('vendor_require_delivery_day','user_'.$vendor_id);
     $closedDatesArr		= get_vendor_closed_dates($vendor_id);
     $delWeekDays		= get_field('openning','user_'.$vendor_id);
