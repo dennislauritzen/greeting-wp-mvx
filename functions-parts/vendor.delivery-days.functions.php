@@ -102,10 +102,14 @@ function get_vendor_dropoff_time($vendor_id, $type = 'weekday'){
         $vendor_dropoff_time = empty($vendor_dropoff_time)?: get_user_meta($vendor_id, 'vendor_drop_off_time', true);
     }
 
-    if(strpos($vendor_dropoff_time,':') === false && strpos($vendor_dropoff_time,'.') === false){
-        $vendor_dropoff_time = $vendor_dropoff_time.':00';
+    if(!empty($vendor_dropoff_time)) {
+        if (strpos($vendor_dropoff_time, ':') === false && strpos($vendor_dropoff_time, '.') === false) {
+            $vendor_dropoff_time = $vendor_dropoff_time . ':00';
+        } else {
+            $vendor_dropoff_time = str_replace(array(':', '.'), array(':', ':'), $vendor_dropoff_time);
+        }
     } else {
-        $vendor_dropoff_time = str_replace(array(':','.'),array(':',':'),$vendor_dropoff_time);
+        $vendor_dropoff_time = '00:00:00';
     }
 
     return $vendor_dropoff_time;
