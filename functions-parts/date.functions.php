@@ -34,14 +34,15 @@ function get_date_diff_text($date){
     }
 
     $today = new DateTime('today');
+    echo now();
     $date_only = new DateTime($date->format('Y-m-d')); // Extracting only the date portion
 
     $date_diff = $today->diff($date_only);
     $diff_days = (int) $date_diff->format('%R%a'); // Convert to integer
 
-    var_dump($date);
-    var_dump($today);
-    var_dump($date_diff);
+    #var_dump($date);
+    #var_dump($today);
+    #var_dump($date_diff);
 
     if($diff_days == 0){
         return 'i dag';
