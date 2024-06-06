@@ -34,7 +34,7 @@ function get_date_diff_text($date){
     }
 
     $today = new DateTime('today');
-    echo now();
+    echo date('Y-m-d H:i:s');
     $date_only = new DateTime($date->format('Y-m-d')); // Extracting only the date portion
 
     $date_diff = $today->diff($date_only);
