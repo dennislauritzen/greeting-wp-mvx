@@ -1,7 +1,5 @@
 <?php
 
-// Set the timezone to Copenhagen
-date_default_timezone_set('Europe/Copenhagen');
 
 /**
  * Function for validation a date has the correct format
