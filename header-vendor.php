@@ -344,16 +344,11 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
             </svg>
             Bestil inden kl.
               <?php
-              $drop_off_time = (!empty(get_field('vendor_drop_off_time', 'user_'.$vendor->id)) ? get_field('vendor_drop_off_time', 'user_'.$vendor->id) : '11');
-              if(strpos($drop_off_time,':') === false && strpos($drop_off_time,'.') === false){
-                $drop_off_time = $drop_off_time.':00';
-              } else {
-                $drop_off_time = str_replace(array(':','.'),array(':',':'),$drop_off_time);
-              }
-              echo $drop_off_time;
+              $dropoff_time = get_vendor_dropoff_time($vendor->id);
+              $formatted_time = date("H:i", strtotime($dropoff_time));
+              echo $formatted_time;
               ?>
             for
-
             <?php
             if($del_value == "1"){
               echo ' levering ';
@@ -363,16 +358,17 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
             ?>
 
             <?php
-              if(get_field('vendor_require_delivery_day', 'user_'.$vendor->id) == 0)
+                $vendor_days_to_delivery = get_vendor_days_until_delivery($vendor->id, true);
+              if($vendor_days_to_delivery == 0)
               {
                 echo ' i dag';
               }
-                else if(get_field('vendor_require_delivery_day', 'user_'.$vendor->id) == 1)
+                else if($vendor_days_to_delivery == 1)
               {
                 echo ' i morgen';
               } else {
-                if(!empty(get_field('vendor_require_delivery_day', 'user_'.$vendor->id))){
-                  echo ' om '.get_field('vendor_require_delivery_day', 'user_'.$vendor->id)." hverdage";
+                if(!empty($vendor_days_to_delivery)){
+                  echo ' om '.$vendor_days_to_delivery." hverdage";
                 } else {
                   echo 'om 2 hverdage';
                 }

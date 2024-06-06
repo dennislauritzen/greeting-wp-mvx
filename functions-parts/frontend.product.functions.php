@@ -214,7 +214,7 @@ function show_price_in_attribute_dropdown( $html, $args ) {
         $html = '<select id="' . esc_attr( $id ) . '" class="' . esc_attr( $class ) . '" name="' . esc_attr( $name ) . '" data-attribute_name="attribute_' . esc_attr( sanitize_title( $attribute ) ) . '" data-show_option_none="' . ( $show_option_none ? 'yes' : 'no' ) . '">';
         $html .= '<option value="">' . esc_html( $show_option_none_text ) . '</option>';
 
-        if ( ! empty( $options ) ) {
+        if ( !empty( $options ) ) {
             $option_value_arr = array();
 
             if ( $product && taxonomy_exists( $attribute ) ) {
@@ -235,13 +235,13 @@ function show_price_in_attribute_dropdown( $html, $args ) {
                 foreach ( $options as $option ) {
                     $selected = sanitize_title( $args['selected'] ) === $args['selected'] ? selected( $args['selected'], sanitize_title( $option ), false ) : selected( $args['selected'], $option, false );
                     // Get and inserting the price
-                    $price_html = get_the_variation_price_html( $product, $name, $option->slug );
-                    $price_raw = get_the_variation_price($product, $name, $option->slug);
+                    $price_html = get_the_variation_price_html( $product, $name, sanitize_title( $option ) );
+                    $price_raw = get_the_variation_price($product, $name, sanitize_title( $option ));
 
                     $option_title_text = ( empty($price_html) ? esc_html(apply_filters( 'woocommerce_variation_option_name', $option )) : esc_html( apply_filters( 'woocommerce_variation_option_name', $option ) . ' (' . $price_html . ')' ) );
                     $content = '<option value="' . esc_attr( $option ) . '" ' . $selected . '>' . $option_title_text . '</option>';
 
-                    $option_value_arr[$option->slug] = array('price' => $price_raw, 'title_text' => $option_title_text, 'html' => $content);
+                    $option_value_arr[sanitize_title( $option )] = array('price' => $price_raw, 'title_text' => $option_title_text, 'html' => $content);
                 }
             }
 
@@ -253,7 +253,7 @@ function show_price_in_attribute_dropdown( $html, $args ) {
                 return ($a['price'] < $b['price']) ? -1 : 1;
             });
 
-            foreach($option_value_arr as $k => $v){
+            foreach($option_value_arr as $v){
                 $html .= $v['html'];
             }
 

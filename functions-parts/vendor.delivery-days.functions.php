@@ -85,8 +85,6 @@ function get_vendor_dropoff_time($vendor_id, $type = 'weekday'){
     // Get the vendor dropoff time the old way
     // Get the dropoff time metavalue for the vendor.
     #$vendorDropOffTime = ($type == 'weekend' ? get_user_meta($vendor_id, 'vendor_drop_off_time_weekend', true) : get_user_meta($vendor_id, 'vendor_drop_off_time', true));
-    $vendor_dropoff_time = get_field('vendor_drop_off_time', 'user_'.$vendor_id);
-    $vendor_dropoff_time = empty($vendor_dropoff_time)?: get_user_meta($vendor_id, 'vendor_drop_off_time', true);
 
     $vendor_cutoff_times = get_field('vendor_cutoff_times', 'user_'.$vendor_id);
 
@@ -99,6 +97,9 @@ function get_vendor_dropoff_time($vendor_id, $type = 'weekday'){
         } else if($type == 'weekday'  && !empty($vendor_cutoff_times['cutoff_time_weekday'])) {
             $vendor_dropoff_time = $vendor_cutoff_times['cutoff_time_weekday'];
         }
+    } else {
+        $vendor_dropoff_time = get_field('vendor_drop_off_time', 'user_'.$vendor_id);
+        $vendor_dropoff_time = empty($vendor_dropoff_time)?: get_user_meta($vendor_id, 'vendor_drop_off_time', true);
     }
 
     if(strpos($vendor_dropoff_time,':') === false && strpos($vendor_dropoff_time,'.') === false){
@@ -229,7 +230,7 @@ function get_vendor_delivery_type($vendor_id, $return_type = 'type'){
  * @param $vendor_id
  * @return false|mixed|void
  */
-function get_vendor_days_until_delivery($vendor_id){
+function get_vendor_days_until_delivery($vendor_id, $for_vendor_header_with_cutoff = false){
     if(empty($vendor_id)){
         return;
     }
@@ -263,6 +264,9 @@ function get_vendor_days_until_delivery($vendor_id){
                 $days_until_delivery++;
             }
         }
+    }
+    if($for_vendor_header_with_cutoff === true){
+        $days_until_delivery--;
     }
 
     return $days_until_delivery;
