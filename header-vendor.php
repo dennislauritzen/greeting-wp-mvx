@@ -358,6 +358,8 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
             ?>
 
             <?php
+                $vendor_delivery_days_from_today = get_vendor_delivery_days_from_today($vendor->id, '', $del_value, 2);
+                echo $vendor_delivery_days_from_today;
                 $vendor_days_to_delivery = get_vendor_days_until_delivery($vendor->id, true);
               if($vendor_days_to_delivery == 0)
               {
