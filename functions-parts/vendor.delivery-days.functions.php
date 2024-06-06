@@ -241,6 +241,9 @@ function get_vendor_days_until_delivery($vendor_id, $for_vendor_header_with_cuto
         return;
     }
 
+    // Set the timezone to Copenhagen
+    date_default_timezone_set('Europe/Copenhagen');
+
     $dropoff_time 		= get_vendor_dropoff_time($vendor_id);
     $delDate 			= get_vendor_delivery_days_required($vendor_id);
     $closedDatesArr		= get_vendor_closed_dates($vendor_id);
@@ -270,9 +273,9 @@ function get_vendor_days_until_delivery($vendor_id, $for_vendor_header_with_cuto
             }
         }
     }
-    if($for_vendor_header_with_cutoff === true){
-        $days_until_delivery--;
-    }
+    #if($for_vendor_header_with_cutoff === true){
+    #    $days_until_delivery--;
+    #}
 
     return $days_until_delivery;
 }
