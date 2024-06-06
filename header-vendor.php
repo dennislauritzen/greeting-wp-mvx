@@ -360,21 +360,6 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
             <?php
                 $vendor_delivery_days_from_today = get_vendor_delivery_days_from_today($vendor->id, '', $del_value, 2);
                 echo $vendor_delivery_days_from_today;
-                $vendor_days_to_delivery = get_vendor_days_until_delivery($vendor->id, true);
-              if($vendor_days_to_delivery == 0)
-              {
-                echo ' i dag';
-              }
-                else if($vendor_days_to_delivery == 1)
-              {
-                echo ' i morgen';
-              } else {
-                if(!empty($vendor_days_to_delivery)){
-                  echo ' om '.$vendor_days_to_delivery." hverdage";
-                } else {
-                  echo 'om 2 hverdage';
-                }
-              }
             ?>
           </div>
           <div class="col-lg-3 d-none d-lg-inline pt-1 pt-lg-0 opening-row">
