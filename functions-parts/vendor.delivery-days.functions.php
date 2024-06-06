@@ -231,10 +231,11 @@ function get_vendor_delivery_type($vendor_id, $return_type = 'type'){
 /**
  * Function for calculating the days until the vendor is next able to deliver.
  *
- * @param $vendor_id
- * @return false|mixed|void
+ * @param int $vendor_id
+ * @param bool $for_vendor_header_with_cutoff
+ * @return false|int|void
  *
- * @todo Calculate this using the new way, in order to ensure it takes weekends and holidays into account.
+ * @throws Exception
  */
 function get_vendor_days_until_delivery($vendor_id, $for_vendor_header_with_cutoff = false){
     if(empty($vendor_id)){
@@ -244,35 +245,42 @@ function get_vendor_days_until_delivery($vendor_id, $for_vendor_header_with_cuto
     // Set the timezone to Copenhagen
     date_default_timezone_set('Europe/Copenhagen');
 
-    $dropoff_time 		= get_vendor_dropoff_time($vendor_id);
-    $delDate 			= get_vendor_delivery_days_required($vendor_id);
-    $closedDatesArr		= get_vendor_closed_dates($vendor_id);
-    $delWeekDays		= get_field('openning','user_'.$vendor_id);
+    $dropoff_time = get_vendor_dropoff_time($vendor_id);
+    $delDate = get_vendor_delivery_days_required($vendor_id);
+    $closedDatesArr = get_vendor_closed_dates($vendor_id);
+    $delWeekDays = get_field('openning', 'user_'.$vendor_id);
 
-    // Check if the store is closed this specific date.
-    $closedThisDate 	= (in_array(date('d-m-Y'), $closedDatesArr)) ? 1 : 0;
+    // Convert closed dates to DateTime objects for easier comparison
+    $closedDates = array_map(function($date) {
+        return DateTime::createFromFormat('d-m-Y', $date);
+    }, $closedDatesArr);
 
-    // Start calculation from 0 (= today)
-    $days_until_delivery = $delDate;
+    // Create an array of open days (ISO-8601 numeric representation of the day of the week)
+    $open_iso_days = array_map(function($day) {
+        return $day['value'];
+    }, $delWeekDays);
 
-    $open_iso_days = array();
-    foreach($delWeekDays as $key => $val){
-        $open_iso_days[] = $val['value'];
-    }
+    // Start calculation from today
+    $current_date = new DateTime('today');
+    $days_until_delivery = 0;
 
-    $open_this_day = (in_array(date('N'), $open_iso_days) ? 1 : 0);
+    while ($days_until_delivery < $delDate) {
+        $current_date->modify('+1 day');
 
-    if($open_this_day == 0){
-        $days_until_delivery++;
-    } else {
-        if($closedThisDate == 1){
+        $is_closed_date = in_array($current_date, $closedDates);
+        $is_open_day = in_array($current_date->format('N'), $open_iso_days);
+
+        // Check if the store is open on this day and it is not a closed date
+        if (!$is_closed_date && $is_open_day) {
             $days_until_delivery++;
-        } else {
-            if($dropoff_time < date('H')){
-                $days_until_delivery++;
-            }
         }
     }
+
+    // Additional checks for cutoff times
+    if ($open_this_day == 0 || $closedThisDate == 1 || ($dropoff_time < date('H'))) {
+        $days_until_delivery++;
+    }
+
     #if($for_vendor_header_with_cutoff === true){
     #    $days_until_delivery--;
     #}
