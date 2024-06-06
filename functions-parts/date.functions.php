@@ -19,35 +19,40 @@ function validateDate($date, $format = 'Y-m-d')
 /**
  * Function for calculating the day difference from today to a date.
  *
- * @param $date
+ * @param DateTime|string $date
  * @return string|void
  * @throws Exception
  */
 function get_date_diff_text($date){
+    // Ensure $date is a DateTime object
     if(!($date instanceof DateTime)){
-        return;
+        try {
+            $date = new DateTime($date);
+        } catch (Exception $e) {
+            return;
+        }
     }
 
     $today = new DateTime('today');
-    $date = new DateTime($date->format('Y-m-d')); // Extracting only the date portion
+    $date_only = new DateTime($date->format('Y-m-d')); // Extracting only the date portion
 
-    $date_diff = $today->diff($date);
+    $date_diff = $today->diff($date_only);
+    $diff_days = (int) $date_diff->format('%R%a'); // Convert to integer
 
-    $diff_days = $date_diff->format('%R%a'); // Convert to integer
-var_dump($date);
-var_dump($today);
-var_dump($date_diff);
-    if($diff_days == '0' || $diff_days == '+0'){
+    var_dump($date);
+    var_dump($today);
+    var_dump($date_diff);
+
+    if($diff_days == 0){
         return 'i dag';
-    } else if($diff_days == '1' || $diff_days == '+1'){
+    } else if($diff_days == 1){
         return 'i morgen';
-    } else if($diff_days == '2' || $diff_days == '+2'){
+    } else if($diff_days == 2){
         return 'i overmorgen';
     } else {
-        return 'om '.$date_diff->format('%a').' dage';
+        return 'om ' . $diff_days . ' dage';
     }
 }
-
 
 /**
  * Function for rephrashing a month to danish
