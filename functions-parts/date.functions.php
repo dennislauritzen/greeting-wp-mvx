@@ -24,6 +24,8 @@ function validateDate($date, $format = 'Y-m-d')
  * @throws Exception
  */
 function get_date_diff_text($date){
+    // Set the timezone to Copenhagen
+    date_default_timezone_set('Europe/Copenhagen');
     // Ensure $date is a DateTime object
     if(!($date instanceof DateTime)){
         try {
@@ -34,7 +36,6 @@ function get_date_diff_text($date){
     }
 
     $today = new DateTime('today');
-    echo date('Y-m-d H:i:s');
     $date_only = new DateTime($date->format('Y-m-d')); // Extracting only the date portion
 
     $date_diff = $today->diff($date_only);
