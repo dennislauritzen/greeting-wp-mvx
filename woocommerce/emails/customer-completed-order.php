@@ -30,8 +30,8 @@ $order_hash2 = hash('md4', 'vvkrne12onrtnFG_:____'.$latestOrderId);
 $vendor_id = greeting_get_vendor_id_from_order( $order );
 $vendor = get_mvx_vendor(absint($vendor_id));
 
-var_dump($vendor_id);
-var_dump($vendor);
+#var_dump($vendor_id);
+#var_dump($vendor);
 
 /**
  * Get variables for use in the template

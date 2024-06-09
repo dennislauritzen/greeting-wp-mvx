@@ -234,7 +234,9 @@ function get_vendor_delivery_type($vendor_id, $return_type = 'type'){
  * @param $vendor_id
  * @return false|mixed|void
  *
- * @todo Calculate this using the new way, in order to ensure it takes weekends and holidays into account.
+ * (No - no necessary) #to do Calculate this using the new way, in order to ensure it takes weekends and holidays into account.
+ *
+ * @deprecated Use get_vendor_delivery_days_from_today instead
  */
 function get_vendor_days_until_delivery($vendor_id, $for_vendor_header_with_cutoff = false){
     if(empty($vendor_id)){
