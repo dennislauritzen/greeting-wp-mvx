@@ -19,18 +19,20 @@ function get_vendor_delivery_days_required($vendor_id, $type = 'weekday'){
 
     #var_dump($get_deliveryday_required_repeater);
 
-    if(empty($get_deliveryday_required_repeater['order_days_before_weekday'])
-        && empty($get_deliveryday_required_repeater['order_days_before_weekend'])
-        && empty($get_deliveryday_required_repeater['order_days_before_holiday']) ){
-
+    if( (empty($get_deliveryday_required_repeater['order_days_before_weekday']) && $get_deliveryday_required_repeater['order_days_before_weekday'] !== "0")
+        && (empty($get_deliveryday_required_repeater['order_days_before_weekend'])  && $get_deliveryday_required_repeater['order_days_before_weekend'] !== "0")
+        && (empty($get_deliveryday_required_repeater['order_days_before_holiday']) && $get_deliveryday_required_repeater['order_days_before_holiday'] !== "0")
+        ){
+        #print "nye felter er tomme";
         return $delivery_day_required_old;
     } else {
+        #print "nye felter er ikke tomme";
         if($type == 'holiday'){
-            return (!empty($get_deliveryday_required_repeater['order_days_before_holiday']) ? $get_deliveryday_required_repeater['order_days_before_holiday'] : $delivery_day_required_old);
+            return (!empty($get_deliveryday_required_repeater['order_days_before_holiday'] || $get_deliveryday_required_repeater['order_days_before_holiday'] == "0") ? $get_deliveryday_required_repeater['order_days_before_holiday'] : $delivery_day_required_old);
         } else if($type == 'weekend') {
-            return (!empty($get_deliveryday_required_repeater['order_days_before_weekend']) ? $get_deliveryday_required_repeater['order_days_before_weekend'] : $delivery_day_required_old);
+            return (!empty($get_deliveryday_required_repeater['order_days_before_weekend'] || $get_deliveryday_required_repeater['order_days_before_weekend'] == "0") ? $get_deliveryday_required_repeater['order_days_before_weekend'] : $delivery_day_required_old);
         } else {
-            return (!empty($get_deliveryday_required_repeater['order_days_before_weekday']) ? $get_deliveryday_required_repeater['order_days_before_weekday'] : $delivery_day_required_old);
+            return (!empty($get_deliveryday_required_repeater['order_days_before_weekday'] || $get_deliveryday_required_repeater['order_days_before_weekday'] == "0") ? $get_deliveryday_required_repeater['order_days_before_weekday'] : $delivery_day_required_old);
         }
     }
 }
@@ -96,7 +98,9 @@ function get_vendor_dropoff_time($vendor_id, $type = 'weekday'){
     // Get the dropoff time metavalue for the vendor.
     #$vendorDropOffTime = ($type == 'weekend' ? get_user_meta($vendor_id, 'vendor_drop_off_time_weekend', true) : get_user_meta($vendor_id, 'vendor_drop_off_time', true));
 
+
     $vendor_cutoff_times = get_field('vendor_cutoff_times', 'user_'.$vendor_id);
+
 
     // Get the new vendor dropoff time.
     if(!empty($vendor_cutoff_times) && count($vendor_cutoff_times) > 0){
@@ -118,11 +122,19 @@ function get_vendor_dropoff_time($vendor_id, $type = 'weekday'){
         } else {
             $vendor_dropoff_time = str_replace(array(':', '.'), array(':', ':'), $vendor_dropoff_time);
         }
+
+        $default_timeZone = new DateTimeZone('UTC');
     } else {
         $vendor_dropoff_time = '00:00:00';
+        $default_timeZone = new DateTimeZone('Europe/Copenhagen');
+
     }
 
-    return $vendor_dropoff_time;
+    $timeZone = new DateTimeZone('Europe/Copenhagen');
+    $dateTime = new DateTime($vendor_dropoff_time, $default_timeZone);
+    $dateTime->setTimezone($timeZone);
+
+    return $dateTime->format('H:i:s');
 }
 
 /**
@@ -304,7 +316,7 @@ function get_vendor_days_until_delivery($vendor_id, $for_vendor_header_with_cuto
 function get_vendor_delivery_days_from_today($vendor_id, $prepend_text = '', $del_type = "1", $long_or_short_text = 0)
 {
     // Set the timezone to Copenhagen
-    date_default_timezone_set('Europe/Copenhagen');
+    #date_default_timezone_set('Europe/Copenhagen');
 
     #if(!($comparison_date instanceof DateTime)){
     #   $comparison_date = DateTime::createFromFormat('d-m-Y', now());
@@ -314,7 +326,6 @@ function get_vendor_delivery_days_from_today($vendor_id, $prepend_text = '', $de
     $result = [];
 
     $now = new DateTime();
-    $now->setTime(0, 0, 0);
 
     foreach ($vendor_days as $p => $c) {
         if(isset($c['cutoff_datetime'])
@@ -341,10 +352,9 @@ function get_vendor_delivery_days_from_today($vendor_id, $prepend_text = '', $de
         return;
     } else {
         // Create a fallback date object.
-        // NOTE: Maybe we shouldnt add the '00:00:00'-part... Test it :-)
         $date_str = $result['date'].' 00:00:00';
         $date_obj =  DateTime::createFromFormat('d-m-Y H:i:s', $date_str);
-        $date = $date_obj->format('d-m-Y'); // Construct from the date.
+        #$date = $date_obj->format('d-m-Y'); // Construct from the date.
 
         $str = '';
         if($del_type == "1"){
@@ -364,22 +374,19 @@ function get_vendor_delivery_days_from_today($vendor_id, $prepend_text = '', $de
 }
 
 /**
- * Function for calculating how many days from now until next time the store can deliver.
- * Implements the array from the get_vendor_dates_new() function.
+ * Function for calculating when the order should be made - used on the header-vendor.php
+ * The difference from the one above is, that it doesnt take current time into account.
+ * Since the text is regarding when I need to order today to get at the next possible delivery time.
  *
  * @uses get_vendor_dates_new()
  * @param $days_array
  * @param $today
  * @return String
  */
-function get_vendor_delivery_days_from_today_new($vendor_id, $prepend_text = '', $del_type = "1", $long_or_short_text = 0)
+function get_vendor_delivery_days_from_today_header_vendor($vendor_id, $prepend_text = '', $del_type = "1", $long_or_short_text = 0)
 {
     // Set the timezone to Copenhagen
-    date_default_timezone_set('Europe/Copenhagen');
-
-    #if(!($comparison_date instanceof DateTime)){
-    #   $comparison_date = DateTime::createFromFormat('d-m-Y', now());
-    #}
+    #date_default_timezone_set('Europe/Copenhagen');
 
     $vendor_days = get_vendor_dates_new($vendor_id, 'd-m-Y', 'all', 60);
     $result = [];
@@ -414,7 +421,14 @@ function get_vendor_delivery_days_from_today_new($vendor_id, $prepend_text = '',
         // NOTE: Maybe we shouldnt add the '00:00:00'-part... Test it :-)
         $date_str = $result['date'].' 00:00:00';
         $date_obj =  DateTime::createFromFormat('d-m-Y H:i:s', $date_str);
-        $date = $date_obj->format('d-m-Y'); // Construct from the date.
+        #$date = $date_obj->format('d-m-Y'); // Construct from the date.
+
+        // Subtract one day in order to calculate comparing to "when I need to order today" for next delivery slot.
+        $subdate = $cutoff_time;
+        $subnow = $now;
+        if($subdate->format('H:i:s') < $subnow->format('H:i:s')){
+            $date_obj->sub(new DateInterval('P1D'));
+        }
 
         $str = '';
         if($del_type == "1"){
@@ -645,6 +659,9 @@ function get_vendor_dates_new($vendor_id, $date_format = 'd-m-Y', $open_close = 
         return false;
     }
 
+    // Set the timezone to Copenhagen
+    #date_default_timezone_set('Europe/Copenhagen');
+
     global $wpdb;
 
 
@@ -732,6 +749,7 @@ function get_vendor_dates_new($vendor_id, $date_format = 'd-m-Y', $open_close = 
                 $cutoff = $vendor_dropoff_time;
                 break;
         }
+        #var_dump($cutoff);
 
         // Calculation of the specific cutoff time for this date.
         # @todo - Make the calculation

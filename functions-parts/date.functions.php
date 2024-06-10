@@ -25,7 +25,7 @@ function validateDate($date, $format = 'Y-m-d')
  */
 function get_date_diff_text($date){
     // Set the timezone to Copenhagen
-    date_default_timezone_set('Europe/Copenhagen');
+    #date_default_timezone_set('Europe/Copenhagen');
 
     // Ensure $date is a DateTime object
     if(!($date instanceof DateTime)){
@@ -37,15 +37,16 @@ function get_date_diff_text($date){
     }
 
     $today = new DateTime('today');
+    $today->setTime(0,0,0);
     //$date_only = new DateTime($date->format('Y-m-d')); // Extracting only the date portion
 
     $date_diff = $today->diff($date);
     $diff_days = (int) $date_diff->format('%R%a'); // Convert to integer
-    
 
     #var_dump($date);
     #var_dump($today);
     #var_dump($date_diff);
+    #var_dump($diff_days);
 
     if($diff_days == 0){
         return 'i dag';
@@ -54,7 +55,7 @@ function get_date_diff_text($date){
     } else if($diff_days == 2){
         return 'i overmorgen';
     } else {
-        return 'om ' . $diff_days . ' dage';
+        return 'om ' . ($diff_days) . ' dage';
     }
 }
 

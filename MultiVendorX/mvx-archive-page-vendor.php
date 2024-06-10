@@ -64,8 +64,6 @@ if(!empty($args['city']) && !empty($args['postalcode'])){
 <section id="backbutton" class="mb-3 mt-1">
   <div class="container">
 
-
-
   </div>
 </section>
 
@@ -451,56 +449,57 @@ if(!empty($args['city']) && !empty($args['postalcode'])){
 				<div id="filteredProduct" class="row">
 
 				</div>
-        <div class="loadingHeartBeat row" style="display: none;">
-          <div class="loadingcard col-6 col-xs-6 col-sm-6 col-md-6 col-lg-4 col-xl-3">
-            <div class="card border-0 mb-3">
-              <div class="image-large animated-background "></div>
-              <div class="card-body">
-                <div class="text-line-heading animated-background "></div>
-                <div class="text-line-60 animated-background "></div>
-                <div class="text-line-100 animated-background "></div>
-                <div class="loading-cta animated-background "></div>
-              </div>
-            </div>
-          </div>
-          <div class="loadingcard col-6 col-xs-6 col-sm-6 col-md-6 col-lg-4 col-xl-3">
-            <div class="card border-0 mb-3">
-              <div class="image-large animated-background "></div>
-              <div class="card-body">
-                <div class="text-line-heading animated-background "></div>
-                <div class="text-line-60 animated-background "></div>
-                <div class="text-line-100 animated-background "></div>
-                <div class="loading-cta animated-background "></div>
-              </div>
-            </div>
-          </div>
-          <div class="loadingcard col-6 col-xs-6 col-sm-6 col-md-6 col-lg-4 col-xl-3">
-            <div class="card border-0 mb-3">
-              <div class="image-large animated-background "></div>
-              <div class="card-body">
-                <div class="text-line-heading animated-background "></div>
-                <div class="text-line-60 animated-background "></div>
-                <div class="text-line-100 animated-background "></div>
-                <div class="loading-cta animated-background "></div>
-              </div>
-            </div>
-          </div>
-          <div class="loadingcard col-6 col-xs-6 col-sm-6 col-md-6 col-lg-4 col-xl-3">
-            <div class="card border-0 mb-3">
-              <div class="image-large animated-background "></div>
-              <div class="card-body">
-                <div class="text-line-heading animated-background "></div>
-                <div class="text-line-60 animated-background "></div>
-                <div class="text-line-100 animated-background "></div>
-                <div class="loading-cta animated-background "></div>
-              </div>
-            </div>
-          </div>
+                <div class="loadingHeartBeat row" style="display: none;">
+                  <div class="loadingcard col-6 col-xs-6 col-sm-6 col-md-6 col-lg-4 col-xl-3">
+                    <div class="card border-0 mb-3">
+                      <div class="image-large animated-background "></div>
+                      <div class="card-body">
+                        <div class="text-line-heading animated-background "></div>
+                        <div class="text-line-60 animated-background "></div>
+                        <div class="text-line-100 animated-background "></div>
+                        <div class="loading-cta animated-background "></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="loadingcard col-6 col-xs-6 col-sm-6 col-md-6 col-lg-4 col-xl-3">
+                    <div class="card border-0 mb-3">
+                      <div class="image-large animated-background "></div>
+                      <div class="card-body">
+                        <div class="text-line-heading animated-background "></div>
+                        <div class="text-line-60 animated-background "></div>
+                        <div class="text-line-100 animated-background "></div>
+                        <div class="loading-cta animated-background "></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="loadingcard col-6 col-xs-6 col-sm-6 col-md-6 col-lg-4 col-xl-3">
+                    <div class="card border-0 mb-3">
+                      <div class="image-large animated-background "></div>
+                      <div class="card-body">
+                        <div class="text-line-heading animated-background "></div>
+                        <div class="text-line-60 animated-background "></div>
+                        <div class="text-line-100 animated-background "></div>
+                        <div class="loading-cta animated-background "></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="loadingcard col-6 col-xs-6 col-sm-6 col-md-6 col-lg-4 col-xl-3">
+                    <div class="card border-0 mb-3">
+                      <div class="image-large animated-background "></div>
+                      <div class="card-body">
+                        <div class="text-line-heading animated-background "></div>
+                        <div class="text-line-60 animated-background "></div>
+                        <div class="text-line-100 animated-background "></div>
+                        <div class="loading-cta animated-background "></div>
+                      </div>
+                    </div>
+                  </div>
 
-        </div>
+                </div>
 			</div>
 		</div>
 	</div>
+</div>
 </section>
 
 <?php $defaultProductIdAsString = implode(",", $productIdArray);?>
@@ -606,20 +605,18 @@ do_action('after_mvx_vendor_description', $vendorId);
             ?>
           </p>
           <p>
-            Butikken leverer senest
-            <?php
-              if(get_field('vendor_require_delivery_day', 'user_'.$vendorId) == 0)
-              {
-                echo ' i dag';
-              }
-                else if(get_field('vendor_require_delivery_day', 'user_'.$vendorId) == 1)
-              {
-                echo ' i morgen';
-              } else {
-                echo 'om '.get_field('vendor_require_delivery_day', 'user_'.$vendorId)." hverdage";
-              }
-            ?>, hvis du bestiller inden kl.
-            <?php echo (!empty(get_field('vendor_drop_off_time', 'user_'.$vendor->id)) ? get_field('vendor_drop_off_time', 'user_'.$vendor->id) : '11'); ?>.
+              <?php
+              // Dropoff time, get.
+              $dropoff_time = get_vendor_dropoff_time($vendor->id);
+              $formatted_time = date("H:i", strtotime($dropoff_time));
+
+              $prepend_text = ($del_value == "1") ? 'Hvis du bestiller inden kl. '.$formatted_time.' kan butikken levere ' : 'Hvis du bestiller inden kl. '.$formatted_time.' kan butikken afsende ';
+              ?>
+
+              <?php
+              $vendor_delivery_days_from_today = get_vendor_delivery_days_from_today_header_vendor($vendor->id, $prepend_text, $del_value, 2);
+              echo $vendor_delivery_days_from_today.'.';
+              ?>
           </p>
         <?php
         }

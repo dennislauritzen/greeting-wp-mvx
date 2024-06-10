@@ -1,8 +1,5 @@
 <?php
 
-
-
-
 /**
  * Filtering action for the admin order page, to filter vendors
  *
