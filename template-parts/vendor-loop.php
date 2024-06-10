@@ -168,6 +168,7 @@ if($args['vendor']){
                     ///////////////////////////
                     // TAG Days until delivery
                     $delivery_days 		= get_vendor_delivery_days_from_today($vendor_id, 'Kan ');
+                    #var_dump($delivery_days);
                     ?>
                     <p class="text-white badge rounded-pill rounded-end bg-teal px-3 py-2 fw-light" style="font-size: 14px;"><?php echo $delivery_days; ?></p>
                     <?php

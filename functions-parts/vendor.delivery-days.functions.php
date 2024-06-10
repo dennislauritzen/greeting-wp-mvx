@@ -9,18 +9,28 @@
 
 
 function get_vendor_delivery_days_required($vendor_id, $type = 'weekday'){
+    // Get the new delivery day required value
     $get_deliveryday_required_repeater = get_field('vendor_require_order_days_before', 'user_'.$vendor_id);
 
-    if(empty($get_deliveryday_required_repeater)){
-        $delday_req = get_field('vendor_require_delivery_day', 'user_'.$vendor_id);
-        return $delday_req;
+    // Get the old delivery day required value.
+    # Just as a fallback
+    $delivery_day_required_old = get_field('vendor_require_delivery_day', 'user_'.$vendor_id);
+    $delivery_day_required_old = (!empty($delivery_day_required_old) ? $delivery_day_required_old : 0);
+
+    #var_dump($get_deliveryday_required_repeater);
+
+    if(empty($get_deliveryday_required_repeater['order_days_before_weekday'])
+        && empty($get_deliveryday_required_repeater['order_days_before_weekend'])
+        && empty($get_deliveryday_required_repeater['order_days_before_holiday']) ){
+
+        return $delivery_day_required_old;
     } else {
         if($type == 'holiday'){
-            return (!empty($get_deliveryday_required_repeater['order_days_before_holiday']) ? $get_deliveryday_required_repeater['order_days_before_holiday'] : 0);
+            return (!empty($get_deliveryday_required_repeater['order_days_before_holiday']) ? $get_deliveryday_required_repeater['order_days_before_holiday'] : $delivery_day_required_old);
         } else if($type == 'weekend') {
-            return (!empty($get_deliveryday_required_repeater['order_days_before_weekend']) ? $get_deliveryday_required_repeater['order_days_before_weekend'] : 0);
+            return (!empty($get_deliveryday_required_repeater['order_days_before_weekend']) ? $get_deliveryday_required_repeater['order_days_before_weekend'] : $delivery_day_required_old);
         } else {
-            return (!empty($get_deliveryday_required_repeater['order_days_before_weekday']) ? $get_deliveryday_required_repeater['order_days_before_weekday'] : 0);
+            return (!empty($get_deliveryday_required_repeater['order_days_before_weekday']) ? $get_deliveryday_required_repeater['order_days_before_weekday'] : $delivery_day_required_old);
         }
     }
 }
@@ -304,10 +314,12 @@ function get_vendor_delivery_days_from_today($vendor_id, $prepend_text = '', $de
     $result = [];
 
     $now = new DateTime();
+    $now->setTime(0, 0, 0);
 
     foreach ($vendor_days as $p => $c) {
         if(isset($c['cutoff_datetime'])
             && $c['cutoff_datetime'] !== false){
+
             $cutofftime = $c['cutoff_datetime'];
             $cutoff_time = DateTime::createFromFormat('d-m-Y H:i:s', $cutofftime);
 
@@ -334,8 +346,75 @@ function get_vendor_delivery_days_from_today($vendor_id, $prepend_text = '', $de
         $date_obj =  DateTime::createFromFormat('d-m-Y H:i:s', $date_str);
         $date = $date_obj->format('d-m-Y'); // Construct from the date.
 
-        // Current date
-        #$today = new DateTime();
+        $str = '';
+        if($del_type == "1"){
+            $str .= 'Levere ';
+        } else if($del_type == "0"){
+            $str .= 'Afsende ';
+        }
+        if($long_or_short_text == 1){
+            $str = "Butikken kan ".strtolower($str);
+        } else if($long_or_short_text == 2){
+            $str = '';
+        }
+
+        return $prepend_text . ' ' . strtolower($str . get_date_diff_text($date_obj));
+        // There is a date. Let's populate the variables for the calculation.
+    }
+}
+
+/**
+ * Function for calculating how many days from now until next time the store can deliver.
+ * Implements the array from the get_vendor_dates_new() function.
+ *
+ * @uses get_vendor_dates_new()
+ * @param $days_array
+ * @param $today
+ * @return String
+ */
+function get_vendor_delivery_days_from_today_new($vendor_id, $prepend_text = '', $del_type = "1", $long_or_short_text = 0)
+{
+    // Set the timezone to Copenhagen
+    date_default_timezone_set('Europe/Copenhagen');
+
+    #if(!($comparison_date instanceof DateTime)){
+    #   $comparison_date = DateTime::createFromFormat('d-m-Y', now());
+    #}
+
+    $vendor_days = get_vendor_dates_new($vendor_id, 'd-m-Y', 'all', 60);
+    $result = [];
+
+    $now = new DateTime();
+
+    foreach ($vendor_days as $p => $c) {
+        if(isset($c['cutoff_datetime'])
+            && $c['cutoff_datetime'] !== false){
+
+            $cutofftime = $c['cutoff_datetime'];
+            $cutoff_time = DateTime::createFromFormat('d-m-Y H:i:s', $cutofftime);
+
+            if($cutoff_time > $now){
+                $result = array(
+                    'date' => $c['date'],
+                    'cutoff_datetime' => $c['cutoff_datetime'],
+                    'cutoff_time' => $c['cutoff_time'],
+                    'type' => $c['type']
+                );
+                break; // Break out of the inner loop once a non-false 'cutoff_time' is found
+            }
+        }
+    }
+
+    $date = '';
+    $text = '';
+    if(empty($result)){
+        return;
+    } else {
+        // Create a fallback date object.
+        // NOTE: Maybe we shouldnt add the '00:00:00'-part... Test it :-)
+        $date_str = $result['date'].' 00:00:00';
+        $date_obj =  DateTime::createFromFormat('d-m-Y H:i:s', $date_str);
+        $date = $date_obj->format('d-m-Y'); // Construct from the date.
 
         $str = '';
         if($del_type == "1"){

@@ -342,23 +342,16 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
               <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
               <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
             </svg>
-            Bestil inden kl.
-              <?php
-              $dropoff_time = get_vendor_dropoff_time($vendor->id);
-              $formatted_time = date("H:i", strtotime($dropoff_time));
-              echo $formatted_time;
-              ?>
-            for
             <?php
-            if($del_value == "1"){
-              echo ' levering ';
-            } else if($del_value == "0"){
-              echo ' forsendelse ';
-            }
+            // Dropoff time, get.
+            $dropoff_time = get_vendor_dropoff_time($vendor->id);
+            $formatted_time = date("H:i", strtotime($dropoff_time));
+
+            $prepend_text = ($del_value == "1") ? 'Bestil inden kl. '.$formatted_time.' for levering ' : 'Bestil inden kl. '.$formatted_time.' for forsendelse ';
             ?>
 
             <?php
-                $vendor_delivery_days_from_today = get_vendor_delivery_days_from_today($vendor->id, '', $del_value, 2);
+                $vendor_delivery_days_from_today = get_vendor_delivery_days_from_today($vendor->id, $prepend_text, $del_value, 2);
                 echo $vendor_delivery_days_from_today;
             ?>
           </div>
