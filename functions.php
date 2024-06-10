@@ -492,8 +492,8 @@ function remove_plugin_bootstrap_styles() {
 
     // MVX SELLER SHOP PAGE: mvx_seller_shop_page_css
     # This was once commented out... Cant remember why?
-    wp_dequeue_style('mvx_seller_shop_page_css');
-    wp_deregister_style('mvx_seller_shop_page_css');
+    #wp_dequeue_style('mvx_seller_shop_page_css');
+    #wp_deregister_style('mvx_seller_shop_page_css');
 
     // MVX SELLER SHOP PAGE: frontend_css
     wp_dequeue_style('frontend_css');
