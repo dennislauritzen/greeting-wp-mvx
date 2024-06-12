@@ -7,9 +7,22 @@
  *
  */
 function lpFilterAction() {
+    global $wpdb;
+
     // default user array come from front end
     $cityDefaultUserIdAsString = $_POST['landingPageDefaultUserIdAsString'];
     $defaultUserArray = explode(",", $cityDefaultUserIdAsString);
+
+    // Check the encryption post key
+    $post_key = 'gr42142!____GRege13lj1mnGnERNGRe' . $cityDefaultUserIdAsString . 'greeting!?41412__%!132æfæfdæfsøøaøræwæååå!';
+    $post_key_str = hash('sha256', $post_key);
+
+    if(empty($_POST['post_key']) || $post_key_str !== $_POST['post_key']){
+        // Someone tried to manipulate the data. Exit.
+
+        return;
+        exit;
+    }
 
     // category & occasion filter data
     $catOccaArray = array();
@@ -41,7 +54,6 @@ function lpFilterAction() {
     $selectedDate2 = $filteredDate->format('dmY');
     $selectedDay = $filteredDate->format('N');
 
-
     // declare array for store user ID get from occasion
     $userIdArrayGetFromCatOcca = array();
 
@@ -51,7 +63,7 @@ function lpFilterAction() {
     // declare array for store user ID got from delivery type
     $userIdArrayGetFromDelivery = array();
 
-    global $wpdb;
+
     // Prepare the where and where-placeholders for term_id (cat and occassion ID's).
     $where = array();
     $placeholder_arr = (is_countable($catOccaDeliveryIdArray) ? array_fill(0, count($catOccaDeliveryIdArray), '%s') : array());
@@ -152,18 +164,13 @@ function lpFilterAction() {
     if($deliveryDate >= 0 && $deliveryDate < 8){
         $args = array(
             'role' => 'dc_vendor',
-            'meta_query' => array(
-                'key' => 'vendor_require_delivery_day',
-                'value' => $deliveryDate,
-                'compare' => '<=',
-                'type' => 'NUMERIC'
-            )
+            'include' => $defaultUserArray,
         );
 
         // (v) @todo: Move cut-off time out of the query and into PHP.
         // (v) @todo: Make sure the store is not closed on the given date!!!! Make a PHP check.
 
-        $usersByDelDateFilter = new WP_User_Query( $args	);
+        $usersByDelDateFilter = new WP_User_Query( $args );
         $delDateArr = $usersByDelDateFilter->get_results();
 
         foreach($delDateArr as $v){

@@ -204,39 +204,6 @@ foreach ($defaultUserArray as $vendorId) {
 }
 $vendorProductIds = array_unique($vendorProductIds);
 
-// Use a custom SQL query to fetch the prices of those products
-$where = array();
-foreach($vendorProductIds as $pv){
-  if(is_numeric($pv)){
-    $where[] = $pv;
-  }
-}
-
-if(!empty($where)){
-  $prices = $wpdb->prepare("
-      SELECT meta_value
-      FROM {$wpdb->postmeta}
-      WHERE meta_key = '_price'
-      AND post_id IN (".implode(', ', array_fill(0, count($vendorProductIds), '%s')).")
-  ", $where);
-  $prices = $wpdb->get_results($prices);
-
-  // Convert the results to an array of prices
-  $priceArray = array();
-  foreach ($prices as $price) {
-      $priceArray[] = $price->meta_value;
-  }
-} else {
-  $priceArray = array(0,2000);
-}
-
-// Use min and max to get the minimum and maximum prices
-$minPrice = min($priceArray);
-$maxPrice = max($priceArray);
-
-// Use array_push to add the prices to the $productPriceArray
-array_push($productPriceArray, $minPrice, $maxPrice);
-
 // Use get_the_terms to fetch all the terms for all products belonging to the vendors
 $terms = wp_get_object_terms($vendorProductIds, array('product_cat', 'occasion'));
 
@@ -258,7 +225,10 @@ if ($terms && !is_wp_error($terms)) {
 $categoryTermListArray = array_unique($categoryTermListArray);
 $occasionTermListArray = array_unique($occasionTermListArray);
 
+$post_key = 'gr42142!____GRege13lj1mnGnERNGRe' . $defaultUserString . 'greeting!?41412__%!132æfæfdæfsøøaøræwæååå!';
+$post_key_str = hash('sha256', $post_key);
 ?>
+<input type="hidden" id="__post_key41" name="__post_key" value="<?php echo $post_key_str;?>">
 <input type="hidden" id="landingPageDefaultUserIdAsString" value="<?php echo $defaultUserString;?>">
 <input type="hidden" id="cityName" value="<?php echo $city_name; ?>">
 
@@ -630,11 +600,6 @@ get_footer(); ?>
      update();
     }
 
-
-      //$('html, body').animate({
-      //    scrollTop: $('.applied-filters').offset().top
-      //}, 0);
-
     jQuery(".filter-on-city-page").click(function(){
       update();
 
@@ -655,6 +620,7 @@ get_footer(); ?>
 
 
     update();
+
     function update(){
       var cityName = $('#cityName').val();
       var postalCode = $('#postalCode').val();
@@ -674,6 +640,7 @@ get_footer(); ?>
 
       var data = {
         'action': 'lpFilterAction',
+        post_key: jQuery("#__post_key41").val(),
         cityName: cityName,
         landingPageDefaultUserIdAsString: jQuery("#landingPageDefaultUserIdAsString").val(),
         delDate: delDate,
