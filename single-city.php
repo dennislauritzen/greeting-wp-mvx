@@ -116,41 +116,6 @@ foreach ($UserIdArrayForCityPostalcode as $vendorId) {
 }
 $vendorProductIds = array_unique($vendorProductIds);
 
-// Use a custom SQL query to fetch the prices of those products
-$where = array();
-foreach($vendorProductIds as $pv){
-  if(is_numeric($pv)){
-    $where[] = $pv;
-  }
-}
-
-if(!empty($where)){
-  $prices = $wpdb->prepare("
-      SELECT meta_value
-      FROM {$wpdb->postmeta}
-      WHERE meta_key = '_price'
-      AND post_id IN (".implode(', ', array_fill(0, count($vendorProductIds), '%s')).")
-  ", $where);
-  $prices = $wpdb->get_results($prices);
-
-  // Convert the results to an array of prices
-  $priceArray = array();
-  foreach ($prices as $price) {
-      $priceArray[] = $price->meta_value;
-  }
-} else {
-  $priceArray = array(0,2000);
-}
-
-
-
-// Use min and max to get the minimum and maximum prices
-$minPrice = min($priceArray);
-$maxPrice = max($priceArray);
-
-// Use array_push to add the prices to the $productPriceArray
-array_push($productPriceArray, $minPrice, $maxPrice);
-
 // Use get_the_terms to fetch all the terms for all products belonging to the vendors
 $terms = wp_get_object_terms($vendorProductIds, array('product_cat', 'occasion'));
 
