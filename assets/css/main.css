@@ -10856,6 +10856,7 @@ ul.timeline li figure {
   width: 100%;
   height: 10vw;
   object-fit: cover;
+  border-radius: 18px;
 }
 #citycontent #topoccassions .card h5.card-title, #citycontent #topoccassions .card .card-title.h5,
 #categorycontent #topoccassions .card h5.card-title,
