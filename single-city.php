@@ -303,6 +303,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     $query->the_post();
                     $landing_page_permalink = get_permalink(); // Get the permalink of the post
                     // You can now use $landing_page_permalink variable as needed
+
+                    wp_reset_postdata(); // Reset post data to avoid conflicts
                 }
 
             $category_or_occasion = ($occasion->taxonomy == 'product_cat') ? 'cat' : 'occ_';
