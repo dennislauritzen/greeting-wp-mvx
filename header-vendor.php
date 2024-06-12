@@ -57,10 +57,10 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
 }
 ?>
 
- <section id="top" class="vendor pt-1" style="min-height: 275px; background-size: cover; background-position: center center; background-image: linear-gradient(rgba(0, 0, 0, 0.35),rgba(0, 0, 0, 0.35)),url('<?php echo esc_url($vendor_banner); ?>');">
+ <section id="top" class="vendor pt-1" style="background-size: cover; background-position: center center; background-image: linear-gradient(rgba(0, 0, 0, 0.35),rgba(0, 0, 0, 0.35)),url('<?php echo esc_url($vendor_banner); ?>');">
   <div class="container py-4">
     <div class="row">
-			<div class="d-flex pb-3 pb-lg-0 pb-xl-0 position-relative justify-content-center justify-content-lg-start justify-content-xl-start col-md-12 col-lg-3">
+        <div class="d-flex pb-3 pb-lg-0 pb-xl-0 position-relative justify-content-center justify-content-lg-start justify-content-xl-start col-md-12 col-lg-3">
         <a href="<?php echo home_url(); ?>">
           <?php echo '<?xml version="1.0" encoding="UTF-8" ?>' ?>
           <svg viewBox="0 0 524 113" width="175" fill="#ffffff"  xmlns="http://www.w3.org/2000/svg">
@@ -164,7 +164,7 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
   </div>
   <div class="container d-flex align-items-end" style="height: inherit; min-height: inherit;">
     <div class="row">
-			<div class="col-12 m-0 p-0">
+        <div class="col-12">
         <?php
         $term = get_queried_object();
 
@@ -222,9 +222,9 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
       <div class="col-12 rounded storebar bg-white py-3 shadow-sm">
         <div class="row align-items-center">
           <div class="d-flex col-md-12 col-lg-3 align-items-center">
-            <div class="col-8 col-md-6 col-lg-12 align-items-center">
+            <div class="col-9 col-sm-8 col-md-8 col-lg-12 align-items-center">
               <div class="d-flex align-items-center">
-                <div class="w-25 float-start">
+                <div class="w-25 w-sm-20 w-md-15 float-start">
                   <a href="<?php echo $vendor->get_permalink(); ?>" class="text-dark">
                     <img class="img-fuid pe-1" style="max-height:75px;"
                     src="<?php echo esc_attr($image); ?>">
@@ -235,25 +235,14 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
                     <?php echo ucfirst(esc_html($vendor->page_title)); ?>
                   </a>
                   <br>
-                  <a href="#" class="text-dark text-decoration-underline" style="font-size: 13px;" data-bs-toggle="modal" data-bs-target="#storeDescriptionModal">Læs mere om butikken</a>
+                  <a href="#" class="text-dark text-decoration-underline d-none d-lg-block" style="font-size: 13px;" data-bs-toggle="modal" data-bs-target="#storeDescriptionModal">Læs mere om butikken</a>
                 </div>
               </div>
             </div>
-            <div class="d-lg-none col-3 col-lg-0">
-              <button type="button" id="toggleOpening" class="d-lg-none btn btn-primary bg-teal border-0 py-2 px-1 px-sm-4" style="font-size:12px;">
-                Se leveringstid & øvrig info
+            <div class="d-lg-none col-3 col-sm-4 col-md-4 col-lg-0">
+              <button type="button" data-bs-toggle="modal" data-bs-target="#storeDescriptionModal" class="d-lg-none btn btn-teal border-0 py-2 px-1 px-sm-4" style="font-size:14px;">
+                Læs om butikken & se leveringstid
               </button>
-              <script type="text/javascript">
-                jQuery(document).ready(function(){
-                  jQuery("#toggleOpening").click(function(){
-                    if(jQuery(".opening-row").css('display') == 'none'){
-                      jQuery(".opening-row").removeClass('d-none', {duration:500});
-                    } else {
-                      jQuery(".opening-row").addClass('d-none', {duration:500});
-                    }
-                  });
-                });
-              </script>
             </div>
           </div>
           <div class="d-none pt-1 pt-lg-0 d-lg-inline col-lg-3 opening-row">
@@ -268,33 +257,6 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
               foreach($opening as $k => $v){
                 $open_iso_days[] = (int) $v['value'];
                 $open_label_days[$v['value']] = $v['label'];
-              }
-
-              if( !function_exists('build_intervals')){
-              	function build_intervals($items, $is_contiguous, $make_interval) {
-              			$intervals = array();
-              			$end   = false;
-              			if(is_array($items) || is_object($items)){
-              				foreach ($items as $item) {
-              						if (false === $end) {
-              								$begin = (int) $item;
-              								$end   = (int) $item;
-              								continue;
-              						}
-              						if ($is_contiguous($end, $item)) {
-              								$end = (int) $item;
-              								continue;
-              						}
-              						$intervals[] = $make_interval($begin, $end);
-              						$begin = (int) $item;
-              						$end   = (int) $item;
-              				}
-              			}
-              			if (false !== $end) {
-              					$intervals[] = $make_interval($begin, $end);
-              			}
-              			return $intervals;
-              	}
               }
 
               $interv = array();
@@ -347,11 +309,9 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
             $formatted_time = date("H:i", strtotime($dropoff_time));
 
             $prepend_text = ($del_value == "1") ? 'Bestil inden kl. '.$formatted_time.' for levering ' : 'Bestil inden kl. '.$formatted_time.' for forsendelse ';
-            ?>
 
-            <?php
-                $vendor_delivery_days_from_today = get_vendor_delivery_days_from_today_header_vendor($vendor->id, $prepend_text, $del_value, 2);
-                echo $vendor_delivery_days_from_today;
+            $vendor_delivery_days_from_today = get_vendor_delivery_days_from_today_header_vendor($vendor->id, $prepend_text, $del_value, 2);
+            echo $vendor_delivery_days_from_today;
             ?>
           </div>
           <div class="col-lg-3 d-none d-lg-inline pt-1 pt-lg-0 opening-row">
@@ -510,10 +470,10 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
 
 
             <br>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-door-open" viewBox="0 0 16 16">
-              <path d="M8.5 10c-.276 0-.5-.448-.5-1s.224-1 .5-1 .5.448.5 1-.224 1-.5 1z"/>
-              <path d="M10.828.122A.5.5 0 0 1 11 .5V1h.5A1.5 1.5 0 0 1 13 2.5V15h1.5a.5.5 0 0 1 0 1h-13a.5.5 0 0 1 0-1H3V1.5a.5.5 0 0 1 .43-.495l7-1a.5.5 0 0 1 .398.117zM11.5 2H11v13h1V2.5a.5.5 0 0 0-.5-.5zM4 1.934V15h6V1.077l-6 .857z"/>
-            </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clock" viewBox="0 0 16 16">
+                  <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+                  <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+              </svg>
               <?php
               // Dropoff time, get.
               $dropoff_time = get_vendor_dropoff_time($vendor->id);
@@ -533,7 +493,7 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
         ?>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Luk</button>
+        <button type="button" class="btn btn-light-grey-dark-border" data-bs-dismiss="modal">Luk</button>
       </div>
     </div>
   </div>

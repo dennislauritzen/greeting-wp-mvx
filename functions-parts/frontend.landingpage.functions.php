@@ -34,9 +34,11 @@ function lpFilterAction() {
     }
 
     // Calculate Selected Date
-    $filteredDate = new DateTime();
+    $timezone = new DateTimeZone('Europe/Copenhagen');
+    $filteredDate = new DateTime('now', $timezone);
     $filteredDate->modify('+'.$deliveryDate.' days');
     $selectedDate = $filteredDate->format('d-m-Y');
+    $selectedDate2 = $filteredDate->format('dmY');
     $selectedDay = $filteredDate->format('N');
 
 
@@ -165,10 +167,11 @@ function lpFilterAction() {
         $delDateArr = $usersByDelDateFilter->get_results();
 
         foreach($delDateArr as $v){
-            $dropoff_time 		= get_field('vendor_drop_off_time','user_'.$v->ID);
-            $delDate 			= (int) get_field('vendor_require_delivery_day','user_'.$v->ID);
-            $closedDatesArr		= get_vendor_closed_dates('user_'.$v->ID);
+            $dropoff_time 		= get_vendor_dropoff_time($v->ID);
+            $delDate 			= get_vendor_delivery_days_required($v->ID);
+            $closedDatesArr		= get_vendor_closed_dates($v->ID);
             $delWeekDays	    = get_field('openning','user_'.$v->ID);
+            $vendor_extraordinary_dates = get_vendor_delivery_dates_extraordinary($v->ID);
 
             $open_iso_days = array();
             foreach($delWeekDays as $key => $val){
@@ -176,6 +179,7 @@ function lpFilterAction() {
             }
 
             $open_this_day = (in_array($selectedDay, $open_iso_days) ? 1 : 0);
+            #var_dump($open_this_day);
 
             // Check if the store is closed this specific date.
             $closedThisDate 	= 0;
@@ -183,14 +187,17 @@ function lpFilterAction() {
                 $closedThisDate = 1;
             }
 
-            #var_dump($delDate);
+            if (in_array($selectedDate, $vendor_extraordinary_dates) || in_array($selectedDate2, $vendor_extraordinary_dates)) {
+                $open_this_day = 1;
+                $closedThisDate = 0;
+            }
 
-            if($deliveryDate < $delDate){
+            if (in_array($selectedDate, $vendor_extraordinary_dates) || in_array($selectedDate2, $vendor_extraordinary_dates)) {
+                array_push($userIdArrayGetFromDelDate, (string) $v->ID);
+            } else if($deliveryDate < $delDate){
                 // Can't delivery on selected date.
-                print "Vi er her";
             } else if($deliveryDate == $delDate && $dropoff_time < date("H")){
                 // Can't deliver on selected date because time has passed cutoff.
-                print "Nej, vi er her";
             } else {
                 // Can deliver, woohoo.
                 if($closedThisDate == 0 && $open_this_day == 1){

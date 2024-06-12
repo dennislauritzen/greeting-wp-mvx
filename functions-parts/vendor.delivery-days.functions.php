@@ -393,6 +393,8 @@ function get_vendor_delivery_days_from_today_header_vendor($vendor_id, $prepend_
 
     $now = new DateTime();
 
+    #var_dump($vendor_days);
+
     foreach ($vendor_days as $p => $c) {
         if(isset($c['cutoff_datetime'])
             && $c['cutoff_datetime'] !== false){
@@ -694,6 +696,11 @@ function get_vendor_dates_new($vendor_id, $date_format = 'd-m-Y', $open_close = 
 
     $opening_days = !empty(get_user_meta($vendor_id, 'openning')) ? get_user_meta($vendor_id, 'openning', true) : get_field('openning', 'user_'.$vendor_id); // true for not array return
     $closed_days = (is_array($opening_days) ? array_diff($default_days, $opening_days) : array());
+
+    if(empty($opening_days)){
+        // If the opening days variable doesnt have a value, just return.
+        return;
+    }
 
     // Get the global dates.
     // Global dates is defined by Greeting - and it is defining close days and "holidays"

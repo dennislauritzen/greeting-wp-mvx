@@ -96,7 +96,7 @@ hr:not([size]) {
 h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 {
   margin-top: 0;
   margin-bottom: 0.5rem;
-  font-family: "Dela Gothic One", sans-serif;
+  font-family: "Dela Gothic One", cursive;
   font-weight: 500;
   line-height: 1.2;
 }
@@ -10016,6 +10016,65 @@ img {
 }
 
 /**
+ * Custom buttons
+ */
+.btn-teal {
+  background: #446a6b;
+  color: #ffffff;
+}
+
+.btn-teal:hover {
+  background: #caad4e;
+  color: #222222;
+}
+
+.btn-light-yellow {
+  background: #d6bf75;
+  color: #222222;
+}
+
+.btn-light-yellow:hover {
+  background: #caad4e;
+  color: #222222;
+}
+
+.btn-light-grey-dark-border {
+  background: #ced4da;
+  color: #222222;
+  border: 1px solid #adb5bd;
+}
+
+.btn-light-grey-dark-border:hover {
+  background: #b1bbc4;
+  color: #222222;
+  border-bolor: #919ca6;
+}
+
+.btn-white-grey-border {
+  background: #fff;
+  color: #222222;
+  border: 1px solid #dee2e6;
+  text-decoration: none;
+}
+
+.btn-white-grey-border:hover {
+  background: #dae0e5;
+  border-color: #c1c9d0;
+  color: #222222;
+}
+
+/**
+ * Custom borders
+ */
+.border-3px-green {
+  border: 3px solid #75b798;
+}
+
+.border-transparent {
+  border-color: rgba(255, 255, 255, 0);
+}
+
+/**
  * WordPress customization
  */
 /* If WP-Adminbar is visible */
@@ -10185,7 +10244,6 @@ a {
 }
 a.greeting-link:hover,
 a:hover {
-  color: #304b4c;
   color: #304b4c;
   text-decoration: underline;
 }
@@ -10714,33 +10772,83 @@ ul.timeline li figure {
 #categorycontent .h1,
 #occasioncontent h1,
 #occasioncontent .h1 {
-  padding-bottom: 15px;
-  position: relative;
+  padding-top: 60px;
+  padding-bottom: 50px;
+  text-align: center;
+  /*position: relative;
+
+  &::before {
+    position: absolute;
+    background: linear-gradient(to right, #555555 75px, #ffffff 75px);
+    height: 3px;
+    content: '';
+    bottom: 0;
+    right: 0;
+    left: 0;
+  }*/
 }
-#citycontent h1::before, #citycontent .h1::before,
-#categorycontent h1::before,
-#categorycontent .h1::before,
-#occasioncontent h1::before,
-#occasioncontent .h1::before {
-  position: absolute;
-  background: linear-gradient(to right, #555555 75px, #ffffff 75px);
-  height: 3px;
-  content: "";
-  bottom: 0;
-  right: 0;
-  left: 0;
+#citycontent h1 span.cityname, #citycontent .h1 span.cityname,
+#categorycontent h1 span.cityname,
+#categorycontent .h1 span.cityname,
+#occasioncontent h1 span.cityname,
+#occasioncontent .h1 span.cityname {
+  /* Color type (chosen by MFR): #5F082B */
+  /* Color type2: #FECBCA */
+  /* Color type3: #805454 */
+  color: #805454;
+  text-decoration: underline;
 }
-#citycontent h1, #citycontent .h1, #citycontent h2, #citycontent .h2,
+#citycontent h1, #citycontent .h1,
 #categorycontent h1,
 #categorycontent .h1,
+#occasioncontent h1,
+#occasioncontent .h1 {
+  font-family: "Dela Gothic One", "Rubik", "Inter", sans-serif;
+  font-size: 40px;
+  font-weight: 300;
+}
+@media (max-width: 991.98px) {
+  #citycontent h1, #citycontent .h1,
+  #categorycontent h1,
+  #categorycontent .h1,
+  #occasioncontent h1,
+  #occasioncontent .h1 {
+    padding-top: 15px;
+    padding-bottom: 30px;
+    font-size: 30px;
+  }
+}
+#citycontent h2, #citycontent .h2,
 #categorycontent h2,
 #categorycontent .h2,
-#occasioncontent h1,
-#occasioncontent .h1,
 #occasioncontent h2,
 #occasioncontent .h2 {
-  font-family: "Rubik", "Inter", sans-serif;
+  font-family: "Inter", "Rubik", sans-serif;
   font-weight: 600;
+}
+#citycontent h3.popular-headings, #citycontent .popular-headings.h3,
+#categorycontent h3.popular-headings,
+#categorycontent .popular-headings.h3,
+#occasioncontent h3.popular-headings,
+#occasioncontent .popular-headings.h3 {
+  font-family: Inter;
+  font-size: 18px;
+  font-weight: 400;
+}
+#citycontent h5.filteringheader, #citycontent .filteringheader.h5,
+#categorycontent h5.filteringheader,
+#categorycontent .filteringheader.h5,
+#occasioncontent h5.filteringheader,
+#occasioncontent .filteringheader.h5 {
+  font-family: "Inter", "Rubik", sans-serif;
+  font-weight: 400;
+}
+#citycontent #topoccassions .card,
+#categorycontent #topoccassions .card,
+#occasioncontent #topoccassions .card {
+  font-size: 15px;
+  font-weight: 400;
+  border-radius: 20px !important;
 }
 #citycontent #topoccassions .card .card-img-top,
 #categorycontent #topoccassions .card .card-img-top,
@@ -10757,6 +10865,11 @@ ul.timeline li figure {
   font-family: "Inter", sans-serif;
   font-size: 14px;
 }
+#citycontent .catrownoscroll::-webkit-scrollbar,
+#categorycontent .catrownoscroll::-webkit-scrollbar,
+#occasioncontent .catrownoscroll::-webkit-scrollbar {
+  width: 0px;
+}
 
 #citycontent #topoccassions .card .card-img-top,
 #categorycontent #topoccassions .card .card-img-top,
@@ -10764,6 +10877,10 @@ ul.timeline li figure {
   width: 100%;
   height: 10vw;
   object-fit: cover;
+  border-top-left-radius: 20px !important;
+  border-top-right-radius: 20px !important;
+  height: 150px !important;
+  min-height: 150px !important;
 }
 
 #citycontent #topoccassions .card h5.card-title, #citycontent #topoccassions .card .card-title.h5,
@@ -10776,11 +10893,27 @@ ul.timeline li figure {
 }
 
 /** Store cards styling **/
-@media (min-width: 576px) {
-  div.store a.cta {
-    font-size: 0.725rem;
-  }
+.datepicking .text {
+  font-family: Inter;
+  font-size: 18px;
+  font-weight: 400;
+  padding: 10px 0 7px 0;
 }
+.datepicking .datelabel,
+.datepicking .datelabel-bg {
+  cursor: pointer;
+}
+.datepicking .datelabel-bg {
+  padding: 10px 15px;
+  background-color: #ececec;
+}
+.datepicking .datelabel, .datepicking .datelabel span {
+  font-size: 15px;
+}
+.datepicking .datelabelstrikethrough {
+  text-decoration: line-through;
+}
+
 div.store {
   transition: all 0.15s ease-in-out;
 }
@@ -10827,11 +10960,30 @@ div.store div.card span.bagde {
   box-shadow: 0 0.5rem 0.75rem rgba(150, 150, 150, 0.175);
 }
 
+section#top.vendor {
+  min-height: 275px;
+}
+
+@media (max-width: 991.98px) {
+  section#top.vendor {
+    min-height: 201px;
+  }
+}
 @media (max-width: 575px) {
   .rounded.storebar {
     border-radius: 0px !important;
   }
 }
+.btn-teal {
+  background-color: #446a6b;
+  color: #fff;
+}
+
+.btn-teal:hover {
+  background: #3a5b5b;
+  color: #fff;
+}
+
 #product h1, #product .h1 {
   font-family: "Rubik", "Inter", sans-serif;
   font-size: 32px;
@@ -11124,5 +11276,3 @@ div.applied-filters {
 .woocommerce-privacy-policy-text {
   padding-top: 35px;
 }
-
-/*# sourceMappingURL=main.css.map */

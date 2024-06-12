@@ -99,7 +99,7 @@ if(!empty($args['city']) && !empty($args['postalcode'])){
         $display = !empty($city_search_val) ? 'block' : 'none';
         ?>
         <div class="pt-lg-2">
-          <a class="text-dark btn btn-secondary bg-light-grey float-lg-end fs-6" style="border-color: #a0a0a0;" id="backbutton_city_a_link__">< Gå tilbage til <?php echo $city_search_val; ?></a>
+          <a class="btn btn-white-grey-border float-lg-end fs-6 text-decoration-none" id="backbutton_city_a_link__">< Gå tilbage til <?php echo $city_search_val; ?></a>
         </div>
         <script type="text/javascript">
         document.addEventListener("DOMContentLoaded", function() {
@@ -367,7 +367,7 @@ if(!empty($args['city']) && !empty($args['postalcode'])){
           </div>
           <div class="modal-footer">
             <button class="btn btn-outline-dark" data-bs-dismiss="modal" aria-label="Close">Luk</button>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-dismiss="modal">Gem filtre</button>
+            <button class="btn btn-teal" data-bs-toggle="modal" data-bs-dismiss="modal">Gem filtre</button>
           </div>
         </div>
       </div>

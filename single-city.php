@@ -2,12 +2,19 @@
 
 /**
  *
+ * @author Dennis Lauritzen
  * Perform start setup
  *
 **/
 global $woocommerce, $wpdb;
 
+// Get the ID of the city
 $postId = get_the_ID();
+
+// Get the permalink of the city
+$city_page_permalink = get_permalink();
+
+// Get the city name and the postalcode of the city.
 $cityPostalcode = get_post_meta($postId, 'postalcode', true);
 $cityName = get_post_meta($postId, 'city', true);
 
@@ -17,17 +24,10 @@ if($cityPostalcode != $checkout_postalcode){
   $woocommerce->cart->empty_cart();
 }
 
-
 // Get header designs.
 get_header();
-get_header('green', array('city' => $cityName, 'postalcode' => $cityPostalcode)); ?>
+get_header('green', array('city' => $cityName, 'postalcode' => $cityPostalcode));
 
-
-<?php
-/**
-* @author Dennis Lauritzen
-*
-*/
  ?>
 
 <main id="main" class="container"<?php if ( isset( $navbar_position ) && 'fixed_top' === $navbar_position ) : echo ' style="padding-top: 100px;"'; elseif ( isset( $navbar_position ) && 'fixed_bottom' === $navbar_position ) : echo ' style="padding-bottom: 100px;"'; endif; ?>>
@@ -192,7 +192,10 @@ document.addEventListener("DOMContentLoaded", function() {
   <div class="container">
     <div class="row">
       <div class="col-12">
-        <h1 class="d-block my-0 my-xs-3 my-sm-2 my-md-2 mt-3 mt-lg-4 pt-lg-1 mb-lg-3">Find butikker med gavehilsner i <?php the_title();?></h1>
+        <h1 class="d-block my-0 my-xs-3 my-sm-2 my-md-2 mt-3 mt-lg-4 pt-lg-1 mb-lg-3">
+            Find butikker med gavehilsner i
+            <span class="cityname"><?php the_title();?></span>
+        </h1>
       </div>
     </div>
 
@@ -203,10 +206,14 @@ document.addEventListener("DOMContentLoaded", function() {
     SELECT
       tt.term_id as term_id,
       tt.taxonomy,
-		  t.name,
+        t.name,
       t.slug,
       (SELECT tm.meta_value FROM {$wpdb->prefix}termmeta tm WHERE tm.term_id = tt.term_id AND tm.meta_key = 'featured') as featured,
-      (SELECT tm.meta_value FROM {$wpdb->prefix}termmeta tm WHERE tm.term_id = tt.term_id AND tm.meta_key = 'featured_image') as image_src
+      (SELECT tm.meta_value FROM {$wpdb->prefix}termmeta tm WHERE tm.term_id = tt.term_id AND tm.meta_key = 'featured_image') as image_src,
+      (SELECT tm.meta_value FROM {$wpdb->prefix}termmeta tm WHERE tm.term_id = tt.term_id AND tm.meta_key = 'featured_icon') as icon_src,
+      (SELECT tm.meta_value FROM {$wpdb->prefix}termmeta tm WHERE tm.term_id = tt.term_id AND tm.meta_key = 'featured_bg_color') as featured_bg_color,
+      (SELECT tm.meta_value FROM {$wpdb->prefix}termmeta tm WHERE tm.term_id = tt.term_id AND tm.meta_key = 'featured_text_color') as featured_text_color,
+      (SELECT tm.meta_value FROM {$wpdb->prefix}termmeta tm WHERE tm.term_id = tt.term_id AND tm.meta_key = 'featured_border_color') as featured_border_color
     FROM
       {$wpdb->prefix}term_taxonomy tt
     INNER JOIN
@@ -217,6 +224,7 @@ document.addEventListener("DOMContentLoaded", function() {
       tt.taxonomy IN ('occasion','product_cat')
     ORDER BY
       CASE featured
+        WHEN 2 THEN 2
         WHEN 1 THEN 1
         ELSE 0
       END DESC,
@@ -231,7 +239,9 @@ document.addEventListener("DOMContentLoaded", function() {
     ?>
     <div class="mt-2 mt-xs-2 mt-sm-0 mb-4" id="topoccassions">
       <div class="d-flex align-items-center mb-1">
-        <h3 class="mt-1" style="font-family: Inter; font-size: 17px;">Kategorier</h3>
+        <h3 class="mt-1 popular-headings">
+            Kategorier & anledninger
+        </h3>
         <div class="button-cont ms-auto">
           <button id="backButton" type="button" class="btn btn-light rounded-circle">
             <div class="align-items-center justify-content-center">
@@ -249,37 +259,95 @@ document.addEventListener("DOMContentLoaded", function() {
           </button>
         </div>
       </div>
-      <style type="text/css">
-        .card-img-top {
-          min-height: 175px !important;
-        }
-        .catrownoscroll::-webkit-scrollbar {
-          width: 0px
-        }
-      </style>
 
       <div class="d-flex flex-row flex-nowrap catrownoscroll p-1" id="catrowscroll" data-snap-slider="occasions" style="overflow-x: auto; scroll-snap-type: x mandatory !important; scroll-behavior: smooth;">
         <?php
         foreach($occasion_featured_list as $occasion){
-          if(in_array($occasion->term_id, $occasionTermListArray) || in_array($occasion->term_id, $categoryTermListArray)){
             // Only show a card, if the cat/occasion is actually present in stores.
+            if(in_array($occasion->term_id, $occasionTermListArray) || in_array($occasion->term_id, $categoryTermListArray)){
+
+                $city_id = $postId;
+                $cat_occ_id = $occasion->term_id;
+
+                $args = array(
+                    'post_type'      => 'landingpage',
+                    'post_status'    => 'publish',
+                    'posts_per_page' => 1, // Limit to one post
+                    'meta_query' => array(
+                        'relation' => 'AND',
+                        array(
+                            'key'     => 'postal_code_relation', // ACF field key
+                            'value'   => '"' . $city_id . '"', // Pass the city post ID
+                            'compare' => 'LIKE',
+                        ),
+                        array(
+                            'relation' => 'OR',
+                            array(
+                                'key' => 'category_relation',
+                                'value' => $cat_occ_id,
+                                'compare' => '='
+                            ),
+                            array(
+                                'key' => 'occasion_relation',
+                                'value' => $cat_occ_id,
+                                'compare' => '='
+                            )
+                        )
+                    )
+                );
+
+                $query = new WP_Query($args);
+
+                $landing_page_permalink = $city_page_permalink.'?c='.$occasion->term_id;
+                if ($query->have_posts()) {
+                    $query->the_post();
+                    $landing_page_permalink = get_permalink(); // Get the permalink of the post
+                    // You can now use $landing_page_permalink variable as needed
+                }
+
             $category_or_occasion = ($occasion->taxonomy == 'product_cat') ? 'cat' : 'occ_';
 
             $occasionImageUrl = '';
-            if(!empty($occasion->image_src)){
-              $occasionImageUrl = wp_get_attachment_image($occasion->image_src, 'vendor-product-box-size', false, array('class' => 'card-img-top ratio-4by3', 'alt' => $occasion->name));
+            $icon_src = $occasion->icon_src;
+            $image_src = $occasion->image_src;
+            $featured_bg_color = $occasion->featured_bg_color;
+            $featured_text_color = $occasion->featured_text_color;
+            $featured_border_color = $occasion->featured_border_color;
+            $featured = $occasion->featured;
+
+            $bg_str = '';
+            $text_str = ' color: #222222;';
+            $border_str = '';
+            if(!empty($featured) && $featured == "1"){
+                if(!empty($featured_bg_color)){
+                    $bg_str = ' background-color: '.$featured_bg_color.'; color: '.$featured_text_color.';';
+                }
+                if(!empty($featured_text_color)){
+                    $text_str = ' color: '.$featured_text_color.'"';
+                }
+                if(!empty($featured_border_color)){
+                    $border_str = ' border: 3px solid '.$featured_border_color.' !important;';
+                }
+            }
+
+            if(!empty($icon_src)){
+                $occasionImageUrl = wp_get_attachment_image($occasion->icon_src, 'vendor-product-box-size', false, array('class' => 'mx-auto my-auto d-block  ratio-4by3', 'style' => 'max-width: 75%; max-height: 75%;', 'alt' => $occasion->name));
             } else {
-              $occasionImageUrl = wp_get_attachment_image($placeHolderImage, 'vendor-product-box-size', false, array('class' => 'card-img-top ratio-4by3', 'alt' => $occasion->name));
+                if(!empty($occasion->image_src)){
+                    $occasionImageUrl = wp_get_attachment_image($occasion->image_src, 'vendor-product-box-size', false, array('class' => 'card-img-top ratio-4by3', 'alt' => $occasion->name));
+                } else {
+                    $occasionImageUrl = wp_get_attachment_image($placeHolderImage, 'vendor-product-box-size', false, array('class' => 'card-img-top ratio-4by3', 'alt' => $occasion->name));
+                }
             }
           ?>
-          <div class="col-6 col-sm-6 col-md-4 col-lg-2 py-0 my-0 pe-2 card_outer" style="scroll-snap-align: start;">
-            <div class="card border-0 shadow-sm">
-              <a href="<?php echo get_permalink().'?c='.$occasion->term_id; ?>" rel="nofollow" data-elm-id="<?php echo $category_or_occasion.$occasion->term_id; ?>" class="top-category-occasion-list stretched-link text-dark">
-                <?php echo $occasionImageUrl;?>
-                <div class="card-body">
-                  <h5 class="card-title">
-                    <b><?php echo $occasion->name;?></b>
-                  </h5>
+          <div class="col-6 col-sm-6 col-md-4 col-lg-3 col-xl-3 col-xxl-2 py-0 my-0 pe-2  card_outer occasion-card" style="scroll-snap-align: start;">
+            <div class="card border-0 shadow-sm" style="<?php echo $bg_str; ?>  <?php echo $border_str; ?>">
+              <a href="<?php echo $landing_page_permalink; ?>" data-elm-id="<?php echo $category_or_occasion.$occasion->term_id; ?>" class="top-category-occasion-list stretched-link" style="<?php echo $text_str; ?>">
+                <div class="card-img-top d-flex flex-wrap align-items-center">
+                    <?php echo $occasionImageUrl;?>
+                </div>
+                <div class="card-body" style="font-size: 14px; font-family: 'Inter', sans-serif;<?php echo $text_str; ?>">
+                    <?php echo $occasion->name;?>
                 </div>
               </a>
             </div>
@@ -296,52 +364,17 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
     <div class="col-12 py-0 my-4 mb-3">
-      <h5 style="font-family: Inter;"><?php echo str_replace(array('{{city_name}}','{{postalcode}}'),array($cityName,$cityPostalcode),get_field('filter_heading','option')); ?></h5>
-      <a class="btn border-teal text-green mb-1 modalBtn" id="filterModalDelDateBtn" data-bs-toggle="modal" data-cd-open="deliveryDates" href="#filterModal" role="button">
-        &#128197;
-        &nbsp;Vælg leveringsdato
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
-          <path d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
-        </svg>
-      </a>
-      <a class="btn border-teal text-green mb-1 modalBtn" id="filterModalOccasionBtn" data-bs-toggle="modal" data-cd-open="occasionFilter" href="#filterModal" role="button">
-        &#127874;
-        &nbsp;Vælg anledning
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
-        <path d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
-      </svg>
-      </a>
-      <a class="btn border-teal text-green mb-1 modalBtn" id="filterModalCategoryBtn" data-bs-toggle="modal" data-cd-open="categoryFilter"  href="#filterModal" role="button">
-        &#128144;
-        &nbsp;Vælg kategori
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down" viewBox="0 0 16 16">
-          <path d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
-        </svg>
-      </a>
-      <a class="btn border-teal text-green mb-1 modalBtn" id="filterModalPriceBtn" data-bs-toggle="modal" data-cd-open="priceFilter" href="#filterModal" role="button">
-        &#128176;
-        &nbsp;Pris
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down" viewBox="0 0 16 16">
-          <path d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
-        </svg>
-      </a>
-    </div>
-    <div class="modal fade" id="filterModal" aria-hidden="true" aria-labelledby="filterButton" tabindex="-1">
-      <div class="modal-dialog modal-fullscreen-lg-down modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalToggleLabel" style="font-family: Inter,sans-serif; font-size: 15px;">Filtrér</h5>
-            <button type="button" class="btn-check" data-bs-dismiss="modal" aria-label="Approve"></button>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
+        <div class="datepicking">
+            <div class="text">
+                Hvornår skal gaven leveres?
+            </div>
             <?php
             // MODAL FILTER (duplicated in desktop filter).
             /**
              * ---------------------
              * Delivery date filter
              * ---------------------
-            **/
+             **/
             $dates = array();
             setlocale(LC_TIME, 'da_DK.UTF-8'); // Set the locale to Danish
             $date_today = new DateTime('now');
@@ -362,272 +395,30 @@ document.addEventListener("DOMContentLoaded", function() {
             $dates[8] = 'Vis alle';
 
             ?>
-            <style type="text/css">
 
-            .collapse-btn h5:before {
-              content: "+";
-              float: right;
-              padding: 0 0 5px 0;
-            }
-            .collapse-btn[aria-expanded="true"] h5:before {
-              content: "-";
-            }
-            </style>
-            <a data-bs-toggle="collapse" href="#deliveryDates" class="collapse-btn position-relative mb-3" role="button" aria-expanded="false" aria-controls="deliveryDates">
-              <h5 class="text-uppercase text-dark pb-2" style="font-family: Inter,sans-serif; font-size: 15px;">
-                &#128197;&nbsp;Hvornår skal gaven leveres?
-              </h5>
-            </a>
-            <div class="dropdown rounded-3 list-unstyled overflow-hidden mb-4 collapse" id="deliveryDates">
-            <?php
-            foreach($dates as $k => $v){
-              $closed_for_today = 0;
-              if($k == 0 && $DropOffTimes <= date("H")){
-                $closed_for_today = 1;
-              }
-            ?>
-            <div class="rounded border-0 rounded-pill bg-light" style="display: inline-block; margin: 5px 5px 4px 0; font-size: 13px;">
-              <label class="" for="filter_delivery_date_<?php echo $k; ?>" style="cursor: pointer; padding: 6px 10px; text-transform: <?php echo ($closed_for_today == 1 ? 'strikethrough;' : ';'); ?>;">
-                  <input type="radio" name="filter_del_days_city" class="form-check-input filter-on-city-page" id="filter_delivery_date_<?php echo $k; ?>" value="<?php echo $k; ?>" <?php echo ($closed_for_today == 1 ? 'disabled="disabled" ' : ''); ?> <?php echo ($k == 8 ? 'checked="checked"' : ''); ?>>
-                  <span style="color: <?php echo ($closed_for_today == 1 ? '#c0c0c0' : '#000000'); ?>;">
-                    <?php echo $v; ?>
-                  </span>
-                </label>
-            </div>
-            <?php
-            }
-            ?>
-            </div>
-
-
-            <?php
-            /**
-             * ---------------------
-             * Price filter
-             * ---------------------
-            **/
-
-            $minProductPrice;
-            $maxProductPrice;
-
-            if(count($productPriceArray) == 0){
-              $minProductPrice = 0;
-              $maxProductPrice = 0;
-              $topProductPrice = (max($productPriceArray) > 1000) ? '1000' : max($productPriceArray);
-            }
-            elseif(min($productPriceArray) == max($productPriceArray)){
-              $minProductPrice = 0;
-              $maxProductPrice = max($productPriceArray);
-              $topProductPrice = (max($productPriceArray) > 1000) ? '1000' : max($productPriceArray);
-            }
-            else {
-              $minProductPrice = 0;
-              $maxProductPrice = max($productPriceArray);
-              $topProductPrice = (max($productPriceArray) > 1000) ? '1000' : max($productPriceArray);
-            }
-
-            $priceIntArray = range($minProductPrice, $topProductPrice, 250);
-
-            $start_val = $minProductPrice;
-            $end_val = $maxProductPrice;
-            if(isset($_GET['price'])){
-              $price_arr = explode(',',$_GET['price']);
-              if(is_numeric($price_arr['0']) && $price_arr['0'] >= $minProductPrice){
-                $start_val = $price_arr['0'];
-              }
-              if(is_numeric($price_arr['1']) && $price_arr['1'] <= $maxProductPrice){
-                $end_val = $price_arr['1'];
-              }
-            }
-            ?>
-
-            <a data-bs-toggle="collapse" href="#priceFilter" class="collapse-btn mb-3" role="button" aria-expanded="false" aria-controls="priceFilter">
-              <h5 class="text-uppercase text-dark pb-2" style="font-family: Inter,sans-serif; font-size: 15px;">
-                &#128176;&nbsp;Pris
-              </h5>
-            </a>
-
-            <div class="row  collapse" id="priceFilter">
-              <div class="col-12">
-                <input type="hidden" name="filter_del_price_default" value="0-<?php echo $maxProductPrice; ?>">
-                <div class="dropdown rounded-3 list-unstyled overflow-hidden mb-4">
+            <div class="rounded-3 mb-4">
                 <?php
-                foreach($priceIntArray as $k => $v){
-                  $start = $v;
-                  $end = (isset($priceIntArray[$k+1]) ? $priceIntArray[$k+1] : '+');
-                  if($end == '+'){
-                    $label = 'Over '.$start;
-                    $value = $start.'-'.$maxProductPrice;
-                  } else {
-                    if($start == "0"){
-                      $label = 'Under '.$end;
-                    } else {
-                      $label = $start.'-'.$end;
+                foreach($dates as $k => $v){
+                    $closed_for_today = 0;
+                    if($k == 0 && $DropOffTimes <= date("H")){
+                        $closed_for_today = 1;
                     }
-                    $value = $start.'-'.$end;
-                  }
-                ?>
-                <div class="rounded border-0 rounded-pill bg-light" style="display: inline-block; margin: 5px 5px 4px 0; font-size: 13px;">
-                  <label class="" for="filter_price_<?php echo $k; ?>" style="cursor: pointer; padding: 6px 10px;">
-                    <input type="checkbox" name="filter_del_price" class="form-check-input filter-on-city-page" id="filter_price_<?php echo $k; ?>" value="<?php echo $value; ?>">
-                    <?php echo $label; ?> kr.
-                  </label>
-                </div>
-                <?php
+                    ?>
+                    <div class="rounded border-0 rounded-pill datelabel-bg" style="display: inline-block; margin: 5px 5px 4px 0; font-size: 13px;">
+                        <label class="datelabel <?php echo ($closed_for_today == 1 ? 'datelabelstrikethrough;' : ';'); ?>" for="filter_delivery_date_<?php echo $k; ?>">
+                            <input type="radio" name="filter_del_days_city" class="form-check-input filter-on-city-page" id="filter_delivery_date_<?php echo $k; ?>" value="<?php echo $k; ?>" <?php echo ($closed_for_today == 1 ? 'disabled="disabled" ' : ''); ?> <?php echo ($k == 8 ? 'checked="checked"' : ''); ?>>
+                            <span style="color: <?php echo ($closed_for_today == 1 ? '#c0c0c0' : '#000000'); ?>;">
+                                <?php echo $v; ?>
+                              </span>
+                        </label>
+                    </div>
+                    <?php
                 }
                 ?>
-                </div>
-              </div>
             </div>
-
-            <?
-            /**
-             * ---------------------
-             * Delivery type filter
-             * ---------------------
-            **/
-            ?>
-            <a data-bs-toggle="collapse" href="#delTypeFilter" class="collapse-btn mb-3" role="button" aria-expanded="false" aria-controls="delTypeFilter">
-              <h5 class="text-uppercase text-dark pb-2" style="font-family: Inter,sans-serif; font-size: 15px;">
-                &#128757;&nbsp;Levering
-              </h5>
-            </a>
-            <ul class="dropdown rounded-3 list-unstyled overflow-hidden collapse mb-4" id="delTypeFilter">
-
-            <div class="form-check form-switch">
-                <input type="checkbox" name="filter_del_city" class="form-check-input filter-on-city-page" id="filter_delivery_1" checked="checked" value="1">
-                <label class="form-check-label" for="filter_delivery_1">
-                  Personlig levering fra lokal butik
-                </label>
-            </div>
-            <div class="form-check form-switch">
-                <input type="checkbox" name="filter_del_city" class="form-check-input filter-on-city-page" id="filter_delivery_0" checked="checked" value="0">
-                <label class="form-check-label" for="filter_delivery_0">
-                  Forsendelse med fragtfirma
-                </label>
-            </div>
-
-            </ul>
-
-
-            <?php
-            /**
-             * ---------------------
-             * Category filter
-             * ---------------------
-            **/
-            ?>
-            <a data-bs-toggle="collapse" href="#categoryFilter" class="collapse-btn mb-3" role="button" aria-expanded="false" aria-controls="categoryFilter">
-              <h5 class="text-uppercase text-dark pb-2" style="font-family: Inter,sans-serif; font-size: 15px;">
-                &#128144;&nbsp;Kategori
-              </h5>
-            </a>
-
-            <ul class="dropdown rounded-3 list-unstyled overflow-hidden collapse mb-4" id="categoryFilter">
-
-            <?php
-            // search users for get filtered category
-            $categoryTermListArrayUnique = array_unique($categoryTermListArray);
-
-            // product category
-            $categoryArgs = array(
-              'fields' => 'all',
-              'taxonomy'   => "product_cat",
-              'exclude' => array('15','16'),
-              'include' => $categoryTermListArrayUnique
-              // 'pad_counts' => true,
-              // 'hide_empty' => 1,
-            );
-            $productCategories = get_terms($categoryArgs);
-
-            foreach($productCategories as $category){ ?>
-              <div class="form-check" style="overflow: visible;">
-                  <input type="checkbox" role="switch" name="filter_catocca_city" class="form-check-input filter-on-city-page" id="filter_cat<?php echo $category->term_id; ?>" value="<?php echo $category->term_id; ?>">
-                  <label for="filter_cat<?php echo $category->term_id; ?>" class="form-check-label">
-                    <?php echo $category->name; ?>
-                  </label>
-              </div>
-            <?php
-            }
-            ?>
-            </ul>
-
-            <?php
-            /**
-             * ---------------------
-             * Occasion filter
-             * ---------------------
-            **/
-            ?>
-            <a data-bs-toggle="collapse" href="#occasionFilter" class="collapse-btn mb-3" role="button" aria-expanded="false" aria-controls="occasionFilter">
-              <h5 class="text-uppercase text-dark pb-2" style="font-family: Inter,sans-serif; font-size: 15px;">
-                &#127874;&nbsp;Anledning
-              </h5>
-            </a>
-            <ul class="dropdown rounded-3 list-unstyled overflow-hidden collapse mb-4" id="occasionFilter">
-            <?php
-            // Occassion
-
-            // Take the occassion term array and make sure we only get uniques.
-            $occasionTermListArrayUnique = array_unique($occasionTermListArray);
-
-            $args = array(
-                'taxonomy'   => "occasion",
-                'include' => $occasionTermListArrayUnique
-                // 'hide_empty' => 1,
-                // 'include'    => $ids
-            );
-            $productOccasions = get_terms($args);
-            foreach($productOccasions as $occasion){
-              ?>
-              <div class="form-check">
-                  <input type="checkbox" name="filter_catocca_city" class="form-check-input filter-on-city-page" id="filter_occ_<?php echo $occasion->term_id; ?>" value="<?php echo $occasion->term_id; ?>">
-                  <label class="form-check-label" for="filter_occ_<?php echo $occasion->term_id; ?>"><?php echo $occasion->name; ?></label>
-              </div>
-            <?php
-            }
-            ?>
-            </ul>
-
-          </div>
-          <div class="modal-footer">
-            <button class="btn btn-outline-dark" data-bs-dismiss="modal" aria-label="Close">Luk</button>
-            <button class="btn bg-teal border-teal text-w" data-bs-toggle="modal" data-bs-dismiss="modal">Gem filtre</button>
-          </div>
         </div>
-      </div>
     </div>
 
-
-    <div class="row">
-      <div class="col-12 mb-2">
-        <h2 class="my-3 my-xs-3 my-sm-3 my-md-3 my-lg-2 my-xl-2 mt-lg-4 mt-xl-4">Alle butikker i <?php the_title();?></h2>
-        <div class="applied-filters row mt-xs-0 mt-sm-0 mt-md-0 mt-3 mb-0 lh-lg">
-          <div class="col-12 filter-list">
-            <div id="filterdel_dummy_0" class="badge rounded-pill border-yellow py-2 px-2 me-1 my-1 text-dark dynamic-filters">
-                Forsendelse med fragtfirma
-              <button type="button" class="btn-close filter-btn-delete"
-              data-filter-id="0" data-label="Forsendelsemedfragtfirma"
-              data-filter-remove="filter_delivery_0" onclick="removeFilterBadgeCity('Forsendelsemedfragtfirma', 'filterfilter_delivery_0', 'filter_delivery_0', true);"></button>
-            </div>
-            <div id="filterdel_dummy_1" class="badge rounded-pill border-yellow py-2 px-2 me-1 my-1 my-lg-0 my-xl-0 text-dark dynamic-filters">
-                Personlig levering fra lokal butik
-              <button type="button" class="btn-close filter-btn-delete" data-filter-id="0" data-label="Personligleveringfralokalbutik"
-              data-filter-remove="filter_delivery_1" onclick="removeFilterBadgeCity('Personligleveringfralokalbutik', 'filterfilter_delivery_1', 'filter_delivery_1', true);"></button>
-            </div>
-            <a href="<?php echo home_url(); ?>"class="badge rounded-pill border-yellow py-2 px-2 my-1 my-lg-0 my-xl-0 mb-1 text-dark">
-              <?php echo $cityPostalcode.' '.$cityName; ?>
-              <button type="button" class="btn-close" aria-label="Close"></button>
-            </a>
-            <a href="#" id="cityPageReset" onclick="event.preventDefault();" class="badge rounded-pill border-yellow py-2 pe-2 my-1 my-lg-0 my-xl-0 mb-1 bg-yellow text-white">
-              Nulstil alle
-              <button type="button" class="btn-close  btn-close-white" aria-label="Close">
-              </button>
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
     <!-- show filtered result here-->
     <div class="filteredStore row"></div>
 
@@ -741,64 +532,10 @@ get_footer( );
 <script type="text/javascript">
   // Start the jQuery
   jQuery(document).ready(function($) {
-    $('#filterdel_dummy_0, #filterdel_dummy_1').remove();
-
-    // Set delivery filters
-    setFilterBadgeCity('Personlig levering fra lokal butik', 'filterfilter_delivery_1', 'filter_delivery_1');
-    setFilterBadgeCity('Forsendelse med fragtfirma', 'filterfilter_delivery_0', 'filter_delivery_0');
-
     var ajaxurl = "<?php echo admin_url('admin-ajax.php');?>";
-    var catOccaDeliveryIdArray = [];
-    var inputPriceRangeArray = [];
-    var deliveryIdArray = [];
 
     // Get URL parameters
-     var url = new URL(window.location.href);
-     var deliveryIdArray = url.searchParams.get("d")?.split(",");
-     var catOccaDeliveryIdArray = url.searchParams.get("c")?.split(",");
-     var inputPriceRangeArray = url.searchParams.get("price")?.split(",");
-
-     // Check delivery filters
-     if (deliveryIdArray) {
-       deliveryIdArray.forEach(function(id) {
-         $('#filter_delivery_' + id).prop('checked', true);
-       });
-     }
-
-     // Check category and occasion filters
-     if (catOccaDeliveryIdArray) {
-       catOccaDeliveryIdArray.forEach(function(id) {
-         var input = $('#filter_cat' + id + ', #filter_occ_' + id);
-         if (input.length) {
-           input.prop('checked', true);
-         }
-       });
-     }
-
-     // Set price range filter
-     if (inputPriceRangeArray) {
-       var priceRangeMinVal = inputPriceRangeArray[0] || 0;
-       var priceRangeMaxVal = inputPriceRangeArray[1];
-       if (priceRangeMaxVal) {
-         priceRangeMaxVal = parseFloat(priceRangeMaxVal);
-       }
-     }
-
-    // Update filters if all are selected
-    if (deliveryIdArray?.length && catOccaDeliveryIdArray?.length && inputPriceRangeArray?.length) {
-      update();
-    }
-
-    // Handle category and occasion filter clicks
-    $('a.top-category-occasion-list').click(function(event) {
-      event.preventDefault();
-      var elmId = this.getAttribute("data-elm-id");
-      $('#filter_' + elmId).click();
-
-      $('html, body').animate({
-        scrollTop: $('h2').offset().top
-      }, 0);
-    });
+    var url = new URL(window.location.href);
 
     jQuery(".filter-on-city-page").click(function(){
       update();
@@ -808,33 +545,12 @@ get_footer( );
         var id2 = id.replace(/[0-9]+/, "");
         jQuery("div[id*='"+id2+"']").remove();
       }
-
-      if(this.checked){
-        setFilterBadgeCity(
-          $('label[for='+this.id+']').text(),
-          this.value,
-          this.id
-        );
-      } else {
-        if (this.id.includes("filter_delivery_date")){
-          jQuery("input#filter_delivery_date_8").prop('checked',true);
-        }
-        removeFilterBadgeCity(
-          $('label[for='+this.id+']').text(),
-          this.value,
-          this.id,
-          false
-        );
-      }
     });
 
     update();
     function update(){
       var cityName = $('#cityName').val();
       var postalCode = $('#postalCode').val();
-      catOccaIdArray = [];
-      deliveryIdArray = [];
-      inputPriceRangeArray = [];
 
       // Make the loading...
       jQuery('.loadingHeartBeat').show();
@@ -843,33 +559,10 @@ get_footer( );
       // Chosen delivery date
       var delDate = $('input[name=filter_del_days_city]:checked').val();
 
-      $("input:checkbox[name=filter_catocca_city]:checked").each(function(){
-        catOccaIdArray.push($(this).val());
-      });
-      $("input:checkbox[name=filter_del_city]:checked").each(function(){
-        deliveryIdArray.push($(this).val());
-      });
-
-
-      if($('input[name=filter_del_price]').is(':checked')){
-        var pricearray = [];
-        $("input:checkbox[name=filter_del_price]:checked").each(function(){
-          var price = $(this).val().split("-");
-          pricearray.push(price[0]);
-          pricearray.push(price[1]);
-        });
-        var inputPriceRange = [Math.min.apply(Math,pricearray), Math.max.apply(Math,pricearray)];
-      } else {
-        var inputPriceRange = $('input[name=filter_del_price_default]').val().split("-");
-      }
-
       var data = {
         'action': 'catOccaDeliveryAction',
         cityDefaultUserIdAsString: jQuery("#cityDefaultUserIdAsString").val(),
         delDate: delDate,
-        catOccaIdArray: catOccaIdArray,
-        deliveryIdArray: deliveryIdArray,
-        inputPriceRangeArray: inputPriceRange,
         cityName: cityName,
         postalCode: postalCode
       };
@@ -877,95 +570,8 @@ get_footer( );
         jQuery('.filteredStore').show();
         jQuery('.filteredStore').html(response);
         jQuery('.loadingHeartBeat').hide();
-
-        if(catOccaIdArray.length == 0 && deliveryIdArray.length == 0 && priceChange == 1){
-          jQuery('.filteredStore').hide();
-          jQuery('#noVendorFound').hide();
-        } else if(catOccaIdArray.length == 0 && deliveryIdArray.length == 0 && priceChange == 0){
-          jQuery('.filteredStore').hide();
-          jQuery('#noVendorFound').hide();
-        }
-
-        var state = { 'd': deliveryIdArray, 'c': catOccaIdArray, 'p': inputPriceRange }
-        var url = '';
-        if(deliveryIdArray.length > 0){
-          if(url){ 	url += '&'; }
-          url += 'd='+deliveryIdArray;
-        }
-        if(catOccaIdArray.length > 0){
-          if(url){ 	url += '&'; }
-          url += 'c='+catOccaIdArray;
-        }
-
-        if(inputPriceRange.length > 0){
-          if(url){ 	url += '&'; }
-          url += 'price='+inputPriceRange;
-        }
-        if(url.length > 0){
-          url = '?'+url;
-        }
-
-        if(url){
-          history.pushState(state, '', url);
-        } else {
-          window.history.replaceState({}, '', location.pathname);
-        }
       });
     }
-
-    // Filter badges on the vendor page.
-    function setFilterBadgeCity(label, id, dataRemove){
-      const elm = document.createElement('div');
-      elm.id = 'filter'+dataRemove;
-      elm.classList.add('badge', 'rounded-pill', 'border-yellow', 'py-2', 'pe-2', 'my-1', 'me-1', 'text-dark', 'dynamic-filters');
-      elm.href = '#';
-      elm.innerHTML = label;
-
-      const elmbtn = document.createElement('button');
-      elmbtn.type = 'button';
-      elmbtn.classList.add('btn-close', 'filter-btn-delete', 'ms-1');
-      elmbtn.dataset.filterId = id;
-      var useableLabel = label.replace(/ /g,'').replace(/(?:\r\n|\r|\n)/g,'').replace(/\./g,'');
-      elmbtn.dataset.label = useableLabel;
-
-      elmbtn.onclick = function(){removeFilterBadgeCity('"'+useableLabel+'"', id, dataRemove, true);};
-      elmbtn.dataset.filterRemove = dataRemove;
-      elm.appendChild(elmbtn);
-
-      jQuery('div.filter-list').prepend(elm);
-    }
-    function removeFilterBadgeCity(label, id, dataRemove, updateVendors){
-      jQuery('#filter'+dataRemove).remove();
-
-      // Check if dataRemove is delivery date, then erase checks and check the defauls.
-      if (dataRemove.includes("filter_delivery_date")){
-        jQuery("input#filter_delivery_date_8").prop('checked',true);
-        jQuery('#'+dataRemove).prop('checked',false);
-      }
-
-      if(updateVendors === true){
-        var elmId = dataRemove;
-        document.getElementById(elmId).checked = false;
-        update();
-      }
-    }
-
-    // reset filter
-    $('#cityPageReset').click(function(){
-      $("input:checkbox[name=filter_catocca_city]").removeAttr("checked");
-      $("input:checkbox[name=filter_del_city]").prop('checked',true);
-      $("input#filter_delivery_date_8").prop('checked',true);
-      //catOccaDeliveryIdArray.length = 0;
-
-      $('div.filter-list div.dynamic-filters').remove();
-
-      setFilterBadgeCity('Personlig levering fra lokal butik', 'filterfilter_delivery_1', 'filter_delivery_1');
-      setFilterBadgeCity('Forsendelse med fragtfirma', 'filterfilter_delivery_0', 'filter_delivery_0');
-
-      //$(this).data('reset-to-default', '1');
-
-      update();
-    });
 
     // Select the container element
     const container = jQuery('#catrowscroll');
@@ -985,16 +591,6 @@ get_footer( );
       container.animate({
         scrollLeft: '-=' + (card_cont.outerWidth(true)-1) * numCardsToScroll
       }, '2');
-    });
-
-    jQuery(".modalBtn").click(function(){
-      var uncollapseItem = jQuery(this).data('cd-open');
-
-      jQuery('.collapse.show').removeClass('show');
-      jQuery('#'+uncollapseItem).addClass('show');
-
-      jQuery('div.modal-body a.collapse-btn').attr("aria-expanded","false");
-      jQuery('*[aria-controls="'+uncollapseItem+'"]').attr("aria-expanded","true");
     });
   });
 </script>
