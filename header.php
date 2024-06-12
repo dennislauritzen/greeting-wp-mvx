@@ -27,7 +27,8 @@
 
     <!-- Font loading with preloading, async, and font-display -->
 <!--    <link rel="preload" as="style" crossorigin onload="this.onload=null;this.rel='stylesheet'" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:wght@300;400;500;700;900&family=Rubik:wght@300;400;500;700;900&display=swap">
--->
+--><!-- Font loading with preloading, async, and font-display -->
+    <link rel="preload" as="style" crossorigin onload="this.onload=null;this.rel='stylesheet'" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:wght@300;400;500;700;900&family=Rubik:wght@300;400;500;700;900&display=swap">
 
     <!-- Fallback for users with JavaScript disabled -->
     <noscript>
