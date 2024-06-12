@@ -100,7 +100,6 @@ function lpFilterAction() {
         $userIdArrayGetFromCatOcca = array_intersect($defaultUserArray, $userIdArrayGetFromCatOcca);
         $defaultUserArray = $userIdArrayGetFromCatOcca;
     }
-    var_dump($defaultUserArray);
 
     //////////////////////////
     // FILTER: Postal Codes
@@ -153,8 +152,6 @@ function lpFilterAction() {
         if(!empty($users_from_postcode)){
             $userIdArrayGetFromPostal = array_intersect($defaultUserArray, $users_from_postcode);
             $defaultUserArray = $userIdArrayGetFromPostal;
-
-            var_dump($defaultUserArray);
         }
     }
     // --
@@ -216,8 +213,6 @@ function lpFilterAction() {
             }
         }
 
-        #var_dump($userIdArrayGetFromDelDate);
-
         // Remove all the stores that doesnt match from default array
         // Normally we would check if the userIdArray is empty, but not here,
         // instead we check if the date-filter is set - if it is and the userID-array
@@ -225,9 +220,6 @@ function lpFilterAction() {
         // if(!empty($userIdArrayGetFromDelDate)){
         $userIdArrayGetFromDelDate = array_intersect($defaultUserArray, $userIdArrayGetFromDelDate);
         $defaultUserArray = $userIdArrayGetFromDelDate;
-
-
-        var_dump($defaultUserArray);
     }
 
     // three array is
