@@ -17,12 +17,14 @@ function get_vendor_delivery_days_required($vendor_id, $type = 'weekday'){
     $delivery_day_required_old = get_field('vendor_require_delivery_day', 'user_'.$vendor_id);
     $delivery_day_required_old = (!empty($delivery_day_required_old) ? $delivery_day_required_old : 0);
 
-    var_dump($get_deliveryday_required_repeater);
-
     if (
-        (!isset($get_deliveryday_required_repeater['order_days_before_weekday']) || (empty($get_deliveryday_required_repeater['order_days_before_weekday']) && $get_deliveryday_required_repeater['order_days_before_weekday'] !== "0"))
-        && (!isset($get_deliveryday_required_repeater['order_days_before_weekend']) || (empty($get_deliveryday_required_repeater['order_days_before_weekend']) && $get_deliveryday_required_repeater['order_days_before_weekend'] !== "0"))
-        && (!isset($get_deliveryday_required_repeater['order_days_before_holiday']) || (empty($get_deliveryday_required_repeater['order_days_before_holiday']) && $get_deliveryday_required_repeater['order_days_before_holiday'] !== "0"))
+        $get_deliveryday_required_repeater === NULL
+        ||
+        (
+            (!isset($get_deliveryday_required_repeater['order_days_before_weekday']) || (empty($get_deliveryday_required_repeater['order_days_before_weekday']) && $get_deliveryday_required_repeater['order_days_before_weekday'] !== "0"))
+            && (!isset($get_deliveryday_required_repeater['order_days_before_weekend']) || (empty($get_deliveryday_required_repeater['order_days_before_weekend']) && $get_deliveryday_required_repeater['order_days_before_weekend'] !== "0"))
+            && (!isset($get_deliveryday_required_repeater['order_days_before_holiday']) || (empty($get_deliveryday_required_repeater['order_days_before_holiday']) && $get_deliveryday_required_repeater['order_days_before_holiday'] !== "0"))
+        )
     ){
         #print "nye felter er tomme";
         return $delivery_day_required_old;
