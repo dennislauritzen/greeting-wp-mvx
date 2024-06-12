@@ -13,7 +13,7 @@ global $product;
 ?>
 <div class="woocommerce-variation-add-to-cart variations_button pt-1 pb-3">
 	<div class="row">
-	<div class="quantity col-4">
+	<div class="quantity col-12 col-xs-12 col-sm-12 col-md-5">
 		<?php do_action( 'woocommerce_before_add_to_cart_button' ); ?>
 
 		<?php
@@ -30,8 +30,8 @@ global $product;
 		do_action( 'woocommerce_after_add_to_cart_quantity' );
 		?>
 	</div>
-	<div class="col-8">
-		<button type="submit" class="single_add_to_cart_button button alt w-100 h-100 bg-teal"><?php echo esc_html( $product->single_add_to_cart_text() ); ?></button>
+	<div class="add-to-cart col-12 col-xs-12 col-sm-12 col-md-7 mt-2 mt-md-0">
+		<button type="submit" class="single_add_to_cart_button button alt py-3 py-xs-2 py-md-0 w-100 h-100 bg-teal"><?php echo esc_html( $product->single_add_to_cart_text() ); ?></button>
 
 		<?php do_action( 'woocommerce_after_add_to_cart_button' ); ?>
 
