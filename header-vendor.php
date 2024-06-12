@@ -241,7 +241,7 @@ if(!empty(get_field('delivery_type', 'user_'.$vendor->id))){
             </div>
             <div class="d-lg-none col-3 col-sm-4 col-md-4 col-lg-0">
               <button type="button" data-bs-toggle="modal" data-bs-target="#storeDescriptionModal" class="d-lg-none btn btn-teal border-0 py-2 px-1 px-sm-4" style="font-size:14px;">
-                Læs om butikken & se leveringstid
+                Læs om butikken
               </button>
             </div>
           </div>
