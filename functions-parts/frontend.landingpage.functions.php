@@ -39,8 +39,8 @@ function lpFilterAction() {
 
     // get the delivery date from post
     // delivery date
-    $deliveryDate = (int) $_POST['delDate'];
-    if(empty($deliveryDate) && $deliveryDate !== 0){
+    $deliveryDate = empty($_POST['delDate']) ? 8 : $_POST['delDate'];
+    if(empty($deliveryDate) && $deliveryDate != 0){
         $deliveryDate = 8;
     } else if(!is_numeric($deliveryDate) || $deliveryDate < 0){
         $deliveryDate = 0;
@@ -100,6 +100,7 @@ function lpFilterAction() {
         $userIdArrayGetFromCatOcca = array_intersect($defaultUserArray, $userIdArrayGetFromCatOcca);
         $defaultUserArray = $userIdArrayGetFromCatOcca;
     }
+    var_dump($defaultUserArray);
 
     //////////////////////////
     // FILTER: Postal Codes
@@ -152,6 +153,8 @@ function lpFilterAction() {
         if(!empty($users_from_postcode)){
             $userIdArrayGetFromPostal = array_intersect($defaultUserArray, $users_from_postcode);
             $defaultUserArray = $userIdArrayGetFromPostal;
+
+            var_dump($defaultUserArray);
         }
     }
     // --
@@ -222,76 +225,9 @@ function lpFilterAction() {
         // if(!empty($userIdArrayGetFromDelDate)){
         $userIdArrayGetFromDelDate = array_intersect($defaultUserArray, $userIdArrayGetFromDelDate);
         $defaultUserArray = $userIdArrayGetFromDelDate;
-    }
 
 
-    ////////////////////////
-    // FILTER: Delivery
-    // Prepare the statement for delivery array
-    $where = array();
-    $placeholder_arr = array_fill(0, count($deliveryIdArray), '%s');
-
-    if(!empty($deliveryIdArray)){
-        $args = array(
-            'role' => 'dc_vendor',
-            'meta_query' => array(
-                'key' => 'delivery_type',
-                'value' => $deliveryIdArray,
-                'compare' => 'IN',
-                'type' => 'NUMERIC'
-            )
-        );
-        $usersByFilter = new WP_User_Query( $args	);
-        $deliveryArr = $usersByFilter->get_results($usersByFilter);
-
-        foreach($deliveryArr as $v){
-            $delivery_type = get_field('delivery_type','user_'.$v->ID);
-
-            if(!empty($delivery_type)){
-                if(in_array($delivery_type[0]['value'],$deliveryIdArray) || (isset($delivery_type[1]['value']) && in_array($delivery_type[1]['value'],$deliveryIdArray) )  ){
-                    array_push($userIdArrayGetFromDelivery, (string) $v->ID);
-                }
-            }
-        }
-    }
-    // Remove all the stores that doesnt match from default array
-    if(!empty($userIdArrayGetFromDelivery)){
-        $userIdArrayGetFromDelivery = array_intersect($defaultUserArray, $userIdArrayGetFromDelivery);
-        $defaultUserArray = $userIdArrayGetFromDelivery;
-    }
-
-    ////////////////
-    // Filter: Price
-    // Location: City Page
-    // input price filter data come from front end
-    $userIdArrayGetFromPriceFilter = array();
-    $inputPriceRangeArray = $_POST['inputPriceRangeArray'];
-    $inputMinPrice = (int) $inputPriceRangeArray[0];
-    $inputMaxPrice = (int) $inputPriceRangeArray[1];
-
-    $author_ids = $wpdb->get_col(
-        $wpdb->prepare(
-            "
-	        SELECT DISTINCT p.post_author
-	        FROM {$wpdb->prefix}posts p
-	        INNER JOIN {$wpdb->prefix}postmeta pm ON p.ID = pm.post_id
-	        WHERE p.post_type = 'product'
-	        AND p.post_status = 'publish'
-	        AND pm.meta_key = '_price'
-	        AND pm.meta_value BETWEEN %d AND %d
-	        ",
-            $inputMinPrice,
-            $inputMaxPrice
-        )
-    );
-
-    $userIdArrayGetFromPriceFilter = array_unique($author_ids);
-
-    // Remove all the stores that doesnt match from default array
-    if(!empty($userIdArrayGetFromPriceFilter)){
-        $userIdArrayGetFromPriceFilter = array_intersect($defaultUserArray, $userIdArrayGetFromPriceFilter);
-
-        $defaultUserArray = $userIdArrayGetFromPriceFilter;
+        var_dump($defaultUserArray);
     }
 
     // three array is
