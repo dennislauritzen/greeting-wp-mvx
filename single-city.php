@@ -1,5 +1,5 @@
 <?php
-
+print microtime(true)*1000 . '<br>';
 /**
  *
  * @author Dennis Lauritzen
@@ -34,7 +34,7 @@ get_header('green', array('city' => $cityName, 'postalcode' => $cityPostalcode))
 <?php
 
 
-
+print microtime(true)*1000.'<br>';
 // get user meta query
 $sql = "SELECT u.ID, umm1.meta_value AS dropoff_time, umm2.meta_value AS require_delivery_day, umm3.meta_value AS delivery_type
           FROM {$wpdb->prefix}users u
@@ -69,7 +69,7 @@ $sql = "SELECT u.ID, umm1.meta_value AS dropoff_time, umm2.meta_value AS require
 $vendor_query = $wpdb->prepare($sql, '%'.$cityPostalcode.'%', '%dc_vendor%');
 $vendor_arr = $wpdb->get_results($vendor_query);
 
-
+print microtime(true)*1000.'<br>';
 $UserIdArrayForCityPostalcode = array();
 $DropOffTimes = array();
 foreach($vendor_arr as $v){
@@ -89,7 +89,7 @@ foreach($vendor_arr as $v){
     }
   }
 }
-
+print microtime(true)*1000.'<br>';
 // The maximum dropoff time today - for filtering.
 $DropOffTimes = (count($DropOffTimes) > 0) ? max($DropOffTimes) : 0;
 
@@ -133,7 +133,7 @@ if ($terms && !is_wp_error($terms)) {
         }
     }
 }
-
+print microtime(true)*1000.'<br>';
 $categoryTermListArray = array_unique($categoryTermListArray);
 $occasionTermListArray = array_unique($occasionTermListArray);
 ?>
@@ -164,8 +164,8 @@ document.addEventListener("DOMContentLoaded", function() {
       </div>
     </div>
 
-
     <?php
+    print microtime(true)*1000.'<br>';
     // get user meta query
     $occasion_featured_list = $wpdb->get_results( "
     SELECT
@@ -196,6 +196,7 @@ document.addEventListener("DOMContentLoaded", function() {
       t.Name ASC
     ");
     $placeHolderImage = wc_placeholder_img_src();
+    print microtime(true)*1000.'<br>';
     ?>
 
     <?php
@@ -227,6 +228,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
       <div class="d-flex flex-row flex-nowrap catrownoscroll p-1" id="catrowscroll" data-snap-slider="occasions" style="overflow-x: auto; scroll-snap-type: x mandatory !important; scroll-behavior: smooth;">
         <?php
+        print microtime(true)*1000.'<br>';
         foreach($occasion_featured_list as $occasion){
             // Only show a card, if the cat/occasion is actually present in stores.
             if(in_array($occasion->term_id, $occasionTermListArray) || in_array($occasion->term_id, $categoryTermListArray)){
@@ -262,7 +264,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 );
 
                 $query = new WP_Query($args);
-
+                print microtime(true)*1000.'<br>';
                 $landing_page_permalink = $city_page_permalink.'?c='.$occasion->term_id;
                 if ($query->have_posts()) {
                     $query->the_post();
@@ -397,6 +399,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
     <?php
+    print microtime(true)*1000.'<br>';
     if(!empty(the_content())){
     ?>
     <style type="text/css">
