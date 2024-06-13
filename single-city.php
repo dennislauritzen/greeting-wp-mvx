@@ -275,7 +275,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 $category_or_occasion = ($occasion->taxonomy == 'product_cat') ? 'cat' : 'occ_';
 
                 // Get the permalink from the associative array or use the default city page permalink
-                $landing_page_permalink = isset($landing_page_permalinks[$cat_occ_id]) ? $landing_page_permalinks[$cat_occ_id] : $city_page_permalink . '?c=' . $occasion->term_id;
+                $landing_page_permalink = isset($landing_page_permalinks[$occasion->term_id]) ? $landing_page_permalinks[$cat_occ_id] : $city_page_permalink . '?c=' . $occasion->term_id;
 
 
                 $occasionImageUrl = '';
