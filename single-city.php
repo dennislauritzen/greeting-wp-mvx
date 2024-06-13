@@ -1,5 +1,5 @@
 <?php
-
+print (microtime(true)*1000) . "<br>";
 /**
  *
  * @author Dennis Lauritzen
@@ -89,7 +89,7 @@ foreach($vendor_arr as $v){
     }
   }
 }
-
+print (microtime(true)*1000) . "<br>";
 // The maximum dropoff time today - for filtering.
 $DropOffTimes = (count($DropOffTimes) > 0) ? max($DropOffTimes) : 0;
 
@@ -133,7 +133,7 @@ if ($terms && !is_wp_error($terms)) {
         }
     }
 }
-
+print (microtime(true)*1000) . "<br>";
 $categoryTermListArray = array_unique($categoryTermListArray);
 $occasionTermListArray = array_unique($occasionTermListArray);
 ?>
@@ -165,6 +165,7 @@ document.addEventListener("DOMContentLoaded", function() {
     </div>
 
     <?php
+    print (microtime(true)*1000) . "<br>";
     // get user meta query
     $occasion_featured_list = $wpdb->get_results( "
     SELECT
@@ -195,6 +196,7 @@ document.addEventListener("DOMContentLoaded", function() {
       t.Name ASC
     ");
     $placeHolderImage = wc_placeholder_img_src();
+    print (microtime(true)*1000) . "<br>";
     ?>
 
     <?php
@@ -226,6 +228,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
       <div class="d-flex flex-row flex-nowrap catrownoscroll p-1" id="catrowscroll" data-snap-slider="occasions" style="overflow-x: auto; scroll-snap-type: x mandatory !important; scroll-behavior: smooth;">
         <?php
+        print (microtime(true)*1000) . "<br>";
         foreach($occasion_featured_list as $occasion){
             // Only show a card, if the cat/occasion is actually present in stores.
             if(in_array($occasion->term_id, $occasionTermListArray) || in_array($occasion->term_id, $categoryTermListArray)){
@@ -305,6 +308,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     $occasionImageUrl = wp_get_attachment_image($placeHolderImage, 'vendor-product-box-size', false, array('class' => 'card-img-top ratio-4by3', 'alt' => $occasion->name));
                 }
             }
+
+                print (microtime(true)*1000) . "<br>";
           ?>
           <div class="col-6 col-sm-6 col-md-4 col-lg-3 col-xl-3 col-xxl-2 py-0 my-0 pe-2  card_outer occasion-card" style="scroll-snap-align: start;">
             <div class="card border-0 shadow-sm" style="<?php echo $bg_str; ?>  <?php echo $border_str; ?>">
@@ -396,6 +401,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
     <?php
+    print (microtime(true)*1000) . "<br>";
     if(!empty(the_content())){
     ?>
     <style type="text/css">
