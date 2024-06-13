@@ -1,5 +1,5 @@
 <?php
-print microtime(true)*1000.'<br>';
+
 /**
  *
  * @author Dennis Lauritzen
@@ -27,7 +27,7 @@ if($cityPostalcode != $checkout_postalcode){
 // Get header designs.
 get_header();
 get_header('green', array('city' => $cityName, 'postalcode' => $cityPostalcode));
-print microtime(true)*1000 . '<br>';
+
  ?>
 
 <main id="main" class="container"<?php if ( isset( $navbar_position ) && 'fixed_top' === $navbar_position ) : echo ' style="padding-top: 100px;"'; elseif ( isset( $navbar_position ) && 'fixed_bottom' === $navbar_position ) : echo ' style="padding-bottom: 100px;"'; endif; ?>>
@@ -69,7 +69,7 @@ $sql = "SELECT u.ID, umm1.meta_value AS dropoff_time, umm2.meta_value AS require
 $vendor_query = $wpdb->prepare($sql, '%'.$cityPostalcode.'%', '%dc_vendor%');
 $vendor_arr = $wpdb->get_results($vendor_query);
 
-print microtime(true)*1000 . '<br>';
+
 $UserIdArrayForCityPostalcode = array();
 $DropOffTimes = array();
 foreach($vendor_arr as $v){
@@ -89,7 +89,7 @@ foreach($vendor_arr as $v){
     }
   }
 }
-print microtime(true)*1000 . '<br>';
+
 // The maximum dropoff time today - for filtering.
 $DropOffTimes = (count($DropOffTimes) > 0) ? max($DropOffTimes) : 0;
 
@@ -109,7 +109,7 @@ $occasionTermListArray = array();
 
 // Get all vendor product IDs
 $vendorProductIds = array();
-print microtime(true)*1000 . '<br>';
+
 foreach ($UserIdArrayForCityPostalcode as $vendorId) {
     $vendor = get_mvx_vendor($vendorId);
     $vendorProductIds = array_merge($vendorProductIds, $vendor->get_products(array('fields' => 'ids')));
@@ -133,7 +133,7 @@ if ($terms && !is_wp_error($terms)) {
         }
     }
 }
-print microtime(true)*1000 . '<br>';
+
 $categoryTermListArray = array_unique($categoryTermListArray);
 $occasionTermListArray = array_unique($occasionTermListArray);
 ?>
@@ -165,7 +165,6 @@ document.addEventListener("DOMContentLoaded", function() {
     </div>
 
     <?php
-    print microtime(true)*1000 . '<br>';
     // get user meta query
     $occasion_featured_list = $wpdb->get_results( "
     SELECT
@@ -227,7 +226,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
       <div class="d-flex flex-row flex-nowrap catrownoscroll p-1" id="catrowscroll" data-snap-slider="occasions" style="overflow-x: auto; scroll-snap-type: x mandatory !important; scroll-behavior: smooth;">
         <?php
-        print microtime(true)*1000 . '<br>';
         foreach($occasion_featured_list as $occasion){
             // Only show a card, if the cat/occasion is actually present in stores.
             if(in_array($occasion->term_id, $occasionTermListArray) || in_array($occasion->term_id, $categoryTermListArray)){
@@ -272,7 +270,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
                     wp_reset_postdata(); // Reset post data to avoid conflicts
                 }
-                print microtime(true)*1000 . '<br>';
+
             $category_or_occasion = ($occasion->taxonomy == 'product_cat') ? 'cat' : 'occ_';
 
             $occasionImageUrl = '';
@@ -366,7 +364,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
             <div class="rounded-3 mb-4">
                 <?php
-                print microtime(true)*1000 . '<br>';
                 foreach($dates as $k => $v){
                     $closed_for_today = 0;
                     if($k == 0 && $DropOffTimes <= date("H")){
@@ -399,7 +396,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
     <?php
-    print microtime(true)*1000 . '<br>';
     if(!empty(the_content())){
     ?>
     <style type="text/css">
