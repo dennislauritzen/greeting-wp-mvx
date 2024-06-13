@@ -226,103 +226,108 @@ document.addEventListener("DOMContentLoaded", function() {
 
       <div class="d-flex flex-row flex-nowrap catrownoscroll p-1" id="catrowscroll" data-snap-slider="occasions" style="overflow-x: auto; scroll-snap-type: x mandatory !important; scroll-behavior: smooth;">
         <?php
+        $city_id = $postId;
+
+        // Query to fetch all landing pages related to the collected cat_occ_ids and city_id
+        $args = array(
+            'post_type'      => 'landingpage',
+            'post_status'    => 'publish',
+            'posts_per_page' => -1, // Fetch all relevant posts
+            'meta_query' => array(
+                'relation' => 'AND',
+                array(
+                    'key'     => 'postal_code_relation', // ACF field key
+                    'value'   => '"' . $city_id . '"', // Pass the city post ID
+                    'compare' => 'LIKE',
+                )
+            )
+        );
+
+        $query = new WP_Query($args);
+
+        // Build an associative array to map cat_occ_id to the landing page permalink
+        $landing_page_permalinks = array();
+
+        if ($query->have_posts()) {
+            while ($query->have_posts()) {
+                $query->the_post();
+                $post_id = get_the_ID();
+
+                // Check if the current post has category_relation or occasion_relation
+                $category_relation = get_post_meta($post_id, 'category_relation', true);
+                $occasion_relation = get_post_meta($post_id, 'occasion_relation', true);
+
+                if ($category_relation) {
+                    $landing_page_permalinks[$category_relation] = get_permalink();
+                } elseif ($occasion_relation) {
+                    $landing_page_permalinks[$occasion_relation] = get_permalink();
+                }
+            }
+            wp_reset_postdata(); // Reset post data after the query
+        }
+        // END OF GETTING PERMALINKS
+
+
         foreach($occasion_featured_list as $occasion){
             // Only show a card, if the cat/occasion is actually present in stores.
-            if(in_array($occasion->term_id, $occasionTermListArray) || in_array($occasion->term_id, $categoryTermListArray)){
+            if(in_array($occasion->term_id, $occasionTermListArray) || in_array($occasion->term_id, $categoryTermListArray))
+            {
+                $category_or_occasion = ($occasion->taxonomy == 'product_cat') ? 'cat' : 'occ_';
 
-                $city_id = $postId;
-                $cat_occ_id = $occasion->term_id;
+                // Get the permalink from the associative array or use the default city page permalink
+                $landing_page_permalink = isset($landing_page_permalinks[$cat_occ_id]) ? $landing_page_permalinks[$cat_occ_id] : $city_page_permalink . '?c=' . $occasion->term_id;
 
-                $args = array(
-                    'post_type'      => 'landingpage',
-                    'post_status'    => 'publish',
-                    'posts_per_page' => 1, // Limit to one post
-                    'meta_query' => array(
-                        'relation' => 'AND',
-                        array(
-                            'key'     => 'postal_code_relation', // ACF field key
-                            'value'   => '"' . $city_id . '"', // Pass the city post ID
-                            'compare' => 'LIKE',
-                        ),
-                        array(
-                            'relation' => 'OR',
-                            array(
-                                'key' => 'category_relation',
-                                'value' => $cat_occ_id,
-                                'compare' => '='
-                            ),
-                            array(
-                                'key' => 'occasion_relation',
-                                'value' => $cat_occ_id,
-                                'compare' => '='
-                            )
-                        )
-                    )
-                );
 
-                $query = new WP_Query($args);
+                $occasionImageUrl = '';
+                $icon_src = $occasion->icon_src;
+                $image_src = $occasion->image_src;
+                $featured_bg_color = $occasion->featured_bg_color;
+                $featured_text_color = $occasion->featured_text_color;
+                $featured_border_color = $occasion->featured_border_color;
+                $featured = $occasion->featured;
 
-                $landing_page_permalink = $city_page_permalink.'?c='.$occasion->term_id;
-                if ($query->have_posts()) {
-                    $query->the_post();
-                    $landing_page_permalink = get_permalink(); // Get the permalink of the post
-                    // You can now use $landing_page_permalink variable as needed
-
-                    wp_reset_postdata(); // Reset post data to avoid conflicts
+                $bg_str = '';
+                $text_str = ' color: #222222;';
+                $border_str = '';
+                if(!empty($featured) && $featured == "1"){
+                    if(!empty($featured_bg_color)){
+                        $bg_str = ' background-color: '.$featured_bg_color.'; color: '.$featured_text_color.';';
+                    }
+                    if(!empty($featured_text_color)){
+                        $text_str = ' color: '.$featured_text_color.'"';
+                    }
+                    if(!empty($featured_border_color)){
+                        $border_str = ' border: 3px solid '.$featured_border_color.' !important;';
+                    }
                 }
 
-            $category_or_occasion = ($occasion->taxonomy == 'product_cat') ? 'cat' : 'occ_';
-
-            $occasionImageUrl = '';
-            $icon_src = $occasion->icon_src;
-            $image_src = $occasion->image_src;
-            $featured_bg_color = $occasion->featured_bg_color;
-            $featured_text_color = $occasion->featured_text_color;
-            $featured_border_color = $occasion->featured_border_color;
-            $featured = $occasion->featured;
-
-            $bg_str = '';
-            $text_str = ' color: #222222;';
-            $border_str = '';
-            if(!empty($featured) && $featured == "1"){
-                if(!empty($featured_bg_color)){
-                    $bg_str = ' background-color: '.$featured_bg_color.'; color: '.$featured_text_color.';';
-                }
-                if(!empty($featured_text_color)){
-                    $text_str = ' color: '.$featured_text_color.'"';
-                }
-                if(!empty($featured_border_color)){
-                    $border_str = ' border: 3px solid '.$featured_border_color.' !important;';
-                }
-            }
-
-            if(!empty($icon_src)){
-                $occasionImageUrl = wp_get_attachment_image($occasion->icon_src, 'vendor-product-box-size', false, array('class' => 'mx-auto my-auto d-block  ratio-4by3', 'style' => 'max-width: 75%; max-height: 75%;', 'alt' => $occasion->name));
-            } else {
-                if(!empty($occasion->image_src)){
-                    $occasionImageUrl = wp_get_attachment_image($occasion->image_src, 'vendor-product-box-size', false, array('class' => 'card-img-top ratio-4by3', 'alt' => $occasion->name));
+                if(!empty($icon_src)){
+                    $occasionImageUrl = wp_get_attachment_image($occasion->icon_src, 'vendor-product-box-size', false, array('class' => 'mx-auto my-auto d-block  ratio-4by3', 'style' => 'max-width: 75%; max-height: 75%;', 'alt' => $occasion->name));
                 } else {
-                    $occasionImageUrl = wp_get_attachment_image($placeHolderImage, 'vendor-product-box-size', false, array('class' => 'card-img-top ratio-4by3', 'alt' => $occasion->name));
+                    if(!empty($occasion->image_src)){
+                        $occasionImageUrl = wp_get_attachment_image($occasion->image_src, 'vendor-product-box-size', false, array('class' => 'card-img-top ratio-4by3', 'alt' => $occasion->name));
+                    } else {
+                        $occasionImageUrl = wp_get_attachment_image($placeHolderImage, 'vendor-product-box-size', false, array('class' => 'card-img-top ratio-4by3', 'alt' => $occasion->name));
+                    }
                 }
-            }
-          ?>
-          <div class="col-6 col-sm-6 col-md-4 col-lg-3 col-xl-3 col-xxl-2 py-0 my-0 pe-2  card_outer occasion-card" style="scroll-snap-align: start;">
-            <div class="card border-0 shadow-sm" style="<?php echo $bg_str; ?>  <?php echo $border_str; ?>">
-              <a href="<?php echo $landing_page_permalink; ?>" data-elm-id="<?php echo $category_or_occasion.$occasion->term_id; ?>" class="top-category-occasion-list stretched-link" style="<?php echo $text_str; ?>">
-                <div class="card-img-top d-flex flex-wrap align-items-center">
-                    <?php echo $occasionImageUrl;?>
+              ?>
+              <div class="col-6 col-sm-6 col-md-4 col-lg-3 col-xl-3 col-xxl-2 py-0 my-0 pe-2  card_outer occasion-card" style="scroll-snap-align: start;">
+                <div class="card border-0 shadow-sm" style="<?php echo $bg_str; ?>  <?php echo $border_str; ?>">
+                  <a href="<?php echo $landing_page_permalink; ?>" data-elm-id="<?php echo $category_or_occasion.$occasion->term_id; ?>" class="top-category-occasion-list stretched-link" style="<?php echo $text_str; ?>">
+                    <div class="card-img-top d-flex flex-wrap align-items-center">
+                        <?php echo $occasionImageUrl;?>
+                    </div>
+                    <div class="card-body" style="font-size: 14px; font-family: 'Inter', sans-serif;<?php echo $text_str; ?>">
+                        <?php echo $occasion->name;?>
+                    </div>
+                  </a>
                 </div>
-                <div class="card-body" style="font-size: 14px; font-family: 'Inter', sans-serif;<?php echo $text_str; ?>">
-                    <?php echo $occasion->name;?>
-                </div>
-              </a>
-            </div>
-          </div>
-      <?php
-        }
-      }
-      ?>
-    </div>
+              </div>
+          <?php
+            } // endif
+        } // endforeach
+        ?>
+        </div>
     </div>
     <?php
     } // end count.
