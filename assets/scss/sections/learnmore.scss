@@ -1,0 +1,24 @@
+/*
+	* #learnmore
+	* Learn more section
+	*/
+#learnmore h1,
+#learnmore h2,
+#learnmore h3,
+#learnmore h4 {
+  font-family: "Dela Gothic One", cursive, serif;
+}
+#learnmore .card .card-img-top {
+  width: 100%;
+  height: 10vw;
+  min-height: 200px;
+  object-fit: cover;
+}
+#learnmore .card .card-title {
+  font-family: 'Rubik',sans-serif;
+}
+#learnmore .card .card-text {
+  font-family: 'Inter',sans-serif;
+  font-size: 14px;
+  line-height: 23px;
+}

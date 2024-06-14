@@ -1,0 +1,56 @@
+#product {
+  h1 {
+    font-family: 'Rubik', 'Inter', sans-serif;
+    font-size: 32px;
+  }
+
+  div.description {
+    font-family: 'Inter', sans-serif;
+  }
+
+  div.single_variation {
+    margin-bottom: 10px;
+  }
+
+  .quantity {
+    float: left;
+  }
+
+  .quantity input.qty {
+    height: 100%;
+  }
+
+  button.single_add_to_cart_button  {
+    font-family: 'Rubik','Inter',sans-serif;
+    background: #446a6b;
+  }
+
+  button.single_add_to_cart_button:hover {
+    font-family: 'Rubik','Inter',sans-serif;
+    background: #2e4748;
+  }
+
+  .woocommerce-product-gallery__trigger {
+    display: none;
+  }
+
+  div.woocommerce-product-gallery
+  {
+    ol.flex-control-thumbs {
+      list-style: none;
+      float: left;
+      margin: 10px 0 0 0;
+      padding: 0;
+
+      li {
+        padding: 0 10px 0 0;
+        float: left;
+      }
+    }
+  }
+}
+@media (max-width: 768px){
+  #product h1 {
+    font-size: 24px;
+  }
+}

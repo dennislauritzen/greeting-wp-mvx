@@ -1,0 +1,32 @@
+/*
+  * #inspiration .inspirationstores
+  * The "get inspired by other stores sections"
+  * also used on product pages.
+  */
+.inspirationstores {
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: "Dela Gothic One", cursive, serif;
+  }
+
+  .card {
+    .card-img-top {
+      width: 100%;
+      height: 10vw;
+      min-height: 200px;
+      object-fit: cover;
+    }
+
+    .card-title {
+      font-family: 'Rubik', sans-serif;
+    }
+
+    .card-text {
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      line-height: 23px;
+    }
+  }
+}

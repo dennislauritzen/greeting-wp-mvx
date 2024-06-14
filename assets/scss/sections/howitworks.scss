@@ -1,0 +1,89 @@
+
+
+/*
+  * section#hotitworks
+  * How it works section
+  * --
+  */
+#howitworks h1,
+#howitworks h2,
+#howitworks h3 {
+  font-family: "Dela Gothic One", cursive, serif;
+  font-weight: 300;
+}
+ul.timeline {
+  width: 100%;
+  position: relative;
+  list-style: none;
+  line-height: 1.8em;
+  min-height: 50px;
+  float: left;
+  text-align: center;
+}
+ul.timeline::before {
+  content: "";
+  display: block;
+  background-color: #446a6b;
+  height: 0.5px;
+  margin: 0 ;
+  position:relative;
+  top:23px;
+}
+ul.timeline li {
+  float: left;
+  width: 20%;
+  min-width: 125px;
+  padding: 0 10px;
+}
+ul.timeline li figure {
+  position: relative;
+  z-index: 2;
+  background: #F8F8F8;
+  height: 50px;
+  width: 80px;
+  border-radius: 50%;
+  margin: 0 auto 10px auto;
+  box-sizing: inherit;
+}
+@media (min-width: 769px){
+  ul.timeline::before {
+    margin: 0 100px;
+  }
+}
+@media (max-width: 768px){
+  ul.timeline {
+    text-align: left;
+  }
+  ul.timeline::before {
+    content: "";
+    position: absolute;
+    width: 1px;
+    top: 10px;
+    left: 59px;
+    margin-top: 25px;
+    height: calc(100% - 75px);
+  }
+  ul.timeline li {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-width: 200px;
+    padding: 5px 10px 10px 10px;
+  }
+  ul.timeline li figure {
+    width: 34px;
+    text-align: left;
+    margin: 0 15px 0 0;
+  }
+  ul.timeline li svg {
+    width: 34px;
+  }
+}
+
+@include media-breakpoint-up(md) {
+  #howitworks {
+    &::before {
+      margin: 0 100px;
+    }
+  }
+}

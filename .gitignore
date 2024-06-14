@@ -1,5 +1,4 @@
 /node_modules/
-/assets/scss/
 /.idea/
 package-lock.json
 .gitignore

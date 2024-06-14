@@ -1,0 +1,24 @@
+section#top.vendor {
+  min-height: 275px;
+}
+@media (max-width: breakpoint-max(lg)) {
+  section#top.vendor {
+    min-height: 201px;
+  }
+}
+
+@media (max-width: 575px) {
+  .rounded.storebar {
+    border-radius: 0px !important;
+  }
+}
+
+
+.btn-teal {
+  background-color: $teal-dark;
+  color: $white;
+}
+.btn-teal:hover {
+  background: darken($teal-dark, 5%);
+  color: $white;
+}

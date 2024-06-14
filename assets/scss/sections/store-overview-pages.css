@@ -1,0 +1,123 @@
+/* Content part */
+#citycontent h1,
+#categorycontent h1,
+#occasioncontent h1 {
+  padding-bottom: 15px;
+  position: relative;
+  text-align: center;
+  font-family: "Dela Gothic One", "Rubik", "Inter", sans-serif;
+}
+#citycontent h1::before,
+#categorycontent h1::before,
+#occasioncontent h1::before {
+  position: absolute;
+  background: linear-gradient(to right, #555555 75px, #ffffff 75px);
+  height: 3px;
+  content: "";
+  bottom: 0;
+  right: 0;
+  left: 0;
+}
+#citycontent h1,
+#categorycontent h1,
+#occasioncontent h1 {
+  font-family: "Dela Gothic One", "Rubik", "Inter", sans-serif;
+  font-weight: 600;
+}
+#citycontent h2,
+#categorycontent h2,
+#occasioncontent h2 {
+  font-family: "Inter", "Rubik", sans-serif;
+  font-weight: 600;
+}
+#citycontent #topoccassions .card,
+#categorycontent #topoccassions .card,
+#occasioncontent #topoccassions .card {
+  border-radius: 20px !important;
+}
+#citycontent #topoccassions .card .card-img-top,
+#categorycontent #topoccassions .card .card-img-top,
+#occasioncontent #topoccassions .card .card-img-top {
+  width: 100%;
+  height: 10vw;
+  object-fit: cover;
+}
+#citycontent #topoccassions .card h5.card-title,
+#categorycontent #topoccassions .card h5.card-title,
+#occasioncontent #topoccassions .card h5.card-title {
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+}
+#citycontent .catrownoscroll::-webkit-scrollbar,
+#categorycontent .catrownoscroll::-webkit-scrollbar,
+#occasioncontent .catrownoscroll::-webkit-scrollbar {
+  width: 0px;
+}
+
+#citycontent #topoccassions .card .card-img-top,
+#categorycontent #topoccassions .card .card-img-top,
+#occasioncontent #topoccassions .card .card-img-top {
+  width: 100%;
+  height: 10vw;
+  object-fit: cover;
+  border-top-left-radius: 20px !important;
+  border-top-right-radius: 20px !important;
+  height: 150px !important;
+  min-height: 150px !important;
+}
+
+#citycontent #topoccassions .card h5.card-title,
+#categorycontent #topoccassions .card h5.card-title,
+#occasioncontent #topoccassions .card h5.card-title {
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+}
+
+/** Store cards styling **/
+div.store {
+  transition: all 0.15s ease-in-out;
+}
+div.store:hover:not(div > span.badge) {
+  transform: scale(1.015);
+}
+@media (max-width: 768px) {
+  div.store .store a.cta {
+    font-size: 0.725rem;
+  }
+}
+div.store h6.card-title {
+  font-family: "Rubik", "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+}
+div.store small {
+  font-family: "Inter", sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+}
+div.store div.card p.price,
+div.store div.card bdi,
+div.store div.card div.price_hold {
+  font-size: 13px;
+}
+div.store div.card span.bagde {
+  transition: none !important;
+  transform: none !important;
+  border-size: 1px !important;
+}
+
+.card {
+  transition: all 0.15s ease-in-out;
+}
+.card h6.card-title {
+  font-family: "Rubik", "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.card:hover {
+  transform: scale(1.015);
+  box-shadow: 0 0.5rem 0.75rem rgba(150, 150, 150, 0.175);
+}
+
+/*# sourceMappingURL=store-overview-pages.css.map */

@@ -1,0 +1,69 @@
+div.woocommerce {
+  #billing_country_field,
+  #shipping_country_field {
+    display: none;
+  }
+  #ship-to-different-address {
+    display: none;
+  }
+  label {
+    font-family: 'Inter', sans-serif;
+  }
+  div.argmc-tab-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    margin:5px 0 10px 0;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Merriweather', serif;
+  }
+  h1 {
+    font-size: 28px;
+    font-weight: 500;
+  }
+  h2 {
+    font-size: 25px;
+    font-weight: 500;
+  }
+  h3 {
+    font-size: 22px !important;
+    font-weight: 500 !important;
+  }
+  input {
+    font-family: 'Inter', sans-serif;
+  }
+  input[type="radio"] {
+    width: 4%;
+    min-width: 20px;
+  }
+  .form-row-label {
+    width: 95%;
+  }
+  .woocommerce-remove-coupon {
+    width: 100%;
+    display: block;
+  }
+}
+
+
+
+p {}
+
+
+section#receipt {
+  h1, h2, h3, h4 {
+    font-family: 'Merriweather', sans-serif;
+  }
+  h1 {
+    font-size: 28px;
+    font-weight: 500;
+  }
+  h2 {
+    font-size: 25px;
+    font-weight: 500;
+  }
+  h3 {
+    font-size: 22px !important;
+    font-weight: 500 !important;
+  }
+}

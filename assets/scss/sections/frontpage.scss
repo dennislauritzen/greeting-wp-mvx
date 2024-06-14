@@ -1,0 +1,87 @@
+/*
+ *
+ * Video on frontpage
+ */
+#maintop {
+  .video-wrapper {
+    /* Telling our absolute positioned video to
+    be relative to this element */
+    width: 100vw;
+    height: 700px;
+    /* Will not allow the video to overflow the
+    container */
+    overflow: hidden;
+  }
+
+  video {
+    /** Simulationg background-size: cover */
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+  }
+}
+
+#frontpageSpinner {
+  color:#fecbca;
+}
+#frontpageSpinner:after {
+  content:"";
+  animation: frontpageVideoOverlaySpin 20s linear infinite;
+}
+@keyframes frontpageVideoOverlaySpin {
+  0% { content:"en gavekurv"; }
+  10% { content:"en vingave"; }
+  20% { content:"et strikkesæt"; }
+  30% { content:"en overraskelse"; }
+  40% { content:"en buket blomster"; }
+  50% { content: "en lækker gin"; }
+  60% { content: "smukke roser"; }
+  70% { content: "tak for besøg-gaven"; }
+  80% { content: "bare fordi-gaven"; }
+  90% { content: "en gavehilsen"; }
+  100% { content:"en gavekurv"; }
+}
+
+
+
+
+
+
+
+
+/*
+ *
+ * Recommandations for cities on frontpage search box
+ *
+ */
+ul.recommandations {
+  li.active {
+    background-color: #d6bf75;
+    border: 0;
+
+    a {
+      color: #ffffff;
+    }
+  }
+
+  li {
+    &:hover {
+      background-color: #d6bf75;
+
+      a {
+        color: #ffffff;
+      }
+    }
+
+    a:hover {
+      color: #ffffff;
+    }
+  }
+
+  li:last-child {
+    &:hover {
+      border-bottom-left-radius: 3px !important;
+      border-bottom-right-radius: 3px !important;
+    }
+  }
+}
