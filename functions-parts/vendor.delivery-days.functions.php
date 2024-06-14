@@ -7,7 +7,6 @@
 ## These functions get the base values
 ##
 
-
 function get_vendor_delivery_days_required($vendor_id, $type = 'weekday'){
     // Get the new delivery day required value
     $get_deliveryday_required_repeater = get_field('vendor_require_order_days_before', 'user_'.$vendor_id);
@@ -101,12 +100,12 @@ function get_vendor_dropoff_time($vendor_id, $type = 'weekday'){
     // Get the dropoff time metavalue for the vendor.
     #$vendorDropOffTime = ($type == 'weekend' ? get_user_meta($vendor_id, 'vendor_drop_off_time_weekend', true) : get_user_meta($vendor_id, 'vendor_drop_off_time', true));
 
-
     $vendor_cutoff_times = get_field('vendor_cutoff_times', 'user_'.$vendor_id);
-
-
+#var_dump($vendor_cutoff_times);
     // Get the new vendor dropoff time.
-    if(!empty($vendor_cutoff_times) && count($vendor_cutoff_times) > 0){
+    if(!empty($vendor_cutoff_times)
+        && !(empty($vendor_cutoff_times['cutoff_time_weekend']) && empty($vendor_cutoff_times['cutoff_time_holiday']) && empty($vendor_cutoff_times['cutoff_time_weekday']))
+        && count($vendor_cutoff_times) > 0){
         if($type == 'weekend' && !empty($vendor_cutoff_times['cutoff_time_weekend'])) {
             $vendor_dropoff_time = $vendor_cutoff_times['cutoff_time_weekend'];
         } else if($type == 'holiday' && !empty($vendor_cutoff_times['cutoff_time_holiday'])) {
@@ -126,17 +125,29 @@ function get_vendor_dropoff_time($vendor_id, $type = 'weekday'){
             $vendor_dropoff_time = str_replace(array(':', '.'), array(':', ':'), $vendor_dropoff_time);
         }
 
-        $default_timeZone = new DateTimeZone('UTC');
+        $default_timeZone = new DateTimeZone('Europe/Copenhagen');
     } else {
         $vendor_dropoff_time = '00:00:00';
         $default_timeZone = new DateTimeZone('Europe/Copenhagen');
-
     }
 
-    $timeZone = new DateTimeZone('Europe/Copenhagen');
+    // Create the DateTime object in default timezone
     $dateTime = new DateTime($vendor_dropoff_time, $default_timeZone);
+
+    // Save the original time
+    $originalTime = $dateTime->format('H:i:s');
+
+    // Change the timezone to Copenhagen but keep the time the same
+    $timeZone = new DateTimeZone('Europe/Copenhagen');
     $dateTime->setTimezone($timeZone);
 
+    // Check if the converted time is different from the original time
+    if ($dateTime->format('H:i:s') !== $originalTime) {
+        // Adjust the DateTime to retain the original time
+        $dateTime = new DateTime($originalTime, new DateTimeZone('Europe/Copenhagen'));
+    }
+
+    // Return the time in H:i:s format
     return $dateTime->format('H:i:s');
 }
 
@@ -335,7 +346,12 @@ function get_vendor_delivery_days_from_today($vendor_id, $prepend_text = '', $de
             && $c['cutoff_datetime'] !== false){
 
             $cutofftime = $c['cutoff_datetime'];
-            $cutoff_time = DateTime::createFromFormat('d-m-Y H:i:s', $cutofftime);
+
+            $cutoff_time = DateTime::createFromFormat('d-m-Y H:i:s', $cutofftime, new DateTimeZone('UTC'));
+            // Change the timezone to Copenhagen
+            $cutoff_time->setTimezone(new DateTimeZone('Europe/Copenhagen'));
+
+            #$cutoff_time = DateTime::createFromFormat('d-m-Y H:i:s', $cutofftime);
 
             if($cutoff_time > $now){
                 $result = array(
@@ -356,7 +372,8 @@ function get_vendor_delivery_days_from_today($vendor_id, $prepend_text = '', $de
     } else {
         // Create a fallback date object.
         $date_str = $result['date'].' 00:00:00';
-        $date_obj =  DateTime::createFromFormat('d-m-Y H:i:s', $date_str);
+        $date_obj =  DateTime::createFromFormat('d-m-Y H:i:s', $date_str, new DateTimeZone('UTC'));
+        $date_obj->setTimezone(new DateTimeZone('Europe/Copenhagen'));
         #$date = $date_obj->format('d-m-Y'); // Construct from the date.
 
         $str = '';
@@ -403,7 +420,9 @@ function get_vendor_delivery_days_from_today_header_vendor($vendor_id, $prepend_
             && $c['cutoff_datetime'] !== false){
 
             $cutofftime = $c['cutoff_datetime'];
-            $cutoff_time = DateTime::createFromFormat('d-m-Y H:i:s', $cutofftime);
+            $cutoff_time = DateTime::createFromFormat('d-m-Y H:i:s', $cutofftime, new DateTimeZone('UTC'));
+            // Change the timezone to Copenhagen
+            $cutoff_time->setTimezone(new DateTimeZone('Europe/Copenhagen'));
 
             if($cutoff_time > $now){
                 $result = array(
@@ -425,7 +444,8 @@ function get_vendor_delivery_days_from_today_header_vendor($vendor_id, $prepend_
         // Create a fallback date object.
         // NOTE: Maybe we shouldnt add the '00:00:00'-part... Test it :-)
         $date_str = $result['date'].' 00:00:00';
-        $date_obj =  DateTime::createFromFormat('d-m-Y H:i:s', $date_str);
+        $date_obj =  DateTime::createFromFormat('d-m-Y H:i:s', $date_str, new DateTimeZone('UTC'));
+        $date_obj->setTimezone(new DateTimeZone('Europe/Copenhagen'));
         #$date = $date_obj->format('d-m-Y'); // Construct from the date.
 
         // Subtract one day in order to calculate comparing to "when I need to order today" for next delivery slot.

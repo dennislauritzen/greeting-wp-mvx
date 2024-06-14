@@ -100,6 +100,42 @@ $cityDefaultUserIdAsString = implode(",", $UserIdArrayForCityPostalcode);
 // Data for the filtering.
 // This data is used for the filters and for the stores.
 // It is also used for the featuring of categories and occasions in the top.
+
+#$productPriceArray = array(); // for price filter
+#$categoryTermListArray = array(); // for cat term filter
+#$occasionTermListArray = array();
+
+// for price filter
+
+// Get all vendor product IDs
+#$vendorProductIds = array();
+
+#foreach ($UserIdArrayForCityPostalcode as $vendorId) {
+#    $vendor = get_mvx_vendor($vendorId);
+#    $vendorProductIds = array_merge($vendorProductIds, $vendor->get_products(array('fields' => 'ids')));
+#}
+#$vendorProductIds = array_unique($vendorProductIds);
+
+// Use get_the_terms to fetch all the terms for all products belonging to the vendors
+#$terms = wp_get_object_terms($vendorProductIds, array('product_cat', 'occasion'));
+
+#$categoryTermListArray = array();
+#$occasionTermListArray = array();
+
+#if ($terms && !is_wp_error($terms)) {
+#    foreach ($terms as $term) {
+#        if ($term->taxonomy === 'product_cat') {
+#            if ($term->term_id != 15 && $term->term_id != 16) {
+#                $categoryTermListArray[] = $term->term_id;
+#            }
+#        } else if ($term->taxonomy === 'occasion') {
+#            $occasionTermListArray[] = $term->term_id;
+#        }
+#    }
+#}
+
+#$categoryTermListArray = array_unique($categoryTermListArray);
+#$occasionTermListArray = array_unique($occasionTermListArray);
 ?>
 
 
@@ -233,43 +269,46 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
         foreach($occasion_featured_list as $occasion){
-            $category_or_occasion = ($occasion->taxonomy == 'product_cat') ? 'cat' : 'occ_';
+            // Only show a card, if the cat/occasion is actually present in stores.
+            #if(in_array($occasion->term_id, $occasionTermListArray) || in_array($occasion->term_id, $categoryTermListArray))
+            #{
+                $category_or_occasion = ($occasion->taxonomy == 'product_cat') ? 'cat' : 'occ_';
 
-            // Get the permalink from the associative array or use the default city page permalink
-            $landing_page_permalink = isset($landing_page_permalinks[$occasion->term_id]) ? $landing_page_permalinks[$occasion->term_id] : $city_page_permalink . '?c=' . $occasion->term_id;
+                // Get the permalink from the associative array or use the default city page permalink
+                $landing_page_permalink = isset($landing_page_permalinks[$occasion->term_id]) ? $landing_page_permalinks[$occasion->term_id] : $city_page_permalink . '?c=' . $occasion->term_id;
 
-            $occasionImageUrl = '';
-            $icon_src = $occasion->icon_src;
-            $image_src = $occasion->image_src;
-            $featured_bg_color = $occasion->featured_bg_color;
-            $featured_text_color = $occasion->featured_text_color;
-            $featured_border_color = $occasion->featured_border_color;
-            $featured = $occasion->featured;
+                $occasionImageUrl = '';
+                $icon_src = $occasion->icon_src;
+                $image_src = $occasion->image_src;
+                $featured_bg_color = $occasion->featured_bg_color;
+                $featured_text_color = $occasion->featured_text_color;
+                $featured_border_color = $occasion->featured_border_color;
+                $featured = $occasion->featured;
 
-            $bg_str = '';
-            $text_str = ' color: #222222;';
-            $border_str = '';
-            if(!empty($featured) && $featured == "1"){
-                if(!empty($featured_bg_color)){
-                    $bg_str = ' background-color: '.$featured_bg_color.'; color: '.$featured_text_color.';';
+                $bg_str = '';
+                $text_str = ' color: #222222;';
+                $border_str = '';
+                if(!empty($featured) && $featured == "1"){
+                    if(!empty($featured_bg_color)){
+                        $bg_str = ' background-color: '.$featured_bg_color.'; color: '.$featured_text_color.';';
+                    }
+                    if(!empty($featured_text_color)){
+                        $text_str = ' color: '.$featured_text_color.'"';
+                    }
+                    if(!empty($featured_border_color)){
+                        $border_str = ' border: 3px solid '.$featured_border_color.' !important;';
+                    }
                 }
-                if(!empty($featured_text_color)){
-                    $text_str = ' color: '.$featured_text_color.'"';
-                }
-                if(!empty($featured_border_color)){
-                    $border_str = ' border: 3px solid '.$featured_border_color.' !important;';
-                }
-            }
 
-            if(!empty($icon_src)){
-                $occasionImageUrl = wp_get_attachment_image($occasion->icon_src, 'vendor-product-box-size', false, array('class' => 'mx-auto my-auto d-block  ratio-4by3', 'style' => 'max-width: 75%; max-height: 75%;', 'alt' => $occasion->name));
-            } else {
-                if(!empty($occasion->image_src)){
-                    $occasionImageUrl = wp_get_attachment_image($occasion->image_src, 'vendor-product-box-size', false, array('class' => 'card-img-top ratio-4by3', 'alt' => $occasion->name));
+                if(!empty($icon_src)){
+                    $occasionImageUrl = wp_get_attachment_image($occasion->icon_src, 'vendor-product-box-size', false, array('class' => 'mx-auto my-auto d-block  ratio-4by3', 'style' => 'max-width: 75%; max-height: 75%;', 'alt' => $occasion->name));
                 } else {
-                    $occasionImageUrl = wp_get_attachment_image($placeHolderImage, 'vendor-product-box-size', false, array('class' => 'card-img-top ratio-4by3', 'alt' => $occasion->name));
+                    if(!empty($occasion->image_src)){
+                        $occasionImageUrl = wp_get_attachment_image($occasion->image_src, 'vendor-product-box-size', false, array('class' => 'card-img-top ratio-4by3', 'alt' => $occasion->name));
+                    } else {
+                        $occasionImageUrl = wp_get_attachment_image($placeHolderImage, 'vendor-product-box-size', false, array('class' => 'card-img-top ratio-4by3', 'alt' => $occasion->name));
+                    }
                 }
-            }
               ?>
               <div class="col-6 col-sm-6 col-md-4 col-lg-3 col-xl-3 col-xxl-2 py-0 my-0 pe-2  card_outer occasion-card" style="scroll-snap-align: start;">
                 <div class="card border-0 shadow-sm" style="<?php echo $bg_str; ?>  <?php echo $border_str; ?>">
@@ -284,6 +323,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 </div>
               </div>
           <?php
+           # } // endif
         } // endforeach
         ?>
         </div>

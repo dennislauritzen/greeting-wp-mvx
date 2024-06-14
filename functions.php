@@ -2,7 +2,7 @@
 
 
 // Set the timezone to Copenhagen
-date_default_timezone_set('Europe/Copenhagen');
+#date_default_timezone_set('Europe/Copenhagen');
 
 /**
  * Include Theme Customizer.

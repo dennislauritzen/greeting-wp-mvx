@@ -107,16 +107,70 @@ $link-decoration: none;
 /**
  * General
  */
-
-
 img {
   vertical-align: middle;
 }
 
+/**
+ * Custom buttons
+ */
+.btn-teal {
+  background: $teal-dark;
+  color: #ffffff;
+}
+.btn-teal:hover {
+  background: darken($yellow-greeting, 10%);
+  color: #222222;
+}
+
+.btn-light-yellow {
+  background: $yellow-greeting;
+  color: #222222;
+}
+.btn-light-yellow:hover {
+  background: darken($yellow-greeting, 10%);
+  color: #222222;
+}
+
+.btn-light-grey-dark-border {
+  background: $gray-400;
+  color: #222222;
+  border:  1px solid $gray-500;
+}
+.btn-light-grey-dark-border:hover {
+  background: darken($gray-400, 10%);
+  color: #222222;
+  border-bolor: darken($gray-500, 10%);
+}
+
+.btn-white-grey-border {
+  background: $white;
+  color: #222222;
+  border: 1px solid $gray-300;
+  text-decoration: none;
+}
+.btn-white-grey-border:hover {
+  background: darken($gray-100, 10%);
+  border-color: darken($gray-300, 10%);
+  color: #222222;
+}
 
 /**
- * WordPress customization
+ * Custom borders
  */
+.border-3px-green {
+  border: 3px solid $green-300;
+}
+
+.border-transparent {
+  border-color: rgb(255,255,255,0);
+
+}
+
+
+  /**
+   * WordPress customization
+   */
 
 /* If WP-Adminbar is visible */
 body.admin-bar {
