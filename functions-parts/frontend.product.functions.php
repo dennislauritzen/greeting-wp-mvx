@@ -376,6 +376,29 @@ function greeting_load_calendar_dates_function( $vendor_id = 0 ){
     ?>
 
     <script type="text/javascript">
+        (function($) {
+            $.datepicker.regional['da'] = {
+                closeText: 'Luk',
+                prevText: '&#x3C;Forrige',
+                nextText: 'Næste&#x3E;',
+                currentText: 'I dag',
+                monthNames: ['Januar','Februar','Marts','April','Maj','Juni',
+                    'Juli','August','September','Oktober','November','December'],
+                monthNamesShort: ['Jan','Feb','Mar','Apr','Maj','Jun',
+                    'Jul','Aug','Sep','Okt','Nov','Dec'],
+                dayNames: ['Søndag','Mandag','Tirsdag','Onsdag','Torsdag','Fredag','Lørdag'],
+                dayNamesShort: ['Søn','Man','Tir','Ons','Tor','Fre','Lør'],
+                dayNamesMin: ['Sø','Ma','Ti','On','To','Fr','Lø'],
+                weekHeader: 'Uge',
+                dateFormat: 'dd-mm-yy',
+                firstDay: 1,
+                isRTL: false,
+                showMonthAfterYear: false,
+                yearSuffix: ''
+            };
+            $.datepicker.setDefaults($.datepicker.regional['da']);
+        })(jQuery);
+
         // Validates that the input string is a valid date formatted as "mm/dd/yyyy"
         function isValidDate(dateString)
         {
