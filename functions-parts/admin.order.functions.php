@@ -347,11 +347,14 @@ function save_shop_order_meta_box_data( $post_id, $post ) {
     $d_year = substr($post_date, 6, 4);
     $unix_date = date("U", strtotime($d_year.'-'.$d_month.'-'.$d_date));
 
-    #update_post_meta( $post_id, '_delivery_unixdate', $unix_date );
-    #update_post_meta( $post_id, '_delivery_date', $my_data );
 
-    $order->update_meta_data('_delivery_unixdate', $unix_date);
-    $order->update_meta_date('_delivery_date', $my_data);
+    if(is_wc_hpos_activated()) {
+        $order->update_meta_data('_delivery_unixdate', $unix_date);
+        $order->update_meta_date('_delivery_date', $my_data);
+    } else {
+        update_post_meta( $post_id, '_delivery_unixdate', $unix_date );
+        update_post_meta( $post_id, '_delivery_date', $my_data );
+    }
 }
 add_action( 'save_post', 'save_shop_order_meta_box_data', 20, 2 );
 
@@ -417,9 +420,6 @@ function save_shop_order_meta_box_store_own_ref_data( $post_id, $post ) {
             update_post_meta( $post_id, '_store_own_order_reference', $my_data );
             #$post_id = $post->ID;
         }
-
-
-
     }
     #print $post_id; exit;
 

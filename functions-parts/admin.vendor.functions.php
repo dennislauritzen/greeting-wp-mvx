@@ -95,13 +95,21 @@ function greeting_change_vendor_show_meta_action( $post_id ) {
 
         $vendor_id = sanitize_text_field( $_POST['vendor_meta_name']);
 
-        #update_post_meta($post_id, '_vendor_id', $vendor_id);
-        $order->update_meta_data('_vendor_id',  $vendor_id);
+        if(is_wc_hpos_activated()){
+            $order->update_meta_data('_vendor_id',  $vendor_id);
+        } else {
+            update_post_meta($post_id, '_vendor_id', $vendor_id);
+        }
+
 
         #// Assuming the vendor name is stored in another custom field, adjust the field name accordingly
         $vendor_name = get_vendor_name_by_id( $vendor_id ); // Replace with your actual function to get vendor name
-        #update_post_meta( $post_id, '_vendor_name', sanitize_text_field( $vendor_name ) );
-        $order->update_meta_data('_vendor_name',  sanitize_text_field( $vendor_name ) );
+
+        if(is_wc_hpos_activated()){
+            $order->update_meta_data('_vendor_name',  sanitize_text_field( $vendor_name ) );
+        } else {
+            update_post_meta( $post_id, '_vendor_name', sanitize_text_field( $vendor_name ) );
+        }
     }
 }
 add_action('save_post', 'greeting_change_vendor_show_meta_action');

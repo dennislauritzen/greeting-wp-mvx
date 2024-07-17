@@ -1132,16 +1132,24 @@ function greeting_save_custom_fields_with_order( $order_id ) {
         $vendor_name = get_user_meta($vendor_id, '_vendor_page_title', 1);
 
         if(!empty($vendor_id)){
-            $order->update_meta_data('_vendor_id', $vendor_id);
-            $order->update_meta_data('_vendor_name', $vendor_name);
+            if(is_wc_hpos_activated()){
+                $order->update_meta_data('_vendor_id', $vendor_id);
+                $order->update_meta_data('_vendor_name', $vendor_name);
+            } else {
+                update_post_meta($order_id, '_vendor_id', $vendor_id );
+                update_post_meta($order_id, '_vendor_name', $vendor_name );
+            }
             break;
         }
     }
 
     $post_date = isset($_POST['delivery_date']) ? esc_attr($_POST['delivery_date']) : '';
     if ( !empty($post_date) ) {
-        $order->update_meta_data('_delivery_date', $post_date);
-        #update_post_meta($order_id, '_delivery_date', $post_date );
+        if(is_wc_hpos_activated()){
+            $order->update_meta_data('_delivery_date', $post_date);
+        } else {
+            update_post_meta($order_id, '_delivery_date', $post_date );
+        }
     };
     if (!empty($post_date) && preg_match('/^\d{2}-\d{2}-\d{4}$/', $post_date)) {
         $d_date = substr($post_date, 0, 2);
@@ -1149,81 +1157,112 @@ function greeting_save_custom_fields_with_order( $order_id ) {
         $d_year = substr($post_date, 6, 4);
         $unix_date = date("U", strtotime($d_year.'-'.$d_month.'-'.$d_date));
 
-        $order->update_meta_data('_delivery_unixdate', esc_attr( $unix_date ) );
-        $order->update_meta_data('_delivery_date', esc_attr( $post_date ) );
-        #update_post_meta( $order_id, '_delivery_unixdate', esc_attr( $unix_date ) );
-        #update_post_meta( $order_id, '_delivery_date', esc_attr( $post_date )  );
+        if(is_wc_hpos_activated()){
+            $order->update_meta_data('_delivery_unixdate', esc_attr( $unix_date ) );
+            $order->update_meta_data('_delivery_date', esc_attr( $post_date ) );
+        } else {
+            update_post_meta( $order_id, '_delivery_unixdate', esc_attr( $unix_date ) );
+            update_post_meta( $order_id, '_delivery_date', esc_attr( $post_date )  );
+        }
     } else {
         $vendor_del_days = (int) get_field('vendor_require_delivery_day', 'user_'.$vendor_id);
         $vendor_drop_off = (int) get_field('vendor_drop_off_time', 'user_'.$vendor_id);
         $vendor_opening_days = get_field('openning', 'user_'.$vendor_id);
         $delivery_date = estimateDeliveryDate($vendor_del_days, $vendor_drop_off, $vendor_opening_days, 'U');
 
-        $order->update_meta_data('_delivery_unixdate', esc_attr($delivery_date));
-        #update_post_meta( $order_id, '_delivery_unixdate', esc_attr( $delivery_date ) );
+        if(is_wc_hpos_activated()){
+            $order->update_meta_data('_delivery_unixdate', sanitize_text_field($delivery_date));
+        } else {
+            update_post_meta( $order_id, '_delivery_unixdate', sanitize_text_field( $delivery_date ) );
+        }
     }
 
-    $is_post_set = isset($_POST) ? 'yes' : 'no';
-    $order->update_meta_data('post_is_set', $is_post_set);
-
-    // Serialize the $_POST data
-    $serialized_post_data = serialize( $_POST );
-    // Save the serialized $_POST data as order meta data
-    $order->update_meta_data( '_serialized_post_data', $serialized_post_data );
-
     // Delivery date time - only on orders with funeral products
-    $delivery_date_time = isset( $_POST['delivery_date_time'] ) ? esc_attr($_POST['delivery_date_time']) : '';
+    $delivery_date_time = isset( $_POST['delivery_date_time'] ) ? sanitize_text_field($_POST['delivery_date_time']) : '';
     if( !empty($delivery_date_time) ){
-        $order->update_meta_data('_delivery_date_time', $delivery_date_time);
-        #update_post_meta($order_id, '_delivery_date_time', sanitize_text_field($_POST['delivery_date_time']));
+        if(is_wc_hpos_activated()){
+            $order->update_meta_data('_delivery_date_time', $delivery_date_time);
+        } else {
+            update_post_meta($order_id, '_delivery_date_time',  $delivery_date_time );
+        }
     }
 
     // Save the message for the greeting card.
-    $greeting_message = isset( $_POST['greeting_message'] ) ? esc_attr($_POST['greeting_message']) : '';
+    $greeting_message = isset( $_POST['greeting_message'] ) ? sanitize_text_field($_POST['greeting_message']) : '';
     if ( !empty($greeting_message) ){
-        $order->update_meta_data('_greeting_message', $greeting_message );
-        #update_post_meta( $order_id, '_greeting_message', sanitize_text_field( $_POST['greeting_message'] ) );
+        if(is_wc_hpos_activated()){
+            $order->update_meta_data('_greeting_message', $greeting_message );
+        } else {
+            update_post_meta( $order_id, '_greeting_message', $greeting_message );
+        }
     }
     $greeting_pro_message = isset( $_POST['message_pro'] ) ? esc_attr($_POST['message_pro']) : '';
     if ( $greeting_pro_message ) {
-        $order->update_meta_data('_greeting_card_upgrade_option', $greeting_pro_message );
-        #update_post_meta( $order_id, '_greeting_card_upgrade_option', sanitize_text_field( $_POST['message_pro'] ) );
+        if(is_wc_hpos_activated()){
+            $order->update_meta_data('_greeting_card_upgrade_option', $greeting_pro_message );
+        } else {
+            update_post_meta( $order_id, '_greeting_card_upgrade_option', sanitize_text_field( $_POST['message_pro'] ) );
+        }
     }
 
     // Band message - for funeral
-    $greeting_message_band_1 = isset( $_POST['greeting_message_band_1'] ) ? esc_attr($_POST['greeting_message_band_1']) : '';
+    $greeting_message_band_1 = isset( $_POST['greeting_message_band_1'] ) ? sanitize_text_field($_POST['greeting_message_band_1']) : '';
     if ( !empty($greeting_message_band_1) ){
-        $order->update_meta_data('_greeting_message_band_1', $greeting_message_band_1 );
-        #update_post_meta($order_id, '_greeting_message_band_1', );
+        if(is_wc_hpos_activated()){
+            $order->update_meta_data('_greeting_message_band_1', $greeting_message_band_1 );
+        } else {
+            update_post_meta($order_id, '_greeting_message_band_1', $greeting_message_band_1 );
+        }
     }
-    $greeting_message_band_2 = isset( $_POST['greeting_message_band_2'] ) ? esc_attr($_POST['greeting_message_band_2']) : '';
+
+    $greeting_message_band_2 = isset( $_POST['greeting_message_band_2'] ) ? sanitize_text_field($_POST['greeting_message_band_2']) : '';
     if ( !empty($greeting_message_band_2) ){
-        $order->update_meta_data('_greeting_message_band_2', $greeting_message_band_2 );
-        #update_post_meta($order_id, '_greeting_message_band_2', sanitize_text_field($_POST['greeting_message_band_2']));
+        if(is_wc_hpos_activated()){
+            $order->update_meta_data('_greeting_message_band_2', $greeting_message_band_2 );
+        } else {
+            update_post_meta($order_id, '_greeting_message_band_2', $greeting_message_band_2 );
+        }
     }
 
     // Receiver phone
-    $receiver_phone = isset( $_POST['receiver_phone'] ) ? esc_attr($_POST['receiver_phone']) : '';
+    $receiver_phone = isset( $_POST['receiver_phone'] ) ? sanitize_text_field($_POST['receiver_phone']) : '';
     if (!empty($receiver_phone)) {
-        $order->update_meta_data('_receiver_phone', esc_attr($receiver_phone));
+        if(is_wc_hpos_activated()){
+            $order->update_meta_data('_receiver_phone', $receiver_phone );
+        } else {
+            update_post_meta($order_id, '_receiver_phone', $receiver_phone );
+        }
     }
 
     // Delivery instructions
-    $delivery_instructions = isset( $_POST['delivery_instructions'] ) ? esc_attr($_POST['delivery_instructions']) : '';
+    $delivery_instructions = isset( $_POST['delivery_instructions'] ) ? sanitize_text_field($_POST['delivery_instructions']) : '';
     if (!empty($delivery_instructions)) {
-        $order->update_meta_data('_delivery_instructions', esc_attr($delivery_instructions));
+        if(is_wc_hpos_activated()){
+            $order->update_meta_data('_delivery_instructions', $delivery_instructions );
+        } else {
+            update_post_meta($order_id, '_delivery_instructions', $delivery_instructions );
+        }
     }
 
     // Leave gift address
-    $leave_gift_address = isset( $_POST['leave_gift_address'] ) ? esc_attr($_POST['leave_gift_address']) : '';
+    $leave_gift_address = isset( $_POST['leave_gift_address'] ) ? sanitize_text_field($_POST['leave_gift_address']) : '';
     if (!empty($leave_gift_address)) {
-        $order->update_meta_data('_leave_gift_address', esc_attr($leave_gift_address));
+        if(is_wc_hpos_activated()){
+            $order->update_meta_data('_leave_gift_address', $leave_gift_address );
+        } else {
+            update_post_meta($order_id, '_leave_gift_address', $leave_gift_address );
+        }
+
     }
 
     // Leave gift neighbour
-    $leave_gift_neighbour = isset( $_POST['leave_gift_neighbour'] ) ? esc_attr($_POST['leave_gift_neighbour']) : '';
+    $leave_gift_neighbour = isset( $_POST['leave_gift_neighbour'] ) ? sanitize_text_field($_POST['leave_gift_neighbour']) : '';
     if (!empty($data['leave_gift_neighbour'])) {
-        $order->update_meta_data('_leave_gift_neighbour', esc_attr($leave_gift_neighbour));
+        if(is_wc_hpos_activated()){
+            $order->update_meta_data('_leave_gift_neighbour', $leave_gift_neighbour );
+        } else {
+            update_post_meta($order_id, '_leave_gift_neighbour', $leave_gift_address );
+        }
     }
 
     // Save all meta data changes to the order
@@ -1252,17 +1291,18 @@ function greeting_save_custom_fields_with_order2( $order_id, $data ) {
         $greeting_message = sanitize_text_field( $_POST['greeting_message'] );
 
         // Update the order meta data
-        $order->update_meta_data( '_greeting_message', $greeting_message );
-
-        $order->update_meta_data( 'JOHN', 'ja');
-        $meta_data = $order->get_meta('JOHN');
+        if(is_wc_hpos_activated()){
+            $order->update_meta_data( '_greeting_message', $greeting_message );
+        } else {
+            update_post_meta($order_id, '_greeting_message', $greeting_message );
+        }
 
         // Save the order with the updated meta data
         try {
             $order->save();
         } catch ( Exception $e ) {
             // Log the error if saving the order fails
-            error_log( 'Error updating order meta data'. $meta_data .': ' . $e->getMessage() );
+            error_log( 'Error updating order meta data: ' . $e->getMessage() );
         }
     }
 }

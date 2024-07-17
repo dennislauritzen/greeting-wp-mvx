@@ -32,8 +32,12 @@ add_action(
                     // Use the CRUD method to get the order and update the meta field.
                     $order = wc_get_order( $order_id );
                     if ( $order ) {
-                        $order->update_meta_data( $field, sanitize_text_field( $value ) );
-                        $order->save(); // Save the changes
+                        if(is_wc_hpos_activated()){
+                            $order->update_meta_data( $field, sanitize_text_field( $value ) );
+                            $order->save(); // Save the changes
+                        } else {
+                            update_post_meta( $order->get_id(), $field, sanitize_text_field( $value ) );
+                        }
                     }
                 },
                 'schema'          => array(
