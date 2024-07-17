@@ -13,9 +13,9 @@ get_header();
 <section id="maintop" class=" position-relative">
     <div class="row g-0">
       <div class="col-12 d-flex  align-items-bottom align-items-md-center align-items-lg-center align-items-xl-center video-wrapper">
-        <video loop="true" autoplay="autoplay" muted poster="https://www.greeting.dk/wp-content/themes/greeting2/assets/img/greeting-poster_webp.webp"  preload="none" playsinline id="frontpagevid" defer async class="position-absolute top-0 start-0" style="pointer-events: none;">
-          <source src="https://www.greeting.dk/wp-content/themes/greeting2/assets/video/greeting_top_main.mp4" type="video/mp4" defer async>
-          <source src="https://www.greeting.dk/wp-content/themes/greeting2/assets/video/greeting_top_comp.webm" type="video/webm" defer async>
+        <video loop="true" autoplay="autoplay" muted poster="https://www.greeting.dk/wp-content/themes/greeting3/assets/img/greeting-poster_webp.webp"  preload="none" playsinline id="frontpagevid" defer async class="position-absolute top-0 start-0" style="pointer-events: none;">
+          <source src="https://www.greeting.dk/wp-content/themes/greeting3/assets/video/greeting_top_main.mp4" type="video/mp4" defer async>
+          <source src="https://www.greeting.dk/wp-content/themes/greeting3/assets/video/greeting_top_comp.webm" type="video/webm" defer async>
         </video>
         <script>
             document.getElementById('frontpagevid').play();
