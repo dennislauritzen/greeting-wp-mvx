@@ -363,7 +363,13 @@ function greeting_load_calendar_dates_function( $vendor_id = 0 ){
 
     $dates = get_vendor_dates_new($vendor_id, 'd-m-Y', 'close');
     if(empty($dates) || !$dates){
-        $dates = array();
+        // Generate an array of all dates within the next 58 days
+        $all_dates = [];
+        $today = new DateTime();
+        for ($i = 0; $i <= 60; $i++) {
+            $all_dates[] = $today->modify('+1 day')->format('d-m-Y');
+        }
+        $dates = $all_dates;
     }
     $dates_values_only = array_values($dates);
     $dates_json = json_encode($dates_values_only);
