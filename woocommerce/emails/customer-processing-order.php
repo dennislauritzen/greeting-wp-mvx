@@ -38,6 +38,9 @@ $main_order_id = (empty(get_post_parent($order->get_id())) ? $order->get_id() : 
 
 $additional_content = (!empty($additional_content) ? $additional_content : 'Vi har modtaget din bestilling - og den er videresendt til butikken, der sørger for, den bliver leveret til tiden. :)');
 
+// Get the value if this order has funeral products
+$order_has_funeral_products = order_has_funeral_products($order->get_id());
+
 /*
  * @hooked WC_Emails::email_header() Output the email header
  */
@@ -55,14 +58,14 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                             <tr>
                                 <td width="75%" style="width: 75%;">
                                     <h1 style="margin-top: 25px;"><?php echo $email_heading; ?></h1>
-																		<small>
+                                    <small>
                                       <img width="15" height="15" src="https://s.w.org/images/core/emoji/14.0.0/72x72/2764.png" style="display: inline-block; width: 15px !important; max-width: 20px; height: 15px; max-height: 20px; font-size: 12px;">
                                       &nbsp; <?php echo $additional_content; ?>
                                    	</small>
                                 </td>
-																<td width="25%" style="width: 25%">
-																		&nbsp;
-																</td>
+                                <td width="25%" style="width: 25%">
+                                        &nbsp;
+                                </td>
                             </tr>
                         </table>
                     </td>
@@ -177,25 +180,42 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                     $order_total = $order->get_total();
                     $order_ship_total = $order->get_shipping_total() + $order->get_shipping_tax();
 
+                    // Calculate the cost of the cards
+                    $fees = $order->get_fees();
+                    $greeting_card_fee_ex_vat = 0;
+                    $greeting_card_fee_with_vat = 0;
+                    foreach($fees as $fee){
+                        $fee_name = $fee->get_name();
+                        $fee_amount = $fee->get_amount();
 
-                    $order_new_subtotal = $order_total - $order_ship_total;
-                    $order_ship_new = 39;
-                    $order_new_total = $order_new_subtotal + $order_ship_new;
+                        $greeting_card_fee_ex_vat =+ $fee_amount;
+                        $greeting_card_fee_with_vat =+ $fee_amount * 1.25 ;
+                    }
+
+                    $order_new_subtotal = $order_total - $greeting_card_fee_with_vat - $order_ship_total;
                 ?>
                 <tr class="order-details-totals-row" style="border-top: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
                     <td width="50%" style="width: 50%; padding: 6px 0 6px 10px;">
                         Varetotal (inkl. 25 % moms)
                     </td>
                     <td style="width: 50%; padding: 6px 10px 6px 0px; text-align: right;">
-                        <?php echo $order_new_subtotal; ?> kr.
+                        <?php echo wc_price( $order_new_subtotal ); ?>
                     </td>
                 </tr>
                 <tr class="order-details-totals-row" style="border-top: 1px solid #c0c0c0; border-bottom: 1px solid #dee2e6;">
                     <td width="50%" style="width: 50%; padding: 6px 0 6px 10px;">
-                        Levering / fragt
+                        Kort
                     </td>
                     <td style="width: 50%; padding: 6px 10px 6px 0px; text-align: right;">
-                        <?php echo $order_ship_total; ?> kr.
+                        <?php echo wc_price( $greeting_card_fee_with_vat ); ?>
+                    </td>
+                </tr>
+                <tr class="order-details-totals-row" style="border-top: 1px solid #c0c0c0; border-bottom: 1px solid #dee2e6;">
+                    <td width="50%" style="width: 50%; padding: 6px 0 6px 10px;">
+                        Levering
+                    </td>
+                    <td style="width: 50%; padding: 6px 10px 6px 0px; text-align: right;">
+                        <?php echo wc_price( $order_ship_total ); ?>
                     </td>
                 </tr>
                 <tr class="order-details-totals-row" style="border-top: 1px solid #c0c0c0; border-bottom: 1px solid #dee2e6;">
@@ -203,7 +223,7 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                         Ordretotal (inkl. 25 % moms)
                     </td>
                     <td style="width: 50%; padding: 6px 10px 6px 0px; text-align: right;">
-                        <?php echo $order_total; ?> kr.
+                        <?php echo wc_price( $order_total ); ?>
                     </td>
                 </tr>
                 <?php } ?>

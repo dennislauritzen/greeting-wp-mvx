@@ -1,5 +1,10 @@
 <?php
 
+// Get the order util in order to check
+// if HPOS is activated, and if it is, then
+// add order meta in a new way
+use Automattic\WooCommerce\Utilities\OrderUtil;
+use Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableController;
 
 /**
  * Register meta box(es).
@@ -8,9 +13,35 @@
  * @author Dennis Lauritzen
  */
 function greeting_change_vendor_show_meta() {
-    add_meta_box( 'meta-change-vendor', __( 'Change Vendor', 'textdomain' ), 'greeting_change_vendor_show_meta_callback', 'shop_order' );
+    if( OrderUtil::custom_orders_table_usage_is_enabled() ) {
+        // HPOS is enabled.
+
+        $screen = wc_get_container()->get( CustomOrdersTableController::class )->custom_orders_table_usage_is_enabled()
+            ? wc_get_page_screen_id( 'shop-order' )
+            : 'shop_order';
+
+        add_meta_box(
+            'meta-change-vendor',
+            __( 'Change Vendor', 'greeting3' ),
+            'greeting_change_vendor_show_meta_callback',
+            $screen,
+            'advanced',
+            'high'
+        );
+    } else {
+        // Custom Post Type order admin interface.
+        add_meta_box(
+            'meta-change-vendor',
+            __( 'Change Vendor', 'greeting3' ),
+            'greeting_change_vendor_show_meta_callback',
+            'shop_order',
+            'advanced',
+            'high'
+        );
+    }
 }
 add_action( 'add_meta_boxes', 'greeting_change_vendor_show_meta' );
+
 
 /**
  * Meta box display callback.
@@ -49,22 +80,32 @@ function greeting_change_vendor_show_meta_callback( $post ) {
  * @return void
  */
 function greeting_change_vendor_show_meta_action( $post_id ) {
-    if( !isset( $_POST['vendor_meta_name'] ) || !wp_verify_nonce( $_POST['greeting_vendor_change'],'greeting_vendor_change_metabox_action') )
+    if( !isset( $_POST['vendor_meta_name'] ) || !wp_verify_nonce( $_POST['greeting_vendor_change'], 'greeting_vendor_change_metabox_action') )
         return;
 
     if ( !current_user_can( 'manage_options', $post_id ))
         return;
 
     if ( isset($_POST['vendor_meta_name']) ) {
+        $order = wc_get_order($post_id);
+
+        if(!is_a($order, 'WC_Order')){
+            return;
+        }
+
         $vendor_id = sanitize_text_field( $_POST['vendor_meta_name']);
-        update_post_meta($post_id, '_vendor_id', $vendor_id);
+
+        #update_post_meta($post_id, '_vendor_id', $vendor_id);
+        $order->update_meta_data('_vendor_id',  $vendor_id);
+
         #// Assuming the vendor name is stored in another custom field, adjust the field name accordingly
         $vendor_name = get_vendor_name_by_id( $vendor_id ); // Replace with your actual function to get vendor name
-        update_post_meta( $post_id, '_vendor_name', sanitize_text_field( $vendor_name ) );
+        #update_post_meta( $post_id, '_vendor_name', sanitize_text_field( $vendor_name ) );
+        $order->update_meta_data('_vendor_name',  sanitize_text_field( $vendor_name ) );
     }
-
 }
 add_action('save_post', 'greeting_change_vendor_show_meta_action');
+
 
 /**
  * Function for getting the vendor name from a vendor ID.
@@ -77,30 +118,17 @@ function get_vendor_name_by_id($vendor_id) {
     return $vendor_user ? $vendor_user->display_name : '';
 }
 
-/**
- * Add a custom action to order actions select box on edit order page.
- * Only added for paid orders that haven't fired this action yet
- *
- * @author Dennis Lauritzen
- * @param array $actions order actions array to display
- * @return array - updated actions
- */
-function greeting_wc_add_order_meta_box_action( $actions ) {
-    #global $theorder;
+function get_vendor_id_by_order_id($order_id){
+    // Get vendor_id from order meta
+    $vendor_id = get_post_meta($order_id, '_vendor_id', true);
 
-    // bail if the order has been paid for or this action has been run
-    #if ( ! $theorder->is_paid() ) {
-    #	return $actions;
-    #}
-
-    // add "mark printed" custom action
-    $actions['wc_custom_order_action'] = __( 'Gensend mail til butikken', 'greeting2' );
-    $actions['wc_custom_order_action_delivery_notice'] = __( 'Gensend leveringsbekræftelse til kunde', 'greeting2' );
-    $actions['wc_custom_order_action_test_mail'] = __( 'SEND TEST MAIL', 'greeting2' );
-    return $actions;
+    // Check if vendor_id exists
+    if ($vendor_id) {
+        return $vendor_id;
+    } else {
+        return false;
+    }
 }
-add_action( 'woocommerce_order_actions', 'greeting_wc_add_order_meta_box_action' );
-
 
 /**
  * Hide fields through CSS in the vendor user admin

@@ -6,6 +6,7 @@
 ## for the Product Page.
 ##
 
+
 function list_hooked_functions($hook_name) {
     global $wp_filter;
 
@@ -82,7 +83,6 @@ function include_greeting_benefits_to_product_page() {
     // Include the template part in the woocommerce_single_product_summary hook
     wc_get_template_part( 'template-parts/inc/blocks/greeting-benefits' );
 }
-
 // Hook the function to woocommerce_single_product_summary
 add_action( 'woocommerce_single_product_summary', 'include_greeting_benefits_to_product_page', 30 );
 
@@ -278,3 +278,229 @@ add_filter( 'woocommerce_dropdown_variation_attribute_options_html', 'show_price
 function add_vendor_info_to_product_page(){
     wc_get_template( 'single-product/vendor-information.php' );
 }
+
+/**
+ * Add update javascript for product page for quantity buttons in footer.
+ *
+ * The conditionally function is only for ensuring the is_cart is actually existing.
+ *
+ * @author Dennis Lauritzen
+ */
+add_action('wp_footer', 'conditionally_add_javascript_on_product_page', 9999);
+function conditionally_add_javascript_on_product_page() {
+    if (is_product() || is_cart()) {
+        add_quantity_plus_and_minus_in_footer();
+    }
+}
+
+function add_quantity_plus_and_minus_in_footer(){
+    ?>
+    <script type="text/javascript">
+        function incrementValue(e) {
+            e.preventDefault();
+            var fieldName = jQuery(e.target).data('field');
+            var parent = jQuery(e.target).closest('div');
+            var currentVal = parseInt(parent.find('input#' + fieldName).val(), 10);
+
+            if (!isNaN(currentVal)) {
+                parent.find('input#' + fieldName).val(currentVal + 1);
+            } else {
+                parent.find('input#' + fieldName).val(0);
+            }
+        }
+
+        function decrementValue(e) {
+            e.preventDefault();
+            var fieldName = jQuery(e.target).data('field');
+            var parent = jQuery(e.target).closest('div');
+            var currentVal = parseInt(parent.find('input#' + fieldName).val(), 10);
+
+            if (!isNaN(currentVal) && currentVal > 0) {
+                parent.find('input#' + fieldName).val(currentVal - 1);
+            } else {
+                parent.find('input#' + fieldName).val(0);
+            }
+        }
+
+        jQuery('.plus-qty').click(function(e) {
+            incrementValue(e);
+        });
+
+        jQuery('.minus-qty').click(function(e) {
+            decrementValue(e);
+        });
+    </script>
+    <?php
+}
+
+/**
+ * Redirect to product page after adding to cart
+ * This to avoid the "Confirm resubmission" alert in some browsers.
+ *
+ * @param $url
+ * @return mixed|void
+ */
+function redirect_to_product_after_add_to_cart($url) {
+    // Check if the 'add-to-cart' parameter is present in the URL
+    if (isset($_REQUEST['add-to-cart'])) {
+        $product_id = intval($_REQUEST['add-to-cart']);
+        // Construct the product URL
+        $product_url = get_permalink($product_id);
+        // Redirect to the product page
+        wp_safe_redirect($product_url);
+        exit;
+    }
+    return $url;
+}
+add_filter('woocommerce_add_to_cart_redirect', 'redirect_to_product_after_add_to_cart');
+
+
+
+function greeting_load_calendar_dates_function( $vendor_id = 0 ){
+    if($vendor_id == 0){
+        return false;
+    }
+
+    $dates = get_vendor_dates_new($vendor_id, 'd-m-Y', 'close');
+    $dates_values_only = array_values($dates);
+    $dates_json = json_encode($dates_values_only);
+    ?>
+
+    <script type="text/javascript">
+        // Validates that the input string is a valid date formatted as "mm/dd/yyyy"
+        function isValidDate(dateString)
+        {
+            // First check for the pattern
+            if(!/^\d{1,2}\-\d{1,2}\-\d{4}$/.test(dateString))
+                return false;
+
+            // Parse the date parts to integers
+            var parts = dateString.split("-");
+            var day = parseInt(parts[0], 10);
+            var month = parseInt(parts[1], 10);
+            var year = parseInt(parts[2], 10);
+
+            // Check the ranges of month and year
+            if(year < 1000 || year > 3000 || month == 0 || month > 12)
+                return false;
+
+            var monthLength = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ];
+
+            // Adjust for leap years
+            if(year % 400 == 0 || (year % 100 != 0 && year % 4 == 0))
+                monthLength[1] = 29;
+
+            // Check the range of the day
+            return day > 0 && day <= monthLength[month - 1];
+        };
+
+        jQuery(document).ready(function($) {
+            $('#datepicker').click(function() {
+
+                var vendorClosedDayArray = <?php echo $dates_json; ?>;
+
+                jQuery('#datepicker').datepicker({
+                    dateFormat: 'dd-mm-yy',
+                    // minDate: -1,
+                    minDate: new Date(),
+                    // maxDate: "+1M +10D"
+                    maxDate: "+58D",
+                    // closed on specific date
+                    beforeShowDay: function(date){
+                        var string = jQuery.datepicker.formatDate('dd-mm-yy', date);
+                        return [ vendorClosedDayArray.indexOf(string) == -1 ];
+                    },
+                    onClose: function(date, datepicker){
+                        const par_elm = jQuery(this).closest('.form-row');
+
+                        if (!isValidDate(date) || date == '') {
+                            par_elm.addClass('has-error');
+                        } else {
+                            par_elm.removeClass('has-error').addClass('woocommerce-validated');
+                            jQuery("#datepicker_field label.error").css('display','none');
+                        }
+                    },
+                    errorPlacement: function(error, element) { }
+                }).datepicker( "show" );
+                jQuery(".ui-datepicker").addClass('notranslate').css('z-index', 99999999999999);
+            });
+        });
+    </script>
+    <?php
+}
+
+// Add this to your theme's functions.php or a custom plugin
+
+function display_acf_repeater_text() {
+    global $product;
+
+    // Get and cache repeater field
+    $text_blocks = get_field('text_block_products', 'option');
+    if (!$text_blocks) {
+        return;
+    }
+
+    // Get product terms once
+    $product_terms = wp_get_post_terms($product->get_id(), 'product_cat', array('fields' => 'ids'));
+    $occasion_terms = wp_get_post_terms($product->get_id(), 'occasion', array('fields' => 'ids'));
+
+    // Ensure arrays are not empty
+    $product_terms = !empty($product_terms) ? $product_terms : [];
+    $occasion_terms = !empty($occasion_terms) ? $occasion_terms : [];
+
+    foreach ($text_blocks as $text_block) {
+        $text = $text_block['text_for_product_page'];
+        $product_cats = $text_block['categories'];
+        $occasions = $text_block['occasion'];
+        $position = $text_block['position'];
+
+        // Ensure arrays are not empty
+        $product_cats = !empty($product_cats) ? $product_cats : [];
+        $occasions = !empty($occasions) ? $occasions : [];
+
+        // Check if current product has the categories and occasions selected
+        $product_cat_intersect = array_intersect($product_cats, $product_terms);
+        $occasion_intersect = array_intersect($occasions, $occasion_terms);
+
+        if (!empty($product_cat_intersect) || !empty($occasion_intersect)) {
+            if ($position == '0') {
+                // Under picture
+                add_action('woocommerce_before_single_product_summary', function() use ($text) {
+                    echo '<div class="row">';
+                    echo '<div class="col-12 custom-text under-picture">';
+                    echo $text;
+                    echo '</div>';
+                    echo '</div>';
+                }, 20);
+            } elseif ($position == '1') {
+                // Under CTA
+                add_action('woocommerce_after_add_to_cart_button', function() use ($text) {
+                    echo '<div class="row">';
+                    echo '<div class="col-12 custom-text under-cta">';
+                    echo $text;
+                    echo '</div>';
+                    echo '</div>';
+                }, 10);
+            } elseif ($position == '2') {
+                // Under Product title
+                add_action('woocommerce_after_product_gallery', function() use ($text) {
+                    echo '<div class="row">';
+                    echo '<div class="col-12 custom-text under-product-title">';
+                    echo $text;
+                    echo '</div>';
+                    echo '</div>';
+                }, 6);
+            } elseif ($position == '3') {
+                // Under Product description
+                add_action('woocommerce_single_product_summary', function() use ($text) {
+                    echo '<div class="row">';
+                    echo '<div class="col-12 custom-text description under-product-description">';
+                    echo $text;
+                    echo '</div>';
+                    echo '</div>';
+                }, 20);
+            }
+        }
+    }
+}
+add_action('woocommerce_before_single_product', 'display_acf_repeater_text');

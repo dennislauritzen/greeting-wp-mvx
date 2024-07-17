@@ -44,7 +44,10 @@ $main_order_object = wc_get_order($main_order);
 $main_order_ID_str = ( empty($main_order_object->get_id())  ? $main_order->ID : $main_order_object->get_id() );
 $main_order_id = (empty(get_post_parent($order->get_id())) ? $order->get_id() : $main_order_ID_str );
 
-$additional_content = (!empty($additional_content) ? $additional_content : 'Vi har modtaget din bestilling - og den er videresendt til butikken, der sørger for, den bliver leveret til tiden. :)');
+$additional_content = (!empty($additional_content) ? $additional_content : 'Din bestilling er leveret - tusind tak for at vælge Greeting.dk og de lokale butikker. :)');
+
+// Get the value if this order has funeral products
+$order_has_funeral_products = order_has_funeral_products($order->get_id());
 
 // Delivery type
 $del_type = '';
@@ -94,48 +97,67 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                         </table>
                     </td>
                 </tr>
-								<tr>
-									<td colspan="2">
-										<?php
-										if($del_value == '1'){
-											// Personlig levering
-										?>
-										<p>Vi har nu leveret din gave til <?php print $order->get_shipping_first_name(); ?>.
-										<br>Vi er sikre på, at din hilsen har gjort en forskel!</p>
+                <tr>
+                    <td colspan="2">
+                        <?php
+                        // Personlig levering
+                        if($del_value == '1'){
+                        ?>
+                            <?php
+                            if($order_has_funeral_products){
+                            ?>
+                                <p>
+                                    Vi har nu leveret din bestilling til <?php print $order->get_shipping_company(); ?>
+                                    ved <?php print $order->get_shipping_first_name(); ?>
+                                    begravelse/bisættelse<?php
+                                    $order_delivery_time = get_post_meta($order->get_id(), '_delivery_date_time', true);
+                                    if(!empty($order_delivery_time)){
+                                        echo ' kl. '.$order_delivery_time;
+                                    }
+                                    ?>.
+                                </p>
+                            <?php
+                            } else {
+                            ?>
+                                <p>Vi har nu leveret din gave til <?php print $order->get_shipping_first_name(); ?>.
+                                <br>Vi er sikre på, at din hilsen har gjort en forskel!</p>
 
-										<p>Vi glæder os til at overraske en heldig modtager næste gang, du skal sende en gavehilsen til en der fortjener det.</p>
-										<?php
-										} else {
-											// Afsendelsesordrer
-										?>
-										<p>Din gavebestilling er sendt til <?php print $order->get_shipping_first_name(); ?>, og vi forventer derfor at <?php print $order->get_shipping_first_name(); ?> modtager
-										gaven meget snart
-										- eller måske endda allerede har modtaget den.</p>
-										<p>Derfor vil vi endnu engang sige tusind tak for din bestilling.</p>
-										<?php
-										}
-										?>
+                                <p>Vi glæder os til at overraske en heldig modtager næste gang, du skal sende en gavehilsen til en der fortjener det.</p>
+                            <?php
+                            } // Order has funeral products end
+                            ?>
+                        <?php
+                        } else {
+                            // Afsendelsesordrer
+                        ?>
+                        <p>Din gavebestilling er sendt til <?php print $order->get_shipping_first_name(); ?>, og vi forventer derfor at <?php print $order->get_shipping_first_name(); ?> modtager
+                        gaven meget snart
+                        - eller måske endda allerede har modtaget den.</p>
+                        <p>Derfor vil vi endnu engang sige tusind tak for din bestilling.</p>
+                        <?php
+                        }
+                        ?>
 
-										<p><b>De bedste hilsner</b><br>
-										<?php print $shop_name; ?> & Greeting.dk</p>
+                        <p><b>De bedste hilsner</b><br>
+                        <?php print $shop_name; ?> & Greeting.dk</p>
 
-										<br>
+                        <br>
 
-										<h4 style="">★★★★★ Vil du hjælpe os? :)</h4>
-										<p style="font-size:14px;">
-											Kunne du tænke dig at hjælpe os ved at anmelde <a href="https://dk.trustpilot.com/review/greeting.dk">din oplevelse med Greeting.dk på TrustPilot</a>?
-										</p>
+                        <h4 style="">★★★★★ Vil du hjælpe os? :)</h4>
+                        <p style="font-size:14px;">
+                            Kunne du tænke dig at hjælpe os ved at anmelde <a href="https://dk.trustpilot.com/review/greeting.dk">din oplevelse med Greeting.dk på TrustPilot</a>?
+                        </p>
 
-										<p>Og hvis du har lyst, må du endelig følge med på vores <a href="https://www.instagram.com/greeting.dk/">Instagram</a>
-										og <a href="https://www.facebook.com/greeting.dk">Facebook</a></p>
+                        <p>Og hvis du har lyst, må du endelig følge med på vores <a href="https://www.instagram.com/greeting.dk/">Instagram</a>
+                        og <a href="https://www.facebook.com/greeting.dk">Facebook</a></p>
 
-										<br><br>
-										<hr style="height: 1px; color: #cccccc;">
-										<br>
-										<h1>Din bestilling i detaljer</h1>
-										<br><br><br>
-									</td>
-								</tr>
+                        <br><br>
+                        <hr style="height: 1px; color: #cccccc;">
+                        <br>
+                        <h1>Din bestilling i detaljer</h1>
+                        <br><br><br>
+                    </td>
+                </tr>
                 <tr>
                     <td colspan="2">
                         <table width="100%" border="0" cellpadding="0" cellspacing="0" class="order-summary">
@@ -246,34 +268,52 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                     $order_total = $order->get_total();
                     $order_ship_total = $order->get_shipping_total() + $order->get_shipping_tax();
 
-                    $order_new_subtotal = $order_total - $order_ship_total;
-                    $order_ship_new = 39;
-                    $order_new_total = $order_new_subtotal + $order_ship_new;
-                ?>
-                <tr class="order-details-totals-row" style="border-top: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
-                    <td width="50%" style="width: 50%; padding: 6px 0 6px 10px;">
-                        Varetotal (inkl. 25 % moms)
-                    </td>
-                    <td style="width: 50%; padding: 6px 10px 6px 0px; text-align: right;">
-                        <?php echo $order_new_subtotal; ?> kr.
-                    </td>
-                </tr>
-                <tr class="order-details-totals-row" style="border-top: 1px solid #c0c0c0; border-bottom: 1px solid #dee2e6;">
-                    <td width="50%" style="width: 50%; padding: 6px 0 6px 10px;">
-                        Levering / fragt
-                    </td>
-                    <td style="width: 50%; padding: 6px 10px 6px 0px; text-align: right;">
-                        <?php echo $order_ship_total; ?> kr.
-                    </td>
-                </tr>
-                <tr class="order-details-totals-row" style="border-top: 1px solid #c0c0c0; border-bottom: 1px solid #dee2e6;">
-                    <td width="50%" style="width: 50%; padding: 6px 0 6px 10px;">
-                        Ordretotal (inkl. 25 % moms)
-                    </td>
-                    <td style="width: 50%; padding: 6px 10px 6px 0px; text-align: right;">
-                        <?php echo $order_total; ?> kr.
-                    </td>
-                </tr>
+                    // Calculate the cost of the cards
+                    $fees = $order->get_fees();
+                    $greeting_card_fee_ex_vat = 0;
+                    $greeting_card_fee_with_vat = 0;
+                    foreach($fees as $fee){
+                        $fee_name = $fee->get_name();
+                        $fee_amount = $fee->get_amount();
+
+                        $greeting_card_fee_ex_vat =+ $fee_amount;
+                        $greeting_card_fee_with_vat =+ $fee_amount * 1.25 ;
+                    }
+
+                    $order_new_subtotal = $order_total - $greeting_card_fee_with_vat - $order_ship_total;
+                    ?>
+                    <tr class="order-details-totals-row" style="border-top: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
+                        <td width="50%" style="width: 50%; padding: 6px 0 6px 10px;">
+                            Varetotal (inkl. 25 % moms)
+                        </td>
+                        <td style="width: 50%; padding: 6px 10px 6px 0px; text-align: right;">
+                            <?php echo wc_price( $order_new_subtotal ); ?>
+                        </td>
+                    </tr>
+                    <tr class="order-details-totals-row" style="border-top: 1px solid #c0c0c0; border-bottom: 1px solid #dee2e6;">
+                        <td width="50%" style="width: 50%; padding: 6px 0 6px 10px;">
+                            Kort
+                        </td>
+                        <td style="width: 50%; padding: 6px 10px 6px 0px; text-align: right;">
+                            <?php echo wc_price( $greeting_card_fee_with_vat ); ?>
+                        </td>
+                    </tr>
+                    <tr class="order-details-totals-row" style="border-top: 1px solid #c0c0c0; border-bottom: 1px solid #dee2e6;">
+                        <td width="50%" style="width: 50%; padding: 6px 0 6px 10px;">
+                            Levering
+                        </td>
+                        <td style="width: 50%; padding: 6px 10px 6px 0px; text-align: right;">
+                            <?php echo wc_price( $order_ship_total ); ?>
+                        </td>
+                    </tr>
+                    <tr class="order-details-totals-row" style="border-top: 1px solid #c0c0c0; border-bottom: 1px solid #dee2e6;">
+                        <td width="50%" style="width: 50%; padding: 6px 0 6px 10px;">
+                            Ordretotal (inkl. 25 % moms)
+                        </td>
+                        <td style="width: 50%; padding: 6px 10px 6px 0px; text-align: right;">
+                            <?php echo wc_price( $order_total ); ?>
+                        </td>
+                    </tr>
                 <?php } ?>
                 <tr>
                     <td valign="top" class="delivery-options-cell">

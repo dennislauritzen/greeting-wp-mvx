@@ -72,7 +72,7 @@ function rephraseMonth($month){
 }
 
 /**
- * Function for rephrasing a date to danish.
+ * Function for rephrasing a date to danish (man-søn).
  *
  * @param $weekday
  * @param $date
@@ -89,4 +89,22 @@ function rephraseDate($weekday, $date, $month, $year) {
     $year_str = ($year != date("Y") ? $year : '');
 
     return $weekday_str." d. ".$date.". ".$month_str. " ". $year_str;
+}
+
+/**
+ * Rephrase a day from english to danish
+ *
+ * @param $weekday Integer
+ * @return string
+ */
+function rephraseWeekday($weekday, $length = 0) {
+    $weekdays = ['mandag', 'tirsdag', 'onsdag', 'torsdag', 'fredag', 'lørdag', 'søndag'];
+
+    $weekday_str = $weekdays[$weekday - 1];
+
+    if($length > 0 && is_int($length)){
+        $weekday_str = substr($weekday_str,0, $length);
+    }
+
+    return $weekday_str;
 }

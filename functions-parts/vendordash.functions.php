@@ -1,10 +1,17 @@
 <?php
 
+function block_wp_admin() {
+    if ( is_admin() && ! current_user_can( 'administrator' ) && ! ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
+        wp_safe_redirect( home_url() );
+        exit;
+    }
+}
+add_action( 'admin_init', 'block_wp_admin' );
 
 /**
  * Removing the visibility of admin area for MVX users and vendors.
  */
-function removeAdminVisibilityForSomeUSers(){
+function removeAdminVisibilityForSomeUsers(){
     $user = wp_get_current_user();
 
     if ( in_array( 'editor', (array) $user->roles ) ) {
@@ -22,7 +29,7 @@ function removeAdminVisibilityForSomeUSers(){
         remove_menu_page('upload.php');
     }
 }
-add_action( 'admin_head', 'removeAdminVisibilityForSomeUSers' );
+add_action( 'admin_head', 'removeAdminVisibilityForSomeUsers' );
 
 
 
@@ -33,15 +40,14 @@ apply_filters('mvx_do_schedule_cron_vendor_monthly_order_stats', true);
 add_filter('mvx_enabled_vendor_weekly_report_mail', '__return_false');
 
 /**
- * Disable autocreate vendor shipping class
- */
-add_filter('mvx_add_vendor_shipping_class', '__return_false');
-
-/**
  * Remove PayPal from dashboard.
  */
 add_filter('woocommerce_should_load_paypal_standard', '__return_true' );
 
+/**
+ * Disable autocreate vendor shipping class
+ */
+add_filter('mvx_add_vendor_shipping_class', '__return_false');
 
 /* Allow vendors to view/choose admin created shipping classes */
 add_filter('mvx_allowed_only_vendor_shipping_class', '__return_false');
@@ -58,7 +64,6 @@ function init_mvx(){
  *
  * @author Dennis Lauritzen
  */
-add_filter('mvx_datatable_order_list_table_headers', 'mvx_add_order_table_column_callback', 10, 2);
 function mvx_add_order_table_column_callback($orders_list_table_headers, $current_user_id) {
     $mvx_custom_columns = array(
         'order_p_id'    => array('label' => __( 'Hoved ordre nr.', 'dc-woocommerce-multi-vendor' ))
@@ -66,7 +71,7 @@ function mvx_add_order_table_column_callback($orders_list_table_headers, $curren
 
     return (array_slice($orders_list_table_headers, 0, 2) + $mvx_custom_columns + array_slice($orders_list_table_headers, 2));
 }
-
+#add_filter('mvx_datatable_order_list_table_headers', 'mvx_add_order_table_column_callback', 10, 2);
 
 /**
  * Add the data to new column the order table on WCMP frontend order table
@@ -74,7 +79,6 @@ function mvx_add_order_table_column_callback($orders_list_table_headers, $curren
  *
  * @author Dennis Lauritzen
  */
-add_filter('mvx_datatable_order_list_row_data', 'mvx_add_order_table_row_data', 10, 2);
 function mvx_add_order_table_row_data($vendor_rows, $order) {
     $item_sku = array();
     $vendor = get_current_vendor();
@@ -90,6 +94,8 @@ function mvx_add_order_table_row_data($vendor_rows, $order) {
     $vendor_rows['order_p_id'] = isset( $parents_order_id ) ? $parents_order_id : '-';
     return $vendor_rows;
 }
+#add_filter('mvx_datatable_order_list_row_data', 'mvx_add_order_table_row_data', 10, 2);
+
 
 /**
  * Function to add Custom menu to Vendor Dashboard
@@ -156,11 +162,16 @@ add_filter('mvx_endpoints_query_vars', 'add_mvx_endpoints_query_vars_new');
  * @return mixed
  */
 function remove_mvx_vendor_dashboard_nav($vendor_nav){
+    #print '<pre>';var_dump($vendor_nav);print'</pre>';
+    #echo'<pre>';print_r($vendor_nav);echo'</pre>';
+
     unset($vendor_nav['vendor-tools']);
     #unset($vendor_nav['store-settings']['submenu']['vendor-billing']);
+    unset($vendor_nav['store-settings']['submenu']['vendor-billing']);
+    unset($vendor_nav['store-settings']['submenu']['products-qna']);
     unset($vendor_nav['vendor-payments']);
     unset($vendor_nav['vendor-report']['submenu']['banking-overview']);
-    #echo'<pre>';print_r($vendor_nav);echo'</pre>';
+
     return $vendor_nav;
 }
 add_filter('mvx_vendor_dashboard_nav', 'remove_mvx_vendor_dashboard_nav', 99);

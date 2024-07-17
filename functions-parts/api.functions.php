@@ -17,12 +17,24 @@ add_action(
             $field,
             array(
                 'get_callback'    => function ( $object ) use ( $field ) {
-                    // Get field as single value from post meta.
-                    return get_post_meta( $object['id'], $field, true );
+                    // Ensure correct retrieval of order ID.
+                    $order_id = empty( $object['id'] ) ? $object->get_id() : $object['id'];
+                    // Use the CRUD method to get the order.
+                    $order = wc_get_order( $order_id );
+                    if ( $order ) {
+                        return $order->get_meta( $field, true );
+                    }
+                    return null;
                 },
                 'update_callback' => function ( $value, $object ) use ( $field ) {
-                    // Update the field/meta value.
-                    update_post_meta( $object->ID, $field, $value );
+                    // Ensure correct retrieval of order ID.
+                    $order_id = empty( $object->ID ) ? $object->get_id() : $object->ID;
+                    // Use the CRUD method to get the order and update the meta field.
+                    $order = wc_get_order( $order_id );
+                    if ( $order ) {
+                        $order->update_meta_data( $field, sanitize_text_field( $value ) );
+                        $order->save(); // Save the changes
+                    }
                 },
                 'schema'          => array(
                     'type'        => 'string',
@@ -58,8 +70,14 @@ add_action(
             $field,
             array(
                 'get_callback'    => function ( $object ) use ( $field ) {
-                    // Get field as single value from post meta.
-                    return get_post_meta( $object['id'], $field, true );
+                    // Ensure correct retrieval of order ID.
+                    $order_id = empty( $object['id'] ) ? $object->get_id() : $object['id'];
+                    // Use the CRUD method to get the order.
+                    $order = wc_get_order( $order_id );
+                    if ( $order ) {
+                        return $order->get_meta( $field, true );
+                    }
+                    return null;
                 },
                 'schema'          => array(
                     'type'        => 'string',
@@ -80,7 +98,7 @@ add_action(
 );
 
 /**
- * Register a users first order date in Rest API.
+ * Register a user's first order date in Rest API.
  * Make sure to use PHP >= 5.4
  *
  * @author Dennis Lauritzen
@@ -90,33 +108,56 @@ add_action(
     function () {
         // Field name to register.
         $field = '_first_order_date';
-        $order_meta = array();
-        $meta_key = "";
-        $meta_value = "";
 
         register_rest_field(
             'shop_order',
             $field,
             array(
                 'get_callback'    => function ( $object ) use ( $field ) {
-                    // Get the customer ID if logged in.
-                    $order_id = $object['id'];
+                    // Ensure correct retrieval of order ID.
+                    $order_id = empty( $object['id'] ) ? $object->get_id() : $object['id'];
+                    $order = wc_get_order( $order_id );
 
-                    $customer_id = get_post_meta( $order_id, '_customer_user', true );
+                    if ( !$order ) {
+                        return null;
+                    }
+
+                    // Get the customer ID if logged in.
+                    $customer_id = $order->get_customer_id();
                     $billing_email = '';
 
                     // If not logged in, try to get customer ID using email.
                     if ( empty( $customer_id ) ) {
-                        $billing_email = get_post_meta( $order_id, '_billing_email', true );
+                        $billing_email = $order->get_billing_email();
                         $customer_id = email_exists( $billing_email );
                     }
 
-                    $order = get_customer_order($customer_id, $billing_email, 'first');
+                    // Function to get customer's first order.
+                    function get_customer_order( $customer_id, $billing_email, $order_type = 'first' ) {
+                        $args = array(
+                            'customer' => $customer_id ? $customer_id : '',
+                            'billing_email' => $billing_email ? $billing_email : '',
+                            'limit' => -1,
+                            'orderby' => 'date',
+                            'order' => 'ASC',
+                        );
 
-                    $first_order_date = $order ? ( $order->get_date_created() ? gmdate( 'Y-m-d H:i:s',
-                        $order->get_date_created()->getOffsetTimestamp() ) : '' ) : '';
+                        // Get orders
+                        $orders = wc_get_orders( $args );
 
-                    if(!empty($first_order_date)){
+                        if ( $order_type == 'first' && !empty( $orders ) ) {
+                            return reset( $orders );
+                        }
+
+                        return null;
+                    }
+
+                    $first_order = get_customer_order( $customer_id, $billing_email, 'first' );
+
+                    $first_order_date = $first_order ? ( $first_order->get_date_created() ? gmdate( 'Y-m-d H:i:s',
+                        $first_order->get_date_created()->getOffsetTimestamp() ) : '' ) : '';
+
+                    if ( !empty( $first_order_date ) ) {
                         return $first_order_date;
                     }
 
@@ -135,67 +176,36 @@ add_action(
 );
 
 /**
- * Get a users order based on either customer ID or billing e-mail
+ * Get a user's order based on either customer ID or billing email.
  *
- * @param $customer_id integer
- * @param $billing_email object
- * @param $first_or_last string #Values: 'first' or 'last'
- * @return bool|WC_Order|WC_Order_Refund
+ * @param int $customer_id
+ * @param string $billing_email
+ * @param string $first_or_last # Values: 'first' or 'last'
+ * @return bool|WC_Order
  */
-function get_customer_order( $customer_id, $billing_email, $first_or_last )
-{
-    global $wpdb;
-
-    if (!empty($customer_id)) {
-        $meta_key = "_customer_user";
-        $meta_value = $customer_id;
-    } elseif (!empty($billing_email)) {
-        $meta_key = "_billing_email";
-        $meta_value = $billing_email;
-    } else {
+function get_customer_order( $customer_id, $billing_email, $first_or_last ) {
+    if ( empty( $customer_id ) && empty( $billing_email ) ) {
         return false;
     }
 
-    if ('first' === $first_or_last) {
-        $direction = 'ASC';
-    } else if ('last' === $first_or_last) {
-        $direction = 'DESC';
-    } else {
-        return false;
-    }
-
-
-    #$order = $wpdb->get_var(
-    #// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
-    #    "SELECT posts.ID
-    #		FROM $wpdb->posts AS posts
-    #		LEFT JOIN {$wpdb->postmeta} AS meta on posts.ID = meta.post_id
-    #		WHERE meta.meta_key = '" . $meta_key . "'
-    #		AND   meta.meta_value = '" . esc_sql($meta_value) . "'
-    #		AND   posts.post_type = 'shop_order'
-    #		AND   posts.post_status IN ( '" . implode("','", array_map('esc_sql', array_keys(wc_get_order_statuses()))) . "' )
-    #		ORDER BY posts.ID {$direction}"
-    #// phpcs:enable
-    #);
-
-    $prepared_query = $wpdb->prepare(
-        "SELECT posts.ID
-    FROM $wpdb->posts AS posts
-    LEFT JOIN {$wpdb->postmeta} AS meta on posts.ID = meta.post_id
-    WHERE meta.meta_key = %s
-    AND meta.meta_value = %s
-    AND posts.post_type = 'shop_order'
-    AND posts.post_status IN ( '" . implode("','", array_map('esc_sql', array_keys(wc_get_order_statuses()))) . "' )
-    ORDER BY posts.ID {$direction}",
-        $meta_key,
-        $meta_value
+    $args = array(
+        'limit'        => 1,
+        'orderby'      => 'date',
+        'order'        => $first_or_last === 'first' ? 'ASC' : 'DESC',
+        'return'       => 'ids',
     );
 
-    $order = $wpdb->get_var($prepared_query);
+    if ( !empty( $customer_id ) ) {
+        $args['customer_id'] = $customer_id;
+    } elseif ( !empty( $billing_email ) ) {
+        $args['billing_email'] = $billing_email;
+    }
 
-    if (!$order) {
+    $orders = wc_get_orders( $args );
+
+    if ( empty( $orders ) ) {
         return false;
     }
 
-    return wc_get_order(absint($order));
+    return wc_get_order( $orders[0] );
 }

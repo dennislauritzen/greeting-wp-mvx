@@ -25,7 +25,6 @@ if ( is_readable( $theme_wordpresscom ) ) {
 	require_once $theme_wordpresscom;
 }
 
-
 /**
  * Set the content width based on the theme's design and stylesheet.
  *
@@ -34,7 +33,6 @@ if ( is_readable( $theme_wordpresscom ) ) {
 if ( ! isset( $content_width ) ) {
 	$content_width = 800;
 }
-
 
 /**
  * General Theme Settings.
@@ -495,6 +493,9 @@ function remove_plugin_bootstrap_styles() {
     wp_dequeue_style('mvx_seller_shop_page_css');
     wp_deregister_style('mvx_seller_shop_page_css');
 
+    wp_dequeue_style('my_account_css');
+    wp_deregister_style('my_account_css');
+
     // MVX SELLER SHOP PAGE: frontend_css
     wp_dequeue_style('frontend_css');
     wp_deregister_style('frontend_css');
@@ -928,10 +929,14 @@ function get_featured_postal_codes(){
 ######
 
 
+## Include the helper for checking for HPOS compatibility.
+include('functions-parts/general.hpos.compatibility.functions.php');
+
 ## Include Greeting specific functions (also the dates).
 include('functions-parts/greeting.functions.php');
 include('functions-parts/greeting.mvx.functions.php');
 include('functions-parts/date.functions.php');
+include('functions-parts/vendor.delivery-days.functions.php');
 
 ## Include general Order Functions e.g. the hashes for tracking url etc.
 include('functions-parts/general.order.functions.php');
@@ -944,6 +949,7 @@ include('functions-parts/admin.vendor.functions.php');
 
 ## Include functions regarding checkout.
 include('functions-parts/checkout.functions.php');
+include('functions-parts/checkout.funeral.functions.php');
 
 ## Include e-mail functions
 include('functions-parts/email.order.functions.php');
@@ -961,7 +967,6 @@ include('functions-parts/frontend.vendor.functions.php');
 include('functions-parts/seo.functions.php');
 
 ## Include functions regarding vendor dashboard.
-include('functions-parts/vendor.delivery-days.functions.php');
 include('functions-parts/vendordash.functions.php');
 
 ## Include API & cron functions.

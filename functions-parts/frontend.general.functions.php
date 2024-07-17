@@ -1,5 +1,12 @@
 <?php
 
+
+/**** Remove Suborder from coustomer my-account page *****/
+add_filter( 'woocommerce_account_orders_columns' , function( $suborders ) {
+    unset( $suborders['mvx_suborder'] );
+    return $suborders;
+} , 999 );
+
 /**
  * Function for generating breadcrumbs.
  * Has to be called on the template pages (not called automatically).

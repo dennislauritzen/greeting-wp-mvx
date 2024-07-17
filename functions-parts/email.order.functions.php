@@ -213,6 +213,17 @@ function add_prod_img_to_vendor_email($item, $order, $vendor_id, $is_ship) {
 }
 
 
+function add_notes_to_vendor_order_item_table( $name, $item ) {
+    $product = new WC_Product($item->get_product_id());
+
+    $name .= '';
+    $note = wc_get_order_item_meta( $item->get_id(), '_custom_note', true ); // Retrieve the note meta data
+    $name .= '<br><span style="display: inline-block; padding-top:10px; font-size:12px;">'. __('Ønske til gavens indhold','greeting3') . ': '.$note.'</span>';
+    return $name;
+}
+add_filter( 'woocommerce_order_item_name', 'add_notes_to_vendor_order_item_table', 10, 2 );
+
+
 /**
  * Remove sold by from vendor mails and admin mails
  *
@@ -240,3 +251,4 @@ function mvx_email_change_sold_by_text($html, $item, $args ){
     return $html;
 }
 add_filter( 'woocommerce_display_item_meta','mvx_email_change_sold_by_text', 10, 3 );
+

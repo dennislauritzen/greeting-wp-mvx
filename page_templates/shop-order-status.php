@@ -167,8 +167,9 @@ get_header('green');
   <?php if($orderStatus == 'delivered' || $orderStatus == 'completed'){
     $hidden_val = 'grewgr8e4g6regr';
     if(isset($_POST['__hidden_updater']) && $_POST['__hidden_updater'] == hash('md4',$hidden_val) ){
-      // Update
-      update_post_meta($order->get_id(), 'store_own_order_reference', $_POST['__store_own_reference']);
+        // Update
+        #update_post_meta($order->get_id(), 'store_own_order_reference', $_POST['__store_own_reference']);
+        $order->update_meta_data('store_own_order_reference', $_POST['__store_own_reference']);
     }
 
     $own_ref = (!empty(get_post_meta($order->get_id(), 'store_own_order_reference', 1)) ? get_post_meta($order->get_id(), 'store_own_order_reference', 1) : '');

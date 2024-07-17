@@ -405,6 +405,69 @@ function get_vendor_delivery_days_from_today($vendor_id, $prepend_text = '', $de
  */
 function get_vendor_delivery_days_from_today_header_vendor($vendor_id, $prepend_text = '', $del_type = "1", $long_or_short_text = 0)
 {
+    // Get the vendors opening days the next 60 days
+    $vendor_days = get_vendor_dates_new($vendor_id, 'd-m-Y', 'all', 60);
+    $result = [];
+
+    $now = new DateTime();
+    foreach ($vendor_days as $p => $c) {
+        if(isset($c['cutoff_datetime'])
+            && $c['cutoff_datetime'] !== false){
+
+            $cutofftime = $c['cutoff_datetime'];
+            $cutoff_time = DateTime::createFromFormat('d-m-Y H:i:s', $cutofftime, new DateTimeZone('UTC'));
+            // Change the timezone to Copenhagen
+            $cutoff_time->setTimezone(new DateTimeZone('Europe/Copenhagen'));
+
+            if($cutoff_time > $now){
+                $result = array(
+                    'date' => $c['date'],
+                    'cutoff_datetime' => $c['cutoff_datetime'],
+                    'cutoff_time' => $c['cutoff_time'],
+                    'type' => $c['type']
+                );
+                break; // Break out of the inner loop once a non-false 'cutoff_time' is found
+            }
+        }
+    }
+
+    if(empty($result)){
+        return;
+    } else {
+        # Calculation of the cutoff time.
+        $cutoff_datetime_obj = DateTime::createFromFormat('d-m-Y H:i:s', $result['cutoff_datetime'], new DateTimeZone('UTC'));
+        $cutoff_weekday = rephraseWeekday( $cutoff_datetime_obj->format('N') );
+        $cutoff_datetime = $cutoff_datetime_obj->format('\k\l\. H:i');
+
+        # Calculation of the delivery time
+        $date_str = $result['date'].' 00:00:00';
+        $delivery_date_obj = DateTime::createFromFormat('d-m-Y H:i:s', $date_str, new DateTimeZone('UTC'));
+        $delivery_date_weekday = rephraseWeekday( $delivery_date_obj->format('N'));
+        $delivery_date_datetime = $delivery_date_obj->format('d/m');
+
+        $str = '';
+        if($del_type == "1"){
+            $str .= 'levering';
+        } else if($del_type == "0"){
+            $str .= 'afsendelse';
+        }
+
+        return 'Bestil inden '.$cutoff_weekday.' '.$cutoff_datetime.' for '.$str.' '.$delivery_date_weekday;
+    }
+}
+
+/**
+ * Function for calculating when the order should be made - used on the header-vendor.php
+ * The difference from the one above is, that it doesnt take current time into account.
+ * Since the text is regarding when I need to order today to get at the next possible delivery time.
+ *
+ * @uses get_vendor_dates_new()
+ * @param $days_array
+ * @param $today
+ * @return String
+ */
+function get_vendor_delivery_days_from_today_header_vendor_old($vendor_id, $prepend_text = '', $del_type = "1", $long_or_short_text = 0)
+{
     // Set the timezone to Copenhagen
     #date_default_timezone_set('Europe/Copenhagen');
 
@@ -471,6 +534,8 @@ function get_vendor_delivery_days_from_today_header_vendor($vendor_id, $prepend_
         // There is a date. Let's populate the variables for the calculation.
     }
 }
+
+
 
 
 function get_del_days_text($opening, $del_type = '1', $long_or_short_text = 0){

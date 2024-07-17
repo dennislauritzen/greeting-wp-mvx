@@ -12,6 +12,7 @@
 #########################################################
 
 
+
 ##########################################################
 ## **************
 ##
@@ -20,6 +21,18 @@
 ##
 ##########################################################
 
+/**
+ * Remove Cart fragments from the whole site except cart and checkout.
+ *
+ * @return void
+ *
+ */
+function disable_woocommerce_cart_fragments() {
+    if (is_front_page() || is_single() || is_archive()) {
+        wp_dequeue_script('wc-cart-fragments');
+    }
+}
+add_action('wp_enqueue_scripts', 'disable_woocommerce_cart_fragments', 11);
 
 
 /**
@@ -81,58 +94,163 @@ function add_javascript_on_cart_page() {
 }
 
 /**
- * Add update javascript for quantity buttons in footer.
  *
- * The conditionally function is only for ensuring the is_cart is actually existing.
+ * Save the note from product page when adding to cart
  *
- * @author Dennis Lauritzen
  */
-add_action('wp_footer', 'conditionally_add_quantity_plus_and_minus_in_footer', 9999);
-function conditionally_add_quantity_plus_and_minus_in_footer() {
-    if (is_cart()) {
-        add_quantity_plus_and_minus_in_footer();
+// Save the custom note to the cart item
+function save_custom_note_to_cart_item( $cart_item_data, $product_id, $variation_id ) {
+    if( isset( $_POST['custom_note'] ) ) {
+        $cart_item_data['custom_note'] = sanitize_text_field( $_POST['custom_note'] );
     }
+    return $cart_item_data;
 }
+add_filter( 'woocommerce_add_cart_item_data', 'save_custom_note_to_cart_item', 10, 3 );
 
-function add_quantity_plus_and_minus_in_footer(){
-?>
-<script type="text/javascript">
-    function incrementValue(e) {
-        e.preventDefault();
-        var fieldName = jQuery(e.target).data('field');
-        var parent = jQuery(e.target).closest('div');
-        var currentVal = parseInt(parent.find('input#' + fieldName).val(), 10);
 
-        if (!isNaN(currentVal)) {
-            parent.find('input#' + fieldName).val(currentVal + 1);
-        } else {
-            parent.find('input#' + fieldName).val(0);
+/**
+ *
+ * Save the note from product page when adding to cart
+ *
+ */
+// Save the custom note to the cart item
+function save_delivery_date_to_cart_item( $cart_item_data, $product_id, $variation_id ) {
+    if( isset( $_POST['delivery_date'] ) ) {
+        WC()->session->set( 'delivery_date', sanitize_text_field( $_POST['delivery_date'] ) );
+    }
+    return $cart_item_data;
+}
+add_filter( 'woocommerce_add_cart_item_data', 'save_delivery_date_to_cart_item', 10, 3 );
+
+
+/**
+ * Add a text field to each cart item
+ */
+function custom_note_cart_item( $cart_item, $cart_item_key ) {
+    $notes = isset( $cart_item['custom_note'] ) ? $cart_item['custom_note'] : '';
+    printf(
+        '<div><textarea class="%s form-control form-control-sm my-2" id="cart_custom_note_%s" data-cart-id="%s" placeholder="Har du ønsker til gavens indhold? Notér dem her - så forsøger vi at følge dem så godt som muligt.">%s</textarea></div>',
+        'prefix-cart-custom-note',
+        $cart_item_key,
+        $cart_item_key,
+        $notes
+    );
+}
+add_action( 'woocommerce_after_cart_item_name', 'custom_note_cart_item', 10, 2 );
+
+/**
+ * Enqueue our JS file
+ */
+function addCartJS() {
+    if ( is_cart() ) { // Check if the current page is the cart page
+    ?>
+    <script>
+        (function($){
+            $(document).ready(function(){
+                var typingTimer;                // Timer identifier
+                var doneTypingInterval = 500;  // Time in milliseconds (0.5 seconds)
+
+                $('.prefix-cart-custom-note').on('keyup paste', function(){
+                    clearTimeout(typingTimer); // Clear the previous timer
+                    var inputField = $(this);
+                    typingTimer = setTimeout(function() {
+                        // Start blocking the cart totals
+                        $('.cart_totals').block({
+                            message: null,
+                            overlayCSS: {
+                                background: '#fff',
+                                opacity: 0.6
+                            }
+                        });
+
+                        var cart_id = inputField.data('cart-id');
+                        $.ajax({
+                            type: 'POST',
+                            url: '<?php echo admin_url( 'admin-ajax.php' ); ?>', // Make sure this variable is correctly defined
+                            data: {
+                                action: 'prefix_update_cart_notes',
+                                security: $('#woocommerce-cart-nonce').val(),
+                                custom_note: $('#cart_custom_note_' + cart_id).val(),
+                                cart_id: cart_id
+                            },
+                            success: function(response) {
+                                // Unblock the cart totals after AJAX success
+                                $('.cart_totals').unblock();
+                            }
+                        });
+                    }, doneTypingInterval);
+                });
+
+                // Clear the timeout if the user starts typing again
+                $('.prefix-cart-notes').on('keydown', function(){
+                    clearTimeout(typingTimer);
+                });
+            });
+        })(jQuery);
+
+    </script>
+    <?php
+    } // end if isCart()
+}
+add_action( 'wp_footer', 'addCartJS' );
+#add_action( 'wp_enqueue_scripts', 'prefix_enqueue_scripts' );
+
+/**
+ * Update cart item notes
+ */
+function prefix_update_cart_notes() {
+    // Do a nonce check to ensure security
+    if( ! isset( $_POST['security'] ) || ! wp_verify_nonce( $_POST['security'], 'woocommerce-cart' ) ) {
+        // Send a JSON response indicating nonce failure
+        wp_send_json( array( 'nonce_fail' => 1 ) );
+        exit;
+    }
+
+    // Save the notes to the cart meta
+    $cart = WC()->cart->cart_contents; // Get the cart contents
+    $cart_id = $_POST['cart_id']; // Get the cart ID from the POST data
+    $notes = $_POST['custom_note']; // Get the notes from the POST data
+
+    // Find the cart item by its ID
+    $cart_item = $cart[$cart_id];
+
+    // Add the notes to the cart item
+    $cart_item['custom_note'] = $notes;
+
+    // Update the cart contents with the modified cart item
+    WC()->cart->cart_contents[$cart_id] = $cart_item;
+
+    // Save the updated cart contents to the session
+    WC()->cart->set_session();
+
+    // Send a JSON response indicating success
+    wp_send_json( array( 'success' => 1 ) );
+    exit;
+
+}
+add_action( 'wp_ajax_prefix_update_cart_notes', 'prefix_update_cart_notes' );
+add_action( 'wp_ajax_nopriv_prefix_update_cart_notes', 'prefix_update_cart_notes' );
+
+function prefix_checkout_create_order_line_item( $item, $cart_item_key, $values, $order ) {
+    foreach( $item as $cart_item_key=>$cart_item ) {
+        if( isset( $cart_item['custom_note'] ) ) {
+            $item->add_meta_data( '_custom_note', $cart_item['custom_note'], true );
         }
     }
-
-    function decrementValue(e) {
-        e.preventDefault();
-        var fieldName = jQuery(e.target).data('field');
-        var parent = jQuery(e.target).closest('div');
-        var currentVal = parseInt(parent.find('input#' + fieldName).val(), 10);
-
-        if (!isNaN(currentVal) && currentVal > 0) {
-            parent.find('input#' + fieldName).val(currentVal - 1);
-        } else {
-            parent.find('input#' + fieldName).val(0);
-        }
-    }
-
-    jQuery('.plus-qty').click(function(e) {
-        incrementValue(e);
-    });
-
-    jQuery('.minus-qty').click(function(e) {
-        decrementValue(e);
-    });
-</script>
-<?php
 }
+add_action( 'woocommerce_checkout_create_order_line_item', 'prefix_checkout_create_order_line_item', 10, 4 );
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -143,14 +261,6 @@ function add_quantity_plus_and_minus_in_footer(){
 ##
 ##
 ##########################################################
-
-//  Save & show date as order meta
-add_action( 'woocommerce_checkout_update_order_meta', 'greeting_save_receiver_info_with_order' );
-function greeting_save_receiver_info_with_order( $order_id ) {
-    global $woocommerce;
-
-    if ( $_POST['receiver_phone'] ) update_post_meta( $order_id, 'receiver_phone', esc_attr( $_POST['receiver_phone'] ) );
-}
 
 // show order date in thank you page
 add_action( 'woocommerce_thankyou', 'greeting_view_order_and_receiver_info_thankyou_page', 20 );
@@ -189,6 +299,9 @@ function greeting_echo_date_picker( ) {
     // Get $product object from Cart object
     $cart = WC()->cart->get_cart();
 
+    // Get the value on funeral - true/false
+    $cart_has_funeral_items = cart_has_funeral_products();
+
     foreach( $cart as $cart_item_key => $cart_item ){
         $product = $cart_item['data'];
         $storeProductId = $product->get_id();
@@ -214,7 +327,20 @@ function greeting_echo_date_picker( ) {
         echo 'Varen sendes hurtigst muligt - og hvis gaven først må åbnes på en bestemt dag, så kan du notere det oven for i leveringsintruktionerne';
         echo '</p>';
     } else {
-        echo '<h3 class="pt-4">Leveringsdato</h3>';
+        $delivery_date = WC()->session->get( 'delivery_date' );
+
+        if(empty($delivery_date)){
+           $delivery_date =  WC()->checkout->get_value( 'delivery_date' );
+        }
+
+        $delivery_date_label = __('Hvornår skal gaven leveres?', 'greeting3');
+        $delivery_date_header = 'Leveringsdato';
+        if($cart_has_funeral_items){
+            $delivery_date_label = __('Hvornår / hvilken dato er begravelsen?', 'greeting3');
+            $delivery_date_header = 'Leveringsdato & -tidspunkt';
+        }
+
+        echo '<h3 class="pt-4">'.$delivery_date_header.'</h3>';
         echo '<script>';
         echo 'jQuery("#datepicker").prop("readonly", true).prop("disabled","disabled");';
         echo '</script>';
@@ -226,7 +352,24 @@ function greeting_echo_date_picker( ) {
             'label'         => __('Hvornår skal gaven leveres?'),
             'placeholder'   => __('Vælg dato hvor gaven skal leveres'),
             'custom_attributes' => array('readonly' => 'readonly', 'translate' => 'no')
-        ), WC()->checkout->get_value( 'delivery_date' ) );
+        ), $delivery_date );
+
+        if($cart_has_funeral_items){
+            $delivery_date_time = WC()->session->get( 'delivery_date_time' );
+
+            if(empty($delivery_date_time)){
+                $delivery_date_time =  WC()->checkout->get_value( 'delivery_date_time' );
+            }
+
+            woocommerce_form_field( 'delivery_date_time', array(
+                'type'          => 'time',
+                'class'         => array('form-row-wide', 'notranslate'),
+                'id'            => '',
+                'required'			=> true,
+                'label'         => __('Begravelsestidspunkt'),
+                'placeholder'   => __('Indtast tidspunkt for begravelsen')
+            ), $delivery_date_time );
+        }
 
 
         // Build intervals & delivery days.
@@ -240,19 +383,27 @@ function greeting_echo_date_picker( ) {
         echo '
         <div style="padding: 6px 10px; font-size: 12px; font-family: Inter,sans-serif; background: #fafafa; color: #666666;">
             <b>Info om butikken, der leverer din gavehilsen</b><br>
-            Du er i gang med at bestille en gavehilsen hos '.get_vendor_name($vendor_id).', der har åbent og kan levere din gave '.$del_days.'.<br><br>
-        
-            Hvis du bestiller nu, kan butikken levere <b>'.$delivery_text.'</b>. (Butikken kan levere inden for '.$vendorDeliverDayReq.' åbningsdag(e), hvis du bestiller inden kl. '.$vendorDropOffTime.').
+            Du er i gang med at bestille en gavehilsen hos '.get_vendor_name($vendor_id).', der kan levere din gave '.$del_days.'.<br><br>
+        ';
+        // Dropoff time, get.
+        $dropoff_time = get_vendor_dropoff_time($vendor_id);
+        $formatted_time = date("H:i", strtotime($dropoff_time));
+
+        $prepend_text = ($del_value == "1") ? 'Hvis du bestiller inden kl. '.$formatted_time.', kan butikken levere ' : 'Hvis du bestiller inden kl. '.$formatted_time.' afsender butikken ';
+
+        $vendor_delivery_days_from_today = get_vendor_delivery_days_from_today_header_vendor($vendor_id, $prepend_text, $del_value, 1);
+
+        echo $vendor_delivery_days_from_today;
+
+        echo '
         </div>
         ';
     }
     ?>
-
     <input type="hidden" id="vendorDeliverDay" value="<?php echo $vendorDeliverDayReq;?>"/>
     <input type="hidden" id="vendorDropOffTimeId" value="<?php echo $vendorDropOffTime;?>"/>
     <?php
 }
-
 
 /**
  * Add New Custom Step to the Arg Checkout, where the Greeting & delivery date can be.
@@ -261,6 +412,7 @@ function greeting_echo_date_picker( ) {
  * return array
  */
 function argmcAddNewSteps($fields) {
+
     //Add First Step
     $position = 6;     //Set Step Position
     $fields['steps'] = array_slice($fields['steps'] , 0, $position - 1, true) +
@@ -272,6 +424,7 @@ function argmcAddNewSteps($fields) {
         ) +
         array_slice($fields['steps'], $position - 1, count($fields['steps']) - 1, true);
 
+    #var_dump($fields['steps']);
     return $fields;
 
 }
@@ -287,7 +440,6 @@ add_filter('arg-mc-init-options', 'argmcAddNewSteps');
  */
 function argmcAddStepsContent($step) {
     //First Step Content
-
     if ($step == 'step_6') {
         greeting_echo_receiver_info();
     }
@@ -295,65 +447,44 @@ function argmcAddStepsContent($step) {
 add_action('arg-mc-checkout-step', 'argmcAddStepsContent');
 
 
-/** Receiver info and message begin */
-#add_action( 'woocommerce_before_order_notes', 'greeting_echo_receiver_info' );
-function greeting_echo_receiver_info( ) {
+/**
+ *
+ * @param $fields
+ * @return mixed
+ */
+function greeting_delivery_instructions( $fields ) {
+    $has_funeral_products = has_funeral_products_in_cart();
 
-    echo '<div>';
+    if($has_funeral_products){
+        echo '<p class="form-row text-end">';
+        echo 'I tvivl om kirkens adresse? Du kan finde den på <a href="https://www.sogn.dk/" rel="nofollow noopener">Sogn.dk</a>';
+        echo '</p>';
+    }
 
-    echo '<h3>Din hilsen til modtager</h3>';
+    /**
+     * The receiver phone field
+     *
+     * Shouldn't show on funeral products.
+     */
+    if(!$has_funeral_products) {
+        woocommerce_form_field('receiver_phone', array(
+            'type' => 'tel',
+            'class' => array('form-row-wide', 'greeting-custom-input'),
+            'input_class' => array('input-text validate[required] validate[custom[phone]'),
+            'required' => true,
+            'label' => __('Modtagerens telefonnr.', 'greeting2'),
+            'placeholder' => __('Indtast modtagerens telefonnummer.', 'greeting2'),
+        ), WC()->checkout->get_value('receiver_phone'));
 
-    #$chosenMessage = WC()->session->get( 'message-pro' );
-    #$chosenMessage = empty( $chosenMessage ) ? WC()->checkout->get_value( 'message-pro' ) : $chosenMessage;
-    #$chosenMessage = empty( $chosenMessage ) ? '0' : $chosenMessage;
-
-    #woocommerce_form_field( 'message-pro',  array(
-    #	'type'      => 'radio',
-    #	'label'			=> 'Hvor lang er din hilsen?',
-    #	'class'     => array( 'form-row-wide', 'update_totals_on_change' ),
-    #	'label_class' =>	array('form-row-label'),
-    #	'options'   => array(
-    #		'0'				=> 'Standardhilsen, håndskrevet (op til 165 tegn)',
-    #		'4'				=> 'Lang hilsen, håndkrevet (op til 400 tegn), +10 kr.'
-    #	),
-    #), $chosenMessage );
-
-    // @todo - If message-pro == 4, then this should be allowed to be 400 characters.
-    woocommerce_form_field( 'greeting_message', array(
-        'type'				=> 'textarea',
-        'id'					=> 'greetingMessage',
-        'class'				=> array('form-row-wide'),
-        'required'		=> true,
-        'input_class'	=> 'validate[required]',
-        'label'				=> __('Din hilsen til modtager (max 160 tegn)', 'greeting2'),
-        'placeholder'	=> __('Skriv din hilsen til din modtager her :)', 'greeting2'),
-        'maxlength' 	=> 160
-    ), WC()->checkout->get_value( 'greeting_message' ) );
-
-    echo '
-        <div style="padding: 6px 10px; font-size: 12px; font-family: Inter,sans-serif; margin-top: -5px;  margin-bottom: 10px; background: #fafafa; color: #666666;">
-            Da vores kort med hilsener er håndskrevne, kan vi ikke indsætte emojis, men vi forsøger at gengive dem på bedst mulig vis.   
-        </div>
-        ';
-
-    woocommerce_form_field( 'receiver_phone', array(
-        'type'          => 'tel',
-        'class'         => array('form-row-wide', 'greeting-custom-input'),
-        'input_class'		=> array('input-text validate[required] validate[custom[phone]'),
-        'required'      => true,
-        'label'         => __('Modtagerens telefonnr.', 'greeting2'),
-        'placeholder'       => __('Indtast modtagerens telefonnummer.', 'greeting2'),
-    ), WC()->checkout->get_value( 'receiver_phone' ));
-    #echo '<tr class="message-pro-radio"><td>';
-
-    echo '
+        echo '
         <div style="padding: 6px 10px; font-size: 12px; font-family: Inter,sans-serif; margin-top: -5px; margin-bottom: 10px; background: #fafafa; color: #666666;">
-            Telefonnummeret bruges <b>kun</b> i forbindelse med selve leveringen, hvis vi modtageren eks. ikke åbner, eller vi skal bruge deres hjælp til at finde indgangen.<br>
+            Telefonnummeret bruges <b>kun</b> i forbindelse med selve leveringen, hvis modtageren eks. ikke åbner, eller vi skal bruge deres hjælp til at finde indgangen.<br>
             Vi sender ikke nogen information om bestillingen - hverken før, under eller efter levering.
         </div>
         ';
+    }
 
-    echo '<h3>Leveringsinstruktioner</h3>
+    echo '<h3 style="margin-top:30px;">Leveringsinstruktioner</h3>
 		<style type="text/css">
 			input#deliveryLeaveGiftAddress,
 			input#deliveryLeaveGiftNeighbour {
@@ -363,28 +494,30 @@ function greeting_echo_receiver_info( ) {
 		</style>
 		';
 
-    woocommerce_form_field( 'leave_gift_address', array(
-        'type'				=> 'checkbox',
-        'id'					=> 'deliveryLeaveGiftAddress',
-        'class'				=> array('form-row-wide'),
-        'label_class' => array(''),
-        'input_class' => array('input-checkbox'),
-        'label'				=> __('Ja, gaven må efterlades på adressen', 'greeting2'),
-        'placeholder'	=> '',
-        'required' 		=> false,
-        'default' 		=> 1
-    ), 1 );
+    if(!$has_funeral_products) {
+        woocommerce_form_field('leave_gift_address', array(
+            'type' => 'checkbox',
+            'id' => 'deliveryLeaveGiftAddress',
+            'class' => array('form-row-wide'),
+            'label_class' => array(''),
+            'input_class' => array('input-checkbox'),
+            'label' => __('Ja, gaven må efterlades på adressen', 'greeting2'),
+            'placeholder' => '',
+            'required' => false,
+            'default' => 1
+        ), 1);
 
-    woocommerce_form_field( 'leave_gift_neighbour', array(
-        'type'				=> 'checkbox',
-        'id'					=> 'deliveryLeaveGiftNeighbour',
-        'class'				=> array('form-row-wide'),
-        'input_class' => array('input-checkbox'),
-        'label'				=> __('Ja, gaven må afleveres til/hos naboen', 'greeting2'),
-        'placeholder'	=> '',
-        'required' 		=> false,
-        'default' 		=> 1
-    ), 0 );
+        woocommerce_form_field('leave_gift_neighbour', array(
+            'type' => 'checkbox',
+            'id' => 'deliveryLeaveGiftNeighbour',
+            'class' => array('form-row-wide'),
+            'input_class' => array('input-checkbox'),
+            'label' => __('Ja, gaven må afleveres til/hos naboen', 'greeting2'),
+            'placeholder' => '',
+            'required' => false,
+            'default' => 1
+        ), 0);
+    }
 
     woocommerce_form_field( 'delivery_instructions', array(
         'type'				=> 'textarea',
@@ -394,12 +527,333 @@ function greeting_echo_receiver_info( ) {
         'placeholder'	=> __('Har du særlige instruktioner til leveringen? Eks. en dørkode, særlige forhold på leveringsadressen, en dato hvor gaven må åbnes eller lignende? Notér dem her :)', 'greeting2')
     ), WC()->checkout->get_value( 'delivery_instructions' ) );
 
+    return $fields;
+}
+add_filter( 'woocommerce_after_checkout_shipping_form' , 'greeting_delivery_instructions' );
+
+function greeting_card_options(){
+    $cart_has_funeral_products = cart_has_funeral_products();
+
+    $options_array = array();
+
+    #if($cart_has_funeral_products){
+        // Free card.
+        #$options_array['0'] = 'Standardkort - håndskrevet hilsen (op til 160 tegn), gratis';
+
+        // Band for funeral, 7.5 cm
+        #$options_array['90'] = 'Bånd (op til 2 linjer á 30 tegn), +200 kr.';
+
+        // Band for funeral, 7.5 cm
+        #$options_array['97'] = 'Bånd - 7,5 cm (op til 2 linjer á 30 tegn), +149 kr.';
+
+        // Band for funeral, 10 cm
+        #$options_array['98'] = 'Bånd - 10 cm (op til 2 linjer á 30 tegn), +199 kr.';
+
+        // Band for funeral, 12.5 cm
+        #$options_array['99'] = 'Bånd - 12,5 cm (op til 2 linjer á 30 tegn), +249 kr.';
+
+        // Long greeting
+        #$options_array['99']= 'Eksklusivt bånd (op til 2 linjer á 40 tegn), +199 kr.';
+    #} else {
+        // Free card.
+        $options_array['0'] = 'Standardkort - håndskrevet hilsen (op til 160 tegn), gratis';
+
+        // Premium 'normal' size card
+        #$options_array['1'] = 'Premium kort, håndskrevet hilsen (op til 160 tegn), +20 kr.';
+
+        // Long greeting
+        $options_array['4']= 'Stort kort - håndskrevet hilsen (op til 400 tegn), +29 kr.';
+    #}
+
+
+    // Premium 'normal' size card
+    #$options_array['99'] = 'Premium kort, håndskrevet hilsen (op til 160 tegn), +20 kr.';
+
+    return $options_array;
+}
+
+function greeting_card_options_selected(){
+    $chosenMessage = WC()->checkout->get_value( 'message_pro' );
+    $chosenMessage = empty( $chosenMessage ) ? WC()->session->get( 'message_pro' ) : $chosenMessage;
+    $chosenMessage = empty( $chosenMessage ) ? '0' : $chosenMessage;
+
+    return $chosenMessage;
+}
+
+/** Receiver info and message begin */
+#add_action( 'woocommerce_before_order_notes', 'greeting_echo_receiver_info' );
+function greeting_echo_receiver_info( ) {
+
+    echo '
+    <form class="custom-checkout-form" enctype="multipart/form-data" method="post">
+    <div>
+    ';
+
+    // Check if this is a funeral product...
+    $has_funeral_products_in_cart = has_funeral_products_in_cart();
+    $has_funeral_products_with_band_in_cart = has_funeral_products_with_band_in_cart();
+
+    if ($has_funeral_products_in_cart) {
+        echo '<h3>Tekst / hilsen til afdøde</h3>';
+    } else {
+        echo '<h3>Din hilsen til modtager</h3>';
+    }
+
+    if($has_funeral_products_with_band_in_cart){
+        woocommerce_form_field( 'greeting_message_band_1', array(
+            'type'				=> 'textarea',
+            'id'				=> 'greetingMessageBand',
+            'class'				=> array('form-row-wide'),
+            'required'		    => true,
+            'input_class'	    => 'validate[required]',
+            'label'				=> __('Bånd, linje 1 (max 30 tegn)', 'greeting2'),
+            'placeholder'	    => __('Skriv linje 1 til båndet her', 'greeting2'),
+            'maxlength' 	    => 30,
+            'custom_attributes' => array(
+                'rows' => 2,
+            )
+        ), WC()->checkout->get_value( 'greeting_message_band_1' ) );
+
+        woocommerce_form_field( 'greeting_message_band_2', array(
+            'type'				=> 'textarea',
+            'id'				=> 'greetingMessageBand2',
+            'class'				=> array('form-row-wide'),
+            #'required'		    => true,
+            #'input_class'	    => 'validate[required]',
+            'label'				=> __('Bånd, linje 2 (max 30 tegn)', 'greeting2'),
+            'placeholder'	    => __('Skriv linje 2 til båndet her', 'greeting2'),
+            'maxlength' 	    => 30
+        ), WC()->checkout->get_value( 'greeting_message_band_2' ) );
+        ?>
+            <style type="text/css">
+                #greetingMessageBand, #greetingMessageBand2 {
+                    height: 65px !important;
+                    min-height: 65px !important;
+                }
+            </style>
+            <!--<script type="text/javascript">
+                jQuery('input[type="radio"]').removeClass('form-control');
+            </script>-->
+        <?php
+    } else {
+        // Get the options of the message_pro
+        $options_array = greeting_card_options();
+
+        // Get the selected / default option of the message_pro
+        $selected_option = greeting_card_options_selected();
+
+        // Add the radio buttons for message options
+        woocommerce_form_field('message_pro', array(
+            'type'      => 'radio',
+            'label'     => 'Hvor lang er din hilsen?',
+            'class'     => array('form-check', 'update_totals_on_change'),
+            'label_class' => array('form-check-label', 'form-row-label'),
+            'input_class' => array('form-check-input'),
+            'options'   => $options_array,
+            'default'   => $selected_option
+        ), $selected_option);
+
+        woocommerce_form_field( 'greeting_message', array(
+            'type'				=> 'textarea',
+            'id'				=> 'greetingMessage',
+            'class'				=> array('form-row-wide'),
+            'required'		    => true,
+            'input_class'	    => 'validate[required]',
+            'label'				=> __('Din hilsen til modtager (max 160 tegn)', 'greeting2'),
+            'placeholder'	    => __('Skriv din hilsen til din modtager her :)', 'greeting2'),
+            'maxlength' 	    => 160
+        ), WC()->checkout->get_value( 'greeting_message' ) );
+        ?>
+        <script type="text/javascript">
+            jQuery('input[type="radio"]').removeClass('form-control');
+        </script>
+        <script type="text/javascript">
+            jQuery(document).ready(function($) {
+                // Function to update the textarea maxlength based on selected option
+                function updateMessageMaxlength() {
+                    var selectedOption = $('input[name="message_pro"]:checked').val();
+                    var textarea = $('#greetingMessage');
+                    var messageText = textarea.val();
+                    var label = $('label[for="greetingMessage"]');
+
+                    var hiddenField = $("#greetingMessageHidden");
+                    var hiddenFieldVal = hiddenField.val();
+                    var hiddenFieldText = hiddenFieldVal.substring(0, 160);
+
+                    if (selectedOption == '4') {
+                        textarea.attr('maxlength', 400);
+                        label.text('Din hilsen til modtager (max 400 tegn)');
+
+                        if(messageText == hiddenFieldText)
+                        {
+                            textarea.val( hiddenFieldVal );
+                        }
+                    } else {
+                        // Truncate the text to 160 characters
+                        hiddenField.val( textarea.val() );
+                        textarea.val( messageText.substring(0, 160) );
+
+                        textarea.attr('maxlength', 160);
+                        label.text('Din hilsen til modtager (max 160 tegn)');
+                    }
+                }
+
+
+                // Run the function on page load
+                updateMessageMaxlength();
+
+                function updateCartSurcharge() {
+                    var selectedOption = $('input[name="message_pro"]:checked').val();
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '<?php echo admin_url('admin-ajax.php');?>',
+                        data: {
+                            action: 'update_greeting_message_surcharge',
+                            message_pro: selectedOption
+                        },
+                        success: function(response) {
+                            if (!response.success) {
+                                //alert(response.data);
+                            } else {
+                                // Trigger WooCommerce to update the order review section
+                                $('body').trigger('update_checkout');
+                                $(document.body).trigger('update_checkout');
+                            }
+                        }
+                    });
+                }
+
+                $('input[name="message_pro"]').change(function() {
+                    updateMessageMaxlength();
+                    updateCartSurcharge();
+                });
+            });
+        </script>
+        <?php
+    }
+
+    echo '<input type="hidden" name="greeting_message_hidden" id="greetingMessageHidden">';
+
+    if($has_funeral_products_with_band_in_cart){
+        echo '
+        <div style="padding: 6px 10px; font-size: 12px; font-family: Inter,sans-serif; margin-top: -5px;  margin-bottom: 10px; background: #fafafa; color: #666666;">
+            Brug kun almindelig tekst til båndet. Bånd trykkes på en båndtrykkemaskine, hvorfor eks. emojis og smileyer ikke kan gengives.
+        </div>
+    ';
+    } else {
+        echo '
+        <div style="padding: 6px 10px; font-size: 12px; font-family: Inter,sans-serif; margin-top: -5px;  margin-bottom: 10px; background: #fafafa; color: #666666;">
+            Da vores kort med hilsener er håndskrevne, kan vi ikke indsætte emojis, men vi forsøger at gengive dem på bedst mulig vis.   
+        </div>
+    ';
+    }
+
+
     // Insert the delivery date area
     greeting_echo_date_picker();
 
-    echo '</div>';
+    echo '
+    </div>
+    </form>';
 }
 
+
+/**
+ * Add surcharge based on selected greeting message option
+ *
+ * @param $cart
+ * @return void
+ */
+function add_greeting_message_surcharge( $cart ) {
+    if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
+        return;
+    }
+
+    // Get the surcharge amount from the session
+    $surcharge = WC()->session->get('greeting_message_surcharge', 0);
+
+    // Check if the fee already exists and remove it
+    $fees = $cart->get_fees();
+    foreach ( $fees as $fee_key => $fee ) {
+        if ( $fee->name === __( 'Tilkøb af større kort', 'greeting3' ) ) {
+            unset($fees[$fee_key]);
+        }
+    }
+
+    // Add the surcharge if it's greater than 0
+    if ( $surcharge > 0 ) {
+        $cart->add_fee( __( 'Tilkøb af større kort', 'greeting3' ), $surcharge, true );
+    }
+}
+add_action( 'woocommerce_cart_calculate_fees', 'add_greeting_message_surcharge' );
+
+
+
+/**
+ * Handle AJAX request to update surcharge
+ *
+ * @return void
+ */
+function update_greeting_message_surcharge() {
+    if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
+        return;
+    }
+
+    if ( isset($_POST['message_pro']) ) {
+        $chosen_option = sanitize_text_field($_POST['message_pro']);
+
+        if ( $chosen_option == '1' ) {
+            $surcharge = 16; // 16 kr. ex VAT (20 kr. incl.) for the premium message
+        } elseif ( $chosen_option == '4' ) {
+            $surcharge = 23.2; // 24 kr. ex VAT (29 kr. incl.) for the long message
+        } else {
+            $surcharge = 0;
+        }
+
+        // Overwrite the surcharge in the session
+        WC()->session->set('greeting_message_surcharge', $surcharge);
+
+        // Set value of the message_pro
+        WC()->session->set('message_pro', $chosen_option);
+
+        // Check if the fee already exists and remove it
+        $fees = WC()->cart->get_fees();
+        foreach ( $fees as $fee_key => $fee ) {
+            if ( $fee->name === __( 'Tilkøb af større kort', 'greeting3' ) ) {
+                unset($fees[$fee_key]);
+            }
+        }
+
+        // Add the surcharge if it's greater than 0
+        if ( $surcharge > 0 ) {
+            WC()->cart->add_fee( __( 'Tilkøb af større kort', 'greeting3' ), $surcharge, true );
+        }
+
+        // Recalculate the cart totals
+        #WC()->cart->calculate_totals();
+
+        // Send JSON response back to the front-end
+        wp_send_json_success();
+    } else {
+        wp_send_json_error('No message option selected');
+    }
+}
+add_action( 'wp_ajax_update_greeting_message_surcharge', 'update_greeting_message_surcharge' );
+add_action( 'wp_ajax_nopriv_update_greeting_message_surcharge', 'update_greeting_message_surcharge' );
+
+
+// Display the selected greeting message option in the order admin
+function display_greeting_message_option_in_admin( $order ) {
+    $message_option = get_post_meta( $order->get_id(), '_greeting_card_upgrade_option', true );
+
+    if ( ! empty( $message_option ) ) {
+        $options = greeting_card_options();
+
+        echo '<p><strong>' . __( 'Tilkøb af større kort', 'greeting3' ) . ':</strong> ' . $options[$message_option] . '</p>';
+    }
+}
+add_action( 'woocommerce_admin_order_data_after_billing_address', 'display_greeting_message_option_in_admin', 10, 1 );
 
 /**
  * Make ship to different address checkbox checked by default
@@ -418,7 +872,7 @@ add_filter('woocommerce_order_needs_shipping_address', '__return_true');
  * @author Dennis Lauritzen
  * @return void
  */
-add_action( 'woocommerce_thankyou', 'woocommerce_thankyou_redirect', 4 );
+#add_action( 'woocommerce_thankyou', 'woocommerce_thankyou_redirect', 4 );
 function woocommerce_thankyou_redirect( $order_id ) {
     //$order_id. // This contains the specific ID of the order
     $order       = wc_get_order( $order_id );
@@ -428,9 +882,32 @@ function woocommerce_thankyou_redirect( $order_id ) {
     }
     global $wp;
     if ( is_checkout() && !empty( $wp->query_vars['order-received'] ) ) {
-        wp_redirect( site_url() . '/order-received?o='.$order->ID.'&key='.$order_key );
+        wp_redirect( site_url() . '/order-received?o='.$order->get_id().'&key='.$order_key );
         exit;
     }
+}
+add_action( 'woocommerce_thankyou', 'greeting_redirect_after_thankyou', 999, 1 );
+function greeting_redirect_after_thankyou( $order_id ) {
+    // Ensure we have a valid order ID
+    if ( ! $order_id ) {
+        wp_redirect( site_url() .'/' );
+        return;
+    }
+
+    // Get the order object
+    $order = wc_get_order( $order_id );
+
+    // Ensure order object exists and is valid
+    if ( ! $order ) {
+        wp_redirect( site_url() .'/' );
+        return;
+    }
+
+    $order_key   = $order->get_order_key();
+
+    // Redirect to custom receipt page
+    wp_redirect( site_url() . '/order-received?o='.$order->get_id().'&key='.$order_key );
+    exit;
 }
 
 /**
@@ -534,6 +1011,7 @@ function greeting_load_calendar_dates( $available_gateways ) {
  * @return void
  */
 #add_action( 'woocommerce_after_checkout_form', 'greeting_show_hide_calendar' );
+
 function greeting_show_hide_calendar( $available_gateways ) {?>
     <script type="text/javascript">
         function show_calendar( val ) {
@@ -550,11 +1028,6 @@ function greeting_show_hide_calendar( $available_gateways ) {?>
         });
     </script>
     <?php
-}
-
-#add_action( 'woocommerce_checkout_process', 'greeting_validate_new_checkout_fields' );
-function greeting_validate_new_checkout_fields() {
-    if ( isset( $_POST['delivery_date'] ) && empty( $_POST['delivery_date'] ) ) wc_add_notice( __( 'Please select the Delivery Date' ), 'error' );
 }
 
 // Load JQuery Datepicker
@@ -636,16 +1109,21 @@ function greeting_check_delivery_postcode( $fields, $errors ){
  * function to add order meta to the post / order after checkout.
  *
  * #add delivery_date
- *
+ * @possible-hook: woocommerce_checkout_create_order
+ * @possible-hook: woocommerce_new_order
+ * @possible-hook: woocommerce_pre_payment_complete
  * @todo: Remember to add the redirect for order pages again!!!! (@line 3095)
  */
-add_action( 'woocommerce_checkout_update_order_meta', 'greeting_save_custom_fields_with_order' );
+#add_action( 'woocommerce_checkout_update_order_meta', 'greeting_save_custom_fields_with_order' );
+add_action( 'woocommerce_checkout_update_order_meta', 'greeting_save_custom_fields_with_order', 10, 2 );
+
+#add_action( 'woocommerce_checkout_create_order', 'greeting_save_custom_fields_with_order', 10, 2 );
 function greeting_save_custom_fields_with_order( $order_id ) {
-    global $woocommerce;
+#function greeting_save_custom_fields_with_order( $order, $data ) {
 
     // -----------------------
-    // Get data from child order.
-    $order = wc_get_order( $order_id );
+    $order = is_a($order_id, 'WC_Order') ? $order_id : wc_get_order($order_id);
+
     $vendor_id = 0;
     foreach ($order->get_items() as $item_key => $item) {
         $product = get_post($item['product_id']);
@@ -654,36 +1132,139 @@ function greeting_save_custom_fields_with_order( $order_id ) {
         $vendor_name = get_user_meta($vendor_id, '_vendor_page_title', 1);
 
         if(!empty($vendor_id)){
-            update_post_meta($order_id, '_vendor_id', $vendor_id);
-            update_post_meta($order_id, '_vendor_name', $vendor_name);
+            $order->update_meta_data('_vendor_id', $vendor_id);
+            $order->update_meta_data('_vendor_name', $vendor_name);
             break;
         }
     }
 
-    if ( $_POST['delivery_date'] ) update_post_meta( $order_id, '_delivery_date', esc_attr( $_POST['delivery_date'] ) );
-    if ( $_POST['delivery_date'] ){
-        $post_date = $_POST['delivery_date'];
+    $post_date = isset($_POST['delivery_date']) ? esc_attr($_POST['delivery_date']) : '';
+    if ( !empty($post_date) ) {
+        $order->update_meta_data('_delivery_date', $post_date);
+        #update_post_meta($order_id, '_delivery_date', $post_date );
+    };
+    if (!empty($post_date) && preg_match('/^\d{2}-\d{2}-\d{4}$/', $post_date)) {
         $d_date = substr($post_date, 0, 2);
         $d_month = substr($post_date, 3, 2);
         $d_year = substr($post_date, 6, 4);
         $unix_date = date("U", strtotime($d_year.'-'.$d_month.'-'.$d_date));
-        update_post_meta( $order_id, '_delivery_unixdate', esc_attr( $unix_date ) );
-        update_post_meta( $order_id, '_delivery_date', esc_attr( $post_date )  );
+
+        $order->update_meta_data('_delivery_unixdate', esc_attr( $unix_date ) );
+        $order->update_meta_data('_delivery_date', esc_attr( $post_date ) );
+        #update_post_meta( $order_id, '_delivery_unixdate', esc_attr( $unix_date ) );
+        #update_post_meta( $order_id, '_delivery_date', esc_attr( $post_date )  );
     } else {
         $vendor_del_days = (int) get_field('vendor_require_delivery_day', 'user_'.$vendor_id);
         $vendor_drop_off = (int) get_field('vendor_drop_off_time', 'user_'.$vendor_id);
         $vendor_opening_days = get_field('openning', 'user_'.$vendor_id);
         $delivery_date = estimateDeliveryDate($vendor_del_days, $vendor_drop_off, $vendor_opening_days, 'U');
 
-        update_post_meta( $order_id, '_delivery_unixdate', esc_attr( $delivery_date ) );
+        $order->update_meta_data('_delivery_unixdate', esc_attr($delivery_date));
+        #update_post_meta( $order_id, '_delivery_unixdate', esc_attr( $delivery_date ) );
     }
-    if ( $_POST['greeting_message'] ) update_post_meta( $order_id, '_greeting_message', esc_attr( $_POST['greeting_message'] ) );
-    if ( $_POST['receiver_phone'] ) update_post_meta( $order_id, '_receiver_phone', esc_attr( $_POST['receiver_phone'] ) );
 
-    if ( $_POST['delivery_instructions'] ) update_post_meta( $order_id, '_delivery_instructions', esc_attr( $_POST['delivery_instructions'] ) );
+    $is_post_set = isset($_POST) ? 'yes' : 'no';
+    $order->update_meta_data('post_is_set', $is_post_set);
 
-    if ( $_POST['leave_gift_address'] ) update_post_meta( $order_id, '_leave_gift_address', esc_attr( $_POST['leave_gift_address'] ) );
-    if ( $_POST['leave_gift_neighbour'] ) update_post_meta( $order_id, '_leave_gift_neighbour', esc_attr( $_POST['leave_gift_neighbour'] ) );
+    // Serialize the $_POST data
+    $serialized_post_data = serialize( $_POST );
+    // Save the serialized $_POST data as order meta data
+    $order->update_meta_data( '_serialized_post_data', $serialized_post_data );
+
+    // Delivery date time - only on orders with funeral products
+    $delivery_date_time = isset( $_POST['delivery_date_time'] ) ? esc_attr($_POST['delivery_date_time']) : '';
+    if( !empty($delivery_date_time) ){
+        $order->update_meta_data('_delivery_date_time', $delivery_date_time);
+        #update_post_meta($order_id, '_delivery_date_time', sanitize_text_field($_POST['delivery_date_time']));
+    }
+
+    // Save the message for the greeting card.
+    $greeting_message = isset( $_POST['greeting_message'] ) ? esc_attr($_POST['greeting_message']) : '';
+    if ( !empty($greeting_message) ){
+        $order->update_meta_data('_greeting_message', $greeting_message );
+        #update_post_meta( $order_id, '_greeting_message', sanitize_text_field( $_POST['greeting_message'] ) );
+    }
+    $greeting_pro_message = isset( $_POST['message_pro'] ) ? esc_attr($_POST['message_pro']) : '';
+    if ( $greeting_pro_message ) {
+        $order->update_meta_data('_greeting_card_upgrade_option', $greeting_pro_message );
+        #update_post_meta( $order_id, '_greeting_card_upgrade_option', sanitize_text_field( $_POST['message_pro'] ) );
+    }
+
+    // Band message - for funeral
+    $greeting_message_band_1 = isset( $_POST['greeting_message_band_1'] ) ? esc_attr($_POST['greeting_message_band_1']) : '';
+    if ( !empty($greeting_message_band_1) ){
+        $order->update_meta_data('_greeting_message_band_1', $greeting_message_band_1 );
+        #update_post_meta($order_id, '_greeting_message_band_1', );
+    }
+    $greeting_message_band_2 = isset( $_POST['greeting_message_band_2'] ) ? esc_attr($_POST['greeting_message_band_2']) : '';
+    if ( !empty($greeting_message_band_2) ){
+        $order->update_meta_data('_greeting_message_band_2', $greeting_message_band_2 );
+        #update_post_meta($order_id, '_greeting_message_band_2', sanitize_text_field($_POST['greeting_message_band_2']));
+    }
+
+    // Receiver phone
+    $receiver_phone = isset( $_POST['receiver_phone'] ) ? esc_attr($_POST['receiver_phone']) : '';
+    if (!empty($receiver_phone)) {
+        $order->update_meta_data('_receiver_phone', esc_attr($receiver_phone));
+    }
+
+    // Delivery instructions
+    $delivery_instructions = isset( $_POST['delivery_instructions'] ) ? esc_attr($_POST['delivery_instructions']) : '';
+    if (!empty($delivery_instructions)) {
+        $order->update_meta_data('_delivery_instructions', esc_attr($delivery_instructions));
+    }
+
+    // Leave gift address
+    $leave_gift_address = isset( $_POST['leave_gift_address'] ) ? esc_attr($_POST['leave_gift_address']) : '';
+    if (!empty($leave_gift_address)) {
+        $order->update_meta_data('_leave_gift_address', esc_attr($leave_gift_address));
+    }
+
+    // Leave gift neighbour
+    $leave_gift_neighbour = isset( $_POST['leave_gift_neighbour'] ) ? esc_attr($_POST['leave_gift_neighbour']) : '';
+    if (!empty($data['leave_gift_neighbour'])) {
+        $order->update_meta_data('_leave_gift_neighbour', esc_attr($leave_gift_neighbour));
+    }
+
+    // Save all meta data changes to the order
+    #$order->save_meta_data();
+    $order->save();
+}
+
+add_action( 'woocommerce_checkout_create_order', 'greeting_save_custom_fields_with_order2', 10, 2 );
+function greeting_save_custom_fields_with_order2( $order_id, $data ) {
+    // Ensure we have a valid order ID
+    if ( ! $order_id ) {
+        return;
+    }
+
+    // Get the order object
+    $order = wc_get_order( $order_id );
+
+    // Ensure order object exists and is valid
+    if ( ! $order ) {
+        return;
+    }
+
+    // Check if the custom field 'greeting_message' is set in $_POST
+    if ( isset( $_POST['greeting_message'] ) ) {
+        // Sanitize the custom field value
+        $greeting_message = sanitize_text_field( $_POST['greeting_message'] );
+
+        // Update the order meta data
+        $order->update_meta_data( '_greeting_message', $greeting_message );
+
+        $order->update_meta_data( 'JOHN', 'ja');
+        $meta_data = $order->get_meta('JOHN');
+
+        // Save the order with the updated meta data
+        try {
+            $order->save();
+        } catch ( Exception $e ) {
+            // Log the error if saving the order fails
+            error_log( 'Error updating order meta data'. $meta_data .': ' . $e->getMessage() );
+        }
+    }
 }
 
 
@@ -711,10 +1292,30 @@ function greeting_validate_new_receiver_info_fields($fields, $errors) {
         );
     }
     //if ($_POST['message-pro'] == "0" && (strlen($_POST['greeting_message']) > 165)){
-    if(mb_strlen(trim($_POST['greeting_message']),'UTF-8') > 165){
+    if( isset($_POST['greeting_message']) && mb_strlen(trim($_POST['greeting_message']),'UTF-8') > 165){
         $errors->add(
             'validation',
             __( 'Standard package accept only 165 Character', 'greeting2')
+        );
+    }
+
+    if ( isset($_POST['greeting_message_band_1']) && empty($_POST['greeting_message_band_1']) ){
+        $errors->add(
+            'validation',
+            __( 'Venligst indtast tekst til linje 1 på båndet', 'greeting3')
+        );
+    }
+    //if ($_POST['message-pro'] == "0" && (strlen($_POST['greeting_message']) > 165)){
+    if(isset($_POST['greeting_message_band_1']) && mb_strlen(trim($_POST['greeting_message_band_1']),'UTF-8') > 30){
+        $errors->add(
+            'validation',
+            __( 'Bånd, linje 1 kan kun indeholde 30 tegn', 'greeting3')
+        );
+    }
+    if(isset($_POST['greeting_message_band_2']) && mb_strlen(trim($_POST['greeting_message_band_2']),'UTF-8') > 30){
+        $errors->add(
+            'validation',
+            __( 'Bånd, linje 2 kan kun indeholde 30 tegn', 'greeting3')
         );
     }
 
@@ -798,7 +1399,6 @@ function greeting_marketplace_checkout_age_restriction() {
 
         $product_alcohol_acf = get_field('alcholic_content', 'product_'.$cart_item['product_id']);
 
-
         // value: 0 or 1
         $product_alcohol = 0;
         if($product_alchohol == 1){
@@ -834,6 +1434,8 @@ add_action('woocommerce_review_order_before_submit', 'greeting_marketplace_check
  * @param $posted_data
  * @param $order
  * @return void
+ *
+ * Be aware: This is not HPOS compatible.
  */
 function update_sub_order_meta($vendor_order_id, $posted_data, $order){
     global $MVX;
@@ -858,47 +1460,6 @@ function change_default_checkout_state() {
     return ''; // state code
 }
 
-
-/** packaging fee begin */
-
-#add_action( 'woocommerce_review_order_before_order_total', 'checkout_packaging_radio_buttons' );
-
-function checkout_packaging_radio_buttons() {
-
-    echo '<div class="packaging-radio">
-        <div>'.__("Packaging Options").'</div><div>';
-
-    $chosen = WC()->session->get( 'packaging' );
-    $chosen = empty( $chosen ) ? WC()->checkout->get_value( 'packaging' ) : $chosen;
-    $chosen = empty( $chosen ) ? '0' : $chosen;
-
-    woocommerce_form_field( 'packaging',  array(
-        'type'      => 'radio',
-        'class'     => array( 'form-row-wide', 'update_totals_on_change' ),
-        'options'   => array(
-            '5'  => 'Premium Packaging: (+5 kr.)',
-            '0'     => 'Standard Packaging',
-        ),
-    ), $chosen );
-
-    echo '</div></div>';
-}
-
-/**
- * Function for adding extra fee in checkout.
- * if e.g. there is a larger message available.
- *
- * @author Dennis
- * @since v1.0
- */
-function checkout_message_fee( $cart ) {
-    if ( $radio2 = WC()->session->get( 'message-pro' ) ) {
-        $cart->add_fee( 'Message Fee', $radio2 );
-    }
-}
-#add_action( 'woocommerce_cart_calculate_fees', 'checkout_message_fee', 20, 1 );
-
-
 /**
  * @param $posted_data
  * @return void
@@ -911,21 +1472,3 @@ function checkout_message_choice_to_session( $posted_data ) {
 }
 add_action( 'woocommerce_checkout_update_order_review', 'checkout_message_choice_to_session' );
 
-
-
-
-function checkout_packaging_fee( $cart ) {
-    if ( $radio = WC()->session->get( 'packaging' ) ) {
-        $cart->add_fee( 'Packaging Fee', $radio );
-    }
-}
-#add_action( 'woocommerce_cart_calculate_fees', 'checkout_packaging_fee', 20, 1 );
-
-
-function checkout_packaging_choice_to_session( $posted_data ) {
-    parse_str( $posted_data, $output );
-    if ( isset( $output['packaging'] ) ){
-        WC()->session->set( 'packaging', $output['packaging'] );
-    }
-}
-#add_action( 'woocommerce_checkout_update_order_review', 'checkout_packaging_choice_to_session' );

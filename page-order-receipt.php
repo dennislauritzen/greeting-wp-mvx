@@ -65,14 +65,14 @@ get_header('checkout');
 		}
 	},
 	'user_details': {
-		'phone': '<?php echo ($order->get_billing_phone()) ? $order->get_billing_phone() : ''; ?>',
-		'mail': '<?php echo ($order->get_billing_email()) ? $order->get_billing_email() : ''; ?>',
-		'full_name': '<?php echo $order->get_formatted_billing_full_name(); ?>',
-		'address': '<?php echo ($order->get_billing_address_1()) ? $order->get_billing_address_1() : ''; ?>',
-		'city': '<?php echo ($order->get_billing_city()) ? $order->get_billing_city() : ''; ?>',
-		'country': '<?php echo ($order->get_billing_country()) ? $order->get_billing_country() : ''; ?>',
-		'postcode': '<?php echo ($order->get_billing_postcode()) ? $order->get_billing_postcode() : ''; ?>',
-		'delivery_phone': '<?php echo (get_post_meta($order->get_id(), '_receiver_phone', true)) ? get_post_meta($order->get_id(), '_receiver_phone', true) : ''; ?>'
+        'phone': '<?php echo $order->get_billing_phone() ? $order->get_billing_phone() : ''; ?>',
+        'mail': '<?php echo $order->get_billing_email() ? $order->get_billing_email() : ''; ?>',
+        'full_name': '<?php echo $order->get_billing_first_name() . ' ' . $order->get_billing_last_name(); ?>',
+        'address': '<?php echo $order->get_billing_address_1() ? $order->get_billing_address_1() : ''; ?>',
+        'city': '<?php echo $order->get_billing_city() ? $order->get_billing_city() : ''; ?>',
+        'country': '<?php echo $order->get_billing_country() ? $order->get_billing_country() : ''; ?>',
+        'postcode': '<?php echo $order->get_billing_postcode() ? $order->get_billing_postcode() : ''; ?>',
+        'delivery_phone': '<?php echo $order->get_meta('_receiver_phone') ? $order->get_meta('_receiver_phone') : ''; ?>'
 	}
 	});
 </script>
@@ -84,7 +84,7 @@ get_header('checkout');
                 <div class="row pb-4">
                     <div class="col-12">
                         <h1 class="mt-5">Din bestilling af gavehilsen er modtaget</h1>
-                        <small>❤️ af hjertet tak fra os - og din modtager</small>
+                        <small>❤️ af hjertet tak fra os<?php if( !order_has_funeral_products($order->get_id()) ){ echo ' - og din modtager'; } ?></small>
                     </div><!-- /.col -->
                 </div>
                 <div class="row border mb-3">
@@ -118,16 +118,7 @@ get_header('checkout');
                             <?php $leave_gift_at_neighbour = (get_post_meta( $order->get_id(), '_leave_gift_neighbour', true ) == "1" ? 'Ja' : 'Nej'); ?>
                             <?php _e('Må gaven afleveres hos naboen:', 'woocommerce'); ?> <?php echo $leave_gift_at_neighbour; ?>
 
-                            <br><br>
 
-                            <?php $delivery_instructions = get_post_meta( $order->get_id(), '_delivery_instructions', true ); ?>
-                            <?php if(!empty($delivery_instructions)){ ?>
-                            <p class="text-start">
-                                <strong><?php _e('Leveringsinstruktioner', 'woocommerce'); ?></strong>
-                                <br>
-                                <?php echo $delivery_instructions; ?>
-                            </p>
-                            <?php } ?>
                         </p>
                     </div>
                     <div class="col-6 pt-2">
@@ -142,6 +133,14 @@ get_header('checkout');
                             <?php
                             echo esc_html( get_post_meta($order->get_id(), '_greeting_message', true) ); ?>
                         </p>
+                        <?php $delivery_instructions = get_post_meta( $order->get_id(), '_delivery_instructions', true ); ?>
+                        <?php if(!empty($delivery_instructions)){ ?>
+                            <p class="text-end">
+                                <strong class="text-uppercase"><?php _e('Leveringsinstruktioner', 'woocommerce'); ?></strong>
+                                <br>
+                                <?php echo $delivery_instructions; ?>
+                            </p>
+                        <?php } ?>
                     </div>
                 </div>
                 <div class="row order">
@@ -161,6 +160,8 @@ get_header('checkout');
                      $variation_id = $item->get_variation_id();
                      $product = $item->get_product();
                      $product_name = $item->get_name();
+                     $product_customer_wish = $item->get_meta('_custom_note');
+
                      $quantity = $item->get_quantity();
                      $subtotal = $item->get_subtotal();
                      $total = $item->get_total();
@@ -183,7 +184,12 @@ get_header('checkout');
                     </div>
                     <div class="col-6">
                         <?php echo ($quantity > 1) ? $quantity.' x ' : ''; ?>
-                        <?php echo $product_name; ?>
+                        <b><?php echo $product_name; ?></b>
+                        <?php if(!empty($product_customer_wish)){
+                            echo '<br><span style="font-size:14px;">Dine ønsker til produktet: ' . $product_customer_wish . '</span>';
+                        }
+                        ?>
+
                     </div>
                     <div class="col-2">
                         <?php echo $order->get_item_subtotal( $item, $inc_tax = 'true', $round = 'false' ); ?> kr. pr. stk.
@@ -207,10 +213,10 @@ get_header('checkout');
                         </div>
                         <div class="row py-2 border-bottom">
                                 <div class="col-6">
-                                    Indpakning
+                                    Kort
                                 </div>
                                 <div class="col-6 text-end">
-
+                                    <?php echo wc_price( $order->get_total_fees() * 1.25 ); ?>
                                 </div>
                         </div>
                         <div class="row py-2 border-bottom">
@@ -218,9 +224,18 @@ get_header('checkout');
                                     Levering & håndtering
                                 </div>
                                 <div class="col-6 text-end">
-                                    <?php echo $order->get_shipping_to_display(); ?>
-                                    <br>
-                                    (heraf <?php echo $order->get_total_tax(); ?> kr. i moms)
+                                    <?php
+                                    // Get the shipping display string with method and taxes
+                                    $shipping_display = $order->get_shipping_to_display();
+
+                                    // Extract shipping cost including VAT from the display string
+                                    $shipping_cost = preg_replace('/[^0-9\.,]/', '', $shipping_display);
+
+                                    // Display the shipping cost including VAT
+                                    echo wp_kses_post( wc_price( $shipping_cost ) );
+                                    ?>
+                                    <!--<br>
+                                    (heraf <?php echo wc_price( $order->get_total_tax() ); ?> kr. i moms)-->
                                 </div>
                         </div>
                         <div class="row py-2 border-bottom">
@@ -230,7 +245,7 @@ get_header('checkout');
                                 <div class="col-6 text-end">
                                     <?php echo $order->get_formatted_order_total(true, 0); ?>
                                     <br>
-                                    (heraf <?php echo $order->get_total_tax(); ?> kr. i moms)
+                                    (heraf <?php echo wc_price( $order->get_total_tax() ); ?> kr. i moms)
                                 </div>
                         </div>
                     </div>

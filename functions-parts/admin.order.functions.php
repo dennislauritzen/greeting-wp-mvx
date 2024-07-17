@@ -107,6 +107,9 @@ function custom_display_order_data_in_admin(){
     $str .= '<div style="margin:15px 0px 0px 15px;"><strong>Modtagers telefonnr.:</strong> {{data.receiver_phone_key}}</div>';
 
     $str .= '<div style="margin:15px 0px 0px 15px;"><strong>Besked til modtager:</strong> {{data.greeting_message_key}}</div>';
+    $str .= '<div style="margin:15px 0px 0px 15px;"><strong>Bånd - linje 1:</strong> {{data.greeting_message_band_1_key}}</div>';
+    $str .= '<div style="margin:2px 0px 0px 15px;"><strong>Bånd - linje 2:</strong> {{data.greeting_message_band_2_key}}</div>';
+
     $str .= '<div style="margin:15px 0px 0px 15px;"><strong>Leveringsinstruktioner:</strong> {{data.delivery_instructions_key}}</div>';
 
 
@@ -131,9 +134,19 @@ function admin_order_preview_add_custom_meta_data( $data, $order ) {
         $data['receiver_phone_key'] = $receiver_phone; // <= Store the value in the data array.
     }
 
-    if( $greeting_message = $order->get_meta('_greeting_message') ){
-        $data['greeting_message_key'] = $greeting_message; // <= Store the value in the data array.
+    if(order_has_funeral_products($order->get_id())){
+        if( $greeting_message_band_1 = $order->get_meta('_greeting_message_band_1') ){
+            $data['greeting_message_band_1_key'] = $greeting_message_band_1; // <= Store the value in the data array.
+        }
+        if( $greeting_message_band_2 = $order->get_meta('_greeting_message_band_2') ){
+            $data['greeting_message_band_2_key'] = $greeting_message_band_2; // <= Store the value in the data array.
+        }
+    } else {
+        if( $greeting_message = $order->get_meta('_greeting_message') ){
+            $data['greeting_message_key'] = $greeting_message; // <= Store the value in the data array.
+        }
     }
+
 
     if( $leave_gift_address = $order->get_meta('_leave_gift_address') ){
         $leave_gift_address = ($leave_gift_address == "1" ? 'Ja' : 'Nej');
@@ -323,6 +336,8 @@ function save_shop_order_meta_box_data( $post_id, $post ) {
         $post = get_post_parent($post_id);
         $post_id = $post->ID;
     }
+
+    $order = wc_get_order($post_id);
     #print $post_id; exit;
 
     // Update the meta field in the database.
@@ -331,8 +346,12 @@ function save_shop_order_meta_box_data( $post_id, $post ) {
     $d_month = substr($post_date, 3, 2);
     $d_year = substr($post_date, 6, 4);
     $unix_date = date("U", strtotime($d_year.'-'.$d_month.'-'.$d_date));
-    update_post_meta( $post_id, '_delivery_unixdate', $unix_date );
-    update_post_meta( $post_id, '_delivery_date', $my_data );
+
+    #update_post_meta( $post_id, '_delivery_unixdate', $unix_date );
+    #update_post_meta( $post_id, '_delivery_date', $my_data );
+
+    $order->update_meta_data('_delivery_unixdate', $unix_date);
+    $order->update_meta_date('_delivery_date', $my_data);
 }
 add_action( 'save_post', 'save_shop_order_meta_box_data', 20, 2 );
 
@@ -367,15 +386,36 @@ function save_shop_order_meta_box_store_own_ref_data( $post_id, $post ) {
 
     # SET THE POST PARENT ID FOR DELIVERY DATE
     if (get_post_parent($post_id) !== null){
-        $post = get_post_parent($post_id);
+        $post_id_parent = get_post_parent($post_id);
+
+        $order_parent = wc_get_order($post_id_parent);
+        if(!is_a($order_parent, 'WC_Order')){
+            return;
+        }
+
         // Before changing the post_id variable, lets update the child order value too.
-        update_post_meta( $post_id, '_store_own_order_reference', $my_data );
-        $post_id = $post->ID;
+        #update_post_meta( $post_id, '_store_own_order_reference', $my_data );
+        #$post_id = $post->ID;
+        $order_parent->update_meta_data('_store_own_order_reference', $my_data);
+        $order_parent->save_meta_data();
+        $order_parent->save();
+    } else {
+        $order = wc_get_order($post_id);
+        if(!is_a($order, 'WC_Order')){
+            return;
+        }
+
+        // Before changing the post_id variable, lets update the child order value too.
+        #update_post_meta( $post_id, '_store_own_order_reference', $my_data );
+        #$post_id = $post->ID;
+        $order->update_meta_data('_store_own_order_reference', $my_data);
+        $order->save_meta_data();
+        $order->save();
     }
     #print $post_id; exit;
 
     // Update the meta field in the database.
-    update_post_meta( $post_id, '_store_own_order_reference', $my_data );
+    #update_post_meta( $post_id, '_store_own_order_reference', $my_data );
 }
 add_action( 'save_post', 'save_shop_order_meta_box_store_own_ref_data', 20, 2 );
 
@@ -513,6 +553,32 @@ add_action( 'manage_shop_order_posts_custom_column' , 'custom_orders_list_column
 
 
 
+
+/**
+ * Add a custom action to order actions select box on edit order page.
+ * Only added for paid orders that haven't fired this action yet
+ *
+ * @author Dennis Lauritzen
+ * @param array $actions order actions array to display
+ * @return array - updated actions
+ */
+function greeting_wc_add_order_meta_box_action( $actions ) {
+    #global $theorder;
+
+    // bail if the order has been paid for or this action has been run
+    #if ( ! $theorder->is_paid() ) {
+    #	return $actions;
+    #}
+
+    // add "mark printed" custom action
+    $actions['wc_custom_order_action'] = __( 'Gensend mail til butikken', 'greeting2' );
+    $actions['wc_custom_order_action_order_notice'] = __( 'Gensend ordrebekræftelse til kunde', 'greeting2' );
+    $actions['wc_custom_order_action_delivery_notice'] = __( 'Gensend leveringsbekræftelse til kunde', 'greeting2' );
+    $actions['wc_custom_order_action_test_mail'] = __( 'SEND TEST MAIL', 'greeting2' );
+    return $actions;
+}
+add_action( 'woocommerce_order_actions', 'greeting_wc_add_order_meta_box_action' );
+
 /**
  * Add an order note when custom action is clicked
  * Add a flag on the order to show it's been run
@@ -533,6 +599,27 @@ function greeting_wc_process_order_meta_box_action( $order ) {
     }
 }
 add_action( 'woocommerce_order_action_wc_custom_order_action', 'greeting_wc_process_order_meta_box_action' );
+
+/**
+ * Add an order note when custom action is clicked
+ * Add a flag on the order to show it's been run
+ *
+ * @author Dennis Lauritzen
+ * @param \WC_Order $order
+ */
+function greeting_wc_completed_order_resend_new_order_mail_to_customer( $order ) {
+    $mailer = WC()->mailer();
+    $mails = $mailer->get_emails();
+
+    if ( !empty( $mails ) ) {
+        foreach ( $mails as $mail ) {
+            if ( $mail->id == 'customer_processing_order' ) {
+                $mail->trigger( $order->get_id() );
+            }
+        }
+    }
+}
+add_action( 'woocommerce_order_action_wc_custom_order_action_order_notice', 'greeting_wc_completed_order_resend_new_order_mail_to_customer' );
 
 /**
  * Add an order note when custom action is clicked
@@ -595,31 +682,36 @@ add_action( 'woocommerce_order_action_wc_custom_order_action_test_mail', 'greeti
 function greeting_delivery_date_display_admin_order_meta( $order ) {
     $str = '<p><strong>Leveringsdato:</strong> ';
     if ( !empty(get_post_meta( $order->get_id(), '_delivery_date', true )) ) {
-        $str .= get_post_meta( $order->get_id(), '_delivery_date', true );
+        $str .= esc_attr( get_post_meta( $order->get_id(), '_delivery_date', true ) );
     } else {
         $str .= 'Hurtigst muligt ('. get_post_meta( $order->get_id(), '_delivery_unixdate', true ).')';
     }
     //$str .= '('.get_post_meta( $order->get_id(), '_delivery_unixdate', true ).')';
     $str .= '</p>';
-    $str .= '<p><strong>Modtagers telefonnr.:</strong> ' . get_post_meta( $order->get_id(), '_receiver_phone', true ) . '</p>';
-    $str .= '<p><strong>Besked til modtager:</strong> ' . get_post_meta( $order->get_id(), '_greeting_message', true ) . '</p>';
+
+    if(order_has_funeral_products( $order->get_id() ))
+    {
+        $str .= '<p>
+                <strong>Bånd - linje 1:</strong> ' . esc_attr( get_post_meta( $order->get_id(), '_greeting_message_band_1', true ) ) . '<br>' .
+                '<strong>Bånd - linje 2:</strong>' . esc_attr( get_post_meta( $order->get_id(), '_greeting_message_band_2', true ) )  .
+            '</p>';
+    } else {
+
+        $str .= '<p><strong>Modtagers telefonnr.:</strong> ' . esc_attr( get_post_meta( $order->get_id(), '_receiver_phone', true ) ) . '</p>';
+        $str .= '<p><strong>Besked til modtager:</strong> ' . esc_attr( get_post_meta( $order->get_id(), '_greeting_message', true ) ) . '</p>';
+    }
 
 
     $str .= '<p><strong>Leveringsinstruktioner:</strong> ' . get_post_meta( $order->get_id(), '_delivery_instructions', true ) . '</p>';
-    $leave_gift_at_address = (get_post_meta( $order->get_id(), '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej');
+    $leave_gift_at_address = (esc_attr( get_post_meta( $order->get_id(), '_leave_gift_address', true ) ) == "1" ? 'Ja' : 'Nej');
     $str .= '<p><strong>Må gaven stilles på adressen:</strong> ' . $leave_gift_at_address . '</p>';
-    $leave_gift_at_neighbour = (get_post_meta( $order->get_id(), '_leave_gift_neighbour', true ) == "1" ? 'Ja' : 'Nej');
+    $leave_gift_at_neighbour = (esc_attr( get_post_meta( $order->get_id(), '_leave_gift_neighbour', true ) ) == "1" ? 'Ja' : 'Nej');
     $str .= '<p><strong>Må gaven afleveres hos naboen:</strong> ' . $leave_gift_at_neighbour . '</p>';
 
     echo $str;
 }
 add_action( 'woocommerce_admin_order_data_after_billing_address', 'greeting_delivery_date_display_admin_order_meta' );
 
-
-function greeting_receiver_info_display_admin_order_meta( $order ) {
-    echo '<p><strong>Modtagers tlf. nr.:</strong> ' . get_post_meta( $order->get_id(), 'receiver_phone', true ) . '</p>';
-}
-add_action( 'woocommerce_admin_order_data_after_billing_address', 'greeting_receiver_info_display_admin_order_meta' );
 
 
 function admin_order_preview_add_receiver_info_custom_meta_data( $data, $order ) {
@@ -630,10 +722,32 @@ function admin_order_preview_add_receiver_info_custom_meta_data( $data, $order )
 // Add custom order meta data to make it accessible in Order preview template#add_filter( 'woocommerce_admin_order_preview_get_order_details', 'admin_order_preview_add_receiver_info_custom_meta_data', 10, 2 );
 
 
-
 function custom_display_order_receiver_info_data_in_admin(){
     // Call the stored value and display it
     echo '<div style="margin:5px 0px 0px 15px;"><strong>Receiver Info:</strong> {{data.receiver_info_key}}</div>';
 }
 // Display order date in admin order preview
 add_action( 'woocommerce_admin_order_preview_start', 'custom_display_order_receiver_info_data_in_admin' );
+
+
+function unit_before_order_itemmeta( $item_id, $item, $product ){
+    // Only "line" items and backend order pages
+    if( ! ( is_admin() && $item->is_type('line_item') ) ) return;
+
+    $unit = $product->get_meta('notes');
+
+    if( ! empty($unit) ) {
+        echo '<p><b>Ønsker til produkt:</b> '.$unit.'</p>';
+    }
+}
+add_action( 'woocommerce_before_order_itemmeta', 'unit_before_order_itemmeta', 10, 3 );
+
+
+// Change display label for custom note meta key
+function change_custom_note_meta_key_label($meta_keys) {
+    if($meta_keys == "_custom_note"){
+        $meta_keys =  __('Kundens ønske til gavens indhold','greeting3');
+    }
+    return $meta_keys;
+}
+add_filter('woocommerce_order_item_display_meta_key', 'change_custom_note_meta_key_label', 10, 1);

@@ -4,8 +4,6 @@ global $MVX, $product;
 $cart_count = WC()->cart->cart_contents_count; // Set variable for cart item count
 $cart_url = wc_get_cart_url();  // Set Cart URL
 
-
-
 /**
  * Handle all vendor information
  * For product pages top.

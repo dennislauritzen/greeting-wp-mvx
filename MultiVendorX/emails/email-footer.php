@@ -14,6 +14,7 @@ global $MVX;
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 ?>
 <!--[if gte mso 9]>
+        </center>
     </td>
   </tr>
 </table>

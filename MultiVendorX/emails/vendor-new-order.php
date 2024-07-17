@@ -53,21 +53,20 @@ do_action( 'woocommerce_email_header', $email_heading );
                                         <?php printf(esc_html__('A new order was received and marked as %s from %s. Their order is as follows:', 'dc-woocommerce-multi-vendor'), $order->get_status( 'edit' ), $order->get_billing_first_name() . ' ' . $order->get_billing_last_name()); ?>
                                     </small>-->
                                     <h1 style="margin-top: 25px;"><?php echo esc_html( $email_heading ); ?></h1>
-                          					<small>
-                                      <img width="15" height="15" src="https://s.w.org/images/core/emoji/14.0.0/72x72/2764.png" style="display: inline-block; width: 15px !important; max-width: 20px; height: 15px; max-height: 20px; font-size: 12px;">
-                                      &nbsp;tak for at levere gode gavehilsner. Hold kunden opdateret her >
-                                     </small>
+                                    <small>
+                                      <img width="15" height="15" src="https://s.w.org/images/core/emoji/14.0.0/72x72/2764.png" style="width: 15px !important; max-width: 20px; height: 15px; max-height: 20px; font-size: 12px;">
+                                      &nbsp;tak for at levere gode gavehilsner. Hold kunden opdateret ved at <br><b>scanne / klikke på QR-koden</b> og markere ordren <u>"modtaget"</u><br> (og markere som <u>leveret</u> senere) >
+                                    </small>
                                 </td>
-                                <td width="15%" style="width: 15%">
-                                    <div style="margin-top: 0px; float: right;">
+                                <td width="15%" style="width: 15%; text-align: center;">
+                                    <div style="margin-top: 5px; float: right; text-align: center;">
                                         <a href="<?php echo $tracking_url; ?>" style="border: 0;" border="0">
                                           <img src="<?php echo $qrcode; ?>" alt="" style="width:100%; max-width: 100px;"/>
                                         </a>
                                         <br>
-                                        <a href="<?php echo $tracking_url; ?>" style="border: 0;" border="0">
-                                          <span style="font-size: 12px; line-height: 15px !important;">
-                                            Opdatér levering & informér kunde
-                                          </span>
+                                        <a href="<?php echo $tracking_url; ?>" style="border: 0; text-align: center;" border="0">
+                                          <span style="font-size: 12px; line-height: 15px !important; text-decoration: underline;">
+                                            Klik/scan her og opdatér levering & informér kunde</span>
                                         </a>
                                     </div>
                                 </td>
@@ -100,7 +99,7 @@ do_action( 'woocommerce_email_header', $email_heading );
                                 <td valign="top" align="right" style="padding: 10px 0px 10px 0;">
                                     <strong style="text-transform: uppercase;">Ordrenr</strong>
                                     <br>
-                                    #<?php echo $main_order_id; ?> (Sub-ordre nr.: #<?php echo $order->get_id(); ?>)
+                                    #<?php echo $main_order_id; ?><!-- (Sub-ordre nr.: #<?php echo $order->get_id(); ?>)-->
                                 </td>
                             </tr>
                             <tr>
@@ -199,26 +198,51 @@ do_action( 'woocommerce_email_header', $email_heading );
                     // Get the shipping total
                     $order_ship_total = $order->get_shipping_total() + $order->get_shipping_tax();
 
+                    // Calculate the cost of the cards
+                    $fees = $order->get_fees();
+                    $greeting_card_fee_ex_vat = 0;
+                    $greeting_card_fee_with_vat = 0;
+                    $greeting_card_store_part = 0.5;
+                    foreach($fees as $fee){
+                        $fee_name = $fee->get_name();
+                        $fee_amount = $fee->get_amount();
+
+                        $greeting_card_fee_ex_vat =+ $fee_amount;
+                        $greeting_card_fee_with_vat =+ $fee_amount * 1.25 ;
+                    }
+                    $greeting_card_store_part_fee_with_vat = $greeting_card_fee_with_vat * $greeting_card_store_part;
+
+
                     // Calculate the new subtotal without shipping
-                    $order_new_subtotal = $total_without_discount - $order_ship_total;
+                    $order_new_subtotal = $total_without_discount - $greeting_card_fee_with_vat - $order_ship_total;
 
                     $order_ship_new = 39;
-                    $order_new_total = $order_new_subtotal + $order_ship_new;
+                    $order_new_total = $order_new_subtotal + $greeting_card_store_part_fee_with_vat + $order_ship_new;
+
+
                 ?>
                 <tr class="order-details-totals-row" style="border-top: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
                     <td width="50%" style="width: 50%; padding: 6px 0 6px 10px;">
                         Varetotal (inkl. 25 % moms)
                     </td>
                     <td style="width: 50%; padding: 6px 10px 6px 0px; text-align: right;">
-                        <?php echo $order_new_subtotal; ?> kr.
+                        <?php echo wc_price( $order_new_subtotal ); ?>
                     </td>
                 </tr>
                 <tr class="order-details-totals-row" style="border-top: 1px solid #c0c0c0; border-bottom: 1px solid #dee2e6;">
                     <td width="50%" style="width: 50%; padding: 6px 0 6px 10px;">
-                        Levering / fragt
+                        Kort
                     </td>
                     <td style="width: 50%; padding: 6px 10px 6px 0px; text-align: right;">
-                        <?php echo $order_ship_new; ?> kr.
+                        <?php echo wc_price( $greeting_card_store_part_fee_with_vat ); ?>
+                    </td>
+                </tr>
+                <tr class="order-details-totals-row" style="border-top: 1px solid #c0c0c0; border-bottom: 1px solid #dee2e6;">
+                    <td width="50%" style="width: 50%; padding: 6px 0 6px 10px;">
+                        Levering
+                    </td>
+                    <td style="width: 50%; padding: 6px 10px 6px 0px; text-align: right;">
+                        <?php echo wc_price( $order_ship_new ); ?>
                     </td>
                 </tr>
                 <tr class="order-details-totals-row" style="border-top: 1px solid #c0c0c0; border-bottom: 1px solid #dee2e6;">
@@ -226,7 +250,7 @@ do_action( 'woocommerce_email_header', $email_heading );
                         Ordretotal (inkl. 25 % moms)
                     </td>
                     <td style="width: 50%; padding: 6px 10px 6px 0px; text-align: right;">
-                        <?php echo $order_new_total; ?> kr.
+                        <?php echo wc_price( $order_new_total ); ?>
                     </td>
                 </tr>
                 <?php } ?>

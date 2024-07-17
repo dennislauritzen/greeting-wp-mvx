@@ -10186,7 +10186,6 @@ a {
 a.greeting-link:hover,
 a:hover {
   color: #304b4c;
-  color: #304b4c;
   text-decoration: underline;
 }
 
@@ -10319,16 +10318,16 @@ a.greeting-link-pink {
   width: 100%;
 }
 
-#spinner {
+#frontpageSpinner {
   color: #fecbca;
 }
 
-#spinner:after {
+#frontpageSpinner:after {
   content: "";
-  animation: spin 20s linear infinite;
+  animation: frontpageVideoOverlaySpin 20s linear infinite;
 }
 
-@keyframes spin {
+@keyframes frontpageVideoOverlaySpin {
   0% {
     content: "en gavekurv";
   }
@@ -10716,6 +10715,8 @@ ul.timeline li figure {
 #occasioncontent .h1 {
   padding-bottom: 15px;
   position: relative;
+  text-align: center;
+  font-family: "Rubik", "Inter", sans-serif;
 }
 #citycontent h1::before, #citycontent .h1::before,
 #categorycontent h1::before,
@@ -10730,17 +10731,26 @@ ul.timeline li figure {
   right: 0;
   left: 0;
 }
-#citycontent h1, #citycontent .h1, #citycontent h2, #citycontent .h2,
+#citycontent h1, #citycontent .h1,
 #categorycontent h1,
 #categorycontent .h1,
+#occasioncontent h1,
+#occasioncontent .h1 {
+  font-family: "Dela Gothic One", "Rubik", "Inter", sans-serif;
+  font-weight: 600;
+}
+#citycontent h2, #citycontent .h2,
 #categorycontent h2,
 #categorycontent .h2,
-#occasioncontent h1,
-#occasioncontent .h1,
 #occasioncontent h2,
 #occasioncontent .h2 {
-  font-family: "Rubik", "Inter", sans-serif;
+  font-family: "Inter", "Rubik", sans-serif;
   font-weight: 600;
+}
+#citycontent #topoccassions .card,
+#categorycontent #topoccassions .card,
+#occasioncontent #topoccassions .card {
+  border-radius: 20px !important;
 }
 #citycontent #topoccassions .card .card-img-top,
 #categorycontent #topoccassions .card .card-img-top,
@@ -10757,6 +10767,11 @@ ul.timeline li figure {
   font-family: "Inter", sans-serif;
   font-size: 14px;
 }
+#citycontent .catrownoscroll::-webkit-scrollbar,
+#categorycontent .catrownoscroll::-webkit-scrollbar,
+#occasioncontent .catrownoscroll::-webkit-scrollbar {
+  width: 0px;
+}
 
 #citycontent #topoccassions .card .card-img-top,
 #categorycontent #topoccassions .card .card-img-top,
@@ -10764,6 +10779,10 @@ ul.timeline li figure {
   width: 100%;
   height: 10vw;
   object-fit: cover;
+  border-top-left-radius: 20px !important;
+  border-top-right-radius: 20px !important;
+  height: 150px !important;
+  min-height: 150px !important;
 }
 
 #citycontent #topoccassions .card h5.card-title, #citycontent #topoccassions .card .card-title.h5,
@@ -10776,11 +10795,6 @@ ul.timeline li figure {
 }
 
 /** Store cards styling **/
-@media (min-width: 576px) {
-  div.store a.cta {
-    font-size: 0.725rem;
-  }
-}
 div.store {
   transition: all 0.15s ease-in-out;
 }

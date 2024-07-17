@@ -71,8 +71,7 @@ function build_css() {
 			sourcemaps.init()
 		)
 		.pipe(
-			sass()
-				.on( 'error', sass.logError )
+			sass().on( 'error', sass.logError )
 		)
 		.pipe(
 			postcss( plugins )

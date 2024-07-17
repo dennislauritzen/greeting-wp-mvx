@@ -1,6 +1,12 @@
 <?php
 
-
+function get_vendor_id_on_product_page() {
+    // Replace with your logic to get vendor ID
+    // Example: Get vendor ID from product data
+    global $product;
+    $vendor_id = get_post_field('post_author', $product->get_id());
+    return $vendor_id;
+}
 function vendor_redirect_to_home( $query ){
     $page_slug = $query->dc_vendor_shop;
     global $wpdb;
@@ -71,7 +77,6 @@ add_action('template_redirect', 'redirect_deactivated_vendor_product');
  * Updated 30/4 by Dennis Lauritzen
  */
 function productFilterAction() {
-
     // default product id array come from front end
     $defaultProductIdAsString = $_POST['defaultProductIdAsString'];
     $defaultProductIdArray = explode(",", $defaultProductIdAsString);
