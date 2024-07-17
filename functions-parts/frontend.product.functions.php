@@ -362,6 +362,9 @@ function greeting_load_calendar_dates_function( $vendor_id = 0 ){
     }
 
     $dates = get_vendor_dates_new($vendor_id, 'd-m-Y', 'close');
+    if(empty($dates) || !$dates){
+        $dates = array();
+    }
     $dates_values_only = array_values($dates);
     $dates_json = json_encode($dates_values_only);
     ?>
