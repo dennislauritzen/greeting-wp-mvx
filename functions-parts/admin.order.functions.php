@@ -394,11 +394,14 @@ function save_shop_order_meta_box_store_own_ref_data( $post_id, $post ) {
         }
 
         // Before changing the post_id variable, lets update the child order value too.
-        #update_post_meta( $post_id, '_store_own_order_reference', $my_data );
-        #$post_id = $post->ID;
-        $order_parent->update_meta_data('_store_own_order_reference', $my_data);
-        $order_parent->save_meta_data();
-        $order_parent->save();
+        if(is_wc_hpos_activated()){
+            $order_parent->update_meta_data('_store_own_order_reference', $my_data);
+            $order_parent->save_meta_data();
+            $order_parent->save();
+        } else {
+            update_post_meta( $post_id, '_store_own_order_reference', $my_data );
+            #$post_id = $post->ID;
+        }
     } else {
         $order = wc_get_order($post_id);
         if(!is_a($order, 'WC_Order')){
@@ -406,11 +409,17 @@ function save_shop_order_meta_box_store_own_ref_data( $post_id, $post ) {
         }
 
         // Before changing the post_id variable, lets update the child order value too.
-        #update_post_meta( $post_id, '_store_own_order_reference', $my_data );
-        #$post_id = $post->ID;
-        $order->update_meta_data('_store_own_order_reference', $my_data);
-        $order->save_meta_data();
-        $order->save();
+        if(is_wc_hpos_activated()){
+            $order->update_meta_data('_store_own_order_reference', $my_data);
+            $order->save_meta_data();
+            $order->save();
+        } else {
+            update_post_meta( $post_id, '_store_own_order_reference', $my_data );
+            #$post_id = $post->ID;
+        }
+
+
+
     }
     #print $post_id; exit;
 
