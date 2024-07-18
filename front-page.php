@@ -17,7 +17,7 @@ get_header();
                   loop
                   autoplay
                   muted
-                  poster="https://www.greeting.dk/wp-content/themes/greeting3/assets/img/greeting-poster_webp.webp"
+                  poster="https://www.greeting.dk/wp-content/themes/greeting-wp-mvx/assets/img/greeting-poster_webp.webp"
                   preload="none"
                   playsinline
                   id="frontpagevid"
