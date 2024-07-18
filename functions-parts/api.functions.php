@@ -136,26 +136,7 @@ add_action(
                         $customer_id = email_exists( $billing_email );
                     }
 
-                    // Function to get customer's first order.
-                    function get_customer_order( $customer_id, $billing_email, $order_type = 'first' ) {
-                        $args = array(
-                            'customer' => $customer_id ? $customer_id : '',
-                            'billing_email' => $billing_email ? $billing_email : '',
-                            'limit' => -1,
-                            'orderby' => 'date',
-                            'order' => 'ASC',
-                        );
-
-                        // Get orders
-                        $orders = wc_get_orders( $args );
-
-                        if ( $order_type == 'first' && !empty( $orders ) ) {
-                            return reset( $orders );
-                        }
-
-                        return null;
-                    }
-
+                    // Get customer's first order.
                     $first_order = get_customer_order( $customer_id, $billing_email, 'first' );
 
                     $first_order_date = $first_order ? ( $first_order->get_date_created() ? gmdate( 'Y-m-d H:i:s',
