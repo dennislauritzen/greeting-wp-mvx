@@ -585,7 +585,6 @@ function greeting_card_options_selected(){
 function greeting_echo_receiver_info( ) {
 
     echo '
-    <form class="custom-checkout-form" enctype="multipart/form-data" method="post">
     <div>
     ';
 
@@ -753,9 +752,7 @@ function greeting_echo_receiver_info( ) {
     // Insert the delivery date area
     greeting_echo_date_picker();
 
-    echo '
-    </div>
-    </form>';
+    echo '</div>';
 }
 
 
