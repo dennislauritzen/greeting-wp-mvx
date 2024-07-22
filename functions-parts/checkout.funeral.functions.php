@@ -30,6 +30,10 @@ function cart_has_funeral_products(){
 }
 
 function has_funeral_products_in_cart() {
+    if ( ! WC()->cart ) {
+        return false;
+    }
+
     // Get the selected category and occasion IDs from ACF options
     $specific_category_id = get_field('specific_product_category', 'option');
     $specific_occasion_id = get_field('specific_occasion', 'option');

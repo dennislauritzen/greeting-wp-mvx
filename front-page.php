@@ -253,26 +253,44 @@ get_template_part('template-parts/inc/blocks/press-mentions');
 </section>
 
 <script type="text/javascript">
+// Function to check if the data in localStorage is still valid
+function isCacheValid(key) {
+    var cachedData = localStorage.getItem(key);
+    if (cachedData) {
+        var parsedData = JSON.parse(cachedData);
+        var now = new Date().getTime();
+        return now - parsedData.timestamp < 7 * 24 * 60 * 60 * 1000; // 7 days
+    }
+    return false;
+}
 
-jQuery(document).ready(function(){
-  var ip = '';
-  jQuery.get('https://ipapi.co/postal/', function(ip_data){
-    ip = ip_data;
+// Function to save data in localStorage with a timestamp
+function saveToLocalStorage(key, data) {
+    var dataToStore = {
+        timestamp: new Date().getTime(),
+        data: data
+    };
+    localStorage.setItem(key, JSON.stringify(dataToStore));
+}
 
-    jQuery.ajax({
-      url: '<?php echo admin_url('admin-ajax.php'); ?>',
-      type: 'post',
-      data: { action: 'get_featured_postal_codes', postal_code: ip },
-      beforeSend: function(){
-        if(ip == null){
-          currentRequest.abort();
-        }
-      },
-      success: function(data) {
-        data_arr = jQuery.parseJSON(data);
+// Function to get data from localStorage
+function getFromLocalStorage(key) {
+    var cachedData = localStorage.getItem(key);
+    if (cachedData) {
+        return JSON.parse(cachedData).data;
+    }
+    return null;
+}
 
-        if(data_arr.length > 0){
-          jQuery.each(data_arr, function(k, v) {
+function handleSuccessResponse(data) {
+    // Define postal_code
+    var postal_code = data.postal_code ? data.postal_code : '';
+    if (!postal_code) {
+        console.log('Postal code is empty or undefined.');
+    }
+
+    if(data.related && data.related.length > 0){
+        jQuery.each(data.related, function(k, v) {
             var link = v.link;
             var postal = v.postal;
             var city = v.city;
@@ -283,60 +301,85 @@ jQuery(document).ready(function(){
             div_elm.append(card_link);
 
             jQuery("ul#postalcodelist").append(div_elm);
-          });
-        }
-      }
-    });
-
-    if(ip){
-      jQuery.ajax({
-        url: '<?php echo admin_url('admin-ajax.php'); ?>',
-        type: 'post',
-        data: { action: 'get_close_stores', postal_code: ip },
-        beforeSend: function(){
-          if(ip == null){
-            currentRequest.abort();
-          }
-        },
-        success: function(data) {
-          if(data){
-            jQuery("#inspiration div.loadedcontent").html(data);
-            jQuery("#inspiration").css('display','block');
-          }
-        }
-      });
-    }
-  }).fail(function(){
-    jQuery.ajax({
-      url: '<?php echo admin_url('admin-ajax.php'); ?>',
-      type: 'post',
-      data: { action: 'get_featured_postal_codes', postal_code: '' },
-      beforeSend: function(){
-        if(ip == null){
-          currentRequest.abort();
-        }
-      },
-      success: function(data) {
-        data_arr = jQuery.parseJSON(data);
-        jQuery.each(data_arr, function(k, v) {
-          var link = v.link;
-          var postal = v.postal;
-          var city = v.city;
-
-          var div_elm = jQuery("<li>", {"class": "list-inline-item pb-1 me-0 ms-0 pe-1"});
-          var card_link = jQuery("<a>",{"class": "btn btn-link rounded-pill pb-2 border-1 border-white text-white", "href": link}).text(postal+' '+city).css('font-size','15px');
-
-          div_elm.append(card_link);
-
-          jQuery("ul#postalcodelist").append(div_elm);
         });
-      }
-    });
-  });
+    }
+
+    if(postal_code){
+        // If we have a postal code, find close stores
+        jQuery.ajax({
+            url: '<?php echo admin_url('admin-ajax.php'); ?>',
+            type: 'post',
+            data: { action: 'get_close_stores', postal_code: postal_code },
+            beforeSend: function(){
+                if(postal_code == null){
+                    currentRequest.abort();
+                }
+            },
+            success: function(data) {
+                if(data){
+                    jQuery("#inspiration div.loadedcontent").html(data);
+                    jQuery("#inspiration").css('display','block');
+                }
+            }
+        });
+    }
+}
+
+jQuery(document).ready(function(){
+    var apiUrl = '<?php echo esc_url(rest_url('custom/v2/get-postal-code')); ?>';
+
+    // Check if we have valid cached data
+    if (isCacheValid('postal_code_data')) {
+        var cachedData = getFromLocalStorage('postal_code_data');
+        handleSuccessResponse(cachedData);
+    } else {
+        jQuery.ajax({
+            url: apiUrl,
+            type: 'get',
+            data: {'assoc': 1},
+            beforeSend: function () {
+            },
+            success: function (data) {
+                console.log('Response:', data);
+
+                // Save the response in localStorage
+                saveToLocalStorage('postal_code_data', data);
+
+                handleSuccessResponse(data);
+            },
+            error: function (xhr, status, error) {
+                console.error('AJAX Error:', status, error);
+            }
+        }).fail(function () {
+            jQuery.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                type: 'post',
+                data: {action: 'get_featured_postal_codes', postal_code: ''},
+                beforeSend: function () {
+                },
+                success: function (data) {
+                    data_arr = jQuery.parseJSON(data);
+                    jQuery.each(data_arr, function (k, v) {
+                        var link = v.link;
+                        var postal = v.postal;
+                        var city = v.city;
+
+                        var div_elm = jQuery("<li>", {"class": "list-inline-item pb-1 me-0 ms-0 pe-1"});
+                        var card_link = jQuery("<a>", {
+                            "class": "btn btn-link rounded-pill pb-2 border-1 border-white text-white",
+                            "href": link
+                        }).text(postal + ' ' + city).css('font-size', '15px');
+
+                        div_elm.append(card_link);
+
+                        jQuery("ul#postalcodelist").append(div_elm);
+                    });
+                }
+            });
+        });
+    } // localStorage check end.
 });
 </script>
-
-
 
 
 <?php

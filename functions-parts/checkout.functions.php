@@ -532,7 +532,7 @@ function greeting_delivery_instructions( $fields ) {
 add_filter( 'woocommerce_after_checkout_shipping_form' , 'greeting_delivery_instructions' );
 
 function greeting_card_options(){
-    $cart_has_funeral_products = cart_has_funeral_products();
+    #$cart_has_funeral_products = cart_has_funeral_products();
 
     $options_array = array();
 

@@ -409,6 +409,10 @@ function get_vendor_delivery_days_from_today_header_vendor($vendor_id, $prepend_
     $vendor_days = get_vendor_dates_new($vendor_id, 'd-m-Y', 'all', 60);
     $result = [];
 
+    if(empty($vendor_days)){
+        return "Næste mulige leveringsdato/-tidspunkt ukendt.";
+    }
+
     $now = new DateTime();
     foreach ($vendor_days as $p => $c) {
         if(isset($c['cutoff_datetime'])
