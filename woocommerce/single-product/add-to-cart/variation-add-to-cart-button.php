@@ -46,12 +46,19 @@ global $product;
             <textarea id="custom_note" class="form-control form-control-sm" name="custom_note" rows="4" cols="50" placeholder="<?php echo __('Indtast eventuelle ønsker til produktet her. Eks. ønsket farve, alkoholfrit indhold el.lign. Vi kan ikke garantere, vi kan imødekomme ønskerne, men vi gør, hvad vi kan. :)', 'textdomain'); ?>"></textarea>
         </div>
     </div>
+    <?php
+    $post_author = get_post_field( 'post_author', $product->get_id() );
+    if( vendor_is_freight_company( $post_author ) ){
+    ?>
     <div class="row">
         <div class="col-12 py-2 mt-1">
             <label for="datepicker" class="label col-12 pb-1" style="font-size: 14px;">Hvornår skal gaven leveres? (kan også vælges senere)</label>
             <input type="text" class="input-text form-control" name="delivery_date" id="datepicker" placeholder="Vælg dato hvor gaven skal leveres" value="" readonly="readonly" translate="no">
         </div>
     </div>
+    <?php
+    }
+    ?>
 </div>
 
 <?php

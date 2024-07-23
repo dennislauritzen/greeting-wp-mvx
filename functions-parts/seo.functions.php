@@ -104,3 +104,37 @@ function add_links_to_keywords($content, $taxonomies, $city_search = false, $cit
     return $content;
 }
 
+
+/**
+ * Action to exclude inactive products from Yoast SEO sitemap
+ *
+ * @author Dennis Lauritzen
+ * @param $post_types
+ * @return array|mixed
+ */
+function exclude_inactive_products_from_sitemap($post_types) {
+    // Check if 'product' is in the array of post types
+    if (in_array('product', $post_types)) {
+        // Filter out 'product' post type if needed
+        $post_types = array_diff($post_types, array('product'));
+    }
+    return $post_types;
+}
+add_filter('wpseo_sitemap_post_types', 'exclude_inactive_products_from_sitemap');
+
+
+/**
+ * Action to exclude draft products from Yoast SEO sitemap
+ *
+ * @author Dennis Lauritzen
+ * @param $entry
+ * @param $post
+ * @return false|mixed
+ */
+function exclude_draft_products_from_sitemap($entry, $post) {
+    if ($post->post_type === 'product' && $post->post_status !== 'publish') {
+        return false; // Exclude non-published products
+    }
+    return $entry;
+}
+add_filter('wpseo_sitemap_entry', 'exclude_draft_products_from_sitemap', 10, 2);

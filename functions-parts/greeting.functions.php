@@ -350,6 +350,23 @@ function show_shop_only_one_store_at_the_same_time(){
 }
 
 /**
+ * Function to check if the vendor is a freight company
+ *
+ * @function vendor_is_freight_company
+ * @param $vendor_id
+ * @return void
+ */
+function vendor_is_freight_company( $vendor_id ){
+    $vendor_type = get_vendor_delivery_type( $vendor_id, 'value' );
+
+    if($vendor_type == "0"){
+        return false;
+    } else {
+        return true;
+    }
+}
+
+/**
  * Only show one store at a time
  *
  * @author Dennis Lauritzen
