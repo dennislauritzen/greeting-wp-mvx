@@ -347,7 +347,7 @@ $occasionTermListArray = array_unique($occasionTermListArray);
                         $dates[$i] = $formatted_date;
                         $date_today->modify('+1 day');
                     }
-                    $dates[8] = 'Vis alle';
+                    $dates[8] = 'Vis alle (inkl. senere) datoer';
 
                     ?>
 
