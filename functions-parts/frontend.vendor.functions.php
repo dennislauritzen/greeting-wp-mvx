@@ -49,7 +49,7 @@ function vendor_redirect_to_home( $query ){
         }
     }
 }
-add_action( 'parse_query', 'vendor_redirect_to_home' );
+#add_action( 'parse_query', 'vendor_redirect_to_home' );
 
 
 /**
