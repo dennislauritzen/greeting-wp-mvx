@@ -8,36 +8,38 @@ function get_vendor_id_on_product_page() {
     return $vendor_id;
 }
 function vendor_redirect_to_home( $query ){
-    $page_slug = $query->dc_vendor_shop;
     global $wpdb;
 
-    #var_dump(get_query_var());
+    #var_dump($query);
+    if(!empty($query->query['dc_vendor_shop'])){
+        $vendor_page_slug = $query->query['dc_vendor_shop'];
+        // Query for users with the specific meta key and value
+        $args = array(
+            'fields'     => 'ID', // Get only user IDs
+            'search'     => $vendor_page_slug,
+            'search_columns' => array('user_nicename'), // Search only in user_nicename
+        );
+        $user_query = new WP_User_Query($args);
 
-    if( is_tax('dc_vendor_shop') ) {
-        $sql = "SELECT
-				u.id
-			FROM  wp_users u
-			INNER JOIN wp_usermeta um
-			ON um.user_id = u.id
-			WHERE um.meta_key = '_vendor_page_slug' AND um.meta_value LIKE %s";
+        // Check if any users were found
+        if (!empty($user_query->results)) {
+            $vendor_id = $user_query->results[0]; // Assuming there's only one vendor for simplicity
 
-        $sql_query = $wpdb->prepare( $sql, $query->query['dc_vendor_shop'] );
-        $results = $wpdb->get_results($sql_query);
-
-        $vendor_id = $results['0']->id;
-        if( isset($vendor_id) && !empty($vendor_id) ){
+            // Get user data
             $user_meta = get_userdata($vendor_id);
-            $user_roles = $user_meta->roles;
+            if ($user_meta) {
+                $user_roles = $user_meta->roles;
 
-            if(in_array('dc_rejected_vendor', $user_roles) || in_array('dc_pending_vendor', $user_roles)){
-
+                // Check if the user has a role of 'dc_rejected_vendor' or 'dc_pending_vendor'
+                if (in_array('dc_rejected_vendor', $user_roles) || in_array('dc_pending_vendor', $user_roles)) {
+                    wp_redirect(home_url(), 302);
+                    exit;
+                }
             }
         }
-        #wp_redirect( home_url() );
-        #exit;
     }
 }
-#add_action( 'parse_query', 'vendor_redirect_to_home' );
+add_action( 'parse_query', 'vendor_redirect_to_home' );
 
 
 /**
