@@ -361,6 +361,11 @@ function greeting_load_calendar_dates_function( $vendor_id = 0 ){
         return false;
     }
 
+    // Get the current time in Copenhagen timezone
+    $timezone = new DateTimeZone('Europe/Copenhagen');
+    $server_time = new DateTime('now', $timezone);
+    $server_time_string = $server_time->format('Y-m-d H:i:s');
+
     $dates = get_vendor_dates_new($vendor_id, 'd-m-Y', 'close');
     if(empty($dates) || !$dates){
         // Generate an array of all dates within the next 58 days
@@ -373,6 +378,8 @@ function greeting_load_calendar_dates_function( $vendor_id = 0 ){
     }
     $dates_values_only = array_values($dates);
     $dates_json = json_encode($dates_values_only);
+
+    var_dump($dates_json);
     ?>
 
     <script type="text/javascript">
@@ -427,20 +434,109 @@ function greeting_load_calendar_dates_function( $vendor_id = 0 ){
         };
 
         jQuery(document).ready(function($) {
+            var vendorCutoffDays = <?php echo get_vendor_delivery_days_required($vendor_id); ?>;
+            var vendorCutoffTime = '<?php echo get_vendor_dropoff_time($vendor_id); ?>';
+            var vendorClosedDayArray = <?php echo $dates_json; ?>;
+            var serverTime = new Date('<?php echo $server_time_string; ?>');
+
+            console.log(vendorCutoffDays);
+            console.log(vendorCutoffTime);
+            console.log(vendorClosedDayArray);
+
             $('#datepicker').click(function() {
 
-                var vendorClosedDayArray = <?php echo $dates_json; ?>;
+                // Extract hours and minutes from the cutoff time
+                var [hours, minutes, seconds] = vendorCutoffTime.split(':').map(Number);
+
+                // Create a cutoff datetime for the current date
+                var cutoffDateTime = new Date();
+                cutoffDateTime.setDate(cutoffDateTime.getDate() + vendorCutoffDays);
+                cutoffDateTime.setHours(hours, minutes, seconds);
+                // Extract hours, minutes, and seconds
+                var co_timeString = ('0' + hours).slice(-2) + ':' + ('0' + minutes).slice(-2) + ':' + ('0' + seconds).slice(-2);
+                console.log('Cutoff DateTime:', cutoffDateTime);
+
+                // Function to format date as "DD-MM-YYYY"
+                function formatDate(date) {
+                    return ('0' + date.getDate()).slice(-2) + '-' +
+                        ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
+                        date.getFullYear();
+                }
+
+                function timeStringToDate(timeString) {
+                    // Create a Date object with a fixed date (e.g., 1970-01-01) and the given time
+                    var date = new Date('1970-01-01T' + timeString + 'Z');
+                    return date;
+                }
+
+                function compareTimes(time1, time2) {
+                    var date1 = timeStringToDate(time1);
+                    var date2 = timeStringToDate(time2);
+
+                    if (date1 > date2) {
+                        return 1; // time1 is later than time2
+                    } else if (date1 < date2) {
+                        return -1; // time1 is earlier than time2
+                    } else {
+                        return 0; // time1 is equal to time2
+                    }
+                }
+
+                // Function to update vendorClosedDayArray based on cutoff
+                function updateClosedDaysArray(cutoffDays, cutoffDateTime, closedDayArray) {
+                    var adjustedDates = new Set(closedDayArray); // Use a Set for unique dates
+
+                    // Loop through the next (cutoffDays + 2) days
+                    for (var i = 0; i <= (cutoffDays + 2); i++) {
+                        var dateToCheck = new Date();
+                        dateToCheck.setDate(dateToCheck.getDate() + i);
+                        var dateToCheckOnlyDate = dateToCheck.getDate();
+                        console.log(dateToCheck);
+
+                        console.log(dateToCheck.getDate());
+                        console.log(cutoffDateTime.getDate());
+
+                        // Handle the case where dateToCheck is the same as the cutoff date
+                        if (dateToCheckOnlyDate === cutoffDateTime.getDate()) {
+                            console.log("DATES ARE THE SAME!!!");
+                            // Check if the current time has passed the cutoff time on the same day
+                            var currentTime = new Date();
+                            // Extract hours, minutes, and seconds
+                            var hours = currentTime.getHours();
+                            var minutes = currentTime.getMinutes();
+                            var seconds = currentTime.getSeconds();
+                            var timeString = ('0' + hours).slice(-2) + ':' + ('0' + minutes).slice(-2) + ':' + ('0' + seconds).slice(-2);
+
+                            console.log(timeString);
+                            console.log(co_timeString);
+
+                            var compareTimeStrings = compareTimes(timeString, co_timeString);
+                            console.log(compareTimeStrings);
+                            if (compareTimeStrings == 1) {
+                                console.log(" Same date added.");
+                                adjustedDates.add(formatDate(dateToCheck));
+                            }
+                        } else if (dateToCheck < cutoffDateTime) {
+                            var formattedDate = formatDate(dateToCheck);
+                            adjustedDates.add(formattedDate);
+                            console.log(dateToCheck + 'other date added');
+                        }
+                    }
+
+                    return Array.from(adjustedDates); // Convert Set back to array
+                }
+
+                // Update closed days array
+                var updatedClosedDaysArray = updateClosedDaysArray(vendorCutoffDays, cutoffDateTime, vendorClosedDayArray);
+                console.log('Updated Closed Days Array:', updatedClosedDaysArray);
 
                 jQuery('#datepicker').datepicker({
                     dateFormat: 'dd-mm-yy',
-                    // minDate: -1,
                     minDate: new Date(),
-                    // maxDate: "+1M +10D"
                     maxDate: "+58D",
-                    // closed on specific date
                     beforeShowDay: function(date){
                         var string = jQuery.datepicker.formatDate('dd-mm-yy', date);
-                        return [ vendorClosedDayArray.indexOf(string) == -1 ];
+                        return [ updatedClosedDaysArray.indexOf(string) == -1 ];
                     },
                     onClose: function(date, datepicker){
                         const par_elm = jQuery(this).closest('.form-row');

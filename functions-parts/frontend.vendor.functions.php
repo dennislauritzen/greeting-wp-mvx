@@ -7,6 +7,14 @@ function get_vendor_id_on_product_page() {
     $vendor_id = get_post_field('post_author', $product->get_id());
     return $vendor_id;
 }
+
+/**
+ * Function for redirecting the vendors if they are not active.
+ * Will do a 302 redirect to frontpage.
+ *
+ * @param $query
+ * @return void
+ */
 function vendor_redirect_to_home( $query ){
     if ( !is_admin() && $query->is_main_query() ) {
         // Get the request URI
