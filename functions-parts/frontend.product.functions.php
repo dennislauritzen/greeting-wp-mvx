@@ -437,10 +437,6 @@ function greeting_load_calendar_dates_function( $vendor_id = 0 ){
             var vendorClosedDayArray = <?php echo $dates_json; ?>;
             var serverTime = new Date('<?php echo $server_time_string; ?>');
 
-            console.log(vendorCutoffDays);
-            console.log(vendorCutoffTime);
-            console.log(vendorClosedDayArray);
-
             $('#datepicker').click(function() {
 
                 // Extract hours and minutes from the cutoff time
