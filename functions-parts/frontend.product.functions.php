@@ -378,8 +378,6 @@ function greeting_load_calendar_dates_function( $vendor_id = 0 ){
     }
     $dates_values_only = array_values($dates);
     $dates_json = json_encode($dates_values_only);
-
-    var_dump($dates_json);
     ?>
 
     <script type="text/javascript">
@@ -454,7 +452,6 @@ function greeting_load_calendar_dates_function( $vendor_id = 0 ){
                 cutoffDateTime.setHours(hours, minutes, seconds);
                 // Extract hours, minutes, and seconds
                 var co_timeString = ('0' + hours).slice(-2) + ':' + ('0' + minutes).slice(-2) + ':' + ('0' + seconds).slice(-2);
-                console.log('Cutoff DateTime:', cutoffDateTime);
 
                 // Function to format date as "DD-MM-YYYY"
                 function formatDate(date) {
@@ -491,35 +488,25 @@ function greeting_load_calendar_dates_function( $vendor_id = 0 ){
                         var dateToCheck = new Date();
                         dateToCheck.setDate(dateToCheck.getDate() + i);
                         var dateToCheckOnlyDate = dateToCheck.getDate();
-                        console.log(dateToCheck);
-
-                        console.log(dateToCheck.getDate());
-                        console.log(cutoffDateTime.getDate());
 
                         // Handle the case where dateToCheck is the same as the cutoff date
                         if (dateToCheckOnlyDate === cutoffDateTime.getDate()) {
-                            console.log("DATES ARE THE SAME!!!");
-                            // Check if the current time has passed the cutoff time on the same day
+                            // Check if the current time has passed the cut
+                            // off time on the same day
                             var currentTime = new Date();
                             // Extract hours, minutes, and seconds
                             var hours = currentTime.getHours();
                             var minutes = currentTime.getMinutes();
                             var seconds = currentTime.getSeconds();
                             var timeString = ('0' + hours).slice(-2) + ':' + ('0' + minutes).slice(-2) + ':' + ('0' + seconds).slice(-2);
-
-                            console.log(timeString);
-                            console.log(co_timeString);
-
                             var compareTimeStrings = compareTimes(timeString, co_timeString);
-                            console.log(compareTimeStrings);
+
                             if (compareTimeStrings == 1) {
-                                console.log(" Same date added.");
                                 adjustedDates.add(formatDate(dateToCheck));
                             }
                         } else if (dateToCheck < cutoffDateTime) {
                             var formattedDate = formatDate(dateToCheck);
                             adjustedDates.add(formattedDate);
-                            console.log(dateToCheck + 'other date added');
                         }
                     }
 
@@ -528,7 +515,6 @@ function greeting_load_calendar_dates_function( $vendor_id = 0 ){
 
                 // Update closed days array
                 var updatedClosedDaysArray = updateClosedDaysArray(vendorCutoffDays, cutoffDateTime, vendorClosedDayArray);
-                console.log('Updated Closed Days Array:', updatedClosedDaysArray);
 
                 jQuery('#datepicker').datepicker({
                     dateFormat: 'dd-mm-yy',
