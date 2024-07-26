@@ -667,7 +667,7 @@ function greeting3_scripts_loader() {
 
     wp_enqueue_style(
         'wpb-google-fonts',
-        'https://fonts.googleapis.com/css2?family=Dela+Gothic+One:wght@300;500&family=Inter:wght@300;500;700&family=Rubik:wght@300;500;700&display=swap',
+        'https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:wght@300;500;700&family=Rubik:wght@300;500;700&display=swap',
         array(),
         $theme_version,
         'all'
