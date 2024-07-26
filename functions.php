@@ -665,9 +665,26 @@ if ( is_readable( $custom_walker_footer ) ) {
 function greeting3_scripts_loader() {
 	$theme_version = wp_get_theme()->get( 'Version' );
 
+    /** Dela gothic */
     wp_enqueue_style(
-        'wpb-google-fonts',
-        'https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter:wght@300;500;700&family=Rubik:wght@300;500;700&display=swap',
+        'google-fonts-dela-gothic',
+        'https://fonts.googleapis.com/css2?family=Dela+Gothic+One&display=swap',
+        array(),
+        $theme_version,
+        'all'
+    );
+    /** Inter */
+    wp_enqueue_style(
+        'google-fonts-rubik',
+        'https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap',
+        array(),
+        $theme_version,
+        'all'
+    );
+    /** Rubik */
+    wp_enqueue_style(
+        'google-fonts-inter',
+        'https://fonts.googleapis.com/css2?family=Rubik:wght@300;500;700&display=swap',
         array(),
         $theme_version,
         'all'
