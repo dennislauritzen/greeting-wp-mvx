@@ -24,8 +24,10 @@ get_header();
                   loading="lazy"
                   class="position-absolute top-0 start-0"
                   style="pointer-events: none;">
-              <source src="https://www.greeting.dk/wp-content/themes/greeting-wp-mvx/assets/video/greeting_top_main.mp4" type="video/mp4">
-              <source src="https://www.greeting.dk/wp-content/themes/greeting-wp-mvx/assets/video/greeting_top_comp.webm" type="video/webm">
+              <!--<source src="https://www.greeting.dk/wp-content/themes/greeting-wp-mvx/assets/video/greeting_top_main.mp4" type="video/mp4">
+              <source src="https://www.greeting.dk/wp-content/themes/greeting-wp-mvx/assets/video/greeting_top_comp.webm" type="video/webm">-->
+              <source src="https://www.greeting.dk/wp-content/uploads/greeting_top_main_h_265_fin.mp4" type="video/mp4">
+              <source src="https://www.greeting.dk/wp-content/uploads/greeting_top_comp_fin.webm" type="video/webm">
           </video>
           <script async>
               document.addEventListener('DOMContentLoaded', function() {
