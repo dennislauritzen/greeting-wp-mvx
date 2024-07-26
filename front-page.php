@@ -21,17 +21,30 @@ get_header();
                   preload="none"
                   playsinline
                   id="frontpagevid"
-                  loading="lazy"
                   class="position-absolute top-0 start-0"
                   style="pointer-events: none;">
               <!--<source src="https://www.greeting.dk/wp-content/themes/greeting-wp-mvx/assets/video/greeting_top_main.mp4" type="video/mp4">
               <source src="https://www.greeting.dk/wp-content/themes/greeting-wp-mvx/assets/video/greeting_top_comp.webm" type="video/webm">-->
-              <source src="https://www.greeting.dk/wp-content/uploads/greeting_top_main_h_265_fin.mp4" type="video/mp4">
-              <source src="https://www.greeting.dk/wp-content/uploads/greeting_top_comp_fin.webm" type="video/webm">
+              <source data-src="https://www.greeting.dk/wp-content/uploads/greeting_top_main_h_265_fin.mp4" type="video/mp4">
+              <source data-src="https://www.greeting.dk/wp-content/uploads/greeting_top_comp_fin.webm" type="video/webm">
           </video>
           <script async>
               document.addEventListener('DOMContentLoaded', function() {
-                  document.getElementById('frontpagevid').play();
+                  var video = document.getElementById('frontpagevid');
+
+                  var observer = new IntersectionObserver(function(entries) {
+                      if (entries[0].isIntersecting) {
+                          var sources = video.querySelectorAll('source');
+                          sources.forEach(function(source) {
+                              source.src = source.dataset.src;
+                          });
+                          video.load();
+
+                          observer.disconnect();
+                      }
+                  });
+
+                  observer.observe(video);
               });
           </script>
         <div class="col-12 col-md-10 col-lg-7 col-xl-6 bg-teal-front position-relative start-0 top-0">
