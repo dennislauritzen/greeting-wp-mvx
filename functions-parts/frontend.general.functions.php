@@ -1,6 +1,31 @@
 <?php
 
 
+/**
+ * Set Cache Headers for frontpage
+ *
+ * @access public
+ */
+function greeting_set_frontpage_custom_headers(){
+    if(is_front_page()) {
+        header("Cache-Tag: Frontpage,TextPage");
+    }
+}
+add_action('template_redirect', 'greeting_set_frontpage_custom_headers');
+
+/**
+ * Set Cache Headers for pages
+ *
+ * @access public
+ */
+function greeting_set_textpage_custom_headers(){
+    if(is_page() && !is_cart() && !is_checkout()) {
+        header("Cache-Tag: TextPage");
+    }
+}
+add_action('template_redirect', 'greeting_set_textpage_custom_headers');
+
+
 /**** Remove Suborder from coustomer my-account page *****/
 add_filter( 'woocommerce_account_orders_columns' , function( $suborders ) {
     unset( $suborders['mvx_suborder'] );

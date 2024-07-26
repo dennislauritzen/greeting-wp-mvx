@@ -1,5 +1,98 @@
 <?php
 
+
+function landingpage_register_post_type(){
+    // landing page
+    register_post_type('landingpage',
+        array(
+            'labels' => array(
+                'name'          => __('Landing Pages', 'woocommerce'),
+                'singular_name' => __('Landing Page', 'woocommerce'),
+            ),
+            'menu_icon' => 'dashicons-flag',
+            'public'      => true,
+            'has_archive' => false,
+            'rewrite' => array('slug' => 'l'),
+            'supports' => array('title','editor'),
+            'capabilities' => array(
+                'publish_posts' => 'publish_wcmppages',
+                'edit_posts' => 'edit_wcmppages',
+                'edit_others_posts' => 'edit_other_wcmppages',
+                'delete_posts' => 'delete_wcmppages',
+                'delete_others_posts' => 'delete_other_wcmppages',
+                'read_private_posts' => 'read_private_wcmppages',
+                'edit_post' => 'edit_wcmppage',
+                'delete_post' => 'delete_wcmppage' )
+        )
+    );
+}
+add_action('init', 'landingpage_register_post_type');
+
+function is_landingpage() {
+    return get_post_type() === 'landingpage';
+}
+
+/**
+ * Set the caching headers for landing pages.
+ *
+ * @access public
+ *
+ */
+function greeting_set_landingpage_custom_headers(){
+    if(is_landingpage()) {
+        // Set sitemap index as tag
+        $post_id = get_the_ID(); // Get the current post ID
+        $sitemap_index = get_sitemap_index_for_landing_page($post_id);
+        $sitemap_index_2 = ($sitemap_index == "1") ? '' : '-'.$sitemap_index;
+
+        // Set the headers
+        #header("Cache-Control: no-cache, must-revalidate");
+        if ($sitemap_index) {
+            header("Cache-Tag: Landingpage,LandingpageSitemapPart".$sitemap_index_2);
+        } else {
+            header("Cache-Tag: Landingpage");
+        }
+        #header("Edge-Cache-Tag: ");
+    }
+}
+add_action('template_redirect', 'greeting_set_landingpage_custom_headers');
+
+function get_sitemap_index_for_landing_page($post_id) {
+    // Get the current post type
+    $post_type = get_post_type($post_id);
+
+    // Check if the post type is 'cities'
+    if ($post_type !== 'landingpage') {
+        return false;
+    }
+
+    // Get the number of posts per sitemap from Yoast SEO settings
+    $posts_per_sitemap = apply_filters('wpseo_sitemap_post_type_limit', 1000, $post_type); // Default is 1000, but this will be dynamically retrieved
+
+    // Get all posts of type 'cities'
+    $args = array(
+        'post_type'      => 'landingpage',
+        'posts_per_page' => -1, // Get all posts
+        'fields'         => 'ids', // Return only IDs
+        'orderby'       => 'ID', // Order by ID
+        'order'         => 'ASC' // Ascending order (change to 'DESC' for descending)
+    );
+    $all_posts = get_posts($args);
+
+    // Find the position of the given post ID
+    $position = array_search($post_id, $all_posts);
+    if ($position === false) {
+        return false; // Post ID not found
+    }
+
+
+    // Calculate the sitemap index (1-based index)
+    $sitemap_index = intval($position / $posts_per_sitemap) + 1;
+
+    return $sitemap_index;
+}
+
+
 /**
  * Vendor filter on Landing Page
  *

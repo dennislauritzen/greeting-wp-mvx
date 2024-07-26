@@ -69,61 +69,6 @@ function add_theme_caps() {
 add_action( 'admin_init', 'add_theme_caps');
 
 /**
- * Custom post
- */
-add_action('init', 'greeting_custom_post_type');
-function greeting_custom_post_type() {
-
-    // landing page
-    register_post_type('landingpage',
-        array(
-            'labels' => array(
-                'name'          => __('Landing Pages', 'woocommerce'),
-                'singular_name' => __('Landing Page', 'woocommerce'),
-            ),
-            'menu_icon' => 'dashicons-flag',
-            'public'      => true,
-            'has_archive' => true,
-            'rewrite' => array('slug' => 'l'),
-            'supports' => array('title','editor'),
-            'capabilities' => array(
-                'publish_posts' => 'publish_wcmppages',
-                'edit_posts' => 'edit_wcmppages',
-                'edit_others_posts' => 'edit_other_wcmppages',
-                'delete_posts' => 'delete_wcmppages',
-                'delete_others_posts' => 'delete_other_wcmppages',
-                'read_private_posts' => 'read_private_wcmppages',
-                'edit_post' => 'edit_wcmppage',
-                'delete_post' => 'delete_wcmppage' )
-        )
-    );
-
-    // city
-    register_post_type('city',
-        array(
-            'labels' => array(
-                'name'          => __('City', 'woocommerce'),
-                'singular_name' => __('Cities', 'woocommerce'),
-            ),
-            'rewrite' => array('slug' => 'c'),
-            'menu_icon' => 'dashicons-location-alt',
-            'public'      => true,
-            'has_archive' => false,
-            'supports' => array('title'),
-            'capabilities' => array(
-                'publish_posts' => 'publish_wcmppages',
-                'edit_posts' => 'edit_wcmppages',
-                'edit_others_posts' => 'edit_other_wcmppages',
-                'delete_posts' => 'delete_wcmppages',
-                'delete_others_posts' => 'delete_other_wcmppages',
-                'read_private_posts' => 'read_private_wcmppages',
-                'edit_post' => 'edit_wcmppage',
-                'delete_post' => 'delete_wcmppage' )
-        )
-    );
-}
-
-/**
  *
  * Custom taxonomy for the Occasions for Greeting
  *
@@ -240,8 +185,6 @@ function greeting_marketplace_min_order_value(){
     }
 }
 
-
-
 function shapeSpace_customize_image_sizes($sizes) {
     unset($sizes['medium_large']); // 768px
     return $sizes;
@@ -263,39 +206,6 @@ add_image_size( 'vendor-product-box-size', 240, 240 );
  * Creating custom sizing for the images in the store view box.
  */
 add_image_size( 'vendor-topbanner-size', 400, 200 );
-
-
-/**
- * Show order date in thank you page
- * @todo - $order is not defined. Therefore we should not try to access object, just use function variable.
- *
- * I think this is deprecated since we made the new order confirmation page setup.
- *
- * @param $order_id
- * @return void
- */
-function greeting_view_order_and_thankyou_page( $order_id ){
-    global $order;
-
-    if( empty($order_id) || !is_numeric($order_id)){
-        $order_id = $order->get_id();
-    }
-
-    $str = '<p><strong>Leveringsdato:</strong> ';
-    if ( $_POST['delivery_date'] ) { $str .= get_post_meta( $order_id, '_delivery_date', true ); } else { $str .= 'Hurtigst muligt'; }
-    $str .= '</p>';
-    $str .= '<p><strong>Modtagers telefonnr.:</strong> ' . get_post_meta( $order_id, '_receiver_phone', true ) . '</p>';
-    $str .= '<p><strong>Besked til modtager:</strong> ' . get_post_meta( $order_id, '_greeting_message', true ) . '</p>';
-    $str .= '<p><strong>Leveringsinstruktioner:</strong> ' . get_post_meta( $order_id, '_delivery_instructions', true ) . '</p>';
-
-    $leave_gift_at_address = (get_post_meta( $order_id, '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej');
-    $str .= '<p><strong>Må gaven stilles på adressen:</strong> ' . $leave_gift_at_address . '</p>';
-    $leave_gift_at_neighbour = (get_post_meta( $order_id, '_leave_gift_neighbour', true ) == "1" ? 'Ja' : 'Nej');
-    $str .= '<p><strong>Må gaven afleveres hos naboen:</strong> ' . $leave_gift_at_neighbour . '</p>';
-
-    echo $str;
-}
-add_action( 'woocommerce_thankyou', 'greeting_view_order_and_thankyou_page', 20 );
 
 
 /**
@@ -452,3 +362,36 @@ function greeting_woocommerce_holiday_mode() {
 function greeting_wc_shop_disabled() {
     wc_print_notice( 'Greeting.dk er lukket ned pga. vedligehold netop nu, desværre :)', 'error');
 }
+
+
+/**
+ * Show order date in thank you page
+ * @todo - $order is not defined. Therefore we should not try to access object, just use function variable.
+ *
+ * I think this is deprecated since we made the new order confirmation page setup.
+ *
+ * @param $order_id
+ * @return void
+ */
+function greeting_view_order_and_thankyou_page( $order_id ){
+    global $order;
+
+    if( empty($order_id) || !is_numeric($order_id)){
+        $order_id = $order->get_id();
+    }
+
+    $str = '<p><strong>Leveringsdato:</strong> ';
+    if ( $_POST['delivery_date'] ) { $str .= get_post_meta( $order_id, '_delivery_date', true ); } else { $str .= 'Hurtigst muligt'; }
+    $str .= '</p>';
+    $str .= '<p><strong>Modtagers telefonnr.:</strong> ' . get_post_meta( $order_id, '_receiver_phone', true ) . '</p>';
+    $str .= '<p><strong>Besked til modtager:</strong> ' . get_post_meta( $order_id, '_greeting_message', true ) . '</p>';
+    $str .= '<p><strong>Leveringsinstruktioner:</strong> ' . get_post_meta( $order_id, '_delivery_instructions', true ) . '</p>';
+
+    $leave_gift_at_address = (get_post_meta( $order_id, '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej');
+    $str .= '<p><strong>Må gaven stilles på adressen:</strong> ' . $leave_gift_at_address . '</p>';
+    $leave_gift_at_neighbour = (get_post_meta( $order_id, '_leave_gift_neighbour', true ) == "1" ? 'Ja' : 'Nej');
+    $str .= '<p><strong>Må gaven afleveres hos naboen:</strong> ' . $leave_gift_at_neighbour . '</p>';
+
+    echo $str;
+}
+#add_action( 'woocommerce_thankyou', 'greeting_view_order_and_thankyou_page', 20 );

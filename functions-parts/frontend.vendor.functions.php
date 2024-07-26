@@ -1,5 +1,64 @@
 <?php
 
+function is_vendor() {
+    // Check if MultivendorX is active
+    if (!function_exists('mvx_is_store_page')) {
+        return false;
+    }
+
+    // Use the MultivendorX function to check if the current page is a store page
+    return mvx_is_store_page();
+}
+
+function greeting_set_vendor_custom_headers(){
+    if(is_vendor()) {
+        // Set the variables
+        $slug = esc_attr( get_vendor_page_slug() );
+
+        // Set the headers
+        #header("Cache-Control: no-cache, must-revalidate");
+        header("Cache-Tag: Vendor, Vendor-".$slug.", VendorGroup-".$slug);
+        #header("Edge-Cache-Tag: ");
+    }
+}
+add_action('template_redirect', 'greeting_set_vendor_custom_headers');
+
+function get_vendor_page_slug() {
+    // Check if we are on a MVX vendor page
+    if (function_exists('mvx_is_store_page') && mvx_is_store_page()) {
+        global $wp_query;
+
+        // Ensure there is a valid post object
+        if ( !empty($wp_query->query['dc_vendor_shop']) ) {
+            // Return the slug of the current post
+            return $wp_query->query['dc_vendor_shop'];
+        }
+    }
+
+    return false; // Return false if not on a vendor page
+}
+
+function get_vendor_slug_by_id($vendor_id) {
+    // Ensure the MVX plugin is active
+    if($vendor_id) {
+        global $MVX;
+
+        $vendor = get_mvx_vendor($vendor_id);
+
+        if ($vendor) {
+            // Assuming $vendor contains user information as an object
+            // and 'user' is the key or method to access user data
+            $user = isset($vendor->user_data) ? $vendor->user_data : null;
+
+            if ($user) {
+                // Return the user nicename
+                return isset($user->user_nicename) ? $user->user_nicename : false;
+            }
+        }
+    }
+    return false;
+}
+
 function get_vendor_id_on_product_page() {
     // Replace with your logic to get vendor ID
     // Example: Get vendor ID from product data

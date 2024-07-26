@@ -207,14 +207,14 @@ document.addEventListener("DOMContentLoaded", function() {
             Kategorier & anledninger
         </h3>
         <div class="button-cont ms-auto">
-          <button id="backButton" type="button" class="btn btn-light rounded-circle">
+          <button id="backButton" type="button" aria-label="Scroll tilbage i kategorier & anledninger" class="btn btn-light rounded-circle">
             <div class="align-items-center justify-content-center">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#1B4949" stroke-width="10" class="bi bi-chevron-left align-middle" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" stroke-width="10" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
               </svg>
             </div>
           </button>
-          <button id="forwardButton" type="button" class="btn btn-light rounded-circle">
+          <button id="forwardButton" type="button" aria-label="Scroll frem i kategorier & anledninger" class="btn btn-light rounded-circle">
             <div class="align-items-center justify-content-center">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#1B4949" stroke-width="10" class="bi bi-chevron-left align-middle"  viewBox="0 0 16 16">
                 <path fill-rule="evenodd" stroke-width="10" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
@@ -304,9 +304,9 @@ document.addEventListener("DOMContentLoaded", function() {
                     $occasionImageUrl = wp_get_attachment_image($occasion->icon_src, 'vendor-product-box-size', false, array('class' => 'mx-auto my-auto d-block  ratio-4by3', 'style' => 'max-width: 75%; max-height: 75%;', 'alt' => $occasion->name));
                 } else {
                     if(!empty($occasion->image_src)){
-                        $occasionImageUrl = wp_get_attachment_image($occasion->image_src, 'vendor-product-box-size', false, array('class' => 'card-img-top ratio-4by3', 'alt' => $occasion->name));
+                        $occasionImageUrl = wp_get_attachment_image($occasion->image_src, 'vendor-product-box-size', false, array('class' => 'card-img-top ratio-4by3', 'alt' => $occasion->name, 'aria-label' => $occasion->name));
                     } else {
-                        $occasionImageUrl = wp_get_attachment_image($placeHolderImage, 'vendor-product-box-size', false, array('class' => 'card-img-top ratio-4by3', 'alt' => $occasion->name));
+                        $occasionImageUrl = wp_get_attachment_image($placeHolderImage, 'vendor-product-box-size', false, array('class' => 'card-img-top ratio-4by3', 'alt' => $occasion->name, 'aria-label' => $occasion->name));
                     }
                 }
               ?>

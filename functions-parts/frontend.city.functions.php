@@ -9,9 +9,60 @@
  * @usedon archive-product.php
  * @author Dennis Lauritzen
  */
+
+
+
 /**
+ * Register the post type of the cities.
+ */
+function city_register_post_type(){
+    // city
+    register_post_type('city',
+        array(
+            'labels' => array(
+                'name'          => __('City', 'woocommerce'),
+                'singular_name' => __('Cities', 'woocommerce'),
+            ),
+            'rewrite' => array('slug' => 'c'),
+            'menu_icon' => 'dashicons-location-alt',
+            'public'      => true,
+            'has_archive' => false,
+            'supports' => array('title'),
+            'capabilities' => array(
+                'publish_posts' => 'publish_wcmppages',
+                'edit_posts' => 'edit_wcmppages',
+                'edit_others_posts' => 'edit_other_wcmppages',
+                'delete_posts' => 'delete_wcmppages',
+                'delete_others_posts' => 'delete_other_wcmppages',
+                'read_private_posts' => 'read_private_wcmppages',
+                'edit_post' => 'edit_wcmppage',
+                'delete_post' => 'delete_wcmppage' )
+        )
+    );
+}
+add_action('init', 'city_register_post_type');
+
+/**
+ * function to check if we are on a city page.
+ */
+function is_city() {
+    return get_post_type() === 'city';
+}
+
+/**
+ * Set the caching headers for city pages.
+ *
+ * @access public
  *
  */
+function greeting_set_city_custom_headers(){
+    if(is_city()) {
+        #header("Cache-Control: no-cache, must-revalidate");
+        header("Cache-Tag: City");
+        #header("Edge-Cache-Tag: City");
+    }
+}
+add_action('template_redirect', 'greeting_set_city_custom_headers');
 
 
 /**

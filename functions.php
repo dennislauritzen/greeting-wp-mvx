@@ -684,6 +684,18 @@ function greeting3_scripts_loader() {
 }
 add_action( 'wp_enqueue_scripts', 'greeting3_scripts_loader' );
 
+function add_defer_attribute($tag, $handle) {
+    // List of handles for scripts you want to defer
+    $scripts_to_defer = array('mainjs', 'main', 'style'); // Replace with the handle(s) of the script(s) you want to defer
+
+    if (in_array($handle, $scripts_to_defer)) {
+        return str_replace('src', 'defer="defer" src', $tag);
+    }
+
+    return $tag;
+}
+#add_filter('script_loader_tag', 'add_defer_attribute', 10, 2);
+
 /***************************************************
  * =================================================
  * Adding new code

@@ -11,6 +11,19 @@
 ##
 #########################################################
 
+/**
+ * Set Cache Headers for checkout
+ *
+ * @access public
+ */
+function greeting_set_cartcheckout_custom_headers(){
+    if(is_cart()) {
+        header("Cache-Tag: Cart");
+    }# else if(is_checkout()) {
+    #    header("Cache-Tag: Checkout");
+    #}
+}
+add_action('template_redirect', 'greeting_set_cartcheckout_custom_headers');
 
 
 ##########################################################
@@ -922,6 +935,13 @@ function greeting_load_calendar_dates( $available_gateways ) {
     }
 
     $vendor_id = get_post_field( 'post_author', $storeProductId );
+
+    // If this is a shipping company, then return empty.
+    $delivery_type = get_vendor_delivery_type($vendor_id, 'value');
+    if($delivery_type == "0"){
+        return;
+    }
+
     $dates = get_vendor_dates_new($vendor_id, 'd-m-Y', 'close');
     $dates_values_only = array_values($dates);
     $dates_json = json_encode($dates_values_only);

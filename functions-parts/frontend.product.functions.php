@@ -1,12 +1,51 @@
 <?php
 
-#####################
-##
-## Reorder the product page hooks
-## for the Product Page.
-##
+/**
+ * Send caching headers for products
+ *
+ * @return void
+ */
+function greeting_set_product_custom_headers() {
+    if (is_product()) {
+        // Get variables
+        $vendor_slug = get_vendor_page_slug_on_product_page();
 
+        // Make sure no content has been sent yet
+        if (!headers_sent()) {
+            if(!empty($vendor_slug)){
+                header("Cache-Tag: Product, VendorGroup-".$vendor_slug);
+            } else {
+                header("Cache-Tag: Product");
+            }
+            // header("Edge-Cache-Tag: Vendor-");
+        }
+    }
+}
+add_action('template_redirect', 'greeting_set_product_custom_headers');
 
+function get_vendor_page_slug_on_product_page() {
+    global $post;
+    if ($post instanceof WP_Post) {
+        // Get the author ID
+        $author_id = get_post_field('post_author', $post->ID);
+
+        // Get the vendor slug
+        $vendor_slug = get_vendor_slug_by_id($author_id);
+
+        if ($vendor_slug) {
+            // Output the vendor slug
+            return esc_html($vendor_slug);
+        }
+    }
+}
+
+/**
+ * Reorder the product page hooks
+ * for the Product Page.
+ *
+ * @param $hook_name
+ * @return void
+ */
 function list_hooked_functions($hook_name) {
     global $wp_filter;
 

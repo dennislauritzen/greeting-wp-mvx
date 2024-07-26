@@ -1,5 +1,27 @@
 <?php
 
+// Function to check if the current page is a WooCommerce product category page
+function is_product_category_page() {
+    return is_product_category();
+}
+
+// Function to check if the current page belongs to the custom taxonomy 'occasion'
+function is_occasion_page() {
+    return is_tax('occasion') && is_archive();
+}
+
+function greeting_set_productcat_occasion_custom_headers(){
+    if(is_product_category_page()) {
+        // Set the headers
+        header("Cache-Tag: ProdcatOccassionPage, ProductCat");
+    } else if(is_occasion_page()) {
+        header("Cache-Tag: ProdcatOccassionPage, Occasion");
+    }
+
+    #header("Cache-Control: no-cache, must-revalidate");
+    #header("Edge-Cache-Tag: ");
+}
+add_action('template_redirect', 'greeting_set_productcat_occasion_custom_headers');
 
 /**
  * Function for getting the postal codes on Category and Occasion landing pages
