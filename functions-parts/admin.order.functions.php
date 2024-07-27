@@ -127,12 +127,20 @@ add_action( 'woocommerce_admin_order_preview_start', 'custom_display_order_data_
  * @return mixed
  */
 function admin_order_preview_add_custom_meta_data( $data, $order ) {
-    if( $delivery_date_value = $order->get_meta('_delivery_date') ){
-        $data['delivery_date_key'] = $delivery_date_value; // <= Store the value in the data array.
+    if(is_wc_hpos_activated()){
+        if( $delivery_date_value = $order->get_meta('_delivery_date') ){
+            $data['delivery_date_key'] = $delivery_date_value; // <= Store the value in the data array.
+        }
+    } else {
+        if( $delivery_date_value = get_post_meta($order->get_id(), '_delivery_date', 'true') ){
+            $data['delivery_date_key'] = $delivery_date_value; // <= Store the value in the data array.
+        }
     }
+
     if( $receiver_phone = $order->get_meta('_receiver_phone') ){
         $data['receiver_phone_key'] = $receiver_phone; // <= Store the value in the data array.
     }
+
 
     if(order_has_funeral_products($order->get_id())){
         if( $greeting_message_band_1 = $order->get_meta('_greeting_message_band_1') ){
@@ -202,8 +210,13 @@ add_action( 'add_meta_boxes', 'add_shop_order_meta_box' );
  * @return void
  */
 function shop_order_display_callback( $post ) {
-    $value = get_post_meta( $post->ID, '_delivery_date', true );
     $order = wc_get_order($post->ID);
+
+    if(is_wc_hpos_activated()){
+        $value = $order->get_meta('_delivery_date' );
+    } else {
+        $value = get_post_meta( $post->ID, '_delivery_date', true );
+    }
 
     $vendor_id = 0;
     $storeProductId = 0;
@@ -222,15 +235,15 @@ function shop_order_display_callback( $post ) {
         }
     } // end foreach
 
-    $vendor_delivery_day_required = (int) get_field('vendor_require_delivery_day', 'user_'.$vendor_id);
-    $vendor_drop_off_time = get_field('vendor_drop_off_time', 'user_'.$vendor_id);
-    if(strpos($vendor_drop_off_time,':') === false && strpos($vendor_drop_off_time,'.')){
-        $vendor_drop_off_time = $vendor_drop_off_time.':00';
-    } else {
-        $vendor_drop_off_time = str_replace(array(':','.'),array(':',':'),$vendor_drop_off_time);
-    }
+    $vendor_delivery_day_required = (int) get_vendor_delivery_days_required($vendor_id);
+    $vendor_drop_off_time = get_vendor_dropoff_time($vendor_id);
+    #if(strpos($vendor_drop_off_time,':') === false && strpos($vendor_drop_off_time,'.')){
+    #    $vendor_drop_off_time = $vendor_drop_off_time.':00';
+    #} else {
+    #    $vendor_drop_off_time = str_replace(array(':','.'),array(':',':'),$vendor_drop_off_time);
+    #}
 
-    if($vendor_drop_off_time < date('H:i')){
+    if($vendor_drop_off_time < date('H:i:s')){
         $vendor_delivery_day_required = $vendor_delivery_day_required + 1;
     }
 
@@ -291,7 +304,13 @@ function shop_order_display_callback( $post ) {
  * @return void
  */
 function shop_order_store_own_ref_callback( $post ){
-    $value = get_post_meta( $post->ID, '_store_own_order_reference', true );
+    if(is_wc_hpos_activated()){
+        $order = wc_get_order($post->ID);
+        $value = $order->get_meta('_store_own_order_reference');
+    } else {
+        $value = get_post_meta( $post->ID, '_store_own_order_reference', true );
+    }
+
 
     woocommerce_form_field( 'store_own_order_reference', array(
         'type'          => 'text',
