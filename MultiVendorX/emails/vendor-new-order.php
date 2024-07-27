@@ -35,6 +35,16 @@ $main_order_object = wc_get_order($main_order);
 $main_order_ID_str = ( empty($main_order_object->get_id())  ? $main_order->ID : $main_order_object->get_id() );
 $main_order_id = (empty(get_post_parent($order->get_id())) ? $order->get_id() : $main_order_ID_str );
 
+// Get the main_order object
+if($main_order_id != $order->get_id()){
+    $main_order = wc_get_order($main_order_id);
+} else {
+    $main_order = $order;
+}
+
+// Set the mail heading / subject for new_vendor_order
+$email_heading = str_replace($order->get_id(), $parent_order_id, $email_heading);
+
 do_action( 'woocommerce_email_header', $email_heading );
 #do_action('woocommerce_email_before_order_table', $order, true, false, $email); ?>
 
@@ -83,7 +93,12 @@ do_action( 'woocommerce_email_header', $email_heading );
                                     <strong style="text-transform: uppercase;">Levering</strong>
                                     <br>
                                     <?php
-                                    $delivery_date = get_post_meta($main_order_id, '_delivery_date', true);
+                                    if(is_wc_hpos_activated()){
+                                        $delivery_date = $main_order->get_meta('_delivery_date');
+                                    } else {
+                                        $delivery_date = get_post_meta($main_order_id, '_delivery_date', true);
+                                    }
+
                                     $wc_date = new WC_Datetime($delivery_date);
                                     $delivery_date2 = wc_format_datetime( $wc_date );
 
@@ -112,10 +127,23 @@ do_action( 'woocommerce_email_header', $email_heading );
                                     <br>
                                     <br>
                                     <?php } ?>
-                                    <?php $leave_gift_at_address = (get_post_meta( $main_order_id, '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej'); ?>
+
+                                    <?php
+                                    if(is_wc_hpos_activated()){
+                                        $leave_gift_at_address = ($main_order->get_meta('_leave_gift_address') == "1" ? 'Ja' : 'Nej');
+                                    } else {
+                                        $leave_gift_at_address = (get_post_meta( $main_order_id, '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej');
+                                    }
+                                    ?>
                                     <?php _e('Må stilles på adressen:', 'woocommerce'); ?> <?php echo $leave_gift_at_address; ?><br>
 
-                                    <?php $leave_gift_at_neighbour = (get_post_meta( $main_order_id, '_leave_gift_neighbour', true ) == "1" ? 'Ja' : 'Nej'); ?>
+                                    <?php
+                                    if(is_wc_hpos_activated()){
+                                        $leave_gift_at_neighbour = ($main_order->get_meta('_leave_gift_neighbour') == "1" ? 'Ja' : 'Nej');
+                                    } else {
+                                        $leave_gift_at_neighbour = (get_post_meta( $main_order_id, '_leave_gift_neighbour', true ) == "1" ? 'Ja' : 'Nej');
+                                    }
+                                    ?>
                                     <?php _e('Må gaven afleveres hos naboen:', 'woocommerce'); ?> <?php echo $leave_gift_at_neighbour; ?>
                                 </td>
                                 <td valign="top" align="right" width="50%" style="width: 50%; padding: 10px 0px 10px 0;">
@@ -123,7 +151,12 @@ do_action( 'woocommerce_email_header', $email_heading );
                                     <br>
                                     <p>
                                         <?php
-                                        echo esc_html( get_post_meta($main_order_id, '_greeting_message', true) ); ?>
+                                        if(is_wc_hpos_activated()){
+                                            echo $main_order->get_meta('_greeting_message');
+                                        } else {
+                                            echo esc_html( get_post_meta($main_order_id, '_greeting_message', true) );
+                                        }
+                                        ?>
                                     </p>
                                 </td>
                             </tr>
@@ -136,7 +169,13 @@ do_action( 'woocommerce_email_header', $email_heading );
                                     <p>
                                       <strong><?php _e('Modtagers telefonnummer:', 'woocommerce'); ?></strong>
                                       <br>
-                                      <?php echo get_post_meta( $main_order_id, '_receiver_phone', true ); ?>
+                                        <?php
+                                        if(is_wc_hpos_activated()){
+                                            echo $main_order->get_meta('_receiver_phone');
+                                        } else {
+                                            echo get_post_meta( $main_order_id, '_receiver_phone', true );
+                                        }
+                                        ?>
                                     </p>
                                 </td>
                                 <td valign="top" align="right" width="50%" style="width: 50%; padding: 10px 0px 10px 0;">
@@ -269,7 +308,12 @@ do_action( 'woocommerce_email_header', $email_heading );
                             <?php echo ($order->get_shipping_country()) ? '<br><span id="ship_country">'.WC()->countries->countries[$order->get_shipping_country()].'</span>' : ''; ?>
 
                             <?php
-                            $delivery_phone = get_post_meta($order->get_id(), '_receiver_phone', true);
+                            if(is_wc_hpos_activated()){
+                                $delivery_phone = $order->get_meta('_receiver_phone');
+                            } else {
+                                $delivery_phone = get_post_meta($order->get_id(), '_receiver_phone', true);
+                            }
+
                             echo ($delivery_phone) ? '<br><span id="ship_phone">Modtagers tlf.: '.$delivery_phone.'</span>' : ''; ?>
                         </p>
                     </td>
