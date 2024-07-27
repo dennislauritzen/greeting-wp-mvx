@@ -1075,7 +1075,7 @@ function greeting_show_hide_calendar( $available_gateways ) {?>
 // Load JQuery Datepicker
 add_action( 'woocommerce_after_checkout_form', 'greeting_enable_datepicker', 10 );
 function greeting_enable_datepicker() { ?>
-    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js" data-cfasync="false"></script>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
     <?php
 }
