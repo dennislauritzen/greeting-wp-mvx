@@ -947,7 +947,7 @@ function greeting_load_calendar_dates( $available_gateways ) {
     $dates_json = json_encode($dates_values_only);
     ?>
 
-    <script type="text/javascript">
+    <script type="text/javascript" data-cfasync="false">
         (function($) {
             $.datepicker.regional['da'] = {
                 closeText: 'Luk',
@@ -1188,9 +1188,9 @@ function greeting_save_custom_fields_with_order( $order_id ) {
     $post_date = isset($_POST['delivery_date']) ? esc_attr($_POST['delivery_date']) : '';
     if ( !empty($post_date) ) {
         if(is_wc_hpos_activated()){
-            $order->update_meta_data('_delivery_date', $post_date);
+            $order->update_meta_data('_delivery_date', esc_attr( $post_date ) );
         } else {
-            update_post_meta($order_id, '_delivery_date', $post_date );
+            update_post_meta($order_id, '_delivery_date', esc_attr( $post_date ) );
         }
     };
     if (!empty($post_date) && preg_match('/^\d{2}-\d{2}-\d{4}$/', $post_date)) {
@@ -1200,10 +1200,10 @@ function greeting_save_custom_fields_with_order( $order_id ) {
         $unix_date = date("U", strtotime($d_year.'-'.$d_month.'-'.$d_date));
 
         if(is_wc_hpos_activated()){
-            $order->update_meta_data('_delivery_unixdate', esc_attr( $unix_date ) );
+            $order->update_meta_data('_delivery_unixdate', $unix_date );
             $order->update_meta_data('_delivery_date', esc_attr( $post_date ) );
         } else {
-            update_post_meta( $order_id, '_delivery_unixdate', esc_attr( $unix_date ) );
+            update_post_meta( $order_id, '_delivery_unixdate', $unix_date );
             update_post_meta( $order_id, '_delivery_date', esc_attr( $post_date )  );
         }
     } else {
