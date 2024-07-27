@@ -1307,9 +1307,11 @@ function greeting_save_custom_fields_with_order( $order_id ) {
         }
     }
 
-    // Save all meta data changes to the order
-    #$order->save_meta_data();
-    $order->save();
+    if(is_wc_hpos_activated()){
+        // Save all meta data changes to the order
+        $order->save_meta_data();
+        $order->save();
+    }
 }
 
 add_action( 'woocommerce_checkout_create_order', 'greeting_save_custom_fields_with_order2', 10, 2 );

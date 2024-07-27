@@ -370,8 +370,8 @@ function save_shop_order_meta_box_data( $post_id, $post ) {
     if(is_wc_hpos_activated()) {
         $order->update_meta_data('_delivery_unixdate', $unix_date);
         $order->update_meta_date('_delivery_date', $my_data);
-        $order_parent->save_meta_data();
-        $order_parent->save();
+        $order->save_meta_data();
+        $order->save();
     } else {
         update_post_meta( $post_id, '_delivery_unixdate', $unix_date );
         update_post_meta( $post_id, '_delivery_date', $my_data );
