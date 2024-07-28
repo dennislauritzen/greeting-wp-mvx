@@ -113,7 +113,7 @@ function send_sms_on_new_order( $order_id, $old_status, $new_status,  $order ) {
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
         // Check if the domain is 'greeting.local' and disable SSL verification for testing
-        if (WP_HOME === 'http://greeting.local') {
+        if (strpos(home_url(), 'http://greeting.local') !== false) {
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         }
