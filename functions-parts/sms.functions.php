@@ -85,7 +85,7 @@ function send_sms_on_new_order( $order_id, $old_status, $new_status,  $order ) {
         // The SMS message with line breaks
         $message = 'Du har modtaget en ny bestilling #' . $order->get_order_number()
             . "\n\n"
-            . "Bestillingen skal er bestilt til postnummer " . $delivery_postal . " og med levering d. " . $delivery_date
+            . "Bestillingen er bestilt til postnummer " . $delivery_postal . " og med levering d. " . $delivery_date
             . "\n\n"
             . "Med venlig hilsen"
             . "\nGreeting";

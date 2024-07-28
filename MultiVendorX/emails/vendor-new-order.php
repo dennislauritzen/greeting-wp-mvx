@@ -251,14 +251,11 @@ do_action( 'woocommerce_email_header', $email_heading );
                     }
                     $greeting_card_store_part_fee_with_vat = $greeting_card_fee_with_vat * $greeting_card_store_part;
 
-
                     // Calculate the new subtotal without shipping
                     $order_new_subtotal = $total_without_discount - $greeting_card_fee_with_vat - $order_ship_total;
 
                     $order_ship_new = 39;
                     $order_new_total = $order_new_subtotal + $greeting_card_store_part_fee_with_vat + $order_ship_new;
-
-
                 ?>
                 <tr class="order-details-totals-row" style="border-top: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
                     <td width="50%" style="width: 50%; padding: 6px 0 6px 10px;">
@@ -268,7 +265,7 @@ do_action( 'woocommerce_email_header', $email_heading );
                         <?php echo wc_price( $order_new_subtotal ); ?>
                     </td>
                 </tr>
-                <?php if($greeting_card_store_part_fee_with_vat > 0){ ?>
+                <?php if($greeting_card_fee_with_vat > 0){ ?>
                 <tr class="order-details-totals-row" style="border-top: 1px solid #c0c0c0; border-bottom: 1px solid #dee2e6;">
                     <td width="50%" style="width: 50%; padding: 6px 0 6px 10px;">
                         Kort
