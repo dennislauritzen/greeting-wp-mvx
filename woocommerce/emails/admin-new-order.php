@@ -201,11 +201,20 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                     $order_total = $order->get_total();
                     $order_ship_total = $order->get_shipping_total() + $order->get_shipping_tax();
 
+                    // Calculate the cost of the cards
+                    $fees = $order->get_fees();
+                    $greeting_card_fee_ex_vat = 0;
+                    $greeting_card_fee_with_vat = 0;
+                    foreach($fees as $fee){
+                        $fee_name = $fee->get_name();
+                        $fee_amount = $fee->get_amount();
 
-                    $order_new_subtotal = $order_total - $order_ship_total;
-                    $order_ship_new = 39;
-                    $order_new_total = $order_new_subtotal + $order_ship_new;
-                ?>
+                        $greeting_card_fee_ex_vat =+ $fee_amount;
+                        $greeting_card_fee_with_vat =+ $fee_amount * 1.25 ;
+                    }
+
+                    $order_new_subtotal = $order_total - $greeting_card_fee_with_vat - $order_ship_total;
+                    ?>
                 <tr class="order-details-totals-row" style="border-top: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
                     <td width="50%" style="width: 50%; padding: 6px 0 6px 10px;">
                         Varetotal (inkl. 25 % moms)
@@ -214,6 +223,16 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                         <?php echo $order_new_subtotal; ?> kr.
                     </td>
                 </tr>
+                <?php if($greeting_card_fee_with_vat > 0){ ?>
+                <tr class="order-details-totals-row" style="border-top: 1px solid #c0c0c0; border-bottom: 1px solid #dee2e6;">
+                    <td width="50%" style="width: 50%; padding: 6px 0 6px 10px;">
+                        Kort
+                    </td>
+                    <td style="width: 50%; padding: 6px 10px 6px 0px; text-align: right;">
+                        <?php echo wc_price( $greeting_card_fee_with_vat ); ?>
+                    </td>
+                </tr>
+                <?php } ?>
                 <tr class="order-details-totals-row" style="border-top: 1px solid #c0c0c0; border-bottom: 1px solid #dee2e6;">
                     <td width="50%" style="width: 50%; padding: 6px 0 6px 10px;">
                         Levering / fragt

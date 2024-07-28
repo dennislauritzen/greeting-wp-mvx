@@ -202,6 +202,7 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                         <?php echo wc_price( $order_new_subtotal ); ?>
                     </td>
                 </tr>
+                <?php if($greeting_card_fee_with_vat > 0){ ?>
                 <tr class="order-details-totals-row" style="border-top: 1px solid #c0c0c0; border-bottom: 1px solid #dee2e6;">
                     <td width="50%" style="width: 50%; padding: 6px 0 6px 10px;">
                         Kort
@@ -210,6 +211,7 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                         <?php echo wc_price( $greeting_card_fee_with_vat ); ?>
                     </td>
                 </tr>
+                <?php } ?>
                 <tr class="order-details-totals-row" style="border-top: 1px solid #c0c0c0; border-bottom: 1px solid #dee2e6;">
                     <td width="50%" style="width: 50%; padding: 6px 0 6px 10px;">
                         Levering

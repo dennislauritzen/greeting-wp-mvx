@@ -139,16 +139,16 @@ function send_sms_on_new_order( $order_id, $old_status, $new_status,  $order ) {
         $response_json = json_decode($result);
         if (json_last_error() === JSON_ERROR_NONE) {
             // Print out response JSON for debugging
-            error_log('Response JSON: ' . print_r($response_json, true));
+            #error_log('Response JSON: ' . print_r($response_json, true));
 
             // Handle specific data in response if it exists
-            if (isset($response_json->ids)) {
-                error_log('Message IDs: ' . implode(', ', $response_json->ids));
-            } else {
-                error_log('No IDs found in response.');
-            }
+            #if (isset($response_json->ids)) {
+                #error_log('Message IDs: ' . implode(', ', $response_json->ids));
+            #} else {
+                #error_log('No IDs found in response.');
+            #}
         } else {
-            error_log('JSON decode error: ' . json_last_error_msg());
+            error_log('SMS Sending error | JSON decode error: ' . json_last_error_msg());
         }
     }
 }

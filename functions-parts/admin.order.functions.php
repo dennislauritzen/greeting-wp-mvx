@@ -630,7 +630,6 @@ function greeting_wc_process_order_meta_box_action( $order ) {
 }
 add_action( 'woocommerce_order_action_wc_custom_order_action', 'greeting_wc_process_order_meta_box_action' );
 
-
 /**
  * Add an order note when custom action is clicked
  * Add a flag on the order to show it's been run
