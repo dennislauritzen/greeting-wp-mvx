@@ -211,6 +211,7 @@ get_header('checkout');
                                     <?php echo $order->get_subtotal_to_display(); ?>
                                 </div>
                         </div>
+                        <?php if($order->get_total_fees() > 0){ ?>
                         <div class="row py-2 border-bottom">
                                 <div class="col-6">
                                     Kort
@@ -219,6 +220,7 @@ get_header('checkout');
                                     <?php echo wc_price( $order->get_total_fees() * 1.25 ); ?>
                                 </div>
                         </div>
+                        <?php } ?>
                         <div class="row py-2 border-bottom">
                                 <div class="col-6">
                                     Levering & håndtering
