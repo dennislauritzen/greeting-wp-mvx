@@ -132,9 +132,21 @@ add_filter('wpseo_sitemap_post_types', 'exclude_inactive_products_from_sitemap')
  * @return false|mixed
  */
 function exclude_draft_products_from_sitemap($entry, $post) {
-    if ($post->post_type === 'product' && $post->post_status !== 'publish') {
-        return false; // Exclude non-published products
+    // Check if this is a sitemap generation request
+    if (defined('DOING_AJAX') && DOING_AJAX) {
+        return $entry; // Skip if this is an AJAX request
     }
+
+    if (function_exists('wpseo_sitemaps_init')) {
+        global $wpseo_sitemaps;
+        if (isset($wpseo_sitemaps) && $wpseo_sitemaps->is_sitemap()) {
+            // Check if the post type is 'product' and status is not 'publish'
+            if ($post->post_type === 'product' && $post->post_status !== 'publish') {
+                return false; // Exclude non-published products
+            }
+        }
+    }
+
     return $entry;
 }
 add_filter('wpseo_sitemap_entry', 'exclude_draft_products_from_sitemap', 10, 2);
