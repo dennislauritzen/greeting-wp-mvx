@@ -993,6 +993,9 @@ include('functions-parts/vendor.delivery-days.functions.php');
 ## Include general Order Functions e.g. the hashes for tracking url etc.
 include('functions-parts/general.order.functions.php');
 
+## Include the functions for sending SMS'es.
+include('functions-parts/sms.functions.php');
+
 ## Include admin panel functions.
 include('functions-parts/admin.general.functions.php');
 include('functions-parts/admin.order.functions.php');
