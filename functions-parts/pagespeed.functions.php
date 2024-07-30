@@ -1,5 +1,4 @@
 <?php
-
 function add_expires_headers_to_assets($headers, $file) {
     $path_info = pathinfo($file);
     $ext = isset($path_info['extension']) ? $path_info['extension'] : '';
@@ -35,4 +34,4 @@ function add_expires_headers_to_assets($headers, $file) {
     return $headers;
 }
 
-add_filter('wp_headers', 'add_expires_headers_to_assets', 10, 2);
+#('wp_headers', 'add_expires_headers_to_assets', 10, 2);
