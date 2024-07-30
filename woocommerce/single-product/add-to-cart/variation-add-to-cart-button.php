@@ -64,6 +64,5 @@ global $product;
 <?php
 $vendor_id = get_vendor_id_on_product_page();
 
-echo greeting_enable_datepicker();
 echo greeting_load_calendar_dates_function( $vendor_id );
 ?>
