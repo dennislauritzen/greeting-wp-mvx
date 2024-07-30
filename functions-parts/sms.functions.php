@@ -50,6 +50,11 @@ function send_sms_on_new_order( $order_id, $old_status, $new_status,  $order ) {
             return;
         }
 
+        // If this is a child order, don't send a SMS
+        if (get_post_parent($order_id) !== null){
+            return;
+        }
+
         // Get vendor ID and the setting if they want to receive SMS.
         $vendor_id = get_vendor_id_by_order_id($order->get_id());
         $vendor_to_receive_sms = get_field('receive_sms', 'user_'.$vendor_id);

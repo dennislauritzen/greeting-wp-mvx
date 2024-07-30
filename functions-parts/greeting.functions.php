@@ -68,6 +68,19 @@ function add_theme_caps() {
 }
 add_action( 'admin_init', 'add_theme_caps');
 
+function get_labels() {
+    // return a default slug
+    if(!defined('WPLANG') || !get_locale() || 'da_DK' == get_locale()) return array('name' => 'Anledninger', 'singular_name' => 'Anledning');
+
+    $slugs = array(
+        'en_US' => array('product', 'name' => 'Occasions', 'singular_name' => 'Occasion'),
+        'en_UK' => array('name' => 'Occasions', 'singular_name' => 'Occasion'),
+        'da_DK' => array('name' => 'Anledninger', 'singular_name' => 'Anledning'),
+    );
+
+    return $slugs[WPLANG];
+}
+
 /**
  *
  * Custom taxonomy for the Occasions for Greeting
@@ -75,10 +88,12 @@ add_action( 'admin_init', 'add_theme_caps');
  **/
 add_action( 'init', 'greeting_custom_taxonomy_occasion', 0 );
 function greeting_custom_taxonomy_occasion()  {
+    $label = get_labels();
+
     $labels = array(
-        'name'                       => 'Occasions',
-        'singular_name'              => 'Occasion',
-        'menu_name'                  => 'Occasions',
+        'name'                       => $label['name'],
+        'singular_name'              => $label['singular_name'],
+        'menu_name'                  => $label['name'],
         'all_occasions'                  => 'All Occasions',
         'parent_occasion'                => 'Parent Occasion',
         'parent_occasion_colon'          => 'Parent Occasion:',
@@ -95,7 +110,7 @@ function greeting_custom_taxonomy_occasion()  {
         'labels'                     => $labels,
         'hierarchical'               => true,
         'public'                     => true,
-        'rewrite'										 => array('slug' => 'anledning'),
+        'rewrite'					 => array('slug' => 'anledning'),
         'show_ui'                    => true,
         'show_admin_column'          => true,
         'show_in_nav_menus'          => true,

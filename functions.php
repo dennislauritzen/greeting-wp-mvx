@@ -990,6 +990,9 @@ include('functions-parts/greeting.mvx.functions.php');
 include('functions-parts/date.functions.php');
 include('functions-parts/vendor.delivery-days.functions.php');
 
+## Include PageSpeed optimization functions
+include('functions-parts/pagespeed.functions.php');
+
 ## Include general Order Functions e.g. the hashes for tracking url etc.
 include('functions-parts/general.order.functions.php');
 
