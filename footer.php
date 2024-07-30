@@ -238,4 +238,23 @@
 		wp_footer();
 	?>
 </body>
+<script defer>
+    document.addEventListener('DOMContentLoaded', function() {
+        var video = document.getElementById('frontpagevid');
+
+        var observer = new IntersectionObserver(function(entries) {
+            if (entries[0].isIntersecting) {
+                var sources = video.querySelectorAll('source');
+                sources.forEach(function(source) {
+                    source.src = source.dataset.src;
+                });
+                video.load();
+
+                observer.disconnect();
+            }
+        });
+
+        observer.observe(video);
+    });
+</script>
 </html>

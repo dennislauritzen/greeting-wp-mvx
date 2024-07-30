@@ -19,6 +19,7 @@ get_header();
                   muted
                   poster="https://www.greeting.dk/wp-content/themes/greeting-wp-mvx/assets/img/greeting-poster_webp.webp"
                   preload="none"
+                  defer
                   playsinline
                   id="frontpagevid"
                   fetchpriority="high"
@@ -29,25 +30,6 @@ get_header();
               <source data-src="https://www.greeting.dk/wp-content/uploads/greeting_top_main_h_265_fin.mp4" type="video/mp4">
               <source data-src="https://www.greeting.dk/wp-content/uploads/greeting_top_comp_fin.webm" type="video/webm">
           </video>
-          <script async>
-              document.addEventListener('DOMContentLoaded', function() {
-                  var video = document.getElementById('frontpagevid');
-
-                  var observer = new IntersectionObserver(function(entries) {
-                      if (entries[0].isIntersecting) {
-                          var sources = video.querySelectorAll('source');
-                          sources.forEach(function(source) {
-                              source.src = source.dataset.src;
-                          });
-                          video.load();
-
-                          observer.disconnect();
-                      }
-                  });
-
-                  observer.observe(video);
-              });
-          </script>
         <div class="col-12 col-md-10 col-lg-7 col-xl-6 bg-teal-front position-relative start-0 top-0">
             <div class="pt-3 pb-4 px-1 px-xs-1 px-sm-1 px-md-2 px-lg-5 px-xl-5 m-5 top-text-content">
                 <div class="m-0 p-0">
