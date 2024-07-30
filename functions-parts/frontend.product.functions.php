@@ -394,22 +394,24 @@ function redirect_to_product_after_add_to_cart($url) {
 add_filter('woocommerce_add_to_cart_redirect', 'redirect_to_product_after_add_to_cart');
 
 function enqueue_jquery_ui_on_product_page() {
-    // Enqueue jQuery UI script
-    wp_enqueue_script(
-        'jquery-ui-custom',
-        '//code.jquery.com/ui/1.11.4/jquery-ui.js',
-        array('jquery'), // jQuery as a dependency
-        '1.11.4',
-        true // Load in the footer
-    );
+    if(is_product()) {
+        // Enqueue jQuery UI script
+        wp_enqueue_script(
+            'jquery-ui-custom',
+            '//code.jquery.com/ui/1.11.4/jquery-ui.js',
+            array('jquery'), // jQuery as a dependency
+            '1.11.4',
+            true // Load in the footer
+        );
 
-    // Enqueue jQuery UI stylesheet
-    wp_enqueue_style(
-        'jquery-ui-css',
-        '//code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css',
-        array(), // No dependencies
-        '1.13.0'
-    );
+        // Enqueue jQuery UI stylesheet
+        wp_enqueue_style(
+            'jquery-ui-css',
+            '//code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css',
+            array(), // No dependencies
+            '1.13.0'
+        );
+    }
 }
 add_action('wp_enqueue_scripts', 'enqueue_jquery_ui_on_product_page');
 
