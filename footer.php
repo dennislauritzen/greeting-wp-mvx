@@ -239,22 +239,32 @@
 	?>
 </body>
 <script defer>
-    document.addEventListener('DOMContentLoaded', function() {
-        var video = document.getElementById('frontpagevid');
+    document.addEventListener("DOMContentLoaded", function() {
+        var lazyVideos = [].slice.call(document.querySelectorAll("video.lazy"));
 
-        var observer = new IntersectionObserver(function(entries) {
-            if (entries[0].isIntersecting) {
-                var sources = video.querySelectorAll('source');
-                sources.forEach(function(source) {
-                    source.src = source.dataset.src;
+        if ("IntersectionObserver" in window) {
+            var lazyVideoObserver = new IntersectionObserver(function(entries, observer) {
+                entries.forEach(function(video) {
+                    if (video.isIntersecting) {
+                        for (var source in video.target.children) {
+                            var videoSource = video.target.children[source];
+                            if (typeof videoSource.tagName === "string" && videoSource.tagName === "SOURCE") {
+                                videoSource.src = videoSource.dataset.src;
+                            }
+                        }
+
+                        video.target.load();
+                        video.target.classList.remove("lazy");
+                        lazyVideoObserver.unobserve(video.target);
+                    }
                 });
-                video.load();
+            });
 
-                observer.disconnect();
-            }
-        });
-
-        observer.observe(video);
+            lazyVideos.forEach(function(lazyVideo) {
+                lazyVideoObserver.observe(lazyVideo);
+            });
+        }
     });
+
 </script>
 </html>

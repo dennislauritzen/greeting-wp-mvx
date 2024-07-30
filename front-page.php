@@ -23,7 +23,7 @@ get_header();
                   playsinline
                   id="frontpagevid"
                   fetchpriority="high"
-                  class="position-absolute top-0 start-0"
+                  class="lazy position-absolute top-0 start-0"
                   style="pointer-events: none;">
               <!--<source src="https://www.greeting.dk/wp-content/themes/greeting-wp-mvx/assets/video/greeting_top_main.mp4" type="video/mp4">
               <source src="https://www.greeting.dk/wp-content/themes/greeting-wp-mvx/assets/video/greeting_top_comp.webm" type="video/webm">-->
