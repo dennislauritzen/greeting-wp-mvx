@@ -17,7 +17,7 @@ get_header();
                   loop
                   autoplay
                   muted
-                  poster="https://www.greeting.dk/wp-content/themes/greeting-wp-mvx/assets/img/greeting-poster_webp.webp"
+                  poster="/wp-content/themes/greeting-wp-mvx/assets/video/1x1pix.png"
                   preload="none"
                   defer
                   playsinline
