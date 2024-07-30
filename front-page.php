@@ -139,7 +139,7 @@ get_header();
                   </ul>
                   </div>
                 </form>
-                <h6 style="font-family: 'Rubik',sans-serif; font-size:18px; color: #ffffff;" class="pb-1">Udvalgte byer<?php if(!empty($user_postal)){ echo ' tæt på dig'; } ?></h6>
+                <h5 style="font-family: 'Rubik',sans-serif; font-size:18px; color: #ffffff;" class="pb-1">Udvalgte byer<?php if(!empty($user_postal)){ echo ' tæt på dig'; } ?></h5>
                 <ul id="postalcodelist" class="list-inline my-1">
 
                 </ul>
