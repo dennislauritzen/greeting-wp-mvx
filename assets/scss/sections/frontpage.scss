@@ -18,12 +18,12 @@
     object-fit: cover;
     height: 100%;
     width: 100%;
-    background:transparent url('/wp-content/themes/greeting/assets/video/greeting-poster-1170_x_658-webp.webp') no-repeat 0 0;
+    background:transparent url('https://www.greeting.dk/wp-content/themes/greeting-wp-mvx/assets/video/greeting-poster-1170_x_658-webp.webp') no-repeat 0 0;
   }
 
   @include media-breakpoint-up(lg) {
     video {
-      background:transparent url('/wp-content/themes/greeting3/assets/video/greeting-poster-1920_x_1080-webp.webp') no-repeat 0 0;
+      background:transparent url('https://www.greeting.dk/wp-content/themes/greeting-wp-mvx/assets/video/greeting-poster-1920_x_1080-webp.webp') no-repeat 0 0;
       -webkit-background-size:cover;
       -moz-background-size:cover;
       -o-background-size:cover;
@@ -32,7 +32,7 @@
   }
   @include media-breakpoint-up(xxl) {
     video {
-      background:transparent url('/wp-content/themes/greeting3/assets/video/greeting-poster-2560_x_1200-webp.webp') no-repeat 0 0;
+      background:transparent url('https://www.greeting.dk/wp-content/themes/greeting-wp-mvx/assets/video/greeting-poster-2560_x_1200-webp.webp') no-repeat 0 0;
       -webkit-background-size:cover;
       -moz-background-size:cover;
       -o-background-size:cover;
