@@ -185,6 +185,13 @@ add_action( 'wp_footer', 'ajax_fetch' );
 
 
 function data_fetch(){
+    // Don't
+    if (isset($_SERVER['HTTP_X_GREETING_SKIP_DATA_FETCH']) && $_SERVER['HTTP_X_GREETING_SKIP_DATA_FETCH'] === 'true') {
+        // Skip fetching the data
+        wp_send_json_success();
+        return;
+    }
+
     $search_query = esc_attr( $_POST['keyword'] );
     global $wpdb;
 

@@ -100,6 +100,13 @@ function get_sitemap_index_for_landing_page($post_id) {
  *
  */
 function lpFilterAction() {
+    // Don't
+    if (isset($_SERVER['HTTP_X_GREETING_SKIP_DATA_FETCH']) && $_SERVER['HTTP_X_GREETING_SKIP_DATA_FETCH'] === 'true') {
+        // Skip fetching the data
+        wp_send_json_success();
+        return;
+    }
+
     global $wpdb;
 
     // default user array come from front end
