@@ -250,7 +250,7 @@ get_template_part('template-parts/inc/blocks/press-mentions');
   </div>
 </section>
 
-<script type="text/javascript">
+<script async type="text/javascript">
 // Function to check if the data in localStorage is still valid
 function isCacheValid(key) {
     var cachedData = localStorage.getItem(key);

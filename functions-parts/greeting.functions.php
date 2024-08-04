@@ -130,6 +130,21 @@ function greeting_custom_taxonomy_occasion()  {
 }
 
 
+function add_video_lazy_load_frontpage(){
+    if(is_front_page()) {
+        // Enqueue jQuery UI stylesheet
+        wp_enqueue_script(
+            'frontpage-video-lazyload', // Handle for the script
+            get_template_directory_uri() . '/assets/js/frontend.video.js', // Path to the script
+            array(), // Dependencies
+            null, // Version number (null to avoid appending version number)
+            true // Load in footer
+        );
+    }
+}
+add_action('wp_enqueue_scripts', 'add_video_lazy_load_frontpage');
+
+
 
 /**
  * Add settings pages to ACF.

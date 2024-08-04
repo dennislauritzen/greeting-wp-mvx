@@ -4,18 +4,6 @@
 	<meta charset="<?php bloginfo( 'charset' ); ?>">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<?php wp_head(); ?>
-
-	<!-- LOCAL TM -->
-	<script async>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-	new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-	j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-	'https://gtm.greeting.dk/bocfvmll.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-	})(window,document,'script','dataLayer','GTM-N7VZGS3');</script>
-	<!-- End LOCAL TM -->
-	<!-- LOCAL TM (noscript) -->
-	<noscript><iframe src="https://gtm.greeting.dk/ns.html?id=GTM-N7VZGS3"
-	height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-	<!-- End LOCAL TM (noscript) -->
 	<meta name="google-site-verification" content="IzMcch4GbZsuyDXUn9Ar4A0kpVHugadljONNzrSZh3I" />
 </head>
 
