@@ -1035,3 +1035,47 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
     // Return either the closed days or the open days, depending on the $open_close parameter.
     return $open_close == 'close' ? $closed_days_date : $dates;
 }
+
+function greeting_generate_filtering_days() {
+    $dates = array();
+    setlocale(LC_TIME, 'da_DK.UTF-8'); // Set the locale to Danish
+    $date_today = new DateTime('now');
+
+    // Get POST variables
+    $greeting_dot = isset($_POST['greeting_dot']) ? sanitize_text_field($_POST['greeting_dot']) : '0';
+    $greeting_dot_key = isset($_POST['greeting_dot_key']) ? sanitize_text_field($_POST['greeting_dot_key']) : '';
+    $greeting_dot_hash = md5("gre_et_i_ng21p412421" . $greeting_dot);
+
+    if($greeting_dot_key !== $greeting_dot_hash){
+        // Return JSON response indicating failure
+        wp_send_json(array('success' => false, 'message' => 'Invalid hash or key. '.$greeting_dot.'    Key: '.$greeting_dot_key.'    Hash: '.$greeting_dot_hash));
+    }
+
+    $danish_month_names = array(
+        'jan' => 'jan', 'feb' => 'feb', 'mar' => 'mar', 'apr' => 'apr',
+        'may' => 'maj', 'jun' => 'jun', 'jul' => 'jul', 'aug' => 'aug',
+        'sep' => 'sep', 'oct' => 'okt', 'nov' => 'nov', 'dec' => 'dec'
+    );
+
+    // Generate dates for the next 7 days
+    for ($i = 0; $i < 9; $i++) {
+        $closed_for_today = 0;
+        if($i == 0 && $greeting_dot_key <= date("H")){
+            $closed_for_today = 1;
+        }
+
+        $formatted_date = strtolower($date_today->format('d. M'));
+        $month_abbr = strtolower($date_today->format('M'));
+        $formatted_date = str_replace($month_abbr, $danish_month_names[$month_abbr], $formatted_date);
+        $dates[] = array('formatted' => $formatted_date, 'date' => $date_today->format('Y-m-d'), 'closed_for_today' => $closed_for_today);
+        $date_today->modify('+1 day');
+    }
+
+    // Add "Show all" option
+    $dates[] = array('formatted' => 'Vis alle (inkl. senere) datoer', 'date' => 'all');
+
+    // Send the response as JSON
+    wp_send_json(array('dates' => $dates));
+}
+add_action('wp_ajax_get_filtering_days', 'greeting_generate_filtering_days');
+add_action('wp_ajax_nopriv_get_filtering_days', 'greeting_generate_filtering_days');

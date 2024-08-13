@@ -69,7 +69,6 @@ $sql = "SELECT u.ID, umm1.meta_value AS dropoff_time, umm2.meta_value AS require
 $vendor_query = $wpdb->prepare($sql, '%'.$cityPostalcode.'%', '%dc_vendor%');
 $vendor_arr = $wpdb->get_results($vendor_query);
 
-
 $UserIdArrayForCityPostalcode = array();
 $DropOffTimes = array();
 foreach($vendor_arr as $v){
@@ -338,6 +337,8 @@ document.addEventListener("DOMContentLoaded", function() {
             <div class="text">
                 Hvornår skal gaven leveres?
             </div>
+            <input type="hidden" name="_gr_key_dot" id="greeting_dot" value="<?php echo $DropOffTimes; ?>">
+            <input type="hidden" name="_gr_key_dot_ss" id="greeting_dot_key" value="<?php echo md5("gre_et_i_ng21p412421".$DropOffTimes); ?>">
             <?php
             // MODAL FILTER (duplicated in desktop filter).
             /**
@@ -355,34 +356,32 @@ document.addEventListener("DOMContentLoaded", function() {
                 'sep' => 'sep', 'oct' => 'okt', 'nov' => 'nov', 'dec' => 'dec'
             );
 
-            for($i=0;$i<7;$i++){
+            for($i = 0; $i < 9; $i++){
                 $formatted_date = strtolower($date_today->format('d. M'));
                 $month_abbr = strtolower($date_today->format('M'));
                 $formatted_date = str_replace($month_abbr, $danish_month_names[$month_abbr], $formatted_date);
-                $dates[$i] = $formatted_date;
+                $dates[$i] = array('formatted' => $formatted_date, 'date' => $date_today->format('Y-m-d'), 'value' => $i);
                 $date_today->modify('+1 day');
             }
-            $dates[8] = 'Vis alle (inkl. senere) datoer';
+            $dates[] = array('formatted' => 'Vis alle (inkl. senere) datoer', 'date' => 'all', 'value' => 'all');
 
             ?>
 
-            <div class="rounded-3 mb-4">
+            <div id="date-labels-container" class="rounded-3 mb-4">
                 <?php
                 foreach($dates as $k => $v){
                     $closed_for_today = 0;
                     if($k == 0 && $DropOffTimes <= date("H")){
                         $closed_for_today = 1;
                     }
-                    ?>
-                    <div class="rounded border-0 rounded-pill datelabel-bg" style="display: inline-block; margin: 5px 5px 4px 0; font-size: 13px;">
-                        <label class="datelabel <?php echo ($closed_for_today == 1 ? 'datelabelstrikethrough;' : ';'); ?>" for="filter_delivery_date_<?php echo $k; ?>">
-                            <input type="radio" name="filter_del_days_city" class="form-check-input filter-on-city-page" id="filter_delivery_date_<?php echo $k; ?>" value="<?php echo $k; ?>" <?php echo ($closed_for_today == 1 ? 'disabled="disabled" ' : ''); ?> <?php echo ($k == 8 ? 'checked="checked"' : ''); ?>>
+                    ?><div class="rounded border-0 rounded-pill datelabel-bg" style="display: inline-block; margin: 5px 12px 4px 0; font-size: 13px;">
+                        <label class="datelabel <?php echo ($closed_for_today == 1 ? 'datelabelstrikethrough;' : ';'); ?>" for="filter_delivery_date_<?php echo $k; ?>" data-date="<?php echo $v['date']; ?>">
+                            <input type="radio" name="filter_del_days_city" class="form-check-input filter-on-city-page" id="filter_delivery_date_<?php echo $k; ?>" value="<?php echo $v['value']; ?>" <?php echo ($closed_for_today == 1 ? 'disabled="disabled" ' : ''); ?> <?php echo ($v['value'] == 'all' ? 'checked="checked"' : ''); ?>>
                             <span style="color: <?php echo ($closed_for_today == 1 ? '#c0c0c0' : '#000000'); ?>;">
-                                <?php echo $v; ?>
+                                <?php echo $v['formatted']; ?>
                               </span>
                         </label>
-                    </div>
-                    <?php
+                    </div><?php
                 }
                 ?>
             </div>
@@ -499,6 +498,143 @@ get_footer( );
 ?>
 
 <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        const cacheKey = 'cachedDates';
+        const cacheExpiryKey = 'cacheExpiry';
+
+        const cachedData = localStorage.getItem(cacheKey);
+        const cacheExpiry = localStorage.getItem(cacheExpiryKey);
+        const currentTime = new Date().getTime();
+
+        // Get the value of the fields field
+        const greeting_dot = document.getElementById('greeting_dot').value;
+        const greeting_dot_key = document.getElementById('greeting_dot_key').value;
+
+        // Prepare the data as URL-encoded form data
+        const postData = new URLSearchParams({
+            greeting_dot: greeting_dot,
+            greeting_dot_key: greeting_dot_key
+        });
+
+        // Check if the cache is still valid
+        if (cachedData && cacheExpiry && currentTime < cacheExpiry) {
+            renderDates(JSON.parse(cachedData));
+        } else {
+            fetch('<?php echo admin_url('admin-ajax.php'); ?>?action=get_filtering_days', {
+                method: 'POST',
+                credentials: 'same-origin', // Ensure cookies are sent along with the request,
+                body: postData,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded' // Set the content type to URL-encoded
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.dates && Array.isArray(data.dates)) {
+                        // Cache the data with an expiry time (e.g., end of today)
+                        localStorage.setItem(cacheKey, JSON.stringify(data.dates));
+
+                        // Set cache to expire at midnight
+                        const midnight = new Date();
+                        midnight.setHours(24, 0, 0, 0);
+                        localStorage.setItem(cacheExpiryKey, midnight.getTime());
+
+                        renderDates(data.dates);
+                    } else {
+                        console.error('Invalid data format:', data);
+                    }
+                })
+                .catch(error => console.error('Error fetching dates:', error));
+        }
+
+        function renderDates(dates) {
+            const dateLabelsContainer = document.querySelector('#date-labels-container');
+            dateLabelsContainer.innerHTML = ''; // Clear any existing content
+
+            dates.forEach((dateObj, index) => {
+                if (dateObj.date === 'all') {
+                    // Special handling for "Show all" option
+                    const div = document.createElement('div');
+                    div.className = 'rounded border-0 rounded-pill datelabel-bg';
+
+                    // Set multiple styles using an object
+                    Object.assign(div.style, {
+                        display: 'inline-block',
+                        margin: '5px 12px 4px 0',
+                        fontSize: '13px'
+                    });
+
+                    const showAllLabel = document.createElement('label');
+                    showAllLabel.className = "datelabel";
+                    showAllLabel.innerHTML = `
+                        <input type="radio" name="filter_del_days_city" class="form-check-input filter-on-city-page" id="filter_delivery_date_all" value="all" checked="checked">
+                        <span>${dateObj.formatted}</span>
+                    `;
+                    // Append the label to the div
+                    div.appendChild(showAllLabel);
+
+                    // Append the div to the container
+                    dateLabelsContainer.appendChild(div);
+                } else {
+                    // Handling for regular dates
+                    const date = new Date(dateObj.date);
+                    date.setHours(23, 59, 59, 999);
+                    const currentDate = new Date();
+
+                    if (currentDate <= date) {
+                        const div = document.createElement('div');
+                        div.className = 'rounded border-0 rounded-pill datelabel-bg';
+
+                        // Set multiple styles using an object
+                        Object.assign(div.style, {
+                            display: 'inline-block',
+                            margin: '5px 12px 4px 0',
+                            fontSize: '13px'
+                        });
+
+                        const label = document.createElement('label');
+                        label.className = "datelabel";
+                        label.setAttribute('for', `filter_delivery_date_${dateObj.date}`);
+                        label.setAttribute('data-date', dateObj.date);
+
+                        // Create input element and set its disabled attribute based on closed_for_today
+                        const input = document.createElement('input');
+                        input.type = 'radio';
+                        input.name = 'filter_del_days_city';
+                        input.className = 'form-check-input filter-on-city-page';
+                        input.id = `filter_delivery_date_${dateObj.date}`;
+                        input.value = index;
+
+                        // Append input to label
+                        label.appendChild(input);
+
+                        // Create span element
+                        const span = document.createElement('span');
+                        span.textContent = " "+dateObj.formatted;
+
+                        // Check if the date should be disabled
+                        if (dateObj.closed_for_today === 1) {
+                            input.disabled = true;
+                            input.setAttribute('disabled','disabled');
+
+                            // Set the color style
+                            span.style.color = '#c0c0c0';
+                        }
+
+                        // Append span to label
+                        label.appendChild(span);
+
+                        // Append the label to the div
+                        div.appendChild(label);
+
+                        // Append the div to the container
+                        dateLabelsContainer.appendChild(div);
+                    }
+                }
+            });
+        }
+    });
+
   // Start the jQuery
   jQuery(document).ready(function($) {
     var ajaxurl = "<?php echo admin_url('admin-ajax.php');?>";
@@ -506,13 +642,14 @@ get_footer( );
     // Get URL parameters
     var url = new URL(window.location.href);
 
-    jQuery(".filter-on-city-page").click(function(){
+    // Event delegation for dynamically inserted radio buttons
+    jQuery(document).on('change', 'input[name="filter_del_days_city"]', function() {
       update();
 
-      if(this.type == "radio"){
-        var id = this.id;
-        var id2 = id.replace(/[0-9]+/, "");
-        jQuery("div[id*='"+id2+"']").remove();
+      if (this.type == "radio") {
+          var id = this.id;
+          var id2 = id.replace(/[0-9]+/, "");
+          $("div[id*='" + id2 + "']").remove();
       }
     });
 
@@ -562,4 +699,28 @@ get_footer( );
       }, '2');
     });
   });
+
+  document.addEventListener("DOMContentLoaded", function() {
+      // Get all the labels with a 'data-date' attribute
+      const dateLabels = document.querySelectorAll('.datelabel[data-date]');
+
+      // Get the current date and set it to tomorrow for testing
+      const currentDate = new Date();
+
+      dateLabels.forEach(label => {
+          const labelDate = new Date(label.getAttribute('data-date'));
+          labelDate.setHours(23, 59, 59, 999);  // Set the time portion to 00:00:00.000
+
+          // Compare the label's date with the current date
+          if (labelDate !== "" && currentDate > labelDate) {
+              // Remove the parent div of the label
+              label.parentElement.remove();
+          }
+      });
+  });
+
+  jQuery(document).on('change', 'input[name="filter_del_days_city"]', function() {
+      console.log('Button clicked:', jQuery(this).val());
+  });
 </script>
+

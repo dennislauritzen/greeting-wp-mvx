@@ -174,7 +174,9 @@ function oldcategoryAndOccasionVendorFilterAction() {
     ////////////////////////
     // FILTER: Delivery DATE
     // Prepare the statement for delivery array
-    if($deliveryDate >= 0 && $deliveryDate < 8){
+    if(
+        $deliveryDate >= 0 && $deliveryDate < 8
+        && $deliveryDate != "all"){
         $args = array(
             'role' => 'dc_vendor',
             'meta_query' => array(
@@ -420,9 +422,12 @@ function categoryAndOccasionVendorFilterAction() {
 
     // delivery date
     $deliveryDate = empty($_POST['delDate']) ? 8 : $_POST['delDate'];
-    if(empty($deliveryDate) && $deliveryDate != 0){
+    if((empty($deliveryDate) && $deliveryDate != 0)
+    || $deliveryDate == 'all'){
         $deliveryDate = 8;
-    } else if(!is_numeric($deliveryDate) || $deliveryDate < 0){
+    } else if(
+        $deliveryDate != 'all'
+        && (!is_numeric($deliveryDate) || $deliveryDate < 0)){
         $deliveryDate = 0;
     }
 

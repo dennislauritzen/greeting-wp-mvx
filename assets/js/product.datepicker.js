@@ -110,7 +110,7 @@ jQuery(document).ready(function($) {
             var adjustedDates = new Set(closedDayArray); // Use a Set for unique dates
 
             // Loop through the next (cutoffDays + 2) days
-            for (var i = 0; i <= (cutoffDays + 2); i++) {
+            for (var i = 0; i <= (cutoffDays); i++) {
                 var dateToCheck = new Date();
                 dateToCheck.setDate(dateToCheck.getDate() + i);
                 var dateToCheckOnlyDate = dateToCheck.getDate();
