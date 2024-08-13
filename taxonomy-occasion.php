@@ -524,12 +524,14 @@ if ($terms && !is_wp_error($terms)) {
             {
                 font-family: 'MS Trebuchet', 'Trebuchet MS', 'Inter', 'Rubik', sans-serif !important;
             }
-            .lp-content-block h1 { font-size: 24px !important; font-weight: 400 !important; }
-            .lp-content-block h2 { font-size: 20px !important; font-weight: 400 !important; }
-            .lp-content-block h3 { font-size: 19px !important; font-weight: 300 !important; }
-            .lp-content-block h4 { font-size: 18px !important; font-weight: 300 !important; }
-            .lp-content-block h5 { font-size: 16px !important; font-weight: 300 !important; }
-            .lp-content-block h6 { font-size: 14px !important; font-weight: 300 !important; }
+            .lp-content-block h1,h2 { font-size: 26px !important; font-weight: 400 !important; }
+
+            .lp-content-block div.catdescription h1,
+            .lp-content-block div.catdescription h2 { font-size: 20px !important; font-weight: 400 !important; }
+            .lp-content-block div.catdescription h3 { font-size: 18px !important; font-weight: 300 !important; }
+            .lp-content-block div.catdescription h4 { font-size: 16px !important; font-weight: 300 !important; }
+            .lp-content-block div.catdescription h5 { font-size: 15px !important; font-weight: 300 !important; }
+            .lp-content-block div.catdescription h6 { font-size: 14px !important; font-weight: 300 !important; }
 
 
             .lp-content-block p {
@@ -540,82 +542,37 @@ if ($terms && !is_wp_error($terms)) {
                 text-decoration: underline;
             }
 
-            .lp-content-block div.short_description {
+            .lp-content-block div.catdescription {
                 column-count: 2;
             }
             @media only screen
             and (max-width: 876px) {
-                .lp-content-block div.short_description {
+                .lp-content-block div.catdescription {
                     column-count: 1;
                 }
             }
         </style>
-        <section id="description" class="description row lp-content-block mt-5 mb-5 pb-4">
+        <section id="description" class="description container lp-content-block mt-5 mb-5 pb-4">
             <div class="description lp-content-block row">
                 <div class="col-12">
-                    <h2 style="font-family: 'Inter', 'Rubik', sans-serif; font-size: 29px; font-weight: 600;">
+                    <h2>
                         <?php echo $category_bottomtitle; ?>
                     </h2>
                     <div style="position: relative;">
-                        <div id="categoryDescription" style="max-height: 400px; overflow: hidden;">
+                        <div id="categoryDescription" class="catdescription">
                             <?php
                             $description = category_description($category_id);
                             $description = add_links_to_keywords(
                                 wp_kses_post( $description ),
                                 array('product_cat', 'occasion')
                             );
-                            $collapsed = false;
 
-                            // Check if the content exceeds the max-height
-                            if (strlen($description) > 300) {
-                                $collapsed = true;
-                            }
-
-                            echo '<div class="short_description">';
                             echo $description;
-                            echo '</div>';
-
-                            if ($collapsed) {
-                                echo '<div class="overlay" id="ctaOverlayWhite"></div>';
-                                echo '<div class="button-line col-12 text-center py-2">';
-                                echo '<button class="btn bg-teal text-white rounded-pill border-teal border-1" id="toggleDescription" style="z-index: 1 !important;">Læs mere</button>';
-                                echo '</div>';
-                            }
                             ?>
                         </div>
-                        <style>
-                            .overlay {
-                                position: absolute;
-                                bottom: 0;
-                                left: 0;
-                                width: 100%;
-                                height: 50%;
-                                background: linear-gradient(to bottom, rgba(255, 255, 255, 0.33) 25%, rgba(255, 255, 255, 1) 100%);
-                                pointer-events: none;
-                            }
-                            .button-line {
-                                position: absolute;
-                                bottom: -40px;
-                                width: 100%;
-                                z-index: 1 !important;
-                            }
-                        </style>
                     </div>
                 </div>
             </div>
-            <script>
-                var categoryDescription = document.getElementById('categoryDescription');
-                var descriptionOverlay = document.getElementById('ctaOverlayWhite');
-                var showMoreButton = document.getElementById('toggleDescription');
-
-                if (showMoreButton) {
-                    showMoreButton.addEventListener('click', function () {
-                        categoryDescription.style.maxHeight = 'none'; // Allow the container to expand
-                        descriptionOverlay.style.display = 'none';
-                        showMoreButton.style.display = 'none'; // Hide the "Show More" button
-                    });
-                }
-            </script>
         </section>
 
 	<?php
@@ -694,7 +651,6 @@ get_footer( );
         // Get the stores.
         jQuery(".filter-on-city-page").click(function(){
             update();
-
 
             if(this.checked){
                 $('label[for="' + $(this).attr('id') + '"] span.swoosh').removeClass('d-none').addClass('d-inline-block');
