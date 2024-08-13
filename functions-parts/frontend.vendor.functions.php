@@ -67,56 +67,42 @@ function get_vendor_id_on_product_page() {
     return $vendor_id;
 }
 
-/**
- * Function for redirecting the vendors if they are not active.
- * Will do a 302 redirect to frontpage.
- *
- * @param $query
- * @return void
- */
-function vendor_redirect_to_home( $query ){
-    if ( !is_admin() && $query->is_main_query() ) {
-        // Get the request URI
-        $request_uri = $_SERVER['REQUEST_URI'];
 
-        // Check if the URL contains '/vendor/'
-        if (strpos($request_uri, '/vendor/') !== false) {
+function redirect_pending_vendors_to_home() {
+    if (is_tax('dc_vendor_shop')) {
+        // Get the queried object (which is a WP_Term object in this case)
+        $queried_object = get_queried_object();
+        $term_id = $queried_object->term_id;
 
-            #var_dump($query);
-            if (!empty($query->query['dc_vendor_shop'])) {
-                global $wpdb;
+        // Get the user ID associated with this term
+        $user_id = get_term_meta($term_id, '_vendor_user_id', true);
 
-                $vendor_page_slug = $query->query['dc_vendor_shop'];
-                // Query for users with the specific meta key and value
-                $args = array(
-                    'fields' => 'ID', // Get only user IDs
-                    'search' => $vendor_page_slug,
-                    'search_columns' => array('user_nicename'), // Search only in user_nicename
-                );
-                $user_query = new WP_User_Query($args);
+        if ($user_id) {
+            // Get the WP_User object
+            $user = get_user_by('id', $user_id);
 
-                // Check if any users were found
-                if (!empty($user_query->results)) {
-                    $vendor_id = $user_query->results[0]; // Assuming there's only one vendor for simplicity
+            if ($user) {
+                // Define roles that should trigger a redirect
+                $roles_to_redirect = array('dc_rejected_vendor', 'dc_pending_vendor');
 
-                    // Get user data
-                    $user_meta = get_userdata($vendor_id);
-                    if ($user_meta) {
-                        $user_roles = $user_meta->roles;
-
-                        // Check if the user has a role of 'dc_rejected_vendor' or 'dc_pending_vendor'
-                        if (in_array('dc_rejected_vendor', $user_roles) || in_array('dc_pending_vendor', $user_roles)) {
-                            wp_redirect(home_url(), 302);
-                            exit;
-                        }
-                    }
+                // Check if the user has any of the roles to redirect
+                if (array_intersect($roles_to_redirect, $user->roles)) {
+                    wp_redirect(home_url());
+                    exit;
                 }
+            } else {
+                #error_log("No user found with ID: " . $user_id);
             }
-
+        } else {
+            #error_log("No vendor found for term ID: " . $term_id);
         }
     }
 }
-#add_action( 'parse_query', 'vendor_redirect_to_home' );
+add_action('template_redirect', 'redirect_pending_vendors_to_home');
+
+
+
+
 
 
 /**
