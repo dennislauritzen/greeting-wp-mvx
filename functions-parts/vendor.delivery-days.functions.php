@@ -1036,7 +1036,42 @@ function get_vendor_dates($vendor_id, $date_format = 'd-m-Y', $open_close = 'clo
     return $open_close == 'close' ? $closed_days_date : $dates;
 }
 
+function greeting_generate_closed_days($vendor_id){
+    // Don't
+    if (isset($_SERVER['HTTP_X_GREETING_SKIP_DATA_FETCH']) && $_SERVER['HTTP_X_GREETING_SKIP_DATA_FETCH'] === 'true') {
+        // Skip fetching the data
+        wp_send_json_success();
+        return;
+    }
+
+    $vendor_id = sanitize_text_field($_POST['vendor_id']);
+
+    if(empty($vendor_id) || !is_numeric($vendor_id)){
+        wp_send_json(array('success' => false, 'message' => 'Invalid vendor ID.'));
+    }
+
+    $greeting_post_key = sanitize_text_field($_POST['greeting_key']);
+    $greeting_key = md5(md5('greeting_few2112mTR#"LTKNGKIRngrl_EE'.$vendor_id));
+
+    if($greeting_key != $greeting_post_key){
+        wp_send_json(array('success' => false, 'message' => 'Invalid hash or key.'));
+    }
+
+    // Send the response as JSON
+    wp_send_json(array('dates' => get_vendor_dates_new($vendor_id)));
+}
+add_action('wp_ajax_get_vendor_closed_days', 'greeting_generate_closed_days');
+add_action('wp_ajax_nopriv_get_vendor_closed_days', 'greeting_generate_closed_days');
+
+
 function greeting_generate_filtering_days() {
+    // Don't
+    if (isset($_SERVER['HTTP_X_GREETING_SKIP_DATA_FETCH']) && $_SERVER['HTTP_X_GREETING_SKIP_DATA_FETCH'] === 'true') {
+        // Skip fetching the data
+        wp_send_json_success();
+        return;
+    }
+
     $dates = array();
     setlocale(LC_TIME, 'da_DK.UTF-8'); // Set the locale to Danish
     $date_today = new DateTime('now');
@@ -1059,7 +1094,7 @@ function greeting_generate_filtering_days() {
 
     if($greeting_dot_key !== $greeting_dot_hash){
         // Return JSON response indicating failure
-        wp_send_json(array('success' => false, 'message' => 'Invalid hash or key. '.$greeting_dot.'    Key: '.$greeting_dot_key.'    Hash: '.$greeting_dot_hash));
+        wp_send_json(array('success' => false, 'message' => 'Invalid hash or key.'));
     }
 
     $danish_month_names = array(

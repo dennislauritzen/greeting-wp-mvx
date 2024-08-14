@@ -440,10 +440,15 @@ function greeting_load_calendar_dates_function( $vendor_id = 0 ){
         return false;
     }
 
+    $greeting_key = md5(md5('greeting_few2112mTR#"LTKNGKIRngrl_EE'.$vendor_id));
+
     // Get the current time in Copenhagen timezone
     $timezone = new DateTimeZone('Europe/Copenhagen');
     $server_time = new DateTime('now', $timezone);
     $server_time_string = $server_time->format('Y-m-d H:i:s');
+    // Get the timezone offset in minutes
+    $offset_in_minutes = $server_time->getOffset() / 60;
+
 
     $dates = get_vendor_dates_new($vendor_id, 'd-m-Y', 'close');
     if(empty($dates) || !$dates){
@@ -458,10 +463,13 @@ function greeting_load_calendar_dates_function( $vendor_id = 0 ){
     $dates_values_only = array_values($dates);
     $dates_json = json_encode($dates_values_only);
     ?>
+    <input type="hidden" name="greeting_post_key_prodvend" id="greeting_post_key_prodvend" value="<?php echo $greeting_key; ?>">
     <input type="hidden" name="vendor_cutoff_days" id="vendor_cutoff_days" value="<?php echo get_vendor_delivery_days_required($vendor_id); ?>">
     <input type="hidden" name="vendor_cutoff_time" id="vendor_cutoff_time" value="<?php echo get_vendor_dropoff_time($vendor_id); ?>">
     <input type="hidden" name="closed_date_array" id="vendor_closed_date_array" value='<?php echo $dates_json; ?>'>
-
+    <input type="hidden" name="vendor_id" id="vendor_id" value="<?php echo $vendor_id; ?>">
+    <input type="hidden" name="server_date_time" id="server_date_time" value="<?php echo $server_time_string; ?>">
+    <input type="hidden" name="server_timezone_offset" id="server_timezone_offset" value="<?php echo $offset_in_minutes; ?>">
     <?php
 }
 

@@ -92,6 +92,12 @@ function catocca_landing_data_fetch(){
  * @author Dennis Lauritzen
  */
 function categoryPageFilterAction() {
+    // Don't
+    if (isset($_SERVER['HTTP_X_GREETING_SKIP_DATA_FETCH']) && $_SERVER['HTTP_X_GREETING_SKIP_DATA_FETCH'] === 'true') {
+        // Skip fetching the data
+        wp_send_json_success();
+        return;
+    }
 
     // default user array come from front end
     $categoryPageDefaultUserIdAsString = $_POST['categoryPageDefaultUserIdAsString'];

@@ -46,7 +46,7 @@ function isValidDate(dateString)
 
     // Check the range of the day
     return day > 0 && day <= monthLength[month - 1];
-};
+}
 
 jQuery(document).ready(function($) {
     // GET THE CUTOFF DAYS / EXTRA DAYS NEEDED
@@ -62,85 +62,16 @@ jQuery(document).ready(function($) {
     var vendorClosedDayArray_str_input = document.getElementById('vendor_closed_date_array');
     // Retrieve the JSON string from the hidden input field's value
     const datesJsonString = vendorClosedDayArray_str_input.value;
+
     // Parse the JSON string to get the array of dates
     const vendorClosedDayArray = JSON.parse(datesJsonString);
 
     // The server time
-    var serverTime = new Date('<?php echo $server_time_string; ?>');
+    var servertime_field = document.getElementById('server_date_time').value;
+    var serverTime = new Date(servertime_field);
 
     $('#datepicker').click(function() {
-        // Extract hours and minutes from the cutoff time
-        var [hours, minutes, seconds] = vendorCutoffTime.split(':').map(Number);
-
-        // Create a cutoff datetime for the current date
-        var cutoffDateTime = new Date();
-        cutoffDateTime.setDate(cutoffDateTime.getDate() + vendorCutoffDays);
-        cutoffDateTime.setHours(hours, minutes, seconds);
-        // Extract hours, minutes, and seconds
-        var co_timeString = ('0' + hours).slice(-2) + ':' + ('0' + minutes).slice(-2) + ':' + ('0' + seconds).slice(-2);
-
-        // Function to format date as "DD-MM-YYYY"
-        function formatDate(date) {
-            return ('0' + date.getDate()).slice(-2) + '-' +
-                ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
-                date.getFullYear();
-        }
-
-        function timeStringToDate(timeString) {
-            // Create a Date object with a fixed date (e.g., 1970-01-01) and the given time
-            var date = new Date('1970-01-01T' + timeString + 'Z');
-            return date;
-        }
-
-        function compareTimes(time1, time2) {
-            var date1 = timeStringToDate(time1);
-            var date2 = timeStringToDate(time2);
-
-            if (date1 > date2) {
-                return 1; // time1 is later than time2
-            } else if (date1 < date2) {
-                return -1; // time1 is earlier than time2
-            } else {
-                return 0; // time1 is equal to time2
-            }
-        }
-
-        // Function to update vendorClosedDayArray based on cutoff
-        function updateClosedDaysArray(cutoffDays, cutoffDateTime, closedDayArray) {
-            var adjustedDates = new Set(closedDayArray); // Use a Set for unique dates
-
-            // Loop through the next (cutoffDays + 2) days
-            for (var i = 0; i <= (cutoffDays); i++) {
-                var dateToCheck = new Date();
-                dateToCheck.setDate(dateToCheck.getDate() + i);
-                var dateToCheckOnlyDate = dateToCheck.getDate();
-
-                // Handle the case where dateToCheck is the same as the cutoff date
-                if (dateToCheckOnlyDate === cutoffDateTime.getDate()) {
-                    // Check if the current time has passed the cut
-                    // off time on the same day
-                    var currentTime = new Date();
-                    // Extract hours, minutes, and seconds
-                    var hours = currentTime.getHours();
-                    var minutes = currentTime.getMinutes();
-                    var seconds = currentTime.getSeconds();
-                    var timeString = ('0' + hours).slice(-2) + ':' + ('0' + minutes).slice(-2) + ':' + ('0' + seconds).slice(-2);
-                    var compareTimeStrings = compareTimes(timeString, co_timeString);
-
-                    if (compareTimeStrings == 1) {
-                        adjustedDates.add(formatDate(dateToCheck));
-                    }
-                } else if (dateToCheck < cutoffDateTime) {
-                    var formattedDate = formatDate(dateToCheck);
-                    adjustedDates.add(formattedDate);
-                }
-            }
-
-            return Array.from(adjustedDates); // Convert Set back to array
-        }
-
-        // Update closed days array
-        var updatedClosedDaysArray = updateClosedDaysArray(vendorCutoffDays, cutoffDateTime, vendorClosedDayArray);
+        var vendorClosedDayArray = vendorClosedDayArray_str_input.value;
 
         jQuery('#datepicker').datepicker({
             dateFormat: 'dd-mm-yy',
@@ -148,7 +79,7 @@ jQuery(document).ready(function($) {
             maxDate: "+58D",
             beforeShowDay: function(date){
                 var string = jQuery.datepicker.formatDate('dd-mm-yy', date);
-                return [ updatedClosedDaysArray.indexOf(string) == -1 ];
+                return [ vendorClosedDayArray.indexOf(string) == -1 ];
             },
             onClose: function(date, datepicker){
                 const par_elm = jQuery(this).closest('.form-row');
@@ -164,4 +95,45 @@ jQuery(document).ready(function($) {
         }).datepicker( "show" );
         jQuery(".ui-datepicker").addClass('notranslate').css('z-index', 99999999999999);
     });
+});
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    var greeting_key = document.getElementById('greeting_post_key_prodvend').value;
+    var vendor_id = document.getElementById('vendor_id').value;
+
+    // Prepare the data as URL-encoded form data
+    const postData = new URLSearchParams({
+        vendor_id: vendor_id,
+        greeting_key: greeting_key
+    });
+
+    fetch('/wp-admin/admin-ajax.php?action=get_vendor_closed_days', {
+        method: 'POST',
+        credentials: 'same-origin', // Ensure cookies are sent along with the request,
+        body: postData,
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded' // Set the content type to URL-encoded
+        }
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data && typeof data === 'object') {
+                // Extract the values from the object into an array
+                const dateArray = Object.values(data);
+
+                // Convert the array to a JSON string
+                const jsonArrayString = JSON.stringify(dateArray);
+
+                // Insert the JSON array string into the hidden input field
+                document.getElementById('vendor_closed_date_array').value = jsonArrayString;
+
+                // For debugging: Output to console to verify the format
+                //console.log(jsonArrayString);
+            } else {
+                console.error('Invalid data format:', data);
+            }
+        })
+        .catch(error => console.error('Error fetching dates:', error));
+
 });
