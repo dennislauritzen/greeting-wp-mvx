@@ -2,6 +2,13 @@
 
 
 /**
+ * Remove admin bar.
+ * It causes trouble with the cache.
+ *
+ */
+add_filter( 'show_admin_bar', '__return_false' );
+
+/**
  *
  * Remove the pagination for product category pages and custom taxonomy 'Occasions'.
  *

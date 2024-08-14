@@ -551,6 +551,9 @@ get_footer( );
             const dateLabelsContainer = document.querySelector('#date-labels-container');
             dateLabelsContainer.innerHTML = ''; // Clear any existing content
 
+            // Get the current hour
+            const currentHour = new Date().getHours();
+
             dates.forEach((dateObj, index) => {
                 if (dateObj.date === 'all') {
                     // Special handling for "Show all" option
@@ -580,6 +583,16 @@ get_footer( );
                     const date = new Date(dateObj.date);
                     date.setHours(23, 59, 59, 999);
                     const currentDate = new Date();
+
+                    const todayDateString = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+
+                    // Compare current date with the date from dateObj
+                    if (dateObj.date === todayDateString) {
+                        // For today's date, check the hour
+                        if (currentHour >= greeting_dot) {
+                            dateObj.closed_for_today = 1;
+                        }
+                    }
 
                     if (currentDate <= date) {
                         const div = document.createElement('div');

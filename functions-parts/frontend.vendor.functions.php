@@ -101,10 +101,6 @@ function redirect_pending_vendors_to_home() {
 add_action('template_redirect', 'redirect_pending_vendors_to_home');
 
 
-
-
-
-
 /**
  * Function to redirect a vendors products to frontpage if the vendor is not active
  *

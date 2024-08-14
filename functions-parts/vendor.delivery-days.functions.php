@@ -1046,6 +1046,17 @@ function greeting_generate_filtering_days() {
     $greeting_dot_key = isset($_POST['greeting_dot_key']) ? sanitize_text_field($_POST['greeting_dot_key']) : '';
     $greeting_dot_hash = md5("gre_et_i_ng21p412421" . $greeting_dot);
 
+    // Validate that the input is numeric and within the hour range
+    if (is_numeric($greeting_dot)) {
+        $greeting_dot = intval($greeting_dot); // Convert to integer
+        if ($greeting_dot < 0 || $greeting_dot > 24) {
+            $greeting_dot = 0; // Default to 0 if out of range
+        }
+    } else {
+        $greeting_dot = 0; // Default to 0 if not numeric
+    }
+
+
     if($greeting_dot_key !== $greeting_dot_hash){
         // Return JSON response indicating failure
         wp_send_json(array('success' => false, 'message' => 'Invalid hash or key. '.$greeting_dot.'    Key: '.$greeting_dot_key.'    Hash: '.$greeting_dot_hash));
@@ -1060,7 +1071,8 @@ function greeting_generate_filtering_days() {
     // Generate dates for the next 7 days
     for ($i = 0; $i < 9; $i++) {
         $closed_for_today = 0;
-        if($i == 0 && $greeting_dot_key <= date("H")){
+        $greeting_dot = isset($_POST['greeting_dot']) ? sanitize_text_field($_POST['greeting_dot']) : '0';
+        if($i == 0 && $greeting_dot <= date("H")){
             $closed_for_today = 1;
         }
 
