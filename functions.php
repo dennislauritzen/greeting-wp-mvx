@@ -1004,6 +1004,7 @@ include('functions-parts/admin.general.functions.php');
 include('functions-parts/admin.order.functions.php');
 include('functions-parts/admin.product.functions.php');
 include('functions-parts/admin.vendor.functions.php');
+include('functions-parts/admin.acf.blocks.functions.php');
 
 ## Include functions regarding checkout.
 include('functions-parts/checkout.functions.php');

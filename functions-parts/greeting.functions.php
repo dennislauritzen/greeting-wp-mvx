@@ -36,6 +36,7 @@ function greeting_change_dk_currency_symbol( $currency_symbol, $currency ) {
 add_filter('woocommerce_currency_symbol', 'greeting_change_dk_currency_symbol', 10, 2);
 
 
+
 /**
  * Turn off the xmlRPC
  *
