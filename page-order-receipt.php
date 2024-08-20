@@ -89,36 +89,86 @@ get_header('checkout');
                 </div>
                 <div class="row border mb-3">
                     <div class="col-6 pt-2">
-                        <p>
-                            <strong class="text-uppercase">Bestillingsdato</strong>
-                            <br>
-                            <?php echo esc_html( wc_format_datetime( $order->get_date_created() ) ); ?><!--(Status: <?php echo $order->get_status(); ?>)-->
-                        </p>
+
                         <p>
                             <strong class="text-uppercase">Levering</strong>
                             <br>
                             <?php
-                            $delivery_date = get_post_meta($order->get_id(), '_delivery_date', true);
+                            if(is_wc_hpos_activated()){
+                                $delivery_date = $order->get_meta('_delivery_date');
+                                $delivery_date_time = $order->get_meta('_delivery_date_time');
+                            } else {
+                                $delivery_date = get_post_meta($order->get_id(), '_delivery_date', true);
+                                $delivery_date_time = get_post_meta($order->get_id(), '_delivery_date_time', true);
+                            }
+
                             $wc_date = new WC_Datetime($delivery_date);
                             $delivery_date2 = wc_format_datetime( $wc_date );
 
                             if(!empty($delivery_date)){
                                 echo esc_html( $delivery_date2 );
+
+                                if(!empty($delivery_date_time)){
+                                    echo ' kl. '.esc_html($delivery_date_time);
+                                }
                             } else {
                                 echo 'Hurtigst muligt';
                             }
                             ?>
-                            <br>til <?php echo $order->get_shipping_first_name().' '.$order->get_shipping_last_name(); ?>
                             <br>
+                            <?php if(order_has_funeral_products($order->get_id())) { ?>
+                                til
+                                <?php echo $order->get_shipping_company(); ?>
+                                (Afdødes navn: <?php echo $order->get_shipping_first_name().' '.$order->get_shipping_last_name(); ?>)
+                            <?php } else { ?>
+                                til
+                                <?php echo $order->get_shipping_first_name().' '.$order->get_shipping_last_name(); ?>
+                            <?php } ?>
+
+                        </p>
+
+                        <?php $delivery_instructions = get_post_meta( $order->get_id(), '_delivery_instructions', true ); ?>
+                        <p>
+                            <strong><?php _e('Leveringsinstruktioner', 'woocommerce'); ?></strong>
                             <br>
+                            <?php echo (!empty($delivery_instructions)) ? $delivery_instructions : 'Ingen særlige leveringsinstruktioner'; ?>
+                            <?php
+                            if(!order_has_funeral_products($order->get_id())){
+
+                                // Only show this if it is not a funeral order.
+
+                                if(is_wc_hpos_activated()){
+                                    $leave_gift_at_address = ($order->get_meta('_leave_gift_address') == "1" ? 'Ja' : 'Nej');
+                                } else {
+                                    $leave_gift_at_address = (get_post_meta( $order->get_id(), '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej');
+                                }
+                                ?>
+                                <?php _e('Må stilles på adressen:', 'woocommerce'); ?> <?php echo $leave_gift_at_address; ?><br>
+
+                                <?php
+                                if(is_wc_hpos_activated()){
+                                    $leave_gift_at_neighbour = ($order->get_meta('_leave_gift_neighbour') == "1" ? 'Ja' : 'Nej');
+                                } else {
+                                    $leave_gift_at_neighbour = (get_post_meta( $order->get_id(), '_leave_gift_neighbour', true ) == "1" ? 'Ja' : 'Nej');
+                                }
+                                ?>
+                                <?php _e('Må gaven afleveres hos naboen:', 'woocommerce'); ?> <?php echo $leave_gift_at_neighbour; ?>
+
+                                <?php
+                            }
+                            ?>
+
+                            <br><br>
 
                             <?php $leave_gift_at_address = (get_post_meta( $order->get_id(), '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej'); ?>
                             <?php _e('Må stilles på adressen:', 'woocommerce'); ?> <?php echo $leave_gift_at_address; ?>
                             <br>
                             <?php $leave_gift_at_neighbour = (get_post_meta( $order->get_id(), '_leave_gift_neighbour', true ) == "1" ? 'Ja' : 'Nej'); ?>
                             <?php _e('Må gaven afleveres hos naboen:', 'woocommerce'); ?> <?php echo $leave_gift_at_neighbour; ?>
-
-
+                        </p>
+                        <p>
+                            <strong><?php _e('Dit telefonnummer:', 'woocommerce'); ?></strong><br>
+                            <?php echo $order->get_billing_phone(); ?>
                         </p>
                     </div>
                     <div class="col-6 pt-2">
@@ -132,15 +182,13 @@ get_header('checkout');
                             <br>
                             <?php
                             echo esc_html( get_post_meta($order->get_id(), '_greeting_message', true) ); ?>
+                            <br>
                         </p>
-                        <?php $delivery_instructions = get_post_meta( $order->get_id(), '_delivery_instructions', true ); ?>
-                        <?php if(!empty($delivery_instructions)){ ?>
-                            <p class="text-end">
-                                <strong class="text-uppercase"><?php _e('Leveringsinstruktioner', 'woocommerce'); ?></strong>
-                                <br>
-                                <?php echo $delivery_instructions; ?>
-                            </p>
-                        <?php } ?>
+                        <p class="text-end">
+                            <strong class="text-uppercase">Bestillingsdato</strong>
+                            <br>
+                            <?php echo esc_html( wc_format_datetime( $order->get_date_created() ) ); ?><!--(Status: <?php echo $order->get_status(); ?>)-->
+                        </p>
                     </div>
                 </div>
                 <div class="row order">

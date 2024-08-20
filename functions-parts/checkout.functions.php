@@ -1375,11 +1375,24 @@ function greeting_validate_new_receiver_info_fields($fields, $errors) {
             __( 'Please enter greeting message', 'greeting2')
         );
     }
+
     //if ($_POST['message-pro'] == "0" && (strlen($_POST['greeting_message']) > 165)){
-    if( isset($_POST['greeting_message']) && mb_strlen(trim($_POST['greeting_message']),'UTF-8') > 165){
+    if( isset($_POST['message_pro']) && $_POST['message_pro'] == "0"
+        && isset($_POST['greeting_message']) && mb_strlen(trim($_POST['greeting_message']),'UTF-8') > 165)
+    {
         $errors->add(
             'validation',
             __( 'Standard package accept only 165 Character', 'greeting2')
+        );
+    }
+
+    //if ($_POST['message-pro'] == "0" && (strlen($_POST['greeting_message']) > 165)){
+    if( isset($_POST['message_pro']) && $_POST['message_pro'] == "4"
+        && isset($_POST['greeting_message']) && mb_strlen(trim($_POST['greeting_message']),'UTF-8') > 400)
+    {
+        $errors->add(
+            'validation',
+            __( 'Kortet kan maksimalt indeholde 400 tegn', 'greeting2')
         );
     }
 

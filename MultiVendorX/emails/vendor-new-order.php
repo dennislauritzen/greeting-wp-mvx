@@ -32,7 +32,7 @@ $qrcode = 'https://api.qrserver.com/v1/create-qr-code/?size=135x135&data='.$code
 // Calculate order IDs
 $main_order = $parent_order_id;
 $main_order_object = wc_get_order($main_order);
-$main_order_ID_str = ( empty($main_order_object->get_id())  ? $main_order->ID : $main_order_object->get_id() );
+$main_order_ID_str = ( empty($main_order_object->get_id())  ? $main_order : $main_order_object->get_id() );
 $main_order_id = (empty(get_post_parent($order->get_id())) ? $order->get_id() : $main_order_ID_str );
 
 // Get the main_order object
@@ -94,9 +94,11 @@ do_action( 'woocommerce_email_header', $email_heading );
                                     <br>
                                     <?php
                                     if(is_wc_hpos_activated()){
-                                        $delivery_date = $main_order->get_meta('_delivery_date');
+                                        $delivery_date = $main_order_object->get_meta('_delivery_date');
+                                        $delivery_date_time = $main_order_object->get_meta('_delivery_date_time');
                                     } else {
                                         $delivery_date = get_post_meta($main_order_id, '_delivery_date', true);
+                                        $delivery_date_time = get_post_meta($main_order_id, '_delivery_date_time', true);
                                     }
 
                                     $wc_date = new WC_Datetime($delivery_date);
@@ -104,11 +106,23 @@ do_action( 'woocommerce_email_header', $email_heading );
 
                                     if(!empty($delivery_date)){
                                         echo esc_html( $delivery_date2 );
+
+                                        if(!empty($delivery_date_time)){
+                                            echo ' kl. '.esc_html($delivery_date_time);
+                                        }
                                     } else {
                                         echo 'Hurtigst muligt';
                                     }
                                     ?>
-                                    <br>til <?php echo $order->get_shipping_first_name().' '.$order->get_shipping_last_name(); ?>
+                                    <br>
+                                    <?php if(order_has_funeral_products($parent_order_id)) { ?>
+                                        til
+                                        <?php echo $order->get_shipping_company(); ?>
+                                        (Afdødes navn: <?php echo $order->get_shipping_first_name().' '.$order->get_shipping_last_name(); ?>)
+                                    <?php } else { ?>
+                                        til
+                                        <?php echo $order->get_shipping_first_name().' '.$order->get_shipping_last_name(); ?>
+                                    <?php } ?>
 
                                 </td>
                                 <td valign="top" align="right" style="padding: 10px 0px 10px 0;">
@@ -129,32 +143,50 @@ do_action( 'woocommerce_email_header', $email_heading );
                                     <?php } ?>
 
                                     <?php
-                                    if(is_wc_hpos_activated()){
-                                        $leave_gift_at_address = ($main_order->get_meta('_leave_gift_address') == "1" ? 'Ja' : 'Nej');
-                                    } else {
-                                        $leave_gift_at_address = (get_post_meta( $main_order_id, '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej');
-                                    }
-                                    ?>
-                                    <?php _e('Må stilles på adressen:', 'woocommerce'); ?> <?php echo $leave_gift_at_address; ?><br>
+                                    if(!order_has_funeral_products($parent_order_id)){
+
+                                        // Only show this if it is not a funeral order.
+
+                                        if(is_wc_hpos_activated()){
+                                            $leave_gift_at_address = ($main_order_object->get_meta('_leave_gift_address') == "1" ? 'Ja' : 'Nej');
+                                        } else {
+                                            $leave_gift_at_address = (get_post_meta( $main_order_id, '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej');
+                                        }
+                                        ?>
+                                        <?php _e('Må stilles på adressen:', 'woocommerce'); ?> <?php echo $leave_gift_at_address; ?><br>
+
+                                        <?php
+                                        if(is_wc_hpos_activated()){
+                                            $leave_gift_at_neighbour = ($main_order_object->get_meta('_leave_gift_neighbour') == "1" ? 'Ja' : 'Nej');
+                                        } else {
+                                            $leave_gift_at_neighbour = (get_post_meta( $main_order_id, '_leave_gift_neighbour', true ) == "1" ? 'Ja' : 'Nej');
+                                        }
+                                        ?>
+                                        <?php _e('Må gaven afleveres hos naboen:', 'woocommerce'); ?> <?php echo $leave_gift_at_neighbour; ?>
 
                                     <?php
-                                    if(is_wc_hpos_activated()){
-                                        $leave_gift_at_neighbour = ($main_order->get_meta('_leave_gift_neighbour') == "1" ? 'Ja' : 'Nej');
-                                    } else {
-                                        $leave_gift_at_neighbour = (get_post_meta( $main_order_id, '_leave_gift_neighbour', true ) == "1" ? 'Ja' : 'Nej');
                                     }
                                     ?>
-                                    <?php _e('Må gaven afleveres hos naboen:', 'woocommerce'); ?> <?php echo $leave_gift_at_neighbour; ?>
                                 </td>
                                 <td valign="top" align="right" width="50%" style="width: 50%; padding: 10px 0px 10px 0;">
                                     <strong style="text-transform: uppercase;">Hilsen til gavemodtager</strong>
                                     <br>
                                     <p>
                                         <?php
-                                        if(is_wc_hpos_activated()){
-                                            echo $main_order->get_meta('_greeting_message');
+                                        if( order_has_funeral_products($parent_order_id)
+                                            && ( !empty(get_post_meta( $parent_order_id, '_greeting_message_band_1', true ) )
+                                                || !empty(get_post_meta( $parent_order_id, '_greeting_message_band_2', true ))
+                                               )
+                                        ){
+                                            $band_line_1 = get_post_meta( $parent_order_id, '_greeting_message_band_1', true );
+                                            $band_line_2 = get_post_meta( $parent_order_id, '_greeting_message_band_2', true );
+
+                                            echo 'Bånd, linje 1: '.$band_line_1 . '<br><br>';
+                                            echo 'Bånd, linje 2: '.$band_line_2;
                                         } else {
-                                            echo esc_html( get_post_meta($main_order_id, '_greeting_message', true) );
+                                            $greeting_message = is_wc_hpos_activated() ? esc_html( $main_order_object->get_meta('_greeting_message') ) : esc_html( get_post_meta($main_order_id, '_greeting_message', true) );
+
+                                            echo $greeting_message;
                                         }
                                         ?>
                                     </p>
@@ -166,17 +198,20 @@ do_action( 'woocommerce_email_header', $email_heading );
                                       <strong><?php _e('Afsenders telefonnummer:', 'woocommerce'); ?></strong><br>
                                       <?php echo $order->get_billing_phone(); ?>
                                     </p>
+
+                                    <?php if(!order_has_funeral_products($parent_order_id)){ ?>
                                     <p>
                                       <strong><?php _e('Modtagers telefonnummer:', 'woocommerce'); ?></strong>
                                       <br>
                                         <?php
                                         if(is_wc_hpos_activated()){
-                                            echo $main_order->get_meta('_receiver_phone');
+                                            echo $main_order_object->get_meta('_receiver_phone');
                                         } else {
                                             echo get_post_meta( $main_order_id, '_receiver_phone', true );
                                         }
                                         ?>
                                     </p>
+                                    <?php } ?>
                                 </td>
                                 <td valign="top" align="right" width="50%" style="width: 50%; padding: 10px 0px 10px 0;">
                                     <strong style="text-transform: uppercase;">Bestillingsdato</strong>

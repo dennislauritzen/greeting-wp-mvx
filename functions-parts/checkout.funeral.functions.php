@@ -29,7 +29,7 @@ function cart_has_funeral_products(){
     return has_funeral_products_in_cart();
 }
 
-function has_funeral_products_in_cart() {
+function has_funeral_products_in_cart_old() {
     if ( ! WC()->cart ) {
         return false;
     }
@@ -63,7 +63,68 @@ function has_funeral_products_in_cart() {
     return false;
 }
 
+function has_funeral_products_in_cart(){
+    if ( ! WC()->cart ) {
+        return false;
+    }
+
+    // Initialize flags
+    $has_funeral_checkout = false;
+
+    // Loop through cart items
+    foreach (WC()->cart->get_cart() as $cart_item) {
+        $product_id = $cart_item['product_id'];
+
+        // Check if product has the activate funeral products field
+        $activate_funeral_products = get_field( 'activate_funeral_checkout', $product_id );
+
+        // Check for specific product category
+        if ($activate_funeral_products) {
+            $has_funeral_checkout = true;
+        }
+
+        // If both conditions are met, no need to check further
+        if ($has_funeral_checkout) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 function has_funeral_products_with_band_in_cart() {
+    // Initialize flags
+    $has_funeral_checkout = false;
+
+    // Loop through cart items
+    foreach (WC()->cart->get_cart() as $cart_item) {
+        $product_id = $cart_item['product_id'];
+
+        // Check if product has the activate funeral products field
+        $activate_funeral_products = get_field( 'activate_funeral_checkout', $product_id );
+
+        // Check if product is eligible for band
+        $is_eligible_for_band = get_post_meta($product_id, 'is_eligible_for_band', true);
+
+        // Check for specific product category
+        if ($activate_funeral_products) {
+            $has_funeral_checkout = true;
+        }
+        // Check for specific product category
+        if ($is_eligible_for_band) {
+            $is_eligible_for_band_bool = true;
+        }
+
+        // If both conditions are met, no need to check further
+        if ($has_funeral_checkout && $is_eligible_for_band_bool) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function has_funeral_products_with_band_in_cart_old() {
     // Get the selected category and occasion IDs from ACF options
     $specific_category_id = get_field('specific_product_category', 'option');
     $specific_occasion_id = get_field('specific_occasion', 'option');
@@ -100,6 +161,83 @@ function has_funeral_products_with_band_in_cart() {
  *
  */
 function order_has_funeral_products($order_id) {
+    // Initialize flags
+    $has_funeral_checkout = false;
+
+    // Get the order
+    $order = wc_get_order($order_id);
+
+    // Loop through order items
+    foreach ($order->get_items() as $item_id => $item) {
+        $product_id = $item->get_product_id();
+
+        // Check if product has the activate funeral products field
+        $activate_funeral_products = get_field( 'activate_funeral_checkout', $product_id );
+
+        // Check if product is eligible for band
+        $is_eligible_for_band = get_post_meta($product_id, 'is_eligible_for_band', true);
+
+        // Check for specific product category
+        if ($activate_funeral_products) {
+            $has_funeral_checkout = true;
+        }
+        // Check for specific product category
+        #if ($is_eligible_for_band) {
+        #    $is_eligible_for_band_bool = true;
+        #}
+
+        // If both conditions are met, no need to check further
+        #if ($has_funeral_checkout && $is_eligible_for_band_bool) {
+        if ($has_funeral_checkout ) {
+            return true;
+        }
+    }
+
+    // If neither condition is met, return false
+    return false;
+}
+
+function order_has_funeral_products_with_band($order_id) {
+    // Initialize flags
+    $has_funeral_checkout = false;
+    $is_eligible_for_band_bool = false;
+
+    // Get the order
+    $order = wc_get_order($order_id);
+
+    // Loop through order items
+    foreach ($order->get_items() as $item_id => $item) {
+        $product_id = $item->get_product_id();
+
+        // Check if product has the activate funeral products field
+        $activate_funeral_products = get_field( 'activate_funeral_checkout', $product_id );
+
+        // Check if product is eligible for band
+        $is_eligible_for_band = get_field('is_eligible_for_band', $product_id);
+
+        // Check for specific product category
+        if ($activate_funeral_products) {
+            $has_funeral_checkout = true;
+        }
+        // Check for specific product category
+        if ($is_eligible_for_band) {
+            $is_eligible_for_band_bool = true;
+        }
+
+        // If both conditions are met, no need to check further
+        if ($has_funeral_checkout && $is_eligible_for_band_bool) {
+            return true;
+        }
+    }
+
+    // If neither condition is met, return false
+    return false;
+}
+
+/**
+ *
+ */
+function order_has_funeral_products_old($order_id) {
     // Get the selected category and occasion IDs from ACF options
     $specific_category_id = get_field('specific_product_category', 'option');
     $specific_occasion_id = get_field('specific_occasion', 'option');
@@ -148,7 +286,7 @@ function custom_checkout_field_labels($fields) {
     if ($has_funeral_products_in_cart) {
         // Change the shipping first name label
         $fields['shipping']['shipping_first_name']['label'] = 'Afdødes fornavn';
-        $fields['shipping']['shipping_first_name']['label'] = 'Afdødes efternavn';
+        $fields['shipping']['shipping_last_name']['label'] = 'Afdødes efternavn';
 
         // Change the shipping company name label
         if (isset($fields['shipping']['shipping_company'])) {
@@ -157,23 +295,8 @@ function custom_checkout_field_labels($fields) {
         if (isset($fields['shipping']['shipping_address'])) {
             $fields['shipping']['shipping_company']['label'] = 'Kirkens eller kapellets adresse';
         }
-        // Add more field modifications as needed
     }
 
     return $fields;
 }
 add_filter('woocommerce_checkout_fields', 'custom_checkout_field_labels');
-
-
-// Add custom HTML under Shipping City field
-function custom_html_under_shipping_city($fields) {
-    $html = '<div class="custom-html-wrapper">';
-    $html .= '<p>This is custom HTML content.</p>';
-    $html .= '</div>';
-
-    // Insert custom HTML after Shipping City field
-    $fields['shipping']['shipping_city']['custom_html'] = $html;
-
-    return $fields;
-}
-add_filter('woocommerce_checkout_fields', 'custom_html_under_shipping_city');

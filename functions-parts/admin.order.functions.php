@@ -131,9 +131,15 @@ function admin_order_preview_add_custom_meta_data( $data, $order ) {
         if( $delivery_date_value = $order->get_meta('_delivery_date') ){
             $data['delivery_date_key'] = $delivery_date_value; // <= Store the value in the data array.
         }
+        if( $delivery_date_time_value = $order->get_meta('_delivery_date_time') ){
+            $data['delivery_date_time_key'] = $delivery_date_time_value; // <= Store the value in the data array.
+        }
     } else {
         if( $delivery_date_value = get_post_meta($order->get_id(), '_delivery_date', 'true') ){
             $data['delivery_date_key'] = $delivery_date_value; // <= Store the value in the data array.
+        }
+        if( $delivery_date_time_value = get_post_meta($order->get_id(), '_delivery_date_time', 'true') ){
+            $data['delivery_date_time_value'] = $delivery_date_time_value; // <= Store the value in the data array.
         }
     }
 
@@ -142,7 +148,7 @@ function admin_order_preview_add_custom_meta_data( $data, $order ) {
     }
 
 
-    if(order_has_funeral_products($order->get_id())){
+    if(order_has_funeral_products($order->get_id()) ){
         if( $greeting_message_band_1 = $order->get_meta('_greeting_message_band_1') ){
             $data['greeting_message_band_1_key'] = $greeting_message_band_1; // <= Store the value in the data array.
         }
@@ -154,7 +160,6 @@ function admin_order_preview_add_custom_meta_data( $data, $order ) {
             $data['greeting_message_key'] = $greeting_message; // <= Store the value in the data array.
         }
     }
-
 
     if( $leave_gift_address = $order->get_meta('_leave_gift_address') ){
         $leave_gift_address = ($leave_gift_address == "1" ? 'Ja' : 'Nej');
@@ -713,24 +718,26 @@ function greeting_delivery_date_display_admin_order_meta( $order ) {
     $str = '<p><strong>Leveringsdato:</strong> ';
     if ( !empty(get_post_meta( $order->get_id(), '_delivery_date', true )) ) {
         $str .= esc_attr( get_post_meta( $order->get_id(), '_delivery_date', true ) );
+
+        // Check if there is a delivery date time and the product is funeral - then show time.
+        if(order_has_funeral_products( $order->get_id() ) && !empty(get_post_meta( $order->get_id(), '_delivery_date_time', true )) ){
+            $str .= ' kl. '.esc_attr( get_post_meta( $order->get_id(), '_delivery_date_time', true ) );
+        }
     } else {
         $str .= 'Hurtigst muligt ('. get_post_meta( $order->get_id(), '_delivery_unixdate', true ).')';
     }
     //$str .= '('.get_post_meta( $order->get_id(), '_delivery_unixdate', true ).')';
     $str .= '</p>';
 
-    if(order_has_funeral_products( $order->get_id() ))
-    {
+    if(order_has_funeral_products_with_band( $order->get_id() ) ){
         $str .= '<p>
                 <strong>Bånd - linje 1:</strong> ' . esc_attr( get_post_meta( $order->get_id(), '_greeting_message_band_1', true ) ) . '<br>' .
                 '<strong>Bånd - linje 2:</strong>' . esc_attr( get_post_meta( $order->get_id(), '_greeting_message_band_2', true ) )  .
             '</p>';
     } else {
-
         $str .= '<p><strong>Modtagers telefonnr.:</strong> ' . esc_attr( get_post_meta( $order->get_id(), '_receiver_phone', true ) ) . '</p>';
         $str .= '<p><strong>Besked til modtager:</strong> ' . esc_attr( get_post_meta( $order->get_id(), '_greeting_message', true ) ) . '</p>';
     }
-
 
     $str .= '<p><strong>Leveringsinstruktioner:</strong> ' . get_post_meta( $order->get_id(), '_delivery_instructions', true ) . '</p>';
     $leave_gift_at_address = (esc_attr( get_post_meta( $order->get_id(), '_leave_gift_address', true ) ) == "1" ? 'Ja' : 'Nej');
