@@ -78,12 +78,23 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                                     <strong style="text-transform: uppercase;">Levering</strong>
                                     <br>
                                     <?php
-                                    $delivery_date = get_post_meta($main_order_id, '_delivery_date', true);
+                                    if(is_wc_hpos_activated()){
+                                        $delivery_date = $order->get_meta('_delivery_date');
+                                        $delivery_date_time = $order->get_meta('_delivery_date_time');
+                                    } else {
+                                        $delivery_date = get_post_meta($order->get_id(), '_delivery_date', true);
+                                        $delivery_date_time = get_post_meta($order->get_id(), '_delivery_date_time', true);
+                                    }
+
                                     $wc_date = new WC_Datetime($delivery_date);
                                     $delivery_date2 = wc_format_datetime( $wc_date );
 
                                     if(!empty($delivery_date)){
                                         echo esc_html( $delivery_date2 );
+
+                                        if(!empty($delivery_date_time)){
+                                            echo ' kl. '.esc_html($delivery_date_time);
+                                        }
                                     } else {
                                         echo 'Hurtigst muligt';
                                     }
@@ -144,6 +155,35 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                                     <p>
                                         <?php
                                         echo esc_html( get_post_meta($main_order_id, '_greeting_message', true) ); ?>
+                                    </p>
+                                    <strong style="text-transform: uppercase;">
+                                        <?php
+                                        if(order_has_funeral_products($parent_order_id)){
+                                            echo 'Hilsen til afdøde';
+                                        } else {
+                                            echo 'Hilsen til gavemodtager';
+                                        }
+                                        ?>
+                                    </strong>
+                                    <br>
+                                    <p>
+                                        <?php
+                                        if( order_has_funeral_products($parent_order_id)
+                                            && ( !empty(get_post_meta( $parent_order_id, '_greeting_message_band_1', true ) )
+                                                || !empty(get_post_meta( $parent_order_id, '_greeting_message_band_2', true ))
+                                            )
+                                        ){
+                                            $band_line_1 = get_post_meta( $parent_order_id, '_greeting_message_band_1', true );
+                                            $band_line_2 = get_post_meta( $parent_order_id, '_greeting_message_band_2', true );
+
+                                            echo 'Bånd, linje 1: '.$band_line_1 . '<br><br>';
+                                            echo 'Bånd, linje 2: '.$band_line_2;
+                                        } else {
+                                            $greeting_message = is_wc_hpos_activated() ? esc_html( $main_order_object->get_meta('_greeting_message') ) : esc_html( get_post_meta($main_order_id, '_greeting_message', true) );
+
+                                            echo $greeting_message;
+                                        }
+                                        ?>
                                     </p>
                                 </td>
                             </tr>
