@@ -260,6 +260,8 @@ do_action( 'woocommerce_email_header', $email_heading );
 
                 <?php
                 if (apply_filters('show_cust_order_calulations_field', true, $vendor->id)) {
+
+
                     // Get the total including tax
                     $order_total = $order->get_total();
 
@@ -276,15 +278,15 @@ do_action( 'woocommerce_email_header', $email_heading );
                     $fees = $order->get_fees();
                     $greeting_card_fee_ex_vat = 0;
                     $greeting_card_fee_with_vat = 0;
-                    $greeting_card_store_part = 0.5;
+                    $greeting_card_store_part_ex_vat = (15*0.8);
                     foreach($fees as $fee){
                         $fee_name = $fee->get_name();
                         $fee_amount = $fee->get_amount();
 
-                        $greeting_card_fee_ex_vat =+ $fee_amount;
-                        $greeting_card_fee_with_vat =+ $fee_amount * 1.25 ;
+                        $greeting_card_fee_ex_vat += $fee_amount;
+                        $greeting_card_fee_with_vat += $fee_amount * 1.25 ;
                     }
-                    $greeting_card_store_part_fee_with_vat = $greeting_card_fee_with_vat * $greeting_card_store_part;
+                    $greeting_card_store_part_fee_with_vat = ($greeting_card_fee_with_vat > 15) ? $greeting_card_store_part_ex_vat * 1.25 : 0;
 
                     // Calculate the new subtotal without shipping
                     $order_new_subtotal = $total_without_discount - $greeting_card_fee_with_vat - $order_ship_total;
