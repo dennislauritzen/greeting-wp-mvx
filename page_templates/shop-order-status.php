@@ -42,9 +42,11 @@ if(empty($order_id) || !isset($order_id)
   || empty($get_order_hash) || $get_order_hash != $order_hash
   || empty($get_order_hash2) || $get_order_hash2 != $order_hash2
 ){
-  wp_redirect(home_url());
-  return;
-  exit();
+    print $order_hash."<br>";
+    print $order_hash2;
+    #wp_redirect(home_url());
+    return;
+    exit();
 }
 
 
@@ -108,11 +110,10 @@ get_header('green');
 
     $border_order_seen = (in_array($orderStatus, $seen_array) ? array('border' => 'succes', 'color' => '#28a745', 'show_link' => true) : array('border' => 'grey', 'color' => '#444444', 'show_link' => false));
     $border_order_delivered = (in_array($orderStatus, $delivered_array) ? array('border' => 'succes', 'color' => '#28a745', 'show_link' => true) : array('border' => 'grey', 'color' => '#444444', 'show_link' => false));
-
-    if($orderStatus == 'processing' || $orderStatus == 'order-mail-open' || $orderStatus == 'order-seen' || $orderStatus == 'order-forwarded' || $orderStatus == 'order-accepted'){?>
+    ?>
     <div class="col-6 col-xs-6 col-sm-6 col-md-6 col-lg-4">
       <?php echo ($border_order_seen['show_link'] === true ? '<a href="'.$update_link.'">' : ''); ?>
-        <div class="text-center btn bg-light shadow border border-<?php echo $border_order_seen['border']; ?> border-1 rounded p-3 w-75">
+        <div class="text-center btn bg-light shadow border border-<?php echo $border_order_seen['border']; ?> border-1 rounded p-3">
           <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="<?php echo $border_order_seen['color']; ?>" class="bi bi-eye" viewBox="0 0 16 16">
             <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
             <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
@@ -127,12 +128,11 @@ get_header('green');
         </div>
       <?php echo ($border_order_seen['show_link'] === true ? '</a>' : ''); ?>
     </div>
-    <?php } ?>
     <div class="col-6 col-xs-6 col-sm-6 col-md-6 col-lg-4">
       <?php if($orderStatus == 'processing' || $orderStatus == 'order-mail-open' || $orderStatus == 'order-seen' || $orderStatus == 'order-forwarded' || $orderStatus == 'order-accepted'){?>
       <!--<p>Klik nedenfor for at markere ordren som leveret / afsendt:</p>-->
       <?php echo ($border_order_delivered['show_link'] === true ? '<a href="'.$update_link.'">' : ''); ?>
-        <div class="text-center btn bg-light shadow border border-<?php echo $border_order_delivered['border']; ?> border-1 rounded p-3 w-75">
+        <div class="text-center btn bg-light shadow border border-<?php echo $border_order_delivered['border']; ?> border-1 rounded p-3">
           <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="<?php echo $border_order_delivered['color']; ?>" class="bi bi-bicycle pb-2" viewBox="0 0 16 16">
             <path d="M4 4.5a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1v.5h4.14l.386-1.158A.5.5 0 0 1 11 4h1a.5.5 0 0 1 0 1h-.64l-.311.935.807 1.29a3 3 0 1 1-.848.53l-.508-.812-2.076 3.322A.5.5 0 0 1 8 10.5H5.959a3 3 0 1 1-1.815-3.274L5 5.856V5h-.5a.5.5 0 0 1-.5-.5zm1.5 2.443-.508.814c.5.444.85 1.054.967 1.743h1.139L5.5 6.943zM8 9.057 9.598 6.5H6.402L8 9.057zM4.937 9.5a1.997 1.997 0 0 0-.487-.877l-.548.877h1.035zM3.603 8.092A2 2 0 1 0 4.937 10.5H3a.5.5 0 0 1-.424-.765l1.027-1.643zm7.947.53a2 2 0 1 0 .848-.53l1.026 1.643a.5.5 0 1 1-.848.53L11.55 8.623z"/>
           </svg>
@@ -145,7 +145,7 @@ get_header('green');
           <path d="M6.854 7.146a.5.5 0 1 0-.708.708L7.293 9l-1.147 1.146a.5.5 0 0 0 .708.708L8 9.707l1.146 1.147a.5.5 0 0 0 .708-.708L8.707 9l1.147-1.146a.5.5 0 0 0-.708-.708L8 8.293 6.854 7.146z"/>
           <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
         </svg>
-        <p><b>Anulleret</b><br>Ordren er desværre enten refunderet, slettet eller ikke gennemført, så den kan ikke markeres som leveret</p>
+        <p><b>Annulleret</b><br>Ordren er desværre enten refunderet, slettet eller ikke gennemført, så den kan ikke markeres som leveret</p>
       </div>
     <?php } else if($orderStatus == 'delivered' || $orderStatus == 'completed') {?>
         <div class="text-center btn bg-light shadow border border-success border-1 rounded p-3 w-75">

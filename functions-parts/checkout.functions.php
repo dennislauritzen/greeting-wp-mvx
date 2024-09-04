@@ -670,7 +670,7 @@ function greeting_echo_receiver_info( ) {
             'id'				=> 'greetingMessage',
             'class'				=> array('form-row-wide'),
             'required'		    => true,
-            'input_class'	    => 'validate[required]',
+            //'input_class'	    => 'validate[required]',
             'label'				=> __('Din hilsen til modtager (max 160 tegn)', 'greeting2'),
             'placeholder'	    => __('Skriv din hilsen til din modtager her :)', 'greeting2'),
             'maxlength' 	    => 160
@@ -1369,12 +1369,13 @@ function greeting_validate_new_receiver_info_fields($fields, $errors) {
     #		__('Indtast et gyldigt telefonnummer til modtager i step 3  (8 cifre, uden mellemrum og landekode), så vi kan kontakte vedkommende ved evt. spørgsmål om levering. Klik på "Gennmfør bestilling" når du har rettet telefonnummeret.','greeting2')
     #	);
     #}
-    if ( isset($_POST['greeting_message']) && empty($_POST['greeting_message']) ){
-        $errors->add(
-            'validation',
-            __( 'Please enter greeting message', 'greeting2')
-        );
-    }
+
+    #if ( isset($_POST['greeting_message']) && empty($_POST['greeting_message']) ){
+    #    $errors->add(
+    #        'validation',
+    #        __( 'Please enter greeting message', 'greeting2')
+    #    );
+    #}
 
     //if ($_POST['message-pro'] == "0" && (strlen($_POST['greeting_message']) > 165)){
     if( isset($_POST['message_pro']) && $_POST['message_pro'] == "0"

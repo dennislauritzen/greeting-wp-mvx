@@ -299,10 +299,10 @@ do_action( 'woocommerce_email_header', $email_heading );
                         Varetotal (inkl. 25 % moms)
                     </td>
                     <td style="width: 50%; padding: 6px 10px 6px 0px; text-align: right;">
-                        <?php echo wc_price( $order_new_subtotal ); ?>
+                        <?php echo $order_new_subtotal; ?> kr.
                     </td>
                 </tr>
-                <?php if($greeting_card_fee_with_vat > 0){ ?>
+                <?php if($greeting_card_store_part_fee_with_vat > 0){ ?>
                 <tr class="order-details-totals-row" style="border-top: 1px solid #c0c0c0; border-bottom: 1px solid #dee2e6;">
                     <td width="50%" style="width: 50%; padding: 6px 0 6px 10px;">
                         Kort
@@ -311,6 +311,7 @@ do_action( 'woocommerce_email_header', $email_heading );
                         <?php echo wc_price( $greeting_card_store_part_fee_with_vat ); ?>
                     </td>
                 </tr>
+                <?php } ?>
                 <?php } ?>
                 <tr class="order-details-totals-row" style="border-top: 1px solid #c0c0c0; border-bottom: 1px solid #dee2e6;">
                     <td width="50%" style="width: 50%; padding: 6px 0 6px 10px;">
