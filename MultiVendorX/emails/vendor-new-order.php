@@ -312,7 +312,6 @@ do_action( 'woocommerce_email_header', $email_heading );
                     </td>
                 </tr>
                 <?php } ?>
-                <?php } ?>
                 <tr class="order-details-totals-row" style="border-top: 1px solid #c0c0c0; border-bottom: 1px solid #dee2e6;">
                     <td width="50%" style="width: 50%; padding: 6px 0 6px 10px;">
                         Levering

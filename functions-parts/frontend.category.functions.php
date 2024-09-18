@@ -84,6 +84,32 @@ function catocca_landing_data_fetch(){
     die();
 }
 
+function yoast_seo_robots_change_author_archive( $robots ) {
+    if (
+        is_paged() && is_archive()
+        || is_paged() && is_product_category_page()
+    ) {
+        return 'noindex, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
+    } else {
+        return $robots;
+    }
+}
+add_filter( 'wpseo_robots', 'yoast_seo_robots_change_author_archive' );
+add_filter( 'wpseo_next_rel_link', '__return_false' );
+add_filter( 'wpseo_prev_rel_link', '__return_false' );
+
+
+
+// Modify canonical URLs to remove pagination
+function remove_pagination_from_canonical($canonical) {
+    if (is_paged() && is_archive()
+        || is_paged() && is_product_category_page()) {
+        // Remove /page/x/ from the canonical URL
+        $canonical = get_pagenum_link(1); // Returns the first page without pagination
+    }
+    return $canonical;
+}
+add_filter('wpseo_canonical', 'remove_pagination_from_canonical');
 
 /**
  * Filtering on the category landing pages.
