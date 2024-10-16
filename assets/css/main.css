@@ -11076,7 +11076,6 @@ section#top.vendor {
   color: #000000;
 }
 
-div.woocommerce #billing_country_field,
 div.woocommerce #shipping_country_field {
   display: none;
 }

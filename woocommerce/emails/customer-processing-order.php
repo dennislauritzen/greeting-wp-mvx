@@ -151,11 +151,11 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                                     ?>
                                 </td>
                                 <td valign="top" align="right" width="50%" style="vertical-align: top; width: 50%; padding: 10px 0px 10px 0;">
-                                    <strong style="text-transform: uppercase;">Hilsen til gavemodtager</strong>
+                                    <!--<strong style="text-transform: uppercase;">Hilsen til gavemodtager</strong>
                                     <p>
                                         <?php
-                                        echo esc_html( get_post_meta($main_order_id, '_greeting_message', true) ); ?>
-                                    </p>
+                                        #echo esc_html( get_post_meta($main_order_id, '_greeting_message', true) ); ?>
+                                    </p>-->
                                     <strong style="text-transform: uppercase;">
                                         <?php
                                         if(order_has_funeral_products($parent_order_id)){

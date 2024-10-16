@@ -198,7 +198,6 @@ do_action( 'woocommerce_email_header', $email_heading );
                                       <strong><?php _e('Afsenders telefonnummer:', 'woocommerce'); ?></strong><br>
                                       <?php echo $order->get_billing_phone(); ?>
                                     </p>
-
                                     <?php if(!order_has_funeral_products($parent_order_id)){ ?>
                                     <p>
                                       <strong><?php _e('Modtagers telefonnummer:', 'woocommerce'); ?></strong>
@@ -279,9 +278,10 @@ do_action( 'woocommerce_email_header', $email_heading );
                     $greeting_card_fee_ex_vat = 0;
                     $greeting_card_fee_with_vat = 0;
                     $greeting_card_store_part_ex_vat = (15*0.8);
-                    foreach($fees as $fee){
+
+					foreach($fees as $fee){
                         $fee_name = $fee->get_name();
-                        $fee_amount = $fee->get_amount();
+                        $fee_amount = (int) $fee->get_amount('edit');
 
                         $greeting_card_fee_ex_vat += $fee_amount;
                         $greeting_card_fee_with_vat += $fee_amount * 1.25 ;

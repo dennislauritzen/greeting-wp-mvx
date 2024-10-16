@@ -606,10 +606,11 @@ function greeting_wc_add_order_meta_box_action( $actions ) {
     #}
 
     // add "mark printed" custom action
-    $actions['wc_custom_order_action'] = __( 'Gensend mail til butikken', 'greeting2' );
-    $actions['wc_custom_order_action_order_notice'] = __( 'Gensend ordrebekræftelse til kunde', 'greeting2' );
-    $actions['wc_custom_order_action_delivery_notice'] = __( 'Gensend leveringsbekræftelse til kunde', 'greeting2' );
-    $actions['wc_custom_order_action_test_mail'] = __( 'SEND TEST MAIL', 'greeting2' );
+    $actions['wc_custom_order_action'] = __( 'Gensend mail til butikken', 'greeting3' );
+    $actions['wc_custom_order_action_order_notice'] = __( 'Gensend ordrebekræftelse til kunde', 'greeting3' );
+    $actions['wc_custom_order_action_delivery_notice'] = __( 'Gensend leveringsbekræftelse til kunde', 'greeting3' );
+	$actions['wc_custom_order_action_admin_notice'] = __( 'Gensend ordre-mail til admin', 'greeting3' );
+    $actions['wc_custom_order_action_test_mail'] = __( 'SEND TEST MAIL', 'greeting3' );
     return $actions;
 }
 add_action( 'woocommerce_order_actions', 'greeting_wc_add_order_meta_box_action' );
@@ -657,6 +658,27 @@ function greeting_wc_completed_order_resend_new_order_mail_to_customer( $order )
 add_action( 'woocommerce_order_action_wc_custom_order_action_order_notice', 'greeting_wc_completed_order_resend_new_order_mail_to_customer' );
 
 /**
+ * Add an order note when send mail to admin action is clicked
+ * Add a flag on the order to show it's been run
+ *
+ * @author Dennis Lauritzen
+ * @param \WC_Order $order
+ */
+function greeting_wc_completed_order_resend_new_order_mail_to_admin( $order ) {
+	$mailer = WC()->mailer();
+	$mails = $mailer->get_emails();
+
+	if ( !empty( $mails ) ) {
+		foreach ( $mails as $mail ) {
+			if ( $mail->id == 'new_order' ) {
+				$mail->trigger( $order->get_id() );
+			}
+		}
+	}
+}
+add_action( 'woocommerce_order_action_wc_custom_order_action_admin_notice', 'greeting_wc_completed_order_resend_new_order_mail_to_admin' );
+
+/**
  * Add an order note when custom action is clicked
  * Add a flag on the order to show it's been run
  *
@@ -700,7 +722,7 @@ function greeting_wc_process_order_meta_box_action_test_mail( $order ) {
     if ( !empty( $mails ) ) {
         foreach ( $mails as $mail ) {
             if ( $mail->id == 'customer_completed_order' ) {
-                add_filter('woocommerce_new_order_email_allows_resend', '__return_true' );
+                aedd_filter('woocommerce_new_order_email_allows_resend', '__return_true' );
                 $mail->trigger( $order->get_id() );
             }
         }

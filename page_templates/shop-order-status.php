@@ -38,16 +38,16 @@ $order_hash2 = hash('md4', 'vvkrne12onrtnFG_:____'.$order_id);
 #print "<p>".$order_hash2." - ".$get_order_hash2."</p>";
 
 // Check if order id and order hash/salt is set.
-if(empty($order_id) || !isset($order_id)
-  || empty($get_order_hash) || $get_order_hash != $order_hash
-  || empty($get_order_hash2) || $get_order_hash2 != $order_hash2
-){
-    print $order_hash."<br>";
-    print $order_hash2;
-    #wp_redirect(home_url());
-    return;
-    exit();
-}
+#if(empty($order_id) || !isset($order_id)
+#  || empty($get_order_hash) || $get_order_hash != $order_hash
+#  || empty($get_order_hash2) || $get_order_hash2 != $order_hash2
+#){
+#    print $order_hash."<br>";
+#    print $order_hash2;
+#    #wp_redirect(home_url());
+#    return;
+#    exit();
+#}
 
 
 

@@ -273,16 +273,17 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                     $order_ship_total = $order->get_shipping_total() + $order->get_shipping_tax();
 
                     // Calculate the cost of the cards
-                    $fees = $order->get_fees();
-                    $greeting_card_fee_ex_vat = 0;
-                    $greeting_card_fee_with_vat = 0;
-                    foreach($fees as $fee){
-                        $fee_name = $fee->get_name();
-                        $fee_amount = $fee->get_amount();
+					$fees = $order->get_fees();
+					$greeting_card_fee_ex_vat = 0;
+					$greeting_card_fee_with_vat = 0;
+					$greeting_card_store_part_ex_vat = (15*0.8);
+					foreach($fees as $fee){
+						$fee_name = $fee->get_name();
+						$fee_amount = (int) $fee->get_amount('edit');
 
-                        $greeting_card_fee_ex_vat =+ $fee_amount;
-                        $greeting_card_fee_with_vat =+ $fee_amount * 1.25 ;
-                    }
+						$greeting_card_fee_ex_vat += $fee_amount;
+						$greeting_card_fee_with_vat += $fee_amount * 1.25 ;
+					}
 
                     $order_new_subtotal = $order_total - $greeting_card_fee_with_vat - $order_ship_total;
                     ?>
