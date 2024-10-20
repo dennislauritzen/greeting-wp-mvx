@@ -470,7 +470,7 @@ function greeting_delivery_instructions( $fields ) {
 
     if($has_funeral_products){
         echo '<p class="form-row text-end">';
-        echo 'I tvivl om kirkens adresse? Du kan finde den på <a href="https://www.sogn.dk/" rel="nofollow noopener">Sogn.dk</a>';
+        echo 'I tvivl om kirkens adresse? Du kan finde den på <a href="https://www.sogn.dk/" target="_blank" rel="nofollow noopener">Sogn.dk</a>';
         echo '</p>';
     }
 
