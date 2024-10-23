@@ -391,7 +391,7 @@ if ($terms && !is_wp_error($terms)) {
                     <?php
                     foreach($dates as $k => $v){
                         $closed_for_today = 0;
-                        if($k == 0 && $DropOffTimes <= date("H")){
+                        if($k == 0 && $max_dropoff_time <= date("H")){
                             $closed_for_today = 1;
                         }
                         ?>

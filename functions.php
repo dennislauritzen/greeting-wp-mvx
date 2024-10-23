@@ -594,9 +594,7 @@ function remove_plugin_bootstrap_styles() {
 add_action('wp_enqueue_scripts', 'remove_plugin_bootstrap_styles', 99999);
 
 
-
-
-        /**
+/**
  * Nav menus.
  *
  * @since v1.0
@@ -1004,6 +1002,7 @@ include('functions-parts/admin.general.functions.php');
 include('functions-parts/admin.order.functions.php');
 include('functions-parts/admin.product.functions.php');
 include('functions-parts/admin.vendor.functions.php');
+include('functions-parts/admin.vendor.invite.functions.php');
 include('functions-parts/admin.acf.blocks.functions.php');
 
 ## Include functions regarding checkout.
@@ -1030,4 +1029,5 @@ include('functions-parts/vendordash.functions.php');
 
 ## Include API & cron functions.
 include('functions-parts/api.functions.php');
+#include('functions-parts/api.economic.functions.php');
 include('functions-parts/cron.order.functions.php');
