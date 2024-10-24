@@ -63,7 +63,7 @@ function greeting_change_vendor_show_meta_callback( $post ) {
 
 	$order_id = ( !empty($post->get_id()) ? $post->get_id() : $post->ID );
 
-    $current_store = get_post_meta($post->ID, '_vendor_id', true);
+    $current_store = get_post_meta($order_id, '_vendor_id', true);
 
     wp_nonce_field( 'greeting_vendor_change_metabox_action', 'greeting_vendor_change' );
     echo '<select name="vendor_meta_name">';
