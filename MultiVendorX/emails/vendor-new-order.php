@@ -133,7 +133,11 @@ do_action( 'woocommerce_email_header', $email_heading );
                             </tr>
                             <tr>
                                 <td valign="top" width="50%" style="width: 50%; padding: 10px 0 15px 0px;">
-                                    <?php $delivery_instructions = get_post_meta( $main_order_id, '_delivery_instructions', true ); ?>
+									<?php if(is_wc_hpos_activated()){
+										$delivery_instructions = $main_order_object->get_meta( $order->get_id(), '_delivery_instructions');
+									} else {
+										$delivery_instructions = get_post_meta( $main_order_id, '_delivery_instructions', true );
+									} ?>
                                     <?php if(!empty($delivery_instructions)){ ?>
                                     <strong><?php _e('Leveringsinstruktioner', 'woocommerce'); ?></strong>
                                     <br>
@@ -172,23 +176,29 @@ do_action( 'woocommerce_email_header', $email_heading );
                                     <strong style="text-transform: uppercase;">Hilsen til gavemodtager</strong>
                                     <br>
                                     <p>
-                                        <?php
-                                        if( order_has_funeral_products($parent_order_id)
-                                            && ( !empty(get_post_meta( $parent_order_id, '_greeting_message_band_1', true ) )
-                                                || !empty(get_post_meta( $parent_order_id, '_greeting_message_band_2', true ))
-                                               )
-                                        ){
-                                            $band_line_1 = get_post_meta( $parent_order_id, '_greeting_message_band_1', true );
-                                            $band_line_2 = get_post_meta( $parent_order_id, '_greeting_message_band_2', true );
 
-                                            echo 'Bånd, linje 1: '.$band_line_1 . '<br><br>';
-                                            echo 'Bånd, linje 2: '.$band_line_2;
-                                        } else {
-                                            $greeting_message = is_wc_hpos_activated() ? esc_html( $main_order_object->get_meta('_greeting_message') ) : esc_html( get_post_meta($main_order_id, '_greeting_message', true) );
+										<?php
+										if(is_wc_hpos_activated()){
+											$band_line_1 = $main_order_object->get_meta('_greeting_message_band_1');
+											$band_line_2 = $main_order_object->get_meta('_greeting_message_band_2');
+										} else {
+											$band_line_1 = get_post_meta( $parent_order_id, '_greeting_message_band_1', true );
+											$band_line_2 = get_post_meta( $parent_order_id, '_greeting_message_band_2', true );
+										}
 
-                                            echo $greeting_message;
-                                        }
-                                        ?>
+										if( order_has_funeral_products($parent_order_id)
+											&& ( !empty($band_line_1)
+												|| !empty( $band_line_2 )
+											)
+										){
+											echo 'Bånd, linje 1: '.$band_line_1 . '<br><br>';
+											echo 'Bånd, linje 2: '.$band_line_2;
+										} else {
+											$greeting_message = is_wc_hpos_activated() ? esc_html( $main_order_object->get_meta('_greeting_message') ) : esc_html( get_post_meta($main_order_id, '_greeting_message', true) );
+
+											echo $greeting_message;
+										}
+										?>
                                     </p>
                                 </td>
                             </tr>

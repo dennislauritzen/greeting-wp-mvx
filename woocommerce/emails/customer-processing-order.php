@@ -337,7 +337,12 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                             <?php echo ($order->get_shipping_country()) ? '<br><span id="ship_country">'.WC()->countries->countries[$order->get_shipping_country()].'</span>' : ''; ?>
 
                             <?php
-                            $delivery_phone = get_post_meta($order->get_id(), '_receiver_phone', true);
+							if(is_wc_hpos_activated()){
+								$delivery_phone = $main_order_object->get_meta('_receiver_phone');
+							} else {
+								$delivery_phone = get_post_meta( $main_order_id, '_receiver_phone', true );
+							}
+
                             echo ($delivery_phone) ? '<br><span id="ship_phone">Modtagers tlf.: '.$delivery_phone.'</span>' : ''; ?>
                         </p>
                     </td>
