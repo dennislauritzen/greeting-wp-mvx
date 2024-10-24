@@ -136,15 +136,50 @@ add_filter('mvx_order_item_quantity_text', 'custom_order_item_quantity_html', 10
  * @author Dennis
  */
 function custom_woocommerce_email_order_meta_fields( $fields, $sent_to_admin, $order ) {
-    $del_date = get_post_meta( $order->get_id(), '_delivery_date', true );
-    $delivery_date = (!empty($del_date) ? $del_date : 'Hurtigst muligt');
+	if( is_wc_hpos_activated() ){
+	# DELIVERY DATE
+		$del_date = $order->get_meta('_delivery_date');
+		$delivery_date = (!empty($del_date) ? $del_date : 'Hurtigst muligt');
+
+		# GREETING MESSAGE
+		$greeting_message = $order->get_meta('_greeting_message');
+
+		# LEAVE GIFT
+		$leave_gift_at_address = ($order->get_meta('_leave_gift_address') == "1" ? 'Ja' : 'Nej');
+		$leave_gift_at_neighbour = ($order->get_meta('_leave_gift_neighbour') == "1" ? 'Ja' : 'Nej');
+
+		# DELIVERY INSTRUCTIONS
+		$delivery_instructions = $order->get_meta('_delivery_instructions');
+
+		# RECEIVER PHONE
+		$receiver_phone = $order->get_meta('_receiver_phone');
+	} else {
+		# DELIVERY DATE
+		$del_date = get_post_meta( $order->get_id(), '_delivery_date', true );
+		$delivery_date = (!empty($del_date) ? $del_date : 'Hurtigst muligt');
+
+		# GREETING MESSAGE
+		$greeting_message = get_post_meta( $order->get_id(), '_greeting_message', true );
+
+		# LEAVE GIFT
+		$leave_gift_at_address = (get_post_meta( $order->get_id(), '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej');
+		$leave_gift_at_neighbour = (get_post_meta( $order->get_id(), '_leave_gift_neighbour', true ) == "1" ? 'Ja' : 'Nej');
+
+		# DELIVERY INSTRUCTIONS
+		$delivery_instructions = get_post_meta( $order->get_id(), '_delivery_instructions', true );
+
+		# RECEIVER PHONE
+		$receiver_phone = get_post_meta( $order->get_id(), '_receiver_phone', true );
+	}
+
+
     $fields['delivery_date'] = array(
         'label' => __( 'Leveringsdato' ),
         'value' => $delivery_date,
     );
     $fields['billing_phone'] = array(
         'label' => __( 'Afsenders telefonnr.' ),
-        'value' => get_post_meta( $order->get_id(), '_billing_phone', true ),
+        'value' => $order->get_billing_phone(),
     );
 
 
@@ -153,24 +188,22 @@ function custom_woocommerce_email_order_meta_fields( $fields, $sent_to_admin, $o
         'value' => get_post_meta( $order->get_id(), '_greeting_message', true ),
     );
 
-
-    $leave_gift_at_address = (get_post_meta( $order->get_id(), '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej');
     $fields['leave_gift_address'] = array(
         'label' => __( 'Efterlad gaven på adressen' ),
         'value' => $leave_gift_at_address
     );
-    $leave_gift_at_neighbour = (get_post_meta( $order->get_id(), '_leave_gift_neighbour', true ) == "1" ? 'Ja' : 'Nej');
+
     $fields['leave_gift_neighbour'] = array(
         'label' => __( 'Gaven må afleveres til naboen' ),
-        'value' => $leave_gift_at_neighbour
+        'value' => $leave_gift_at_neighbour,
     );
     $fields['delivery_instructions'] = array(
         'label' => __( 'Leveringsinstruktioner' ),
-        'value' => get_post_meta( $order->get_id(), '_delivery_instructions', true ),
+        'value' => $delivery_instructions,
     );
     $fields['receiver_phone'] = array(
         'label' => __( 'Modtagers telefonnr.' ),
-        'value' => get_post_meta( $order->get_id(), '_receiver_phone', true ),
+        'value' => $receiver_phone,
     );
 
     return $fields;
