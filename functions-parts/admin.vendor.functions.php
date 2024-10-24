@@ -60,10 +60,14 @@ function greeting_change_vendor_show_meta_callback( $post ) {
     );
     $query = new WP_User_Query($args);
     $stores = $query->get_results();
+
+	$order_id = ( !empty($post->get_id()) ? $post->get_id() : $post->ID );
+
     $current_store = get_post_meta($post->ID, '_vendor_id', true);
 
     wp_nonce_field( 'greeting_vendor_change_metabox_action', 'greeting_vendor_change' );
     echo '<select name="vendor_meta_name">';
+	echo '<option value="">Vælg en vendor</option>';
     foreach($stores as $k => $v){
         $selected = ($current_store == $v->ID ? ' selected="selected"' : '');
         $name = get_user_meta( $v->ID, '_vendor_page_title', true );
@@ -86,7 +90,7 @@ function greeting_change_vendor_show_meta_action( $post_id ) {
     if ( !current_user_can( 'manage_options', $post_id ))
         return;
 
-    if ( isset($_POST['vendor_meta_name']) ) {
+    if ( isset($_POST['vendor_meta_name']) && !empty($_POST['vendor_meta_name']) ) {
         $order = wc_get_order($post_id);
 
         if(!is_a($order, 'WC_Order')){
