@@ -128,7 +128,12 @@ function get_vendor_name_by_id($vendor_id) {
 
 function get_vendor_id_by_order_id($order_id){
     // Get vendor_id from order meta
-    $vendor_id = get_post_meta($order_id, '_vendor_id', true);
+	if(is_wc_hpos_activated()){
+		$order = wc_get_order( $order_id );
+		$vendor_id = $order->get_meta('_vendor_id');
+	} else {
+		$vendor_id = get_post_meta($order_id, '_vendor_id', true);
+	}
 
     // Check if vendor_id exists
     if ($vendor_id) {

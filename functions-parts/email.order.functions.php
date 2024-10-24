@@ -171,7 +171,7 @@ function custom_woocommerce_email_order_meta_fields( $fields, $sent_to_admin, $o
 		# RECEIVER PHONE
 		$receiver_phone = get_post_meta( $order->get_id(), '_receiver_phone', true );
 	}
-	
+
     $fields['delivery_date'] = array(
         'label' => __( 'Leveringsdato' ),
         'value' => $delivery_date,

@@ -277,8 +277,14 @@ add_action( 'woocommerce_checkout_create_order_line_item', 'prefix_checkout_crea
 
 // show order date in thank you page
 add_action( 'woocommerce_thankyou', 'greeting_view_order_and_receiver_info_thankyou_page', 20 );
-function greeting_view_order_and_receiver_info_thankyou_page( $order_id ){  ?>
-    <?php echo '<p><strong>'.__('Receiver phone','greeting2').':</strong> ' . get_post_meta( $order_id, 'receiver_phone', true ) . '</p>';
+function greeting_view_order_and_receiver_info_thankyou_page( $order_id ){
+	if(is_wc_hpos_activated()){
+		$order = wc_get_order( $order_id );
+		$receiver_phone = $order->get_meta('receiver_phone');
+	} else {
+		$receiver_phone = get_post_meta( $order_id, 'receiver_phone', true );
+	}
+	echo '<p><strong>' . __('Receiver phone','greeting2') . ':</strong> ' . $receiver_phone . '</p>';
 }
 
 
@@ -855,7 +861,11 @@ add_action( 'wp_ajax_nopriv_update_greeting_message_surcharge', 'update_greeting
 
 // Display the selected greeting message option in the order admin
 function display_greeting_message_option_in_admin( $order ) {
-    $message_option = get_post_meta( $order->get_id(), '_greeting_card_upgrade_option', true );
+	if(is_wc_hpos_activated()){
+		$message_option = $order->get_meta('_greeting_card_upgrade_option');
+	} else {
+		$message_option = get_post_meta( $order->get_id(), '_greeting_card_upgrade_option', true );
+	}
 
     if ( ! empty( $message_option ) ) {
         $options = greeting_card_options();
@@ -1539,7 +1549,12 @@ function update_sub_order_meta($vendor_order_id, $posted_data, $order){
     global $MVX;
 
     $vendor_order = wc_get_order($vendor_order_id);
-    $vendor_id = get_post_meta($vendor_order_id, '_vendor_id', true);
+
+	if(is_wc_hpos_activated()){
+		$vendor_id = $vendor_order->get_meta('_vendor_id');
+	} else {
+		$vendor_id = get_post_meta($vendor_order_id, '_vendor_id', true);
+	}
 
     #$vendor_id = get_post_meta($vendor_order_id, '_vendor_id', true);
 }
