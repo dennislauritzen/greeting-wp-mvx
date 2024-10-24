@@ -61,7 +61,17 @@ function greeting_change_vendor_show_meta_callback( $post ) {
     $query = new WP_User_Query($args);
     $stores = $query->get_results();
 
-	$order_id = ( !empty($post->get_id()) ? $post->get_id() : $post->ID );
+	$order_id = 0;
+	if(is_wc_hpos_activated()){
+		$order = wc_get_order($post->ID);
+		$order_id = $order->get_id();
+	} else {
+		$order_id = $post->ID;
+	}
+
+	if( empty($order_id) || $order_id == 0){
+		return;
+	}
 
     $current_store = get_post_meta($order_id, '_vendor_id', true);
 
