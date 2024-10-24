@@ -137,7 +137,7 @@ add_filter('mvx_order_item_quantity_text', 'custom_order_item_quantity_html', 10
  */
 function custom_woocommerce_email_order_meta_fields( $fields, $sent_to_admin, $order ) {
 	if( is_wc_hpos_activated() ){
-	# DELIVERY DATE
+		# DELIVERY DATE
 		$del_date = $order->get_meta('_delivery_date');
 		$delivery_date = (!empty($del_date) ? $del_date : 'Hurtigst muligt');
 
