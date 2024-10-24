@@ -95,6 +95,7 @@ function has_funeral_products_in_cart(){
 function has_funeral_products_with_band_in_cart() {
     // Initialize flags
     $has_funeral_checkout = false;
+	$is_eligible_for_band_bool = false;
 
     // Loop through cart items
     foreach (WC()->cart->get_cart() as $cart_item) {
