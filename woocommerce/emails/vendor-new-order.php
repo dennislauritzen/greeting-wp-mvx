@@ -76,10 +76,15 @@ if (apply_filters('show_cust_order_calulations_field', true, $vendor->id)){
 
     <p><strong><?php __('Leveringsinstruktioner', 'dc-woocommerce-multi-vendor'); ?></strong> <?php echo get_post_meta( $order->get_id(), '_delivery_instructions', true ); ?></p>
 
-    <?php $leave_gift_at_address = (get_post_meta( $order->get_id(), '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej'); ?>
+	<?php if(is_wc_hpos_activated()){
+		$leave_gift_at_address = ($order->get_meta('_leave_gift_address') == "1" ? 'Ja' : 'Nej');
+		$leave_gift_at_neighbour = ($order->get_meta('_leave_gift_neighbour') == "1" ? 'Ja' : 'Nej');
+	} else {
+		$leave_gift_at_address = (get_post_meta( $order->get_id(), '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej');
+		$leave_gift_at_neighbour = (get_post_meta( $order->get_id(), '_leave_gift_neighbour', true ) == "1" ? 'Ja' : 'Nej');
+	} ?>
     <p><strong><?php __('Må stilles på adressen:', 'dc-woocommerce-multi-vendor'); ?></strong> <?php echo $leave_gift_at_address; ?></p>
 
-    <?php $leave_gift_at_neighbour = (get_post_meta( $order->get_id(), '_leave_gift_neighbour', true ) == "1" ? 'Ja' : 'Nej'); ?>
     <p><strong><?php __('Må gaven afleveres hos naboen:', 'dc-woocommerce-multi-vendor'); ?></strong> <?php echo $leave_gift_at_neighbour; ?></p>
 
     <?php if ($order->get_billing_email()) { ?>

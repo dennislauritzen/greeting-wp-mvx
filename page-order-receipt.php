@@ -127,7 +127,13 @@ get_header('checkout');
 
                         </p>
 
-                        <?php $delivery_instructions = get_post_meta( $order->get_id(), '_delivery_instructions', true ); ?>
+                        <?php
+						if(is_wc_hpos_activated()){
+							$delivery_instructions = $order->get_meta('_delivery_instructions');
+						} else {
+							$delivery_instructions = get_post_meta( $order->get_id(), '_delivery_instructions', true );
+						}
+						?>
                         <p>
                             <strong><?php _e('Leveringsinstruktioner', 'woocommerce'); ?></strong>
                             <br>
