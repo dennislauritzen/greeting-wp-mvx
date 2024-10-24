@@ -227,7 +227,7 @@ if ($terms && !is_wp_error($terms)) {
 	<div class="row main-and-filter-content" style="display: none;">
         <?php
         // get user meta query
-        $occasion_query = $wpdb->prepare( "
+        $occasion_query = "
                 SELECT
                   tt.term_id as term_id,
                   tt.taxonomy,
@@ -254,7 +254,7 @@ if ($terms && !is_wp_error($terms)) {
                     ELSE 0
                   END DESC,
                   t.Name ASC
-            ");
+            ";
 
         $occasion_featured_list = $wpdb->get_results($occasion_query);
 
