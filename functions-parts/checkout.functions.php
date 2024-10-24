@@ -212,44 +212,40 @@ add_action( 'wp_footer', 'addCartJS' );
  * Update cart item notes
  */
 function prefix_update_cart_notes() {
-    // Do a nonce check to ensure security
-    if( ! isset( $_POST['security'] ) || ! wp_verify_nonce( $_POST['security'], 'woocommerce-cart' ) ) {
-        // Send a JSON response indicating nonce failure
-        wp_send_json( array( 'nonce_fail' => 1 ) );
-        exit;
-    }
+	// Do a nonce check to ensure security
+	if( ! isset( $_POST['security'] ) || ! wp_verify_nonce( $_POST['security'], 'woocommerce-cart' ) ) {
+		wp_send_json( array( 'nonce_fail' => 1 ) );
+		exit;
+	}
 
-    // Save the notes to the cart meta
-    $cart = WC()->cart->cart_contents; // Get the cart contents
-    $cart_id = $_POST['cart_id']; // Get the cart ID from the POST data
-    $notes = $_POST['custom_note']; // Get the notes from the POST data
+	$cart_id = $_POST['cart_id']; // Get the cart ID from the POST data
+	$notes = $_POST['custom_note']; // Get the notes from the POST data
 
-    // Find the cart item by its ID
-    $cart_item = $cart[$cart_id];
+	// Get cart contents by cart ID
+	foreach ( WC()->cart->get_cart() as $key => $cart_item ) {
+		if ( $key === $cart_id ) {
+			// Use the set_meta method to properly store custom data
+			$cart_item['custom_note'] = $notes;
+			WC()->cart->cart_contents[ $key ] = $cart_item; // Update cart item
+			break;
+		}
+	}
 
-    // Add the notes to the cart item
-    $cart_item['custom_note'] = $notes;
+	// Save the updated cart contents to the session
+	WC()->cart->set_session();
 
-    // Update the cart contents with the modified cart item
-    WC()->cart->cart_contents[$cart_id] = $cart_item;
-
-    // Save the updated cart contents to the session
-    WC()->cart->set_session();
-
-    // Send a JSON response indicating success
-    wp_send_json( array( 'success' => 1 ) );
-    exit;
-
+	// Send a JSON response indicating success
+	wp_send_json( array( 'success' => 1 ) );
+	exit;
 }
 add_action( 'wp_ajax_prefix_update_cart_notes', 'prefix_update_cart_notes' );
 add_action( 'wp_ajax_nopriv_prefix_update_cart_notes', 'prefix_update_cart_notes' );
 
+
 function prefix_checkout_create_order_line_item( $item, $cart_item_key, $values, $order ) {
-    foreach( $item as $cart_item_key=>$cart_item ) {
-        if( isset( $cart_item['custom_note'] ) ) {
-            $item->add_meta_data( '_custom_note', $cart_item['custom_note'], true );
-        }
-    }
+	if ( isset( $values['custom_note'] ) ) {
+		$item->add_meta_data( '_custom_note', $values['custom_note'], true );
+	}
 }
 add_action( 'woocommerce_checkout_create_order_line_item', 'prefix_checkout_create_order_line_item', 10, 4 );
 
