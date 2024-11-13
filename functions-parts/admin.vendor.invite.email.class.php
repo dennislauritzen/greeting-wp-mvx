@@ -39,6 +39,9 @@ if ( ! class_exists( 'WC_Email_Vendor_Order_Invite', false ) ) {
 				'{invite_guid}' => '',
 			);
 
+			// Define the email format as HTML
+			$this->email_type     = 'html';
+
 			// Triggers for this email.
 			#add_action( 'send_vendor_invite_email_notification', array($this, 'trigger'), 20, 5);
 
