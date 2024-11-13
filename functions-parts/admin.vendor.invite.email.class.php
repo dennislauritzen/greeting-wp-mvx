@@ -40,6 +40,7 @@ if ( ! class_exists( 'WC_Email_Vendor_Order_Invite', false ) ) {
 			);
 
 			// Define the email format as HTML
+			$this->content_type = 'text/html';
 			$this->email_type     = 'html';
 
 			// Triggers for this email.
@@ -172,6 +173,8 @@ if ( ! class_exists( 'WC_Email_Vendor_Order_Invite', false ) ) {
 		public function get_default_heading() {
 			return __( 'You are invited to accept an order in your area', 'woocommerce' );
 		}
+
+
 
 		/**
 		 * Get content html.
