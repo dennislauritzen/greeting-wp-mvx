@@ -40,8 +40,8 @@ if ( ! class_exists( 'WC_Email_Vendor_Order_Invite', false ) ) {
 			);
 
 			// Define the email format as HTML
-			$this->content_type = 'text/html';
-			$this->email_type     = 'html';
+			$this->content_type		= "html";
+			$this->email_type     	= "html";
 
 			// Triggers for this email.
 			#add_action( 'send_vendor_invite_email_notification', array($this, 'trigger'), 20, 5);
@@ -86,6 +86,18 @@ if ( ! class_exists( 'WC_Email_Vendor_Order_Invite', false ) ) {
 					'placeholder' => '',
 					'default'     => __( 'You’re Invited to Take Over a Funeral Order', 'greeting3' ),
 				),
+				'email_type' => array(
+					'title' => __('Email Type', 'multivendorx'),
+					'type' => 'select',
+					'description' => __('Choose which format of email to be sent.', 'multivendorx'),
+					'default' => 'html',
+					'class' => 'email_type',
+					'options' => array(
+						'plain' => __('Plain Text', 'multivendorx'),
+						'html' => __('HTML', 'multivendorx'),
+						'multipart' => __('Multipart', 'multivendorx'),
+					)
+				)
 			);
 		}
 
