@@ -3,7 +3,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 $order = (!empty($order)) ? $order : wc_get_order($order_id);
 
-$order_number = $order->get_order_number();
+$order_number = $order->get_id();
 $order_date = $order->get_date_created()->date('F j, Y');
 $billing_postcode = $order->get_billing_postcode();
 $shipping_postcode = $order->get_shipping_postcode();
