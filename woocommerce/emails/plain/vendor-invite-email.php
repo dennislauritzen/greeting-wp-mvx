@@ -28,8 +28,18 @@ foreach ($order->get_items() as $item) {
 	}
 }
 
-$accept_url = home_url("/vendor-order-accept/?acc_order_id=$order_id&acc_invite_id=$invite_id&acc_invite_guid=$calculated_invite_guid&acc_vendor=$vendor_id&acc_vendor_guid=$calculated_vendor_guid&acc_action_guid=zzkrne1FD_fe&acc_t=$calculated_t_var");
-$decline_url = home_url("/vendor-order-accept/?acc_order_id=$order_id&acc_invite_id=$invite_id&acc_invite_guid=$calculated_invite_guid&acc_vendor=$vendor_id&acc_vendor_guid=$calculated_vendor_guid&acc_action_guid=mfefldm1_ewq&acc_t=$calculated_t_var");
+// Accessing the invite details passed in placeholders
+$invite_id = isset($invite_id) ? $invite_id : '';
+$invite_guid = isset($invite_guid) ? $invite_guid : '';
+
+$calculated_invite_guid = md5('greeting____invite!Lfæaaæel41_QR!' . $invite_id);
+$calculated_t_var = md5('gree_inv_grrg1_;:,f,e1' . $order->get_id() . $invite_id . $vendor_id);
+$calculated_vendor_guid = md5('vendor_id_id_id_fkrenfguu12_GUID_' . $vendor_id);
+
+// Build the URL with parameters
+$accept_url = home_url("/vendor-order-accept/?acc_order_id=".$order_id."&acc_invite_id=".$invite_id."&acc_invite_guid=".$calculated_invite_guid."&acc_vendor=".$vendor_id."&acc_vendor_guid=".$calculated_vendor_guid."&acc_action_guid=zzkrne1FD_fe&acc_t=".$calculated_t_var);
+$decline_url = home_url("/vendor-order-accept/?acc_order_id=".$order_id."&acc_invite_id=".$invite_id."&acc_invite_guid=".$calculated_invite_guid."&acc_vendor=".$vendor_id."&acc_vendor_guid=".$calculated_vendor_guid."&acc_action_guid=mfefldm1_ewq&acc_t=".$calculated_t_var);
+# /vendor-order-accept/?acc_order_id=$order_id&acc_invite_id=$invite_id&acc_invite_guid=$calculated_invite_guid&acc_vendor=$vendor_id&acc_vendor_guid=$calculated_vendor_guid&acc_action_guid={action}&acc_t=$calculated_t_var
 
 echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n";
 echo esc_html( wp_strip_all_tags( $email_heading ) );
