@@ -96,6 +96,71 @@ function action_pre_get_posts( $query ) {
 add_action( 'pre_get_posts', 'action_pre_get_posts', 10, 1 );
 
 
+
+// Populate the custom column with a star if the order has products with a custom note
+add_action('manage_shop_order_posts_custom_column', 'show_custom_note_in_orders_table', 20, 2);
+function show_custom_note_in_orders_table($column, $post_id) {
+	if ('order_number' === $column) {
+		$order = wc_get_order($post_id);
+		$has_custom_note = false;
+		// Check if any item in the order has a custom note
+		foreach ($order->get_items() as $item_id => $item) {
+			if ($item->get_meta('custom_note') || $item->get_meta('_custom_note')) {
+				$has_custom_note = true;
+				break;
+			}
+		}
+
+		// === CALCULATE IF ORDER HAS LARGER CARD
+		// Calculate the cost of the cards
+		$fees = $order->get_fees();
+		$order_has_fees = false;
+		foreach($fees as $fee){
+			$fee_name = $fee->get_name();
+			$fee_amount = $fee->get_amount('edit');
+
+			if($fee_amount > 0){
+				$order_has_fees = true;
+			}
+		}
+		// ===
+
+		// === =DELIVERY INSTRUCTIONS
+		if (is_wc_hpos_activated()) {
+			$delivery_instructions = $order->get_meta($order->get_id(), '_delivery_instructions');
+		} else {
+			$delivery_instructions = get_post_meta($order->get_id(), '_delivery_instructions', true);
+		}
+		// ====
+
+		if( $has_custom_note || order_has_funeral_products($post_id) || $order_has_fees || !empty($delivery_instructions) ){
+			echo '<div style="font-size:17px;">';
+
+			if(order_has_funeral_products($post_id)){
+				echo '<span title="Ordren har begravelsesprodukter">✝️</span> ';
+			}
+
+			// Display a star if a custom note exists
+			if ($has_custom_note) {
+				echo '<span title="Ordren har særligt ønske til produkt fra kunden">⭐</span> '; // Display star (or any other icon/HTML)
+			}
+
+
+			if($order_has_fees){
+				echo '<span title="Ordren har tilkøb af større kort">🏷</span> ';
+			}
+
+			if( !empty($delivery_instructions) ){
+				echo '<span title="Ordren har specifikke leveringsinstrukser">🚚</span> ';
+			}
+
+			echo '</div>';
+		}
+	}
+}
+
+
+
 /**
  * Display order data in admin order preview
  *
@@ -371,16 +436,17 @@ function save_shop_order_meta_box_data( $post_id, $post ) {
     $d_year = substr($post_date, 6, 4);
     $unix_date = date("U", strtotime($d_year.'-'.$d_month.'-'.$d_date));
 
-
-    if(is_wc_hpos_activated()) {
-        $order->update_meta_data('_delivery_unixdate', $unix_date);
-        $order->update_meta_date('_delivery_date', $my_data);
-        $order->save_meta_data();
-        $order->save();
-    } else {
-        update_post_meta( $post_id, '_delivery_unixdate', $unix_date );
-        update_post_meta( $post_id, '_delivery_date', $my_data );
-    }
+	if ( isset( $post->post_type ) && 'shop_order' == $post->post_type ) {
+		if (is_wc_hpos_activated()) {
+			$order->update_meta_data('_delivery_unixdate', $unix_date);
+			$order->update_meta_date('_delivery_date', $my_data);
+			$order->save_meta_data();
+			$order->save();
+		} else {
+			update_post_meta($post_id, '_delivery_unixdate', $unix_date);
+			update_post_meta($post_id, '_delivery_date', $my_data);
+		}
+	}
 }
 add_action( 'save_post', 'save_shop_order_meta_box_data', 20, 2 );
 

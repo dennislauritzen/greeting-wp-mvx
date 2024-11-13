@@ -96,11 +96,11 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                                     <br>
                                     <?php
                                     if(is_wc_hpos_activated()){
-                                        $delivery_date = $order->get_meta('_delivery_date');
-                                        $delivery_date_time = $order->get_meta('_delivery_date_time');
+                                        $delivery_date = $main_order_object->get_meta('_delivery_date');
+                                        $delivery_date_time = $main_order_object->get_meta('_delivery_date_time');
                                     } else {
-                                        $delivery_date = get_post_meta($order->get_id(), '_delivery_date', true);
-                                        $delivery_date_time = get_post_meta($order->get_id(), '_delivery_date_time', true);
+                                        $delivery_date = get_post_meta($main_order_object->get_id(), '_delivery_date', true);
+                                        $delivery_date_time = get_post_meta($main_order_object->get_id(), '_delivery_date_time', true);
                                     }
 
                                     $wc_date = new WC_Datetime($delivery_date);
@@ -114,7 +114,7 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
                                         }
                                     } else {
                                         echo 'Hurtigst muligt';
-                                        }
+									}
                                     ?>
                                     <br>
                                     <?php if(order_has_funeral_products($parent_order_id)) { ?>
@@ -288,7 +288,7 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
 					$greeting_card_store_part_ex_vat = (15*0.8);
 					foreach($fees as $fee){
 						$fee_name = $fee->get_name();
-						$fee_amount = (int) $fee->get_amount('edit');
+						$fee_amount = $fee->get_amount('edit');
 
 						$greeting_card_fee_ex_vat += $fee_amount;
 						$greeting_card_fee_with_vat += $fee_amount * 1.25 ;

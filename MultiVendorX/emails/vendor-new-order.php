@@ -291,7 +291,7 @@ do_action( 'woocommerce_email_header', $email_heading );
 
 					foreach($fees as $fee){
                         $fee_name = $fee->get_name();
-                        $fee_amount = (int) $fee->get_amount('edit');
+                        $fee_amount = $fee->get_amount('edit');
 
                         $greeting_card_fee_ex_vat += $fee_amount;
                         $greeting_card_fee_with_vat += $fee_amount * 1.25 ;

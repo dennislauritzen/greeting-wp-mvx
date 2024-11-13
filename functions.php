@@ -1,5 +1,11 @@
 <?php
 
+// Define custom log file path
+define('CUSTOM_LOG_FILE', 'C:\wamp64\logs\custom_log.txt');
+
+// Ensure error_log() writes to your custom log file
+ini_set('error_log', CUSTOM_LOG_FILE);
+
 
 // Set the timezone to Copenhagen
 #date_default_timezone_set('Europe/Copenhagen');
@@ -1002,7 +1008,7 @@ include('functions-parts/admin.general.functions.php');
 include('functions-parts/admin.order.functions.php');
 include('functions-parts/admin.product.functions.php');
 include('functions-parts/admin.vendor.functions.php');
-#include('functions-parts/admin.vendor.invite.functions.php');
+include('functions-parts/admin.vendor.invite.functions.php');
 include('functions-parts/admin.acf.blocks.functions.php');
 
 ## Include functions regarding checkout.
