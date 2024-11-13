@@ -146,7 +146,7 @@ foreach ($product_details as $product) {
 
 	echo "\n" . esc_html($product['name']) . "\n";
 
-	echo "\n" . __('Ønske til gavens indhold','greeting3') . ": " .$product['customer_note'];
+	echo "\n Ønske til gavens indhold: " .$product['customer_note'];
 }
 
 
