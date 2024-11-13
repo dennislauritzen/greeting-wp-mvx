@@ -1,12 +1,5 @@
 <?php
 
-// Define custom log file path
-define('CUSTOM_LOG_FILE', 'C:\wamp64\logs\custom_log.txt');
-
-// Ensure error_log() writes to your custom log file
-ini_set('error_log', CUSTOM_LOG_FILE);
-
-
 // Set the timezone to Copenhagen
 #date_default_timezone_set('Europe/Copenhagen');
 
