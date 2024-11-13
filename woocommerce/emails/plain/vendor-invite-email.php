@@ -1,7 +1,7 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-$order_id = (empty($order_id)) ? $order_id = $this->order_id : $order_id;
+$order_id = (empty($order_id)) ? $this->order_id : $order_id;
 
 $order = (!empty($order)) ? $order : wc_get_order($order_id);
 

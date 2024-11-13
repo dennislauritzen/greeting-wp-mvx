@@ -200,9 +200,14 @@ if ( ! class_exists( 'WC_Email_Vendor_Order_Invite', false ) ) {
 		public function get_content_plain()
 		{
 			return wc_get_template_html($this->template_plain, array(
+				'order' => $this->object,
 				'email_heading' => $this->get_heading(),
-				'invite_guid' => $this->invite_guid,
 				'email' => $this,
+				'order_id' => $this->order_id,
+				'vendor_id' => $this->vendor_id,
+				'vendor_name' => $this->vendor_name,
+				'invite_id' => $this->invite_id,
+				'invite_guid' => $this->invite_guid,
 			), '', $this->template_base);
 		}
 
