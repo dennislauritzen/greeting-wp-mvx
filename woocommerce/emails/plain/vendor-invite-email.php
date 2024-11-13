@@ -144,9 +144,9 @@ echo "\n\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=";
 // Loop through the product details and display the names and images
 foreach ($product_details as $product) {
 
-	echo "\n".esc_html($product['name'])."\n";
+	echo "\n" . esc_html($product['name']) . "\n";
 
-	echo "\n".echo __('Ønske til gavens indhold','greeting3') . ": ".$product['customer_note'];
+	echo "\n" . __('Ønske til gavens indhold','greeting3') . ": " .$product['customer_note'];
 }
 
 
