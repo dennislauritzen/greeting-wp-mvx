@@ -272,19 +272,19 @@ do_action( 'woocommerce_email_header', $email_heading );
 
 
                     // Get the total including tax
-                    $order_total = $order->get_total();
+                    $order_total = $main_order->get_total();
 
                     // Get the total discount amount including tax
-                    $total_discount = $order->get_discount_total() + $order->get_discount_tax();
+                    $total_discount = $main_order->get_discount_total() + $main_order->get_discount_tax();
 
                     // Calculate the total without any discounts
                     $total_without_discount = $order_total + $total_discount;
 
                     // Get the shipping total
-                    $order_ship_total = $order->get_shipping_total() + $order->get_shipping_tax();
+                    $order_ship_total = $main_order->get_shipping_total() + $main_order->get_shipping_tax();
 
                     // Calculate the cost of the cards
-                    $fees = $order->get_fees();
+                    $fees = $main_order->get_fees();
                     $greeting_card_fee_ex_vat = 0;
                     $greeting_card_fee_with_vat = 0;
                     $greeting_card_store_part_ex_vat = (15*0.8);
