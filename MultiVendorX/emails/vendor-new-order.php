@@ -43,7 +43,7 @@ if($main_order_id != $order->get_id()){
 }
 
 // Set the mail heading / subject for new_vendor_order
-$email_heading = str_replace($order->get_id(), $parent_order_id, $email_heading);
+$email_heading = str_replace($order->get_id(), $main_order_id, $email_heading);
 
 do_action( 'woocommerce_email_header', $email_heading );
 #do_action('woocommerce_email_before_order_table', $order, true, false, $email); ?>

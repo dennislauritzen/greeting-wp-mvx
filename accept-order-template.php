@@ -107,15 +107,18 @@ foreach ($order_items as $item_id => $item) {
 			foreach ($product_details as $product) {
 				?>
 				<div class="row">
-					<div class="col-2 col-xs-4 col-sm-3 col-md-2 col-lg-2">
-						<img src="<?php echo esc_url($product['image']); ?>" alt="<?php echo esc_attr($product['name']); ?>" style="width: 100px; height: auto;">
+					<div class="col-2 col-xs-4 col-sm-4 col-md-2 col-lg-2">
+						<img src="<?php echo esc_url($product['image']); ?>"
+							 alt="<?php echo esc_attr($product['name']); ?>"
+							 class="img-fluid"
+							 style="max-width: 100%; height: auto;">
 					</div>
-					<div class="col-10 col-xs-8 col-sm-9 col-md-10 col-lg-10">
+					<div class="col-10 col-xs-8 col-sm-8 col-md-10 col-lg-10">
 						<b><?php echo esc_html($product['name']); ?></b>
 
-						<?php if(!empty($product['customer_note'])){ ?>
-						<br>
-						<span><u><?php echo __('Ønske til gavens indhold','greeting3'); ?>:</u></b> <?php echo $product['customer_note']; ?></span>
+						<?php if(!empty($product['customer_note'])) { ?>
+							<br>
+							<span><u><?php echo __('Ønske til gavens indhold','greeting3'); ?>:</u> <?php echo $product['customer_note']; ?></span>
 						<?php } ?>
 					</div>
 				</div>

@@ -98,7 +98,7 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
 									<h1 style="margin-top: 25px;"><?php echo $email_heading; ?></h1>
 									<small>
 										<img width="15" height="15" src="https://s.w.org/images/core/emoji/14.0.0/72x72/2764.png" style="display: inline-block; width: 15px !important; max-width: 20px; height: 15px; max-height: 20px; font-size: 12px;">
-										&nbsp; <?php _e( 'You have been invited to take over an order on our platform!', 'greeting3' ); ?>
+										&nbsp; <?php _e( 'Du er inviteret til at modtage en invitation til at overtage en ordre', 'greeting3' ); ?>
 									</small>
 								</td>
 							</tr>
