@@ -17,7 +17,7 @@ $shipping_postcode = $order->get_shipping_postcode();
 $customer_name = $order->get_billing_first_name();
 
 // Get the delivery date, HPOS compatible
-if(is_wc_hpos_activated()){
+if(is_wc_hpos_activated('frontend')){
 	$delivery_date = $order->get_meta('_delivery_date');
 } else {
 	$delivery_date = get_post_meta($order->get_id(), '_delivery_date', true);

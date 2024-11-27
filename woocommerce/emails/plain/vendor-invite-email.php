@@ -8,7 +8,7 @@ $order_date = $order->get_date_created()->date('F j, Y');
 $billing_postcode = $order->get_billing_postcode();
 $shipping_postcode = $order->get_shipping_postcode();
 
-$delivery_date = is_wc_hpos_activated() ? $order->get_meta('_delivery_date') : get_post_meta($order->get_id(), '_delivery_date', true);
+$delivery_date = is_wc_hpos_activated('frontend') ? $order->get_meta('_delivery_date') : get_post_meta($order->get_id(), '_delivery_date', true);
 
 $order_total = $order->get_total();
 $goods_total = $order->get_subtotal_to_display();

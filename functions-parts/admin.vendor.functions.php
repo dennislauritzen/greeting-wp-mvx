@@ -3,8 +3,6 @@
 // Get the order util in order to check
 // if HPOS is activated, and if it is, then
 // add order meta in a new way
-use Automattic\WooCommerce\Utilities\OrderUtil;
-use Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableController;
 
 /**
  * Register meta box(es).
@@ -13,18 +11,13 @@ use Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableControlle
  * @author Dennis Lauritzen
  */
 function greeting_change_vendor_show_meta() {
-    if( OrderUtil::custom_orders_table_usage_is_enabled() ) {
+    if( is_wc_hpos_activated('meta_box') ) {
         // HPOS is enabled.
-
-        $screen = wc_get_container()->get( CustomOrdersTableController::class )->custom_orders_table_usage_is_enabled()
-            ? wc_get_page_screen_id( 'shop-order' )
-            : 'shop_order';
-
         add_meta_box(
             'meta-change-vendor',
             __( 'Change Vendor', 'greeting3' ),
             'greeting_change_vendor_show_meta_callback',
-            $screen,
+            get_wc_hpos_order_screen_name(),
             'advanced',
             'high'
         );
@@ -73,7 +66,11 @@ function greeting_change_vendor_show_meta_callback( $post ) {
 		return;
 	}
 
-    $current_store = get_post_meta($order_id, '_vendor_id', true);
+	if(is_wc_hpos_activated()){
+		$current_store = $order->get_meta('_vendor_id');
+	} else {
+		$current_store = get_post_meta($order_id, '_vendor_id', true);
+	}
 
     wp_nonce_field( 'greeting_vendor_change_metabox_action', 'greeting_vendor_change' );
     echo '<select name="vendor_meta_name">';

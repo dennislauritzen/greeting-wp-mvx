@@ -16,7 +16,10 @@ if (!defined('ABSPATH'))
 global $MVX;
 $vendor = get_mvx_vendor(absint($vendor_id));
 
-$parent_order_id = (empty(wp_get_post_parent_id($order->get_id())) ? $order->get_id() : wp_get_post_parent_id($order->get_id()));
+$order_id = $order->get_id();
+$hpos_enabled = is_wc_hpos_activated('frontend');
+
+$parent_order_id = (empty(wp_get_post_parent_id($order_id)) ? $order_id : wp_get_post_parent_id($order_id));
 
 // The different number orders
 $latestOrderId = $parent_order_id; // Last order ID
@@ -93,7 +96,7 @@ do_action( 'woocommerce_email_header', $email_heading );
                                     <strong style="text-transform: uppercase;">Levering</strong>
                                     <br>
                                     <?php
-                                    if(is_wc_hpos_activated()){
+                                    if($hpos_enabled){
                                         $delivery_date = $main_order_object->get_meta('_delivery_date');
                                         $delivery_date_time = $main_order_object->get_meta('_delivery_date_time');
                                     } else {
@@ -133,7 +136,7 @@ do_action( 'woocommerce_email_header', $email_heading );
                             </tr>
                             <tr>
                                 <td valign="top" width="50%" style="width: 50%; padding: 10px 0 15px 0px;">
-									<?php if(is_wc_hpos_activated()){
+									<?php if($hpos_enabled){
 										$delivery_instructions = $main_order_object->get_meta( $order->get_id(), '_delivery_instructions');
 									} else {
 										$delivery_instructions = get_post_meta( $main_order_id, '_delivery_instructions', true );
@@ -151,7 +154,7 @@ do_action( 'woocommerce_email_header', $email_heading );
 
                                         // Only show this if it is not a funeral order.
 
-                                        if(is_wc_hpos_activated()){
+                                        if($hpos_enabled){
                                             $leave_gift_at_address = ($main_order_object->get_meta('_leave_gift_address') == "1" ? 'Ja' : 'Nej');
                                         } else {
                                             $leave_gift_at_address = (get_post_meta( $main_order_id, '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej');
@@ -160,7 +163,7 @@ do_action( 'woocommerce_email_header', $email_heading );
                                         <?php _e('Må stilles på adressen:', 'woocommerce'); ?> <?php echo $leave_gift_at_address; ?><br>
 
                                         <?php
-                                        if(is_wc_hpos_activated()){
+                                        if($hpos_enabled){
                                             $leave_gift_at_neighbour = ($main_order_object->get_meta('_leave_gift_neighbour') == "1" ? 'Ja' : 'Nej');
                                         } else {
                                             $leave_gift_at_neighbour = (get_post_meta( $main_order_id, '_leave_gift_neighbour', true ) == "1" ? 'Ja' : 'Nej');
@@ -178,7 +181,7 @@ do_action( 'woocommerce_email_header', $email_heading );
                                     <p>
 
 										<?php
-										if(is_wc_hpos_activated()){
+										if($hpos_enabled){
 											$band_line_1 = $main_order_object->get_meta('_greeting_message_band_1');
 											$band_line_2 = $main_order_object->get_meta('_greeting_message_band_2');
 										} else {
@@ -194,7 +197,7 @@ do_action( 'woocommerce_email_header', $email_heading );
 											echo 'Bånd, linje 1: '.$band_line_1 . '<br><br>';
 											echo 'Bånd, linje 2: '.$band_line_2;
 										} else {
-											$greeting_message = is_wc_hpos_activated() ? esc_html( $main_order_object->get_meta('_greeting_message') ) : esc_html( get_post_meta($main_order_id, '_greeting_message', true) );
+											$greeting_message = $hpos_enabled ? esc_html( $main_order_object->get_meta('_greeting_message') ) : esc_html( get_post_meta($main_order_id, '_greeting_message', true) );
 
 											echo $greeting_message;
 										}
@@ -213,7 +216,7 @@ do_action( 'woocommerce_email_header', $email_heading );
                                       <strong><?php _e('Modtagers telefonnummer:', 'woocommerce'); ?></strong>
                                       <br>
                                         <?php
-                                        if(is_wc_hpos_activated()){
+                                        if($hpos_enabled){
                                             echo $main_order_object->get_meta('_receiver_phone');
                                         } else {
                                             echo get_post_meta( $main_order_id, '_receiver_phone', true );
@@ -354,7 +357,7 @@ do_action( 'woocommerce_email_header', $email_heading );
                             <?php echo ($order->get_shipping_country()) ? '<br><span id="ship_country">'.WC()->countries->countries[$order->get_shipping_country()].'</span>' : ''; ?>
 
                             <?php
-                            if(is_wc_hpos_activated()){
+                            if($hpos_enabled){
                                 $delivery_phone = $order->get_meta('_receiver_phone');
                             } else {
                                 $delivery_phone = get_post_meta($order->get_id(), '_receiver_phone', true);

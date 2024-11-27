@@ -23,6 +23,9 @@ if($order_id != $order_id_data){
 	return;
 }
 
+// Define if HPOS is active
+$hpos_active = is_wc_hpos_activated('frontend');
+
 #do_action( 'woocommerce_thankyou_' . $order->get_payment_method(), $order->get_id() );
 #do_action( 'woocommerce_thankyou', $order->get_id() );
 
@@ -94,10 +97,11 @@ get_header('checkout');
                             <strong class="text-uppercase">Levering</strong>
                             <br>
                             <?php
-                            if(is_wc_hpos_activated()){
+                            if($hpos_active){
                                 $delivery_date = $order->get_meta('_delivery_date');
                                 $delivery_date_time = $order->get_meta('_delivery_date_time');
                             } else {
+								print "HPOS no";
                                 $delivery_date = get_post_meta($order->get_id(), '_delivery_date', true);
                                 $delivery_date_time = get_post_meta($order->get_id(), '_delivery_date_time', true);
                             }
@@ -128,7 +132,7 @@ get_header('checkout');
                         </p>
 
                         <?php
-						if(is_wc_hpos_activated()){
+						if($hpos_active){
 							$delivery_instructions = $order->get_meta('_delivery_instructions');
 						} else {
 							$delivery_instructions = get_post_meta( $order->get_id(), '_delivery_instructions', true );
@@ -143,7 +147,7 @@ get_header('checkout');
 
                                 // Only show this if it is not a funeral order.
 
-                                if(is_wc_hpos_activated()){
+                                if($hpos_active){
                                     $leave_gift_at_address = ($order->get_meta('_leave_gift_address') == "1" ? 'Ja' : 'Nej');
                                 } else {
                                     $leave_gift_at_address = (get_post_meta( $order->get_id(), '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej');
@@ -152,7 +156,7 @@ get_header('checkout');
                                 <?php _e('Må stilles på adressen:', 'woocommerce'); ?> <?php echo $leave_gift_at_address; ?><br>
 
                                 <?php
-                                if(is_wc_hpos_activated()){
+                                if($hpos_active){
                                     $leave_gift_at_neighbour = ($order->get_meta('_leave_gift_neighbour') == "1" ? 'Ja' : 'Nej');
                                 } else {
                                     $leave_gift_at_neighbour = (get_post_meta( $order->get_id(), '_leave_gift_neighbour', true ) == "1" ? 'Ja' : 'Nej');
@@ -187,7 +191,14 @@ get_header('checkout');
                             <strong class="text-uppercase">Hilsen til gavemodtager</strong>
                             <br>
                             <?php
-                            echo esc_html( get_post_meta($order->get_id(), '_greeting_message', true) ); ?>
+                             ?>
+							<?php
+							if($hpos_active){
+								echo $order->get_meta('_greeting_message', true);
+							} else {
+								echo esc_html( get_post_meta($order->get_id(), '_greeting_message', true) );
+							}
+							?>
                             <br>
                         </p>
                         <p class="text-end">
@@ -321,8 +332,13 @@ get_header('checkout');
                             <?php echo ($order->get_shipping_country()) ? '<br><span id="ship_country">'.$order->get_shipping_country().'</span>' : ''; ?>
 
                             <?php
-                            $delivery_phone = get_post_meta($order->get_id(), '_receiver_phone', true);
-                            echo ($delivery_phone) ? '<br><span id="ship_phone">'.$delivery_phone.'</span>' : ''; ?>
+							if($hpos_active){
+								$delivery_phone = $order->get_meta('receiver_phone', true);
+							} else {
+								$delivery_phone = get_post_meta($order->get_id(), 'receiver_phone', true);
+							}
+							echo '<br><span id="ship_phone">' . $delivery_phone . '</span>';
+							?>
                         </p>
                     </div>
                     <div class="col-6">

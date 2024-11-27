@@ -65,7 +65,7 @@ function send_sms_on_new_order( $order_id, $old_status, $new_status,  $order ) {
 
         // Check if HPOS is active
         // Get the vendor_id of the order.
-        if (is_wc_hpos_activated()) {
+        if (is_wc_hpos_activated('frontend')) {
             $vendor_id = $order->get_meta('_vendor_id');
             $delivery_date = $order->get_meta('_delivery_date');
         } else {

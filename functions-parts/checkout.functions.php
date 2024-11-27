@@ -278,7 +278,7 @@ add_action( 'woocommerce_checkout_create_order_line_item', 'prefix_checkout_crea
 // show order date in thank you page
 add_action( 'woocommerce_thankyou', 'greeting_view_order_and_receiver_info_thankyou_page', 20 );
 function greeting_view_order_and_receiver_info_thankyou_page( $order_id ){
-	if(is_wc_hpos_activated()){
+	if(is_wc_hpos_activated('frontend')){
 		$order = wc_get_order( $order_id );
 		$receiver_phone = $order->get_meta('receiver_phone');
 	} else {
@@ -861,7 +861,7 @@ add_action( 'wp_ajax_nopriv_update_greeting_message_surcharge', 'update_greeting
 
 // Display the selected greeting message option in the order admin
 function display_greeting_message_option_in_admin( $order ) {
-	if(is_wc_hpos_activated()){
+	if(is_wc_hpos_activated('frontend')){
 		$message_option = $order->get_meta('_greeting_card_upgrade_option');
 	} else {
 		$message_option = get_post_meta( $order->get_id(), '_greeting_card_upgrade_option', true );
@@ -1176,6 +1176,8 @@ function greeting_save_custom_fields_with_order( $order_id ) {
     // -----------------------
     $order = is_a($order_id, 'WC_Order') ? $order_id : wc_get_order($order_id);
 
+	$hpos_enabled = is_wc_hpos_activated('frontend');
+
     $vendor_id = 0;
     foreach ($order->get_items() as $item_key => $item) {
         $product = get_post($item['product_id']);
@@ -1184,7 +1186,7 @@ function greeting_save_custom_fields_with_order( $order_id ) {
         $vendor_name = get_user_meta($vendor_id, '_vendor_page_title', 1);
 
         if(!empty($vendor_id)){
-            if(is_wc_hpos_activated()){
+            if($hpos_enabled){
                 $order->update_meta_data('_vendor_id', $vendor_id);
                 $order->update_meta_data('_vendor_name', $vendor_name);
             } else {
@@ -1197,7 +1199,7 @@ function greeting_save_custom_fields_with_order( $order_id ) {
 
     $post_date = isset($_POST['delivery_date']) ? esc_attr($_POST['delivery_date']) : '';
     if ( !empty($post_date) ) {
-        if(is_wc_hpos_activated()){
+        if($hpos_enabled){
             $order->update_meta_data('_delivery_date', esc_attr( $post_date ) );
         } else {
             update_post_meta($order_id, '_delivery_date', esc_attr( $post_date ) );
@@ -1209,7 +1211,7 @@ function greeting_save_custom_fields_with_order( $order_id ) {
         $d_year = substr($post_date, 6, 4);
         $unix_date = date("U", strtotime($d_year.'-'.$d_month.'-'.$d_date));
 
-        if(is_wc_hpos_activated()){
+        if($hpos_enabled){
             $order->update_meta_data('_delivery_unixdate', $unix_date );
             $order->update_meta_data('_delivery_date', esc_attr( $post_date ) );
         } else {
@@ -1222,7 +1224,7 @@ function greeting_save_custom_fields_with_order( $order_id ) {
         $vendor_opening_days = get_field('openning', 'user_'.$vendor_id);
         $delivery_date = estimateDeliveryDate($vendor_del_days, $vendor_drop_off, $vendor_opening_days, 'U');
 
-        if(is_wc_hpos_activated()){
+        if($hpos_enabled){
             $order->update_meta_data('_delivery_unixdate', sanitize_text_field($delivery_date));
         } else {
             update_post_meta( $order_id, '_delivery_unixdate', sanitize_text_field( $delivery_date ) );
@@ -1232,7 +1234,7 @@ function greeting_save_custom_fields_with_order( $order_id ) {
     // Delivery date time - only on orders with funeral products
     $delivery_date_time = isset( $_POST['delivery_date_time'] ) ? sanitize_text_field($_POST['delivery_date_time']) : '';
     if( !empty($delivery_date_time) ){
-        if(is_wc_hpos_activated()){
+        if($hpos_enabled){
             $order->update_meta_data('_delivery_date_time', $delivery_date_time);
         } else {
             update_post_meta($order_id, '_delivery_date_time',  $delivery_date_time );
@@ -1242,7 +1244,7 @@ function greeting_save_custom_fields_with_order( $order_id ) {
     // Save the message for the greeting card.
     $greeting_message = isset( $_POST['greeting_message'] ) ? sanitize_text_field($_POST['greeting_message']) : '';
     if ( !empty($greeting_message) ){
-        if(is_wc_hpos_activated()){
+        if($hpos_enabled){
             $order->update_meta_data('_greeting_message', $greeting_message );
         } else {
             update_post_meta( $order_id, '_greeting_message', $greeting_message );
@@ -1250,7 +1252,7 @@ function greeting_save_custom_fields_with_order( $order_id ) {
     }
     $greeting_pro_message = isset( $_POST['message_pro'] ) ? esc_attr($_POST['message_pro']) : '';
     if ( $greeting_pro_message ) {
-        if(is_wc_hpos_activated()){
+        if($hpos_enabled){
             $order->update_meta_data('_greeting_card_upgrade_option', $greeting_pro_message );
         } else {
             update_post_meta( $order_id, '_greeting_card_upgrade_option', sanitize_text_field( $_POST['message_pro'] ) );
@@ -1260,7 +1262,7 @@ function greeting_save_custom_fields_with_order( $order_id ) {
     // Band message - for funeral
     $greeting_message_band_1 = isset( $_POST['greeting_message_band_1'] ) ? sanitize_text_field($_POST['greeting_message_band_1']) : '';
     if ( !empty($greeting_message_band_1) ){
-        if(is_wc_hpos_activated()){
+        if($hpos_enabled){
             $order->update_meta_data('_greeting_message_band_1', $greeting_message_band_1 );
         } else {
             update_post_meta($order_id, '_greeting_message_band_1', $greeting_message_band_1 );
@@ -1269,7 +1271,7 @@ function greeting_save_custom_fields_with_order( $order_id ) {
 
     $greeting_message_band_2 = isset( $_POST['greeting_message_band_2'] ) ? sanitize_text_field($_POST['greeting_message_band_2']) : '';
     if ( !empty($greeting_message_band_2) ){
-        if(is_wc_hpos_activated()){
+        if($hpos_enabled){
             $order->update_meta_data('_greeting_message_band_2', $greeting_message_band_2 );
         } else {
             update_post_meta($order_id, '_greeting_message_band_2', $greeting_message_band_2 );
@@ -1279,7 +1281,7 @@ function greeting_save_custom_fields_with_order( $order_id ) {
     // Receiver phone
     $receiver_phone = isset( $_POST['receiver_phone'] ) ? sanitize_text_field($_POST['receiver_phone']) : '';
     if (!empty($receiver_phone)) {
-        if(is_wc_hpos_activated()){
+        if($hpos_enabled){
             $order->update_meta_data('_receiver_phone', $receiver_phone );
         } else {
             update_post_meta($order_id, '_receiver_phone', $receiver_phone );
@@ -1289,7 +1291,7 @@ function greeting_save_custom_fields_with_order( $order_id ) {
     // Delivery instructions
     $delivery_instructions = isset( $_POST['delivery_instructions'] ) ? sanitize_text_field($_POST['delivery_instructions']) : '';
     if (!empty($delivery_instructions)) {
-        if(is_wc_hpos_activated()){
+        if($hpos_enabled){
             $order->update_meta_data('_delivery_instructions', $delivery_instructions );
         } else {
             update_post_meta($order_id, '_delivery_instructions', $delivery_instructions );
@@ -1299,7 +1301,7 @@ function greeting_save_custom_fields_with_order( $order_id ) {
     // Leave gift address
     $leave_gift_address = isset( $_POST['leave_gift_address'] ) ? sanitize_text_field($_POST['leave_gift_address']) : '';
     if (!empty($leave_gift_address)) {
-        if(is_wc_hpos_activated()){
+        if($hpos_enabled){
             $order->update_meta_data('_leave_gift_address', $leave_gift_address );
         } else {
             update_post_meta($order_id, '_leave_gift_address', $leave_gift_address );
@@ -1310,14 +1312,14 @@ function greeting_save_custom_fields_with_order( $order_id ) {
     // Leave gift neighbour
     $leave_gift_neighbour = isset( $_POST['leave_gift_neighbour'] ) ? sanitize_text_field($_POST['leave_gift_neighbour']) : '';
     if (!empty($data['leave_gift_neighbour'])) {
-        if(is_wc_hpos_activated()){
+        if($hpos_enabled){
             $order->update_meta_data('_leave_gift_neighbour', $leave_gift_neighbour );
         } else {
             update_post_meta($order_id, '_leave_gift_neighbour', $leave_gift_address );
         }
     }
 
-    if(is_wc_hpos_activated()){
+    if($hpos_enabled){
         // Save all meta data changes to the order
         $order->save_meta_data();
         $order->save();
@@ -1345,7 +1347,7 @@ function greeting_save_custom_fields_with_order2( $order_id, $data ) {
         $greeting_message = sanitize_text_field( $_POST['greeting_message'] );
 
         // Update the order meta data
-        if(is_wc_hpos_activated()){
+        if(is_wc_hpos_activated('frontend')){
             $order->update_meta_data( '_greeting_message', $greeting_message );
         } else {
             update_post_meta($order_id, '_greeting_message', $greeting_message );
@@ -1550,7 +1552,7 @@ function update_sub_order_meta($vendor_order_id, $posted_data, $order){
 
     $vendor_order = wc_get_order($vendor_order_id);
 
-	if(is_wc_hpos_activated()){
+	if(is_wc_hpos_activated('frontend')){
 		$vendor_id = $vendor_order->get_meta('_vendor_id');
 	} else {
 		$vendor_id = get_post_meta($vendor_order_id, '_vendor_id', true);
