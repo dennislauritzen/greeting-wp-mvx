@@ -1184,9 +1184,11 @@ function greeting_save_custom_fields_with_order( $order_id ) {
 		$product_id = $item->get_product_id(); // Get product ID from the order item
 		$product = wc_get_product($product_id);
 
-		error_log(var_dump($product->get_data()));
 
 		if ($product) {
+
+			error_log( print_r($product) );
+			
 			// Get the vendor ID (post author of the product)
 			$vendor_id = $product->get_data()->post_author;
 
