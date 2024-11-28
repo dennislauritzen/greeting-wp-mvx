@@ -1031,3 +1031,25 @@ include('functions-parts/vendordash.functions.php');
 include('functions-parts/api.functions.php');
 #include('functions-parts/api.economic.functions.php');
 include('functions-parts/cron.order.functions.php');
+
+
+
+### LOGGING FUNCTIONS
+add_action( 'woocommerce_before_checkout_process', function() {
+	error_log( 'Checkout process started' );
+	// Add more logs as necessary
+} );
+
+add_action( 'woocommerce_checkout_create_order_line_item', function( $item, $cart_item_key ) {
+	if ( method_exists( $item, 'offsetSet' ) ) {
+		error_log( 'OffsetSet called on order item: ' . print_r( debug_backtrace(), true ) );
+	}
+}, 10, 2 );
+
+function log_offsetSet_backtrace( $function_name, $args ) {
+	if ( $function_name === 'WC_Order_Item_Product::offsetSet' ) {
+		error_log( 'OffsetSet call trace: ' . print_r( debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS ), true ) );
+	}
+}
+add_action( 'deprecated_function_run', 'log_offsetSet_backtrace', 10, 2 );
+
