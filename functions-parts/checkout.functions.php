@@ -1167,7 +1167,7 @@ function greeting_check_delivery_postcode( $fields, $errors ){
  * @todo: Remember to add the redirect for order pages again!!!! (@line 3095)
  */
 #add_action( 'woocommerce_checkout_update_order_meta', 'greeting_save_custom_fields_with_order' );
-add_action( 'woocommerce_checkout_update_order_meta', 'greeting_save_custom_fields_with_order', 10, 2 );
+#add_action( 'woocommerce_checkout_update_order_meta', 'greeting_save_custom_fields_with_order', 10, 2 );
 
 #add_action( 'woocommerce_checkout_create_order', 'greeting_save_custom_fields_with_order', 10, 2 );
 function greeting_save_custom_fields_with_order( $order_id ) {
@@ -1186,7 +1186,7 @@ function greeting_save_custom_fields_with_order( $order_id ) {
 
 		if ($product) {
 			// Debugging: Log the product details (if needed)
-			error_log(print_r($product, true));
+			#error_log(print_r($product, true));
 
 			// Get the vendor ID (post author of the product)
 			$vendor_id = get_post_field('post_author', $product_id); // Get the author (vendor) of the product
