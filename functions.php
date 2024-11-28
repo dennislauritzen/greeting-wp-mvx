@@ -1040,16 +1040,5 @@ add_action( 'woocommerce_before_checkout_process', function() {
 	// Add more logs as necessary
 } );
 
-add_action( 'woocommerce_checkout_create_order_line_item', function( $item, $cart_item_key ) {
-	if ( method_exists( $item, 'offsetSet' ) ) {
-		error_log( 'OffsetSet called on order item: ' . print_r( debug_backtrace(), true ) );
-	}
-}, 10, 2 );
-
-add_action( 'deprecated_function_run', function ( $function_name ) {
-	if ( $function_name === 'WC_Order_Item_Product::offsetSet' ) {
-		error_log( 'Deprecated function "offsetSet" called.' );
-		error_log( print_r( debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS ), true ) );
-	}
-}, 10 );
+error_log( 'Test error log entry from functions.php' );
 
