@@ -1181,15 +1181,14 @@ function greeting_save_custom_fields_with_order( $order_id ) {
 	$vendor_id = 0;
 	foreach ($order->get_items() as $item_key => $item) {
 		// Get the product from the order item
-		$product_id = $item->get_id(); // Get product ID from the order item
+		$product_id = $item->get_product_id(); // Get product ID from the order item
 		$product = wc_get_product($product_id);
-
 
 		if ($product) {
 			error_log( print_r($product) );
 
 			// Get the vendor ID (post author of the product)
-			$vendor_id = $product->get_data()->post_author;
+			$vendor_id = $product->get_data()['post_author'];
 
 			// Get vendor name using the user meta field for the vendor's title
 			$vendor_name = get_user_meta($vendor_id, '_vendor_page_title', true); // Use true for a single value
