@@ -1056,22 +1056,11 @@ function conditionally_show_phpinfo() {
 // Hook into the order line item creation process
 add_action( 'woocommerce_checkout_create_order_line_item', function( $item, $cart_item_key ) {
 	// Check if the item is an instance of WC_Order_Item_Product
-	if ( method_exists( $item, 'offsetSet' ) ) {
-		// Log the backtrace to see where the offsetSet method is being called
-		error_log( 'offsetSet called on order item: ' . print_r( debug_backtrace(), true ) );
+	if ( is_a( $item, 'WC_Order_Item_Product' ) ) {
+		// Use debug_backtrace to log when offsetSet() is called
+		if ( method_exists( $item, 'offsetSet' ) ) {
+			// Log the backtrace
+			error_log( 'offsetSet called on order item: ' . print_r( debug_backtrace(), true ) );
+		}
 	}
 }, 10, 2 );
-
-// Hook into the __call method of WC_Order_Item_Product class to track deprecated method calls
-add_action( 'wp', function() {
-	if ( class_exists( 'WC_Order_Item_Product' ) ) {
-		// Override the __call method dynamically for debugging
-		WC_Order_Item_Product::add_filter( '__call', function( $name, $args ) {
-			if ( $name === 'offsetSet' ) {
-				error_log( 'offsetSet called with arguments: ' . print_r( $args, true ) );
-			}
-			return call_user_func_array( array( $this, $name ), $args );
-		});
-	}
-});
-
