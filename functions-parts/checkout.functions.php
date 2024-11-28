@@ -1178,24 +1178,32 @@ function greeting_save_custom_fields_with_order( $order_id ) {
 
 	$hpos_enabled = is_wc_hpos_activated('frontend');
 
-    $vendor_id = 0;
-    foreach ($order->get_items() as $item_key => $item) {
-        $product = get_post($item['product_id']);
-        $vendor_id = $product->post_author;
+	$vendor_id = 0;
+	foreach ($order->get_items() as $item_key => $item) {
+		// Get the product from the order item
+		$product = $item->get_product(); // Correct way to get the product from the order item
 
-        $vendor_name = get_user_meta($vendor_id, '_vendor_page_title', 1);
+		if ($product) {
+			$vendor_id = $product->get_post_author(); // Get the vendor ID (post author of the product)
 
-        if(!empty($vendor_id)){
-            if($hpos_enabled){
-                $order->update_meta_data('_vendor_id', $vendor_id);
-                $order->update_meta_data('_vendor_name', $vendor_name);
-            } else {
-                update_post_meta($order_id, '_vendor_id', $vendor_id );
-                update_post_meta($order_id, '_vendor_name', $vendor_name );
-            }
-            break;
-        }
-    }
+			// Get vendor name using the user meta field for the vendor's title
+			$vendor_name = get_user_meta($vendor_id, '_vendor_page_title', true); // Use true for a single value
+
+			// Update order meta if vendor exists
+			if (!empty($vendor_id)) {
+				if ($hpos_enabled) {
+					// HPOS enabled: Update the metadata using WooCommerce methods
+					$order->update_meta_data('_vendor_id', $vendor_id);
+					$order->update_meta_data('_vendor_name', $vendor_name);
+				} else {
+					// HPOS not enabled: Use regular WordPress post meta
+					update_post_meta($order_id, '_vendor_id', $vendor_id);
+					update_post_meta($order_id, '_vendor_name', $vendor_name);
+				}
+				break; // Exit loop after the first vendor found
+			}
+		}
+	}
 
     $post_date = isset($_POST['delivery_date']) ? esc_attr($_POST['delivery_date']) : '';
     if ( !empty($post_date) ) {
