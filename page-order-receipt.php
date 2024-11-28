@@ -26,6 +26,7 @@ if($order_id != $order_id_data){
 // Define if HPOS is active
 $hpos_active = is_wc_hpos_activated('frontend');
 
+
 #do_action( 'woocommerce_thankyou_' . $order->get_payment_method(), $order->get_id() );
 #do_action( 'woocommerce_thankyou', $order->get_id() );
 

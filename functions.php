@@ -1031,7 +1031,3 @@ include('functions-parts/vendordash.functions.php');
 include('functions-parts/api.functions.php');
 #include('functions-parts/api.economic.functions.php');
 include('functions-parts/cron.order.functions.php');
-
-
-
-### LOGGING FUNCTIONS
