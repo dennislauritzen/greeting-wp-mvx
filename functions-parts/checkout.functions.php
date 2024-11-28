@@ -1184,7 +1184,7 @@ function greeting_save_custom_fields_with_order( $order_id ) {
 		$product = $item->get_product(); // Correct way to get the product from the order item
 
 		if ($product) {
-			$vendor_id = $product->get_post_author(); // Get the vendor ID (post author of the product)
+			$vendor_id = $product->post_author; // Get the vendor ID (post author of the product)
 
 			// Get vendor name using the user meta field for the vendor's title
 			$vendor_name = get_user_meta($vendor_id, '_vendor_page_title', true); // Use true for a single value
