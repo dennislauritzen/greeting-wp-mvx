@@ -1078,9 +1078,3 @@ add_action( 'woocommerce_checkout_order_processed', 'log_memory_usage', 10, 1 );
 function log_memory_usage( $order_id ) {
 	error_log( 'Memory usage before processing order: ' . memory_get_usage() );
 }
-
-// You can also log memory usage inside loops, if you suspect a specific part of your code is consuming too much memory
-foreach ($order->get_items() as $item_key => $item) {
-	error_log( 'Memory usage during loop: ' . memory_get_usage() );
-	// Add your regular logic here
-}
