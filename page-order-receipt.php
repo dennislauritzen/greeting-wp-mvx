@@ -36,7 +36,7 @@ get_header('checkout');
 <script>
 	dataLayer.push({
 		'ecommerce': {
-		'currencyCode': '<?php echo $order->get_order_currency(); ?>',
+		'currencyCode': '<?php echo $order->get_currency(); ?>',
 		'purchase': {
 			'actionField':{
 			'id': '<?php echo $order->get_order_number(); ?>',
@@ -44,22 +44,29 @@ get_header('checkout');
 			'revenue': <?php echo number_format($order->get_subtotal(), 2, ".", ""); ?>,
 			'tax': <?php echo number_format($order->get_total_tax(), 2, ".", ""); ?>,
 			'shipping': <?php echo number_format($order->calculate_shipping(), 2, ".", ""); ?>,
-			<?php if($order->get_used_coupons()): ?>
-				'coupon': '<?php echo implode("-", $order->get_used_coupons()); ?>'
+			<?php if($order->get_coupon_codes()): ?>
+				'coupon': '<?php echo implode("-", $order->get_coupon_codes()); ?>'
 			<?php endif; ?>
 			},
 			'products': [
 				<?php
 				foreach($order->get_items() as $key => $item):
-					$product = $order->get_product_from_item( $item );
-					$variant_name = ($item['variation_id']) ? wc_get_product($item['variation_id']) : '';
+					$product = wc_get_product($item->get_product_id()); // Get the product from the item
+					$variant_name = ($item->get_variation_id()) ? wc_get_product($item->get_variation_id()) : '';
+
+
+					$terms = get_the_terms($product->get_id(), 'product_cat'); // Fetch product categories
+					$category_names = array();
+					if ($terms && !is_wp_error($terms)) {
+						$category_names = wp_list_pluck($terms, 'name'); // Get category names
+					}
 				?>
 					{
 					'name': '<?php echo $item['name']; ?>',
 					'id': '<?php echo $item['product_id']; ?>',
 					'price': '<?php echo number_format($order->get_line_subtotal($item), 2, ".", ""); ?>',
 					'brand': '',
-					'category': '<?php echo strip_tags($product->get_categories(', ', '', '')); ?>',
+					'category': '<?php echo strip_tags(implode(', ', $category_names)); ?>',
 					'variant': '<?php echo ($variant_name) ? implode("-", $variant_name->get_variation_attributes()) : ''; ?>',
 					'quantity': <?php echo $item['qty']; ?>
 					},
