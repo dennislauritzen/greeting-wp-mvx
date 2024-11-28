@@ -1180,34 +1180,36 @@ function greeting_save_custom_fields_with_order( $order_id ) {
 
 	$vendor_id = 0;
 	foreach ($order->get_items() as $item_key => $item) {
-		// Get the product from the order item
-		$product_id = $item->get_product_id(); // Get product ID from the order item
-		$product = wc_get_product($product_id);
+		// Get the product ID from the order item
+		$product_id = $item->get_product_id(); // Correctly get product ID
+		$product = wc_get_product($product_id); // Get the product object from the product ID
 
 		if ($product) {
-			error_log( print_r($product) );
+			// Debugging: Log the product details (if needed)
+			error_log(print_r($product, true));
 
 			// Get the vendor ID (post author of the product)
-			$vendor_id = $product->get_data()['post_author'];
+			$vendor_id = $product->get_post()->post_author; // Get the author (vendor) of the product
 
 			// Get vendor name using the user meta field for the vendor's title
-			$vendor_name = get_user_meta($vendor_id, '_vendor_page_title', true); // Use true for a single value
+			$vendor_name = get_user_meta($vendor_id, '_vendor_page_title', true); // Retrieve vendor title
 
 			// Update order meta if vendor exists
 			if (!empty($vendor_id)) {
 				if ($hpos_enabled) {
-					// HPOS enabled: Update the metadata using WooCommerce methods
+					// HPOS enabled: Use WooCommerce metadata functions
 					$order->update_meta_data('_vendor_id', $vendor_id);
-					$order->update_meta_data('_vendor_name', sanitize_text_field($vendor_name)); // Sanitize the vendor name
+					$order->update_meta_data('_vendor_name', sanitize_text_field($vendor_name)); // Sanitize vendor name
 				} else {
-					// HPOS not enabled: Use regular WordPress post meta
+					// HPOS not enabled: Use WordPress post meta functions
 					update_post_meta($order_id, '_vendor_id', $vendor_id);
-					update_post_meta($order_id, '_vendor_name', sanitize_text_field($vendor_name)); // Sanitize the vendor name
+					update_post_meta($order_id, '_vendor_name', sanitize_text_field($vendor_name)); // Sanitize vendor name
 				}
-				break; // Exit loop after the first vendor found
+				break; // Exit loop after the first vendor found (assuming a single vendor per order)
 			}
 		}
 	}
+
 
 
 	$post_date = isset($_POST['delivery_date']) ? esc_attr($_POST['delivery_date']) : '';
