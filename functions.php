@@ -1046,10 +1046,10 @@ add_action( 'woocommerce_checkout_create_order_line_item', function( $item, $car
 	}
 }, 10, 2 );
 
-function log_offsetSet_backtrace( $function_name, $args ) {
+add_action( 'deprecated_function_run', function ( $function_name ) {
 	if ( $function_name === 'WC_Order_Item_Product::offsetSet' ) {
-		error_log( 'OffsetSet call trace: ' . print_r( debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS ), true ) );
+		error_log( 'Deprecated function "offsetSet" called.' );
+		error_log( print_r( debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS ), true ) );
 	}
-}
-add_action( 'deprecated_function_run', 'log_offsetSet_backtrace', 10, 2 );
+}, 10 );
 
