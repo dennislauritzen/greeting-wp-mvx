@@ -1181,7 +1181,8 @@ function greeting_save_custom_fields_with_order( $order_id ) {
 	$vendor_id = 0;
 	foreach ($order->get_items() as $item_key => $item) {
 		// Get the product from the order item
-		$product = $item->get_product(); // Get the WC_Product object directly
+		$product_id = $item->get_product_id(); // Get product ID from the order item
+		$product = wc_get_product($product_id);
 
 		if ($product) {
 			// Get the vendor ID (post author of the product)
