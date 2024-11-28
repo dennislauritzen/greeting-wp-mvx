@@ -1189,7 +1189,7 @@ function greeting_save_custom_fields_with_order( $order_id ) {
 			error_log(print_r($product, true));
 
 			// Get the vendor ID (post author of the product)
-			$vendor_id = $product->get_post()->post_author; // Get the author (vendor) of the product
+			$vendor_id = get_post_field('post_author', $product_id); // Get the author (vendor) of the product
 
 			// Get vendor name using the user meta field for the vendor's title
 			$vendor_name = get_user_meta($vendor_id, '_vendor_page_title', true); // Retrieve vendor title
