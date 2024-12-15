@@ -109,7 +109,7 @@ get_header('checkout');
                                 $delivery_date = $order->get_meta('_delivery_date');
                                 $delivery_date_time = $order->get_meta('_delivery_date_time');
                             } else {
-								print "HPOS no";
+								#print "HPOS no";
                                 $delivery_date = get_post_meta($order->get_id(), '_delivery_date', true);
                                 $delivery_date_time = get_post_meta($order->get_id(), '_delivery_date_time', true);
                             }

@@ -1197,7 +1197,6 @@ function greeting_save_custom_fields_with_order( $order_id ) {
 		}
 	}
 
-
 	$post_date = isset($_POST['delivery_date']) ? esc_attr($_POST['delivery_date']) : '';
     if ( !empty($post_date) ) {
         if($hpos_enabled){
