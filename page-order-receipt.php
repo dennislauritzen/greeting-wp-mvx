@@ -75,9 +75,28 @@ get_header('checkout');
 			]
 		}
 	},
+	<?php
+	# Make sure Phone has +45.
+	function validate_billing_phone_e164($phone) {
+		// Remove all non-numeric characters except "+"
+		$phone = preg_replace('/[^\d+]/', '', $phone);
+
+		// Ensure it starts with "+"
+		if (strpos($phone, '+') !== 0) {
+			return false; // Invalid format
+		}
+
+		// Ensure it contains only digits after "+"
+		if (!preg_match('/^\+\d{6,15}$/', $phone)) {
+			return false; // E.164 requires 6-15 digits after "+"
+		}
+
+		return $phone;
+	}
+	?>
 	'user_details': {
-        'phone': '<?php echo $order->get_billing_phone() ? $order->get_billing_phone() : ''; ?>',
-        'phone_sha256': '<?php echo hash('sha256', $order->get_billing_phone() ? $order->get_billing_phone() : ''); ?>',
+        'phone': '<?php echo $order->get_billing_phone() ? validate_billing_phone_e164($order->get_billing_phone()) : ''; ?>',
+        'phone_sha256': '<?php echo hash('sha256', $order->get_billing_phone() ? validate_billing_phone_e164($order->get_billing_phone()) : ''); ?>',
         'mail': '<?php echo $order->get_billing_email() ? $order->get_billing_email() : ''; ?>',
         'mail_sha256': '<?php echo hash('sha256', $order->get_billing_email() ? $order->get_billing_email() : ''); ?>',
 		'first_name': '<?php echo $order->get_billing_first_name(); ?>',
