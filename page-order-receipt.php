@@ -152,7 +152,8 @@ get_header('checkout');
                             <strong><?php _e('Leveringsinstruktioner', 'woocommerce'); ?></strong>
                             <br>
                             <?php echo (!empty($delivery_instructions)) ? $delivery_instructions : 'Ingen særlige leveringsinstruktioner'; ?>
-                            <?php
+
+							<?php
                             if(!order_has_funeral_products($order->get_id())){
 
                                 // Only show this if it is not a funeral order.
@@ -165,12 +166,10 @@ get_header('checkout');
                                 ?>
 
 								<br><br>
-
-                                <?php _e('Må stilles på adressen:', 'woocommerce'); ?> <?php echo $leave_gift_at_address; ?><br>
+                                <?php _e('Må stilles på adressen:', 'woocommerce'); ?> <?php echo $leave_gift_at_address; ?>
 
 
 								<br>
-
                                 <?php
                                 if($hpos_active){
                                     $leave_gift_at_neighbour = ($order->get_meta('_leave_gift_neighbour') == "1" ? 'Ja' : 'Nej');
