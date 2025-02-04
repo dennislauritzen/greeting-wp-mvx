@@ -163,7 +163,13 @@ get_header('checkout');
                                     $leave_gift_at_address = (get_post_meta( $order->get_id(), '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej');
                                 }
                                 ?>
+
+								<br><br>
+
                                 <?php _e('Må stilles på adressen:', 'woocommerce'); ?> <?php echo $leave_gift_at_address; ?><br>
+
+
+								<br>
 
                                 <?php
                                 if($hpos_active){
@@ -178,13 +184,13 @@ get_header('checkout');
                             }
                             ?>
 
-                            <br><br>
 
-                            <?php $leave_gift_at_address = (get_post_meta( $order->get_id(), '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej'); ?>
+
+                            <!--<?php $leave_gift_at_address = (get_post_meta( $order->get_id(), '_leave_gift_address', true ) == "1" ? 'Ja' : 'Nej'); ?>
                             <?php _e('Må stilles på adressen:', 'woocommerce'); ?> <?php echo $leave_gift_at_address; ?>
                             <br>
                             <?php $leave_gift_at_neighbour = (get_post_meta( $order->get_id(), '_leave_gift_neighbour', true ) == "1" ? 'Ja' : 'Nej'); ?>
-                            <?php _e('Må gaven afleveres hos naboen:', 'woocommerce'); ?> <?php echo $leave_gift_at_neighbour; ?>
+                            <?php _e('Må gaven afleveres hos naboen:', 'woocommerce'); ?> <?php echo $leave_gift_at_neighbour; ?>-->
                         </p>
                         <p>
                             <strong><?php _e('Dit telefonnummer:', 'woocommerce'); ?></strong><br>
