@@ -78,6 +78,8 @@ get_header('checkout');
 	'user_details': {
         'phone': '<?php echo $order->get_billing_phone() ? $order->get_billing_phone() : ''; ?>',
         'mail': '<?php echo $order->get_billing_email() ? $order->get_billing_email() : ''; ?>',
+		'first_name': '<?php echo $order->get_billing_first_name(); ?>',
+		'last_name': '<?php echo $order->get_billing_last_name(); ?>',
         'full_name': '<?php echo $order->get_billing_first_name() . ' ' . $order->get_billing_last_name(); ?>',
         'address': '<?php echo $order->get_billing_address_1() ? $order->get_billing_address_1() : ''; ?>',
         'city': '<?php echo $order->get_billing_city() ? $order->get_billing_city() : ''; ?>',
