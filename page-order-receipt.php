@@ -36,7 +36,8 @@ get_header('checkout');
 ?>
 <script>
 	dataLayer.push({
-		'ecommerce': {
+        'event': 'purchase',
+        'ecommerce': {
 		'currencyCode': '<?php echo $order->get_currency(); ?>',
 		'purchase': {
 			'actionField':{
