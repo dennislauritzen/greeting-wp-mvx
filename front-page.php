@@ -79,7 +79,7 @@ get_header();
                 </div>
                 <h4 class="text-teal fs-6">#STØTLOKALT</h4>
                 <h1 class="text-white pb-3">Skal vi levere <span id="frontpageSpinner"></span> <br>til én du holder af?</h1>
-                <script type="text/javascript">
+                <script data-cfasync="false" type="text/javascript">
                 //set responsive mobile input field placeholder text
                 if (jQuery(window).width() < 769) {
                     jQuery("input#front_Search-new_ucsa").attr("placeholder", "By eller postnr. (eks. <?php echo (!empty($user_postal) ? $user_postal : '8000'); ?>)");
@@ -250,7 +250,7 @@ get_template_part('template-parts/inc/blocks/press-mentions');
   </div>
 </section>
 
-<script async type="text/javascript">
+<script async data-cfasync="false" type="text/javascript">
 // Function to check if the data in localStorage is still valid
 function isCacheValid(key) {
     var cachedData = localStorage.getItem(key);
@@ -619,7 +619,7 @@ if(!empty($frontpage_desc)){
                 </div>
             </div>
         </div>
-        <script>
+        <script data-cfasync="false">
             var categoryDescription = document.getElementById('categoryDescription');
             var descriptionOverlay = document.getElementById('ctaOverlayWhite');
             var showMoreButton = document.getElementById('toggleDescription');
