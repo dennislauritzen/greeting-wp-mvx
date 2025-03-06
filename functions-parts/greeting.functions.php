@@ -44,20 +44,6 @@ add_filter('woocommerce_currency_symbol', 'greeting_change_dk_currency_symbol', 
 add_filter( 'xmlrpc_enabled', '__return_false' );
 
 
-/**
- * Avoid Rocket Loader hitting jquery
- *
- * @param $wp_rewrite
- * @return void
- */
-function greeting_script_loader_tag( $tag, $handle ) {
-	if ( 'jquery-core' !== $handle ) {
-		return $tag;
-	}
-
-	return str_replace( ' src', ' data-cfasync="false" src', $tag );
-}
-add_filter( 'script_loader_tag', 'wpse_script_loader_tag', 10, 2 );
 
 
 
