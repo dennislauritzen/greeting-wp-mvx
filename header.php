@@ -21,7 +21,7 @@
 	<header class="p-0 m-0">
 		<div class="bg-pink small text-uppercase">
         <!-- TrustBox script -->
-        <script type="text/javascript" src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" defer async></script>
+        <script type="text/javascript" src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" defer async data-cfasync="false"></script>
         <!-- End TrustBox script -->
 	    <div class="topbar d-block d-lg-none d-xl-none">
 				<ul>

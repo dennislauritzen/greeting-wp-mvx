@@ -36,13 +36,28 @@ function greeting_change_dk_currency_symbol( $currency_symbol, $currency ) {
 add_filter('woocommerce_currency_symbol', 'greeting_change_dk_currency_symbol', 10, 2);
 
 
-
 /**
  * Turn off the xmlRPC
  *
  * @author Dennis Lauritzen
  */
 add_filter( 'xmlrpc_enabled', '__return_false' );
+
+
+/**
+ * Avoid Rocket Loader hitting jquery
+ *
+ * @param $wp_rewrite
+ * @return void
+ */
+function exclude_jquery_from_rocket_loader($tag, $handle) {
+	if ($handle === 'jquery-core' || $handle === 'jquery') {
+		return str_replace('<script ', '<script data-cfasync="false" ', $tag);
+	}
+	return $tag;
+}
+add_filter('script_loader_tag', 'exclude_jquery_from_rocket_loader', 10, 2);
+
 
 
 #add_action( 'generate_rewrite_rules', 'register_product_rewrite_rules' );
@@ -140,7 +155,6 @@ function greeting_custom_taxonomy_occasion()  {
 
 function add_video_lazy_load_frontpage(){
     if(is_front_page()) {
-        // Enqueue jQuery UI stylesheet
         wp_enqueue_script(
             'frontpage-video-lazyload', // Handle for the script
             get_template_directory_uri() . '/assets/js/frontend.video.js', // Path to the script
