@@ -233,7 +233,7 @@ get_template_part('template-parts/inc/blocks/press-mentions');
   </div>
 </section>
 
-<script async data-cfasync="false" type="text/javascript">
+<script type="text/javascript">
 
 jQuery(document).ready(function(){
     //set responsive mobile input field placeholder text
