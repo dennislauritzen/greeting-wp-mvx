@@ -50,13 +50,14 @@ add_filter( 'xmlrpc_enabled', '__return_false' );
  * @param $wp_rewrite
  * @return void
  */
-function exclude_jquery_from_rocket_loader($tag, $handle) {
-	if ($handle === 'jquery-core' || $handle === 'jquery') {
-		return str_replace('<script ', '<script data-cfasync="false" ', $tag);
+function greeting_script_loader_tag( $tag, $handle ) {
+	if ( 'jquery-core' !== $handle ) {
+		return $tag;
 	}
-	return $tag;
+
+	return str_replace( ' src', ' data-cfasync="false" src', $tag );
 }
-add_filter('script_loader_tag', 'exclude_jquery_from_rocket_loader', 10, 2);
+add_filter( 'script_loader_tag', 'wpse_script_loader_tag', 10, 2 );
 
 
 
